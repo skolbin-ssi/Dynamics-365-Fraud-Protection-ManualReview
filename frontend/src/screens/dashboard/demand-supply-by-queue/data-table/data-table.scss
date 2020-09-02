@@ -1,0 +1,139 @@
+@import "../../../../styles/variables";
+
+.data-table {
+  $root: &;
+
+  &__table {
+    .ms-DetailsHeader-cell {
+      &:hover {
+        background: none;
+      }
+    }
+
+    .ms-DetailsHeader-cell:last-child {
+      > span {
+        justify-content: center;
+      }
+    }
+
+    .ms-DetailsHeader-cell:nth-child(5) {
+      .ms-DetailsHeader-cellTitle {
+        padding-right: 22px;
+      }
+    }
+
+    .ms-DetailsRow-cell {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .ms-DetailsRow-cell:nth-child(-n + 2) {
+      justify-content: flex-start;
+    }
+
+    .ms-DetailsRow-cell:last-child {
+      justify-content: center;
+    }
+
+  }
+
+  &__fraud-score {
+    font-weight: bold;
+  }
+
+  &__data-header-cell > span {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__data-header-cell {
+    &:hover {
+      background: none;
+    }
+  }
+
+  &__data-header-cell:nth-child(2) > span {
+    justify-content: flex-start;
+  }
+
+  &__analysts-header-cell > span {
+    padding-left: 20px;
+  }
+
+  &__analysts-col {
+    padding-left: 30px;
+  }
+
+  &__go-to-queue-db-btn {
+    display: contents;
+    cursor: pointer;
+    color: $themeDark;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__time-left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  &__time-left-text {
+    padding-left: 8px;
+    color: $neutralSecondary;
+
+    &--overdue-text {
+      padding-left: 8px;
+      color: $highRiskColor;
+    }
+  }
+
+  &__absent-value {
+    height: 2px;
+    width: 15px;
+    background: #D2D0CE;
+  }
+
+  &__data-cell-timeout {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    & > span {
+      text-align: right;
+    }
+  }
+
+  &__min-text {
+    margin-left: 5px;
+  }
+
+  &__table-wrap {
+    position: relative;
+  }
+
+  &__info-icon {
+    $timeoutAndAnalystColumnWidth: 235px;
+
+    position: absolute;
+    top: 30px;
+    left: calc(100% - #{$timeoutAndAnalystColumnWidth});
+  }
+
+  &__risk-value {
+    color: $highRiskColor;
+  }
+
+  &__tooltip-content {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    grid-template-rows: repeat(3, auto);
+    grid-column-gap: 5px;
+    grid-row-gap: 5px;
+    align-items: center;
+  }
+}

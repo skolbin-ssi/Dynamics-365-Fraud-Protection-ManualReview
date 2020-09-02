@@ -1,0 +1,160 @@
+{
+  "id": "a17b57cd-a383-4b56-8756-11319436682b",
+  "active": false,
+  "label": {},
+  "purchase": {
+    "PurchaseId": "a17b57cd-a383-4b56-8756-11319436682b",
+    "User": {
+      "UserId": "580e022d-2c1d-42f7-8a23-2dbc0a21aee5",
+      "CreationDate": "2020-04-08T07:45:32Z",
+      "UpdateDate": "2020-04-08T07:45:32Z",
+      "FirstName": "Dula",
+      "LastName": "Kumela",
+      "Country": "US",
+      "ZipCode": "98052",
+      "TimeZone": "Pacific Standard Time",
+      "Language": "EN-US",
+      "PhoneNumber": "2064090909",
+      "Email": "dkumela@hotmail.com",
+      "ProfileType": "Consumer",
+      "TotalSpend": 56.42,
+      "TotalTransactions": 2.0,
+      "TotalRefundAmount": 0.0,
+      "TotalChargebackAmount": 0.0,
+      "TotalDaysOfUse": 1.0,
+      "Last30DaysSpend": 56.42,
+      "Last30DaysTransactions": 2.0,
+      "Last30DaysRefundAmount": 0.0,
+      "Last30DaysChargebackAmount": 0.0,
+      "Last30DaysOfUse": 0.0,
+      "MonthlyAverageSpend": 56.42,
+      "MonthlyAverageTransactions": 2.0,
+      "MonthlyAverageRefundAmount": 0.0,
+      "MonthlyAverageChargebackAmount": 0.0,
+      "MeasuresIngestionDateTimeUTC": "2020-04-09T03:59:53Z",
+      "MerchantLocalDate": "2020-04-08T07:43:35Z"
+    },
+    "DeviceContext": {
+      "DeviceContextId": "e82b0748-47cc-4473-acae-f3960c65494f",
+      "Provider": "DFPFingerPrinting",
+      "DeviceContextDC": "uswest",
+      "UserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36",
+      "ScreenResolution": "3840x2160",
+      "DeviceType": "browser_computer",
+      "BrowserLanguage": "en-US,en;q=0.9",
+      "DiscoveredIPAddress": "66.234.216.64",
+      "RoutingType": "fixed",
+      "ConnectionType": "tx",
+      "PurchaseId": "a17b57cd-a383-4b56-8756-11319436682b",
+      "MerchantLocalDate": "2020-04-08T07:43:35Z",
+      "OS": "Windows 10",
+      "IPAddress": "2001:4898:d8:79::8:dcab",
+      "IPLatitude": 47.10913,
+      "IPLongitude": -119.26881,
+      "IPCity": "moses lake",
+      "IPCountry": "us",
+      "IPState": "washington"
+    },
+    "AddressList": [
+      {
+        "AddressId": "236726A595222D7BA0A270A2678EDA9A",
+        "Type": "SHIPPING",
+        "FirstName": "Dula",
+        "LastName": "Kumela",
+        "PhoneNumber": "2064090909",
+        "Street1": "1 Microsoft Wy",
+        "City": "Redmond",
+        "State": "WA",
+        "ZipCode": "98052",
+        "CountryRegion": "US"
+      }
+    ],
+    "PaymentInstrumentList": [
+      {
+        "PaymentInstrumentId": "27170F37B2C485A20813EA0E0E442CB0_580E022D-2C1D-42F7-8A23-2DBC0A21AEE5-CREDITCARD",
+        "PurchaseAmount": 43.4,
+        "PurchaseAmountInUSD": 43.4,
+        "MerchantPaymentInstrumentId": "580e022d-2c1d-42f7-8a23-2dbc0a21aee5-CreditCard",
+        "Type": "CreditCard",
+        "CreationDate": "2019-02-08T07:43:35Z",
+        "State": "Active",
+        "CardType": "Visa",
+        "HolderName": "Dula",
+        "ExpirationDate": "06/19",
+        "LastFourDigits": "1234",
+        "MerchantLocalDate": "2020-04-08T07:43:35Z",
+        "BIN": "123412"
+      }
+    ],
+    "ProductList": [
+      {
+        "ProductId": "635",
+        "ProductName": ".NET Bot Black Sweatshirt",
+        "Type": "Digital",
+        "Sku": "635",
+        "Category": "ClothingShoes",
+        "Market": "US",
+        "SalesPrice": 19.5,
+        "SalesPriceInUSD": 19.5,
+        "Currency": "USD",
+        "CurrencyConversionFactor": 1.0,
+        "IsRecurring": false,
+        "IsFree": false,
+        "Language": "EN-US",
+        "PurchasePrice": 19.5,
+        "PurchasePriceInUSD": 19.5,
+        "Margin": 2.1,
+        "MarginInUSD": 2.1,
+        "Quantity": 1.0,
+        "IsPreorder": false,
+        "ShippingMethod": "Standard",
+        "COGS": 0.11,
+        "COGSInUSD": 0.11
+      },
+      {
+        "ProductId": "637",
+        "ProductName": ".NET Foundation Sheet",
+        "Type": "Digital",
+        "Sku": "637",
+        "Category": "Jewelry",
+        "Market": "US",
+        "SalesPrice": 12.0,
+        "SalesPriceInUSD": 12.0,
+        "Currency": "USD",
+        "CurrencyConversionFactor": 1.0,
+        "IsRecurring": false,
+        "IsFree": false,
+        "Language": "EN-US",
+        "COGS": 0.11,
+        "COGSInUSD": 0.11
+      }
+    ],
+    "BankEventsList": [
+      {
+        "BankEventId": "475a1aff-2c10-4b36-9474-ff1ee78245a1",
+        "Type": "Charge",
+        "BankEventTimestamp": "2020-04-08T07:43:36Z",
+        "Status": "Approved",
+        "BankResponseCode": "A000",
+        "PaymentProcessor": "CitiAch",
+        "MRN": "Z20LY1SSB3WY",
+        "MID": "A1010EUSD01"
+      }
+    ],
+    "CustomData": {},
+    "PreviousPurchaseList": []
+  },
+  "assessmentResult": {
+    "PurchaseStatusList": [
+      {
+        "PurchaseId": "a17b57cd-a383-4b56-8756-11319436682b",
+        "StatusType": "Approved",
+        "StatusDate": "04/08/2020 07:43:36 +00:00",
+        "Reason": "RuleEngine"
+      }
+    ]
+  },
+  "decision": {},
+  "lock": {},
+  "ttl": -1
+}

@@ -1,0 +1,25 @@
+import { PerformanceMetricsDTO } from '../performance-metrics-dto';
+import { PeriodPerformanceMetrics } from '../period-performance-metrics';
+
+export interface AnalystPerformanceDTO {
+
+    /**
+     * id - analyst id
+     */
+    id: string,
+    //
+    // /**
+    //  * displayName - name of the analyst
+    //  */
+    // displayName: string;
+
+    /**
+     * data - aggregated performance metrics by dates
+     */
+    data: PeriodPerformanceMetrics;
+
+    /**
+     * total -  total aggregated performance metrics for analyst
+     */
+    total: PerformanceMetricsDTO;
+}

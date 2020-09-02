@@ -1,0 +1,38 @@
+@import '../../../../styles/variables';
+
+.queues-list-expandable-group {
+  &__title {
+    height: 44px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    cursor: pointer;
+    position: relative;
+    outline: none;
+    border-bottom: 1px solid $neutralLight;
+
+    span {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 16px;
+      color: $themePrimary;
+      font-variant: small-caps;
+    }
+
+    &--collapsed {
+      background-color: $neutralLighterAlt;
+    }
+  }
+
+  &__content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+
+    &--expanded {
+      max-height: 2000px;
+    }
+  }
+}

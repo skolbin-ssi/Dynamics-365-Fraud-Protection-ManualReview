@@ -1,0 +1,52 @@
+@import '../../../styles/variables';
+
+.start-review-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: calc(100% - #{$headerHeight});
+
+  &__warning-message {
+    margin: 8px;
+    width: calc(100% - 16px);
+    display: flex;
+    flex-shrink: 0;
+
+    .ms-MessageBar-innerText  {
+      font-size: $warningFontSize;
+    }
+  }
+
+  &__warning-message-icon {
+    color: $highRiskColor;
+  }
+
+  &__start-review-btn-wrap {
+    padding: 40px;
+    margin-top: 32px;
+    border: 1px solid $neutralLighter;
+    width: calc(100% - 64px);
+    display: flex;
+    justify-content: center;
+  }
+
+  &__start-review-button {
+    background: $themePrimary;
+    width: 158px;
+    height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: $white;
+  }
+
+  &__start-review-link {
+    cursor: pointer;
+  }
+
+  &__user-notes {
+    padding: 32px 32px 0;
+    width: 100%;
+    overflow-y: auto;
+  }
+}

@@ -1,0 +1,29 @@
+.review-modal {
+  display: flex;
+  flex-direction: column;
+
+  &__content {
+    width: 640px;
+    padding-bottom: 60px;
+  }
+
+  &__children {
+    flex-grow: 1;
+  }
+
+  &__header {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  &__close-icon {
+    cursor: pointer;
+    padding-right: 27px;
+    font-size: 16px;
+    position: absolute;
+    right: 0;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "extends": ["airbnb-typescript"],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "arrow-parens": ["error", "as-needed"],
+    "comma-dangle": "off",
+    "max-len": ["error", { "code": 200 }],
+    "class-methods-use-this": "off",
+    "@typescript-eslint/indent": ["error", 4],
+    "import/prefer-default-export": "off",
+    "react/jsx-indent": ["error", 4],
+    "react/jsx-indent-props": ["error", 4],
+    "react/static-property-placement": "off",
+    "@typescript-eslint/interface-name-prefix": "error",
+    "linebreak-style": "off"
+  }
+}

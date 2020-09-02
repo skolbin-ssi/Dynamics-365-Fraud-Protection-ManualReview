@@ -1,0 +1,65 @@
+@import '../../../styles/variables';
+
+$addNewBtnHeight: 53px;
+
+.queues-list {
+    width: 300px;
+    padding-top: 7px;
+    justify-content: space-between;
+    overflow: hidden;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+
+    &__top-add-button {
+        width: 40px;
+        min-width: 40px;
+        margin-bottom: -36px;
+        margin-right: 8px;
+        align-self: flex-end;
+        z-index: 1;
+        border-color: $neutralLight;
+        color: $themePrimary;
+    }
+
+    &__pivot,
+    [role="tabpanel"],
+    &__pivot-item {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow: hidden;
+    }
+
+    &__pivot {
+        .ms-Pivot {
+            border-bottom: 1px solid $neutralLight;
+            padding-left: 8px;
+        }
+    }
+
+    &__queues {
+        overflow-y: auto;
+        height: 100%;
+    }
+
+    &__center-aligned {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__add-new-item-btn {
+        border-top: 1px solid $neutralLight;
+        width: 100%;
+        height: $addNewBtnHeight;
+        color: $themePrimary;
+        font-weight: 600;
+
+        &-icon {
+            margin: 0 10px;
+        }
+    }
+}

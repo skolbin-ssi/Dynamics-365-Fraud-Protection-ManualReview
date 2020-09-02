@@ -1,0 +1,122 @@
+@import '../../../styles/variables';
+
+.demand-supply-dashboard {
+  $root: &;
+
+  &__aggregation-header {
+    margin-bottom: 20px;
+  }
+
+  &__additional-title {
+    font-weight: 600;
+  }
+
+  &__queue-name-cell {
+    display: flex;
+  }
+
+  &__go-to-queue-db-btn {
+    display: contents;
+    cursor: pointer;
+    color: $themeDark;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__score-cell {
+    text-align: right;
+  }
+
+  &__data-cell {
+    text-align: right;
+  }
+
+  &__data-header-cell > span {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__analysts-header-cell > span {
+    padding-left: 20px;
+  }
+
+  &__analysts-col {
+    padding-left: 30px;
+  }
+
+  &__table {
+    .ms-DetailsHeader-cell {
+      &:hover {
+        background: none;
+      }
+    }
+
+    .ms-DetailsHeader {
+      .ms-DetailsHeader-cell:nth-child(2) {
+        .ms-DetailsHeader-cellName {
+          display: flex;
+          justify-content: flex-end;
+          width: 100px;
+          position: relative;
+          overflow: visible;
+
+          &::before {
+            top: 12px;
+            width: 12px;
+            left: 15px;
+            height: 20px;
+            position: absolute;
+            content: '';
+            @include backgroundSvgIcon($svgSortArrowDown)
+          }
+        }
+      }
+    }
+  }
+
+  &__faces-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+
+    &-divider {
+      width: 1px;
+      height: 24px;
+      background-color: $neutralLight;
+      margin: 0 8px;
+    }
+
+    #{$root}__faces {
+      &--supervisors {
+        .ms-Facepile-members {
+          overflow: visible;
+        }
+
+        .ms-Facepile-member {
+          position: relative;
+          &::after {
+            position: absolute;
+            right: -3px;
+            top: -3px;
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: $white url('../../../assets/icon/crown.png') center center no-repeat;
+            background-size: 7px 7px;
+            border-radius: 6px;
+            box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.13), 0 0.3px 0.9px rgba(0, 0, 0, 0.1);
+          }
+        }
+      }
+    }
+  }
+
+  &__generate-reports-button {
+    position: absolute;
+    top: -66px;
+    right: 32px;
+  }
+
+}

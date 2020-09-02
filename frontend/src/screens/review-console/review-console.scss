@@ -1,0 +1,92 @@
+@import '../../styles/variables';
+
+.review-console {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 330px;
+  grid-template-rows: 48px 1fr;
+  grid-auto-flow: column;
+
+  &__status-data {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  &__error-modal-content {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 30px;
+  }
+
+  // right part
+
+  &__review-console-panel {
+    grid-row: 1 / 3;
+    border-left: 1px solid $neutralLighter;
+  }
+
+  &__review-console-heading {
+    height: 48px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid $neutralLighter;
+  }
+
+  &__modal-illustration {
+    margin-bottom: 20px;
+  }
+
+  &__modal-text {
+    color: $neutralPrimary;
+    font-size: 16px;
+    margin-bottom: 23px;
+  }
+
+  &__modal-text-item {
+    margin-bottom: 23px;
+  }
+
+  &__spinner-wrap {
+    $spinnerWidth: 44px;
+    $reviewPanelWidth: 330px;
+
+    // $alignDiffRightBody -
+    // difference with left side spinner in items-details spinner
+    $alignDiffRightContent: 2px;
+
+    position: absolute;
+    top: calc(50% + #{$alignDiffRightContent});
+    right: calc(#{$reviewPanelWidth} / 2 - #{$spinnerWidth} / 2);
+  }
+
+  &__all-done-modal-action-btn {
+    width: 170px;
+  }
+
+  &__go-to-locked-item {
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 250px;
+    margin-top: 10px;
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &__start-review-link {
+    cursor: pointer;
+  }
+}

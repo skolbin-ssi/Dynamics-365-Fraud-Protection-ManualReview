@@ -1,0 +1,67 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "identity": {
+            "type": "string"
+        },
+        "rgName":{
+            "type": "string"
+        },
+        "utcValue": {
+            "type": "string",
+            "defaultValue": "[utcNow()]"
+        },
+        "storageAccountName": {
+            "type": "string"
+        },
+        "fdName": {
+            "type": "string"
+        },
+        "fdEndpointName": {
+            "type": "string",
+            "defaultValue": "CustomFrontendEndpoint"
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Resources/deploymentScripts",
+        "apiVersion": "2019-10-01-preview",
+        "name": "powershellEnableFrontDoorsHTTPS",
+        "location": "[resourceGroup().location]",
+        "kind": "AzurePowerShell",
+        "identity": {
+          "type": "userAssigned",
+          "userAssignedIdentities": {
+            "[parameters('identity')]": {
+            }
+          }
+        },
+        "properties": {
+            "forceUpdateTag": "[parameters('utcValue')]",
+            "storageAccountSettings": {
+                "storageAccountName": "[parameters('storageAccountName')]",
+                "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value]"
+            },
+            "azPowerShellVersion": "3.0",
+            "scriptContent": "
+                param([string] $rgName,[string] $fdName, [string] $fdEndpointName)
+                $httpsStatus = Get-AzFrontDoorFrontendEndpoint -ResourceGroupName $rgName -FrontDoorName $fdName -Name $fdEndpointName
+                if ($httpsStatus.CustomHttpsProvisioningState -eq 'Disabled') {
+                    Write-Host 'Enabling custom domain https'
+                    Enable-AzFrontDoorCustomDomainHttps -ResourceGroupName $rgName -FrontDoorName $fdName -FrontendEndpointName $fdEndpointName
+                } else {
+                    Write-Host 'Custom domain https is already enabled'
+                }
+            ",
+            "arguments": "[concat('-rgName',' ',parameters('rgName'),' ','-fdName',' ',parameters('fdName'),' ','-fdEndpointName',' ',parameters('fdEndpointName'))]",
+            "timeout": "PT1H",
+            "cleanupPreference": "OnSuccess",
+            "retentionInterval": "P1D"
+        }
+      }
+    ],
+    "outputs": {}
+}

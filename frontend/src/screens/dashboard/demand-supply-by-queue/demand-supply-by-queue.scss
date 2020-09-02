@@ -1,0 +1,381 @@
+@import "../../../styles/variables";
+
+.demand-supply-by-queue-dashboard {
+  $root: &;
+
+  $chartHeaderHeight: 64px;
+  $chartHeight: 250px;
+  $chartLegendsHeight: 40px;
+
+  // TODO: remove when layout on the main dashboard page will be changed
+  margin-bottom: 50px;
+
+  &__custom-sub-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+  }
+
+  &__aggregation-header {
+    display: flex;
+    align-items: center;
+    height: 100px; // as dashboard segmentation header
+
+    .switch-header__sub-header {
+      width: 100%;
+    }
+
+    &--with-assignees-line {
+      margin-bottom: 30px;
+    }
+  }
+
+  &__charts {
+    position:relative;
+
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-column-gap: 25px;
+
+    width: 100%;
+    border: 1px solid $neutralLight;
+    padding: 16px 30px;
+    margin-bottom: 56px;
+  }
+
+  &__chart {
+    display: grid;
+    grid-template-rows: $chartHeaderHeight $chartHeight $chartLegendsHeight;
+    grid-row-gap: 5px;
+  }
+
+  &__remaining-chart,
+  &__item-placement-chart {
+    height: $chartHeight;
+  }
+
+  // REMAINING CHART STYLES
+
+  &__remaining-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__analysts-list {
+    display: flex;
+  }
+
+  &__reviewed-new-chart {
+    padding: 10px;
+    width: 50%;
+    height: 400px;
+  }
+
+  // ITEM PLACEMENT CHART STYLES
+
+  &__chart-header {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 12px;
+    padding-right: 22px;
+
+    &-remaining {
+      align-items: center;
+    }
+  }
+
+  &__progress:first-child {
+    border-left: none;
+  }
+
+  // CHARTS LEGENDS STYLES
+
+  &__chart-legends {
+    display: flex;
+    align-items: center;
+    padding-left: 30px;
+  }
+
+  &__legend {
+    margin-right: 25px;
+    display: flex;
+    align-items: center;
+  }
+
+  &__legend-text {
+    font-size: 10px;
+  }
+
+  &__legend-color-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 4px;
+  }
+
+  &__load_more_orders {
+    color: $neutralDark;
+    width: 100%;
+    padding: 12px 20px;
+    background: $neutralLight;
+    margin-top: 8px;
+    cursor: pointer;
+    border: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    span {
+      font-weight: 600;
+    }
+  }
+
+  &__realtime-data-header {
+    width: 70%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+
+    &--no-data {
+      width: 34%;
+    }
+  }
+
+  &__real-time-title {
+    width: 162px;
+    font-size: 20px;
+    color: $neutralPrimary;
+    font-weight: bold;
+
+    &--no-data {
+      width: auto;
+      font-weight: normal;
+    }
+  }
+
+  &__controls {
+    width: 100%;
+  }
+
+  &__go-to-queue {
+    place-self: center end;
+  }
+
+  &__go-to-queue-btn {
+    display: flex;
+    align-items: center;
+  }
+
+  &__control-btn-down {
+    margin-left: 5px;
+  }
+
+  &__queue-view-options {
+    width: 180px;
+  }
+
+  &__queue-view-option {
+    width: 100%;
+    height: 40px;
+    border: none;
+    color: $neutralDark;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    background-color: $white;
+    cursor: pointer;
+
+    &:hover {
+      background: $neutralLighterAlt;
+    }
+
+    &:active {
+      color: $neutralPrimary;
+      background: $neutralTertiaryAlt;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .queues-list-expandable-group__content--expanded {
+    max-height: 100%;
+  }
+
+  &__real-time-data {
+    display: flex;
+  }
+
+  &__queue-items-tables {
+    width: 70%;
+  }
+
+  &__score-distribution-chart-container {
+    width: 30%;
+  }
+
+  &__action_btns {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__action-btn {
+    margin-right: 8px;
+    background: transparent;
+    min-height: 30px;
+
+    &:first-child {
+      margin-left: 8px;
+    }
+
+    &--auto-refresh {
+      margin-bottom: 0;
+
+      label {
+        margin-left: 10px;
+        font-size: 14px;
+        font-weight: normal;
+      }
+    }
+  }
+
+  &__action-btn {
+    margin-right: 8px;
+    background: transparent;
+    min-height: 30px;
+
+    &:first-child {
+      margin-left: 8px;
+    }
+
+    &--auto-refresh {
+      margin-bottom: 0;
+
+      label {
+        margin-left: 10px;
+        font-size: 14px;
+        font-weight: normal;
+      }
+    }
+  }
+
+  &__meta-title {
+    color: $neutralTertiary;
+    padding-left: 16px;
+  }
+
+  &__meta-value {
+    color: $neutralPrimary;
+
+    &--bold {
+      font-weight: 600;
+    }
+  }
+
+  &__refresh-controls {
+    display: flex;
+  }
+
+  &__warning-message-icon {
+    color: $highRiskColor;
+  }
+
+  &__queue-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: $neutralPrimary;
+    margin-right: 5px;
+  }
+
+  &__queue-title-wrap {
+    display: flex;
+    align-items: center;
+  }
+
+  &__queue-title-shimmer {
+    margin-top: 5px;
+  }
+
+
+  &__shimmer-sub {
+    width: 70%;
+
+    .ms-Shimmer-container:first-child {
+      margin-bottom: 40px;
+    }
+
+    .ms-Shimmer-container {
+      margin-bottom: 10px;
+    }
+  }
+
+  &__faces-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+
+    &-divider {
+      width: 1px;
+      height: 24px;
+      background-color: $neutralLight;
+      margin: 0 8px;
+    }
+
+    #{$root}__faces {
+      &--supervisors {
+        .ms-Facepile-members {
+          overflow: visible;
+        }
+
+        .ms-Facepile-member {
+          position: relative;
+          &::after {
+            position: absolute;
+            right: -3px;
+            top: -3px;
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: $white url('../../../assets/icon/crown.png') center center no-repeat;
+            background-size: 7px 7px;
+            border-radius: 6px;
+            box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.13), 0 0.3px 0.9px rgba(0, 0, 0, 0.1);
+          }
+        }
+      }
+    }
+  }
+
+  &__generate-reports-button {
+    position: absolute;
+    top: 34px;
+    right: 32px;
+  }
+
+  &__switch {
+    display: flex;
+    align-items: flex-start;
+    font-size: 14px;
+
+    &:last-child {
+      justify-self: end;
+    }
+  }
+
+  &__switch-title {
+    color: $neutralSecondary;
+  }
+
+  &__switch-items {
+    display: flex;
+    align-items:  center;
+  }
+
+  &__switch-item {
+    margin-left: 20px;
+  }
+}

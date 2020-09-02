@@ -1,0 +1,68 @@
+@import "../../../../styles/variables";
+
+.dashboard-search {
+  $self: &;
+
+  display: flex;
+  position: relative;
+
+  &__search-icon {
+    font-size: 16px;
+    color: $themePrimary;
+  }
+
+  &__search-icon-container {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: calc(50% - 8px);
+    left: 2%;
+  }
+
+  .ms-BasePicker-text {
+    border-radius: 2px;
+    border-color: $gray;
+  }
+
+  &__search {
+    width: 418px;
+    border-radius: 2px;
+
+    .ms-BasePicker-input {
+      padding-left: 40px;
+      transition: padding-left 0.167s ease 0s;
+
+      &:focus {
+        padding-left: 10px;
+      }
+
+      &::placeholder {
+        color: $neutralDark;
+      }
+
+    }
+  }
+
+  &__selector-persona {
+    height: 40px;
+    padding: 5px 10px;
+  }
+
+
+  &__search-options {
+    margin-left: 20px;
+  }
+
+  &__group-container {
+    display: flex;
+
+    .ms-ChoiceField {
+      margin-right: 12px;
+    }
+  }
+
+  &__queue-suggestion-item {
+    padding: 5px 10px;
+  }
+}

@@ -1,0 +1,191 @@
+@import '../../../../styles/variables';
+
+.fraud-score-indication {
+  $root: &;
+
+  width: 220px;
+  border: 1px solid $neutralQuaternary;
+  border-radius: 3px;
+  overflow: hidden;
+  z-index: 100;
+  cursor: pointer;
+
+  &--expanded {
+    background: $white;
+    box-shadow: 0 0.6px 1.8px rgba(0, 0, 0, 0.1), 0 3.2px 7.2px rgba(0, 0, 0, 0.13);
+    border: none;
+
+    #{$root}-value-indicator-bg,
+    #{$root}-value-indicator-value {
+      &::after {
+        background-color: $white;
+      }
+    }
+  }
+
+  &__top {
+    display: grid;
+    padding: 8px 12px;
+    grid-template-columns: 62px auto 30px;
+    grid-template-rows: repeat(2, auto);
+    grid-template-areas:
+            "odo title arrow"
+            "odo factors arrow";
+    outline: none;
+
+    #{$root}-value-indicator {
+      grid-area: odo;
+      align-self: center;
+      justify-self: flex-start;
+    }
+
+    #{$root}-title {
+      grid-area: title;
+    }
+
+    #{$root}-expand {
+      grid-area: arrow;
+      align-self: center;
+    }
+
+    #{$root}-score-factors {
+      grid-area: factors;
+    }
+  }
+
+  &-title,
+  &-score-factors {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &-title {
+    color: $neutralTertiary;
+  }
+
+  &-score-factors {
+    color: $neutralSecondary;
+    font-weight: 600;
+  }
+
+  &-expand {
+    .ms-Icon {
+      width: 12px;
+      height: 12px;
+      font-size: 12px;
+      color: $neutralSecondary;
+    }
+  }
+
+  &-value {
+    font-size: 16px;
+    font-weight: 600;
+
+    &-container {
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      background: $white;
+      border: 1px solid $neutralLight;
+      border-radius: 2px;
+      padding: 8px 12px;
+      margin-left: 8px;
+    }
+  }
+
+  &-value-indicator {
+    $width: 48px;
+    $height: $width / 2;
+    $bg: $neutralLighter;
+
+    position: relative;
+    height: $height;
+    width: $width;
+    overflow: hidden;
+
+    &-bg,
+    &-value {
+      width: $width;
+      height: $height;
+      border-radius: $height $height 0 0;
+      overflow: hidden;
+
+      &::after {
+        width: $width - 8;
+        height: $width - 8;
+        content: '';
+        position: absolute;
+        left: 4px;
+        top: 4px;
+        background: $bg;
+        border-radius: $height;
+      }
+    }
+
+    &-bg {
+      width: $width - 2px;
+      height: $height - 2px;
+      margin-left: 1px;
+      margin-top: 1px;
+      background: $rainbow-circle-background;
+    }
+
+    &-value {
+      background: $neutralLight;
+      position: absolute;
+      top: 0;
+      // transform: rotate(-180deg);
+      transform-origin: bottom center;
+    }
+
+    &-score {
+      $scoreW: $width - 10px;
+
+      position: absolute;
+      width: $scoreW;
+      left: 50%;
+      bottom: 0;
+      margin-left: -$scoreW / 2;
+      color: $neutralPrimary;
+      text-align: center;
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 16px;
+    }
+  }
+
+  &-list-score-factors {
+    max-height: 0;
+    color: $neutralSecondary;
+    background: white;
+
+    &--expanded {
+      max-height: 400px;
+      padding-bottom: 12px;
+    }
+
+    ul {
+      list-style: none;
+      margin: 0;
+
+      li {
+        font-size: 12px;
+        line-height: 16px;
+      }
+
+      /**
+       * @see https://www.w3schools.com/howto/howto_css_bullet_color.asp
+       */
+      li::before {
+        content: "\2022";  /* Add content: \2022 is the CSS Code/unicode for a bullet */
+        color: $neutralTertiaryAlt; /* Change the color */
+        font-weight: bold; /* If you want it to be bold */
+        display: inline-block; /* Needed to add space between the bullet and the text */
+        width: 1em; /* Also needed for space (tweak if needed) */
+        margin-left: -1em; /* Also needed for space (tweak if needed) */
+      }
+    }
+  }
+}

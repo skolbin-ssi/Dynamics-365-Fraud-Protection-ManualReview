@@ -1,0 +1,42 @@
+@import "../../../../styles/variables";
+
+.slice-tooltip {
+  min-width: 230px;
+  padding: 16px;
+  background: $white;
+  box-shadow: 0 6.4px 14.4px rgba(0, 0, 0, 0.13),
+  0 1.2px 3.6px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+
+  &__color-indicator {
+    width: 10px;
+    height: 10px;
+    margin-right: 12px;
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    font-size: 12px;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 20px;
+    font-size: 12px;
+
+    &--increased-height {
+      height: 34px;
+    }
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+  }
+}

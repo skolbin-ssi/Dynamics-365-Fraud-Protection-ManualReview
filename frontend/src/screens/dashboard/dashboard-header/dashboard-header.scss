@@ -1,0 +1,33 @@
+@import "../../../styles/variables";
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px ;
+  box-shadow: inset 0px -1px 0px #{$neutralLight};
+
+  &__search {
+    display: flex;
+    align-items: center;
+
+    &--hide {
+      visibility: hidden;
+    }
+  }
+
+  &__date-selection {
+    display: flex;
+    width: 440px;
+    justify-content: space-between;
+  }
+
+  &__dropdown, &__date-picker {
+    width: 144px;
+    border-radius: 2px;
+  }
+
+  &__go-back-btn {
+    margin-right: 25px;
+  }
+}

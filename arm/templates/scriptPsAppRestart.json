@@ -1,0 +1,58 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "identity": {
+            "type": "string"
+        },
+        "rgName":{
+            "type": "string"
+        },
+        "appName":{
+            "type": "string"
+        },
+        "utcValue": {
+            "type": "string",
+            "defaultValue": "[utcNow()]"
+        },
+        "storageAccountName": {
+            "type": "string"
+        }
+    },
+    "variables": {
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Resources/deploymentScripts",
+        "apiVersion": "2019-10-01-preview",
+        "name": "[concat('powershellApp',parameters('appName'),'Restart')]",
+        "location": "[resourceGroup().location]",
+        "kind": "AzurePowerShell",
+        "identity": {
+          "type": "userAssigned",
+          "userAssignedIdentities": {
+            "[parameters('identity')]": {
+            }
+          }
+        },
+        "properties": {
+            "forceUpdateTag": "[parameters('utcValue')]",
+            "storageAccountSettings": {
+                "storageAccountName": "[parameters('storageAccountName')]",
+                "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value]"
+            },
+            "azPowerShellVersion": "3.0",
+            "scriptContent": "
+                param([string] $rgName,[string] $appName)
+                Stop-AzWebApp -ResourceGroupName $rgName -Name $appName
+                Start-AzWebApp -ResourceGroupName $rgName -Name $appName
+            ",
+            "arguments": "[concat('-rgName',' ',parameters('rgName'),' ','-appName',' ',parameters('appName'))]",
+            "timeout": "PT1H",
+            "cleanupPreference": "OnSuccess",
+            "retentionInterval": "P1D"
+        }
+      }
+    ],
+    "outputs": {}
+}

@@ -1,0 +1,97 @@
+@import '../../../../../styles/variables';
+
+.item-details-account-summary {
+  $root: &;
+
+  &__header {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &__top {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-bottom: 1px solid $neutralLight;
+    margin-bottom: 20px;
+
+    #{$root}__expandable {
+      grid-column: span 3;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      // height: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-in-out;
+
+      &--expanded {
+        max-height: 300px;
+        height: auto;
+      }
+    }
+  }
+
+  &__bottom {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr 1fr;
+
+    #{$root}__span-2 {
+      grid-column: span 2;
+    }
+  }
+
+  &__details-toggle {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  &__pl {
+    color: $neutralTertiary;
+  }
+
+  &__validated-info {
+    &-icon {
+      margin-right: 4px;
+      box-sizing: border-box;
+    }
+
+    &-date {
+      margin-left: 4px;
+      color: $neutralTertiary;
+    }
+
+    &-value {
+      max-width: 100%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      display: inline-block;
+    }
+  }
+
+  &__external-links {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+    &-badge,
+    &-icon {
+      margin-left: 6px;
+    }
+
+    &-badge {
+      height: 24px;
+      padding: 2px 12px;
+      background-color: $themeLighterAlt;
+      color: $themePrimary;
+      font-size: 14px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    &-icon i {
+      font-size: 24px;
+    }
+  }
+}

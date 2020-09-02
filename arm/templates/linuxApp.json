@@ -1,0 +1,293 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webAppName": {
+      "type": "string",
+      "defaultValue" : "AzureLinuxApp",
+      "metadata": {
+        "description": "Base name of the resource such as web app name and app service plan "
+      },
+      "minLength": 2
+    },
+    "packageUrl": {
+      "type": "string"
+    },
+    "sku":{
+      "type": "string",
+      "defaultValue" : "S1",
+      "metadata": {
+        "description": "The SKU of App Service Plan "
+      }
+    },
+    "linuxFxVersion" : {
+        "type": "string",
+        "defaultValue" : "JAVA|11-java11",
+        "metadata": {
+          "description": "The Runtime stack of current web app"
+        }
+    },
+    "logsDirectorySizeLimit": {
+        "type": "int",
+        "defaultValue": 100
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "numberOfWorkers": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "webHttpLogRetentionDays": {
+      "type": "string",
+      "defaultValue": "3"
+    },
+    "powershellAppRestartTemplateUri": {
+      "type": "string"
+    },
+    "deploymentIdentity": {
+      "type": "string"
+    },
+    "deploymentStorageAccount": {
+      "type": "string"
+    },
+    "deploymentResourceGroup": {
+      "type": "string"
+    },
+    "cosmosDbAccountName": {
+          "type": "String"
+    },
+    "ehubOffsetStorageName": {
+          "type": "String"
+    },
+    "appClientId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "appSpId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "tenantId": {
+      "type": "string"
+    },
+    "appJavaOpts": {
+      "type": "string"
+    },
+    "mailUsername": {
+      "type": "string"
+    },
+    "mailSmtpHost": {
+      "type": "string"
+    },
+    "mailSmtpPort": {
+      "type": "string"
+    },
+    "dfpSpId": {
+      "type": "string"
+    },
+    "keyVaultEndpoint": {
+      "type": "string"
+    },
+    "keyVaultName": {
+      "type": "string"
+    },
+    "appInsightName": {
+      "type": "String"
+    },
+    "tenantShortName": {
+      "type": "String"
+    },
+    "logWorkspaceName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "appServicePlanName": "[concat(parameters('webAppName'), '-sp')]",
+    "webappSecretsPermissions": [ "get", "list" ],
+    "settingName": "[concat(parameters('webAppName'),'/microsoft.insights/', 'AppDiagnostics')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2018-02-01",
+      "name": "[variables('appServicePlanName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('sku')]",
+        "capacity": "[parameters('numberOfWorkers')]"
+      },
+      "kind": "linux",
+      "properties": {
+        "reserved":true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-11-01",
+      "name": "[parameters('webAppName')]",
+      "location": "[parameters('location')]",
+      "kind": "app",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+      ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "siteConfig": {
+            "numberOfWorkers": "[parameters('numberOfWorkers')]",
+            "linuxFxVersion": "[parameters('linuxFxVersion')]",
+            "httpLoggingEnabled": true,
+            "logsDirectorySizeLimit": "[parameters('logsDirectorySizeLimit')]",
+            "appSettings": [
+                {
+                    "name": "JAVA_OPTS",
+                    "value": "[parameters('appJavaOpts')]"
+                },
+                {
+                  "name": "WEBSITE_RUN_FROM_PACKAGE",
+                  "value": "[parameters('packageUrl')]"
+                },                
+                {
+                  "name": "COSMOSDB_ENDPOINT",
+                  "value": "[reference(resourceId('Microsoft.DocumentDb/databaseAccounts/', parameters('cosmosDbAccountName')),'2020-04-01').documentEndpoint]"
+                },
+                {
+                  "name": "EVENT_HUB_OFFSET_STORAGE_NAME",
+                  "value": "[parameters('ehubOffsetStorageName')]"
+                },
+                {
+                  "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+                  "value": "[parameters('webHttpLogRetentionDays')]"
+                },
+                {
+                  "name": "CLIENT_ID",
+                  "value": "[parameters('appClientId')]"
+                },
+                {
+                  "name": "APP_SP_ID",
+                  "value": "[parameters('appSpId')]"
+                },
+                {
+                  "name": "TENANT_ID",
+                  "value": "[parameters('tenantId')]"
+                },
+                {
+                  "name": "MAIL_USERNAME",
+                  "value": "[parameters('mailUsername')]"
+                },
+                {
+                  "name": "MAIL_SMTP_HOST",
+                  "value": "[parameters('mailSmtpHost')]"
+                },
+                {
+                  "name": "MAIL_SMTP_PORT",
+                  "value": "[parameters('mailSmtpPort')]"
+                },
+                {
+                  "name": "DFP_SP_ID",
+                  "value": "[parameters('dfpSpId')]"
+                },
+                {
+                  "name": "TENANT_SHORT_NAME",
+                  "value": "[parameters('tenantShortName')]"
+                },
+                {
+                  "name": "KEYVAULT_ENDPOINT",
+                  "value": "[parameters('keyVaultEndpoint')]"
+                },
+                {
+                  "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                  "value": "[concat('InstrumentationKey=',reference(resourceId('Microsoft.Insights/components', parameters('appInsightName')),'2018-05-01-preview').InstrumentationKey)]"
+                }
+            ]
+          }
+      }
+    },
+    {                                                               // Diagnostic settings for app
+			"type": "Microsoft.Web/sites/providers/diagnosticSettings",
+			"apiVersion": "2017-05-01-preview",
+			"name": "[variables('settingName')]",
+      "dependsOn": [
+          "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+          "[resourceId('Microsoft.Web/sites',parameters('webAppName'))]"
+      ],
+			"properties": {
+				"workspaceId": "[resourceId('microsoft.operationalinsights/workspaces',parameters('logWorkspaceName'))]",
+				"logs": [
+					{
+						"category": "AppServicePlatformLogs",
+						"enabled": true
+					}
+				]
+			}
+		},
+    {                                               // Grant app identity Key Vault permissions
+        "type": "Microsoft.KeyVault/vaults/accessPolicies",
+        "name": "[concat(parameters('keyVaultName'), '/add')]",
+        "apiVersion": "2019-09-01",
+        "dependsOn": [
+          "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+          "[resourceId('Microsoft.Web/sites',parameters('webAppName'))]"
+        ],
+        "properties": {
+            "accessPolicies": [
+                {
+                    "tenantId": "[reference(resourceId('Microsoft.Web/sites', parameters('webAppName')),'2018-02-01', 'Full').identity.tenantId]",
+                    "objectId": "[reference(resourceId('Microsoft.Web/sites', parameters('webAppName')),'2018-02-01', 'Full').identity.principalId]",
+                    "permissions": {
+                        "secrets": "[variables('webappSecretsPermissions')]"
+                    }
+                }
+            ]
+        }
+    },
+    {                                                // Power Shell Restart Web App
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "[concat('powershellTemplateApp','Restart',parameters('webAppName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "[resourceId('Microsoft.Web/sites',parameters('webAppName'))]",
+        "[resourceId('Microsoft.KeyVault/vaults/accessPolicies', parameters('keyVaultName'), 'add')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[parameters('powershellAppRestartTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "identity": {
+            "value": "[parameters('deploymentIdentity')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('deploymentStorageAccount')]"
+          },
+          "appName": {
+            "value": "[parameters('webAppName')]"
+          },
+          "rgName": {
+            "value": "[parameters('deploymentResourceGroup')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": { 
+    "defaultHostName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Web/sites',parameters('webAppName'))).defaultHostName]"
+    },
+    "appSiteResourceId": {
+        "type": "string",
+        "value": "[resourceId('Microsoft.Web/sites',parameters('webAppName'))]"
+    }
+  }
+}

@@ -1,0 +1,83 @@
+@import '../../../styles/variables';
+
+.console-header {
+  &__header {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid $neutralLighter;
+    overflow: hidden;
+  }
+
+  &__back-to-queues-btn {
+    color: $neutralSecondary;
+    font-weight: 600;
+  }
+
+  &__back-to-queues-btn-icon {
+    color: $neutralSecondary;
+  }
+
+  &__queue-data {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-grow: 1;
+    margin: 0 15px;
+    overflow: hidden;
+  }
+
+  &__queue-name {
+    display: flex;
+    height: 32px;
+    color: $themeDark;
+    line-height: 30px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  &__queue-name-queue {
+    padding: 0 12px;
+    background-color: $themeLighter;
+  }
+
+  &__queue-name-name {
+    padding: 0 12px;
+    background-color: $themeLighterAlt;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    > span {
+      font-weight: 600;
+    }
+  }
+
+  &__queue-metadata {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  &__meta-title {
+    color: $neutralTertiary;
+    padding-left: 26px;
+  }
+
+  &__meta-value {
+    color: $neutralPrimary;
+  }
+
+  &__queue-id {
+    display: inline-flex;
+    color: $neutralPrimary;
+    cursor: default;
+    height: 18px;
+  }
+
+  &__queue-id-icon {
+    margin-left: 8px;
+    margin-top: 2px;
+  }
+}

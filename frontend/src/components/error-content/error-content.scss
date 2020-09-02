@@ -1,0 +1,17 @@
+@import "../../styles/variables";
+
+.error-content {
+  &__text {
+    color: $neutralPrimary;
+  }
+
+  &__btn {
+    width: 320px;
+    margin-top: 45px;
+    height: 40px;
+  }
+
+  &__image {
+    margin-bottom: 20px;
+  }
+}

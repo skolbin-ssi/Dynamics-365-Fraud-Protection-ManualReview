@@ -1,0 +1,14 @@
+@import "../../styles/variables";
+
+.error {
+  height: 100vh;
+
+  &__header {
+    color: $white;
+    flex-shrink: 0;
+  }
+
+  &__content {
+    margin-top: -$headerHeight;
+  }
+}

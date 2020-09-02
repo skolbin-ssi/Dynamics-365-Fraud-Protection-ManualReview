@@ -1,0 +1,62 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "mapsAccountName": {
+            "type": "string",
+            "metadata": {
+            "description": "the name of the Azure Map Account"
+            }
+        },
+        "sku": {
+                "type": "string",
+                "defaultValue": "S0"
+        },
+        "principalId": {
+                "type": "string",
+                "metadata": {
+                    "description": "Specifies the principal ID assigned to the role."
+                }      
+        },
+        "guid": {
+            "type": "string",
+            "defaultValue": "[guid(resourceGroup().id)]",
+            "metadata": {
+                "description": "Input string for new GUID associated with assigning built in role types"
+            }
+        }
+    },
+    "variables": {
+        "Azure Maps Data Reader": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '423170ca-a8f6-4b0f-8487-9e4eb8f49bfa')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2018-05-01",
+            "name": "[parameters('mapsAccountName')]",
+            "location": "global",
+            "type": "Microsoft.Maps/accounts",
+            "sku": {
+                "name": "[parameters('sku')]"
+            }
+        },
+        {
+            "apiVersion": "2018-09-01-preview",
+            "name": "[concat(parameters('mapsAccountName'), '/Microsoft.Authorization/', parameters('guid'))]",
+            "type": "Microsoft.Maps/accounts/providers/roleAssignments",
+            "dependsOn": [
+                "[parameters('mapsAccountName')]"
+            ],
+            "properties": {
+                "roleDefinitionId": "[variables('Azure Maps Data Reader')]",
+                "principalId": "[parameters('principalId')]",
+                "principalType": "Group"
+            }
+        }
+    ],
+    "outputs": {
+        "mapsAccountClientId": {
+            "type": "string",
+            "value": "[replace(replace(string(reference(resourceId('Microsoft.Maps/accounts', parameters('mapsAccountName')),'2018-05-01','Full').properties),'{\"x-ms-client-id\":\"',''),'\"}','')]"
+        }
+    }
+}

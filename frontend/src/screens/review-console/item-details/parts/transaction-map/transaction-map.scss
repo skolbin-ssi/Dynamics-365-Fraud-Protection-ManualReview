@@ -1,0 +1,115 @@
+@import '../../../../../styles/variables';
+
+.item-details-transaction-map {
+  &__content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+  }
+
+  &__map {
+    display: flex;
+    overflow: hidden;
+  }
+
+  &__address-list {
+    padding-left: 16px;
+
+    &-inner {
+      position: relative;
+
+      &::before {
+        position: absolute;
+        content: '';
+        display: block;
+        top: 20px;
+        bottom: 0;
+        left: 12px;
+        width: 1px;
+        border-left: 1px dashed $neutralTertiaryAlt;
+        z-index: 1;
+      }
+    }
+  }
+
+  &__single-address {
+    $sa: &;
+
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) 20px;
+    grid-template-rows: auto auto;
+    margin-bottom: 24px;
+
+    &-street {
+      color: $neutralPrimary;
+      font-size: 14px;
+      line-height: 20px;
+      display: grid;
+      align-self: center;
+      white-space: pre-wrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    &-icon {
+      background-color: $white;
+      position: relative;
+      z-index: 2;
+      padding: 10px 0;
+      box-sizing: content-box;
+    }
+
+    &-type {
+      grid-column: 2/4;
+      font-size: 12px;
+      line-height: 16px;
+
+      &-label {
+        color: $neutralPrimary;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      &-distance {
+        color: $neutralSecondary;
+        font-weight: normal;
+        font-size: 12px;
+      }
+    }
+
+    &-details {
+      grid-column: 2/4;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-in-out;
+
+      &--expanded {
+        max-height: 300px;
+        height: auto;
+      }
+
+      &-toggle {
+        padding: 0;
+        width: 20px;
+        height: 20px;
+
+        .ms-Icon {
+          width: 12px;
+          height: 12px;
+          font-size: 12px;
+          color: $neutralSecondary;
+        }
+      }
+
+      #{$sa}-detail {
+        &-lavel,
+        &-value {
+          font-size: 12px;
+        }
+
+        &-label {
+          color: $neutralSecondary;
+        }
+      }
+    }
+  }
+}

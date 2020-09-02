@@ -1,0 +1,77 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "identity": {
+            "type": "string"
+        },
+        "storageAccountName": {
+            "type": "string"
+        },
+        "primaryScriptUri": {
+            "type": "string"
+        },
+        "srcSA":{
+            "type": "string"
+        },
+        "srcCont":{
+            "type": "string"
+        },
+        "srcRG":{
+            "type": "string"
+        },
+        "dstSA":{
+            "type": "string"
+        },
+        "dstRG":{
+            "type": "string"
+        },
+        "logLevel":{
+            "type": "string"
+        },
+        "clientId":{
+            "type": "string"
+        },
+        "tenantId":{
+            "type": "string"
+        },
+        "mapClientId":{
+            "type": "string"
+        },
+        "utcValue": {
+            "type": "string",
+            "defaultValue": "[utcNow()]"
+        }
+    },
+    "variables": {},
+    "resources": [
+      {
+        "type": "Microsoft.Resources/deploymentScripts",
+        "apiVersion": "2019-10-01-preview",
+        "name": "powershellFixFrontend",
+        "location": "[resourceGroup().location]",
+        "kind": "AzurePowerShell",
+        "identity": {
+          "type": "userAssigned",
+          "userAssignedIdentities": {
+            "[parameters('identity')]": {
+            }
+          }
+        },
+        "properties": {
+            "forceUpdateTag": "[parameters('utcValue')]",
+            "storageAccountSettings": {
+                "storageAccountName": "[parameters('storageAccountName')]",
+                "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value]"
+            },
+            "azPowerShellVersion": "3.0",
+            "primaryScriptUri": "[parameters('primaryScriptUri')]",
+            "arguments": "[concat('-srcSA',' ',parameters('srcSA'),' ','-srcCont',' ',parameters('srcCont'),' ','-srcRG',' ',parameters('srcRG'),' ','-dstSA',' ',parameters('dstSA'),' ','-dstRG',' ',parameters('dstRG'),' ','-logLevel',' ',parameters('logLevel'),' ','-clientId',' ',parameters('clientId'),' ','-tenantId',' ',parameters('tenantId'),' ','-mapClientId',' ', parameters('mapClientId'))]",
+            "timeout": "PT1H",
+            "cleanupPreference": "OnSuccess",
+            "retentionInterval": "P1D"
+        }
+      }
+    ],
+    "outputs": {}
+}

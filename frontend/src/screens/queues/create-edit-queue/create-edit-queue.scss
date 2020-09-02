@@ -1,0 +1,138 @@
+@import '../../../styles/variables';
+
+%part-title {
+    height: 60px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.create-edit-queue {
+    width: 800px;
+    min-height: 500px;
+    max-height: calc(100vh - 80px);
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    overflow: hidden;
+
+    &__translucent-overlay {
+        opacity: .9;
+        background-color: $white;
+    }
+
+    // Left part
+
+    &__left-part {
+        width: 200px;
+        height: 100%;
+        background: $neutralLighterAlt;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__left-part-title {
+        @extend %part-title;
+    }
+
+    &__left-tabs {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        position: relative;
+    }
+
+    &__delete-tab {
+        justify-self: flex-end;
+        position: absolute;
+        bottom: 0;
+    }
+
+    // Right part
+
+    &__right-part {
+        height: 100%;
+        max-height: inherit;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    &__right-part-title {
+        @extend %part-title;
+        justify-content: space-between;
+        border-bottom: 1px solid $neutralLight;
+    }
+
+    &__part-title-text {
+        font-weight: 600;
+    }
+
+    &__close-btn {
+        color: $neutralDark;
+    }
+
+    &__right-part-body {
+        flex-grow: 1;
+        padding: 0 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        overflow-y: auto;
+    }
+
+    &__bottom-btns {
+        display: flex;
+        flex-grow: 0;
+        padding: 20px;
+        justify-content: flex-end;
+        align-items: flex-end;
+        flex-shrink: 0;
+        border-top: 1px solid $neutralLight;
+
+        button {
+            margin-left: 8px;
+        }
+    }
+
+    &__delete-btn {
+        background-color: $rejectFill;
+        border-color: $rejectColor;
+        color: $rejectColor;
+
+        &:hover {
+            background-color: $rejectFillHover;
+            border-color: $rejectColor;
+            color: $rejectColor;
+        }
+
+        &:active {
+            background-color: $rejectFillActive;
+            border-color: $rejectColor;
+            color: $rejectColor;
+        }
+    }
+
+    // Update states
+
+    &__info-badge {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+
+        &-green {
+            color: $themePrimary;
+        }
+
+        &-red {
+            color: $highRiskColor;
+        }
+    }
+
+    &__info-badge-icon {
+        margin-right: 10px;
+        font-size: 1.4em;
+    }
+}

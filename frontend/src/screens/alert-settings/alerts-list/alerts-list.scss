@@ -1,0 +1,55 @@
+@import "../../../styles/variables";
+
+.alerts-list {
+  &__header {
+    display: flex;
+    flex-direction: column;
+
+    &__title {
+      font-weight: 600;
+      color: $neutralPrimary;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &__data-list {
+    width: 100%;
+    margin-top: 20px;
+
+    .ms-DetailsRow:hover {
+      background-color: $neutralLighter;
+    }
+  }
+
+  &__vertically-aligned-cell {
+    color: $neutralSecondary;
+    display: flex;
+    align-items: center;
+  }
+
+  &__active-cell {
+    margin-bottom: 0;
+  }
+
+  &__delete-cell {
+    color: $neutralSecondary;
+
+    &:hover {
+      color: $neutralSecondary;
+      background-color: $neutralQuaternaryAlt;
+    }
+  }
+
+  &__name-cell {
+    font-size: 16px;
+    color: $themePrimary;
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

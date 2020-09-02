@@ -1,0 +1,106 @@
+@import '../../styles/variables';
+
+.range-slider {
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+
+    &__slider {
+        position: relative;
+        z-index: 1;
+        height: 4px;
+        margin: 0 15px;
+        width: 100%;
+
+        &.disabled {
+            background-color: $neutralLighter;
+        }
+    }
+
+    &__track {
+        position: absolute;
+        z-index: 1;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        border-radius: 2px;
+        background-color: $themeLighter;
+
+        &.disabled {
+            background-color: $neutralLighter;
+        }
+    }
+
+    &__range {
+        position: absolute;
+        z-index: 2;
+        left: 25%;
+        right: 25%;
+        top: 0;
+        bottom: 0;
+        border-radius: 2px;
+        background-color: $themePrimary;
+
+        &.disabled {
+            background-color: $neutralTertiary;
+        }
+    }
+
+    &__thumb-left, &__thumb-right {
+        position: absolute;
+        z-index: 3;
+        width: 16px;
+        height: 16px;
+        background-color: $white;
+        border: 2px solid $themeDark;
+        border-radius: 50%;
+        transition: box-shadow .3s ease-in-out;
+
+        &.disabled {
+            border-color: $neutralTertiaryAlt;
+        }
+    }
+
+    &__thumb-left {
+        left: 25%;
+        transform: translate(-8px, -6px);
+    }
+
+    &__thumb-right {
+        right: 25%;
+        transform: translate(8px, -6px);
+    }
+
+    &__hidden-range {
+        position: absolute;
+        pointer-events: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        z-index: 2;
+        height: 16px;
+        width: 100%;
+        opacity: 0;
+    }
+
+    &__hidden-range::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        pointer-events: all;
+        width: 30px;
+        height: 30px;
+        border-radius: 0;
+        border: 0 none;
+    }
+
+    // couldn't use placeholders here - some weird Sass bug
+    &__hidden-range::-moz-range-thumb {
+        -moz-appearance: none;
+        pointer-events: all;
+        width: 30px;
+        height: 30px;
+        border-radius: 0;
+        border: 0 none;
+    }
+}

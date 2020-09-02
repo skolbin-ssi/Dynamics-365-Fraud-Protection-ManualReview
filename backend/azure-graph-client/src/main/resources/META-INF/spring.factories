@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.griddynamics.msd365fp.manualreview.azuregraph.config.AnalystClientAutoConfiguration

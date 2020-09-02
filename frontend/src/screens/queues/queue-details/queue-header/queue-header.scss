@@ -1,0 +1,90 @@
+@import "../../../../styles/variables";
+
+.queue-header {
+    display: grid;
+    grid-template-rows: repeat(2, 48px);
+    margin-bottom: 10px;
+    overflow: hidden;
+
+    &__row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        overflow: hidden;
+
+        &:first-child {
+            border-bottom: 1px solid $neutralLight;
+        }
+    }
+
+    &__queue-name {
+        font-weight: 600;
+        color: $neutralPrimary;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__queue-metadata {
+        flex-shrink: 0;
+    }
+
+    &__action_btns {
+        display: flex;
+        align-items: center;
+    }
+
+    &__start-review-btn {
+        margin-right: 8px;
+    }
+
+    &__action-btn {
+        margin-right: 8px;
+        background: transparent;
+        min-height: 30px;
+
+        &:first-child {
+            margin-left: 8px;
+        }
+
+        &--auto-refresh {
+            margin-bottom: 0;
+
+            label {
+                margin-left: 10px;
+                font-size: 14px;
+                font-weight: normal;
+            }
+        }
+    }
+
+    &__meta-title {
+        color: $neutralTertiary;
+        padding-left: 16px;
+    }
+
+    &__meta-value {
+        color: $neutralPrimary;
+
+        &--bold {
+            font-weight: 600;
+        }
+    }
+
+    &__queue-id {
+        display: inline-flex;
+        color: $neutralPrimary;
+        cursor: default;
+        height: 22px;
+    }
+
+    &__queue-id-icon {
+        margin-left: 8px;
+        margin-top: 2px;
+    }
+
+    &__sort-order-icon {
+        padding-left: 5px;
+    }
+}

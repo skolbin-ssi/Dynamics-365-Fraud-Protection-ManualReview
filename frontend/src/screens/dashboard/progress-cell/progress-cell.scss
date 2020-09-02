@@ -1,0 +1,42 @@
+@import "../../../styles/variables";
+
+.progress-cell {
+  &__decision-cell {
+    padding: 10px;
+    border-left: 1px solid $neutralLight;
+  }
+
+  &__progress-item-title {
+    font-size: 14px;
+    color: $neutralSecondary;
+    margin-bottom: 5px;
+  }
+
+  &__progress-number {
+    position: relative;
+    color: $black;
+    font-size: 18px;
+  }
+
+  &__progress-percents {
+    display: flex;
+    align-items: center;
+    left: 115%;
+    top: 0;
+    position: absolute;
+    font-size: 10px;
+
+    &--red {
+      color: $highRiskColor;
+    }
+
+    &--green {
+      color: $approveColor;
+    }
+  }
+
+  &__progress-percent-arrow {
+    margin-right: 4px;
+  }
+
+}

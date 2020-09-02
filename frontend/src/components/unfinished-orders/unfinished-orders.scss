@@ -1,0 +1,66 @@
+@import '../../styles/variables';
+
+.unfinished-orders {
+    &__button {
+        background: transparent;
+        color: $white;
+        padding: 0 16px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        border: none;
+        cursor: pointer;
+
+        &:hover {
+            background-color: $themeDarkAlt;
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &:active {
+            background-color: $themeDark;
+        }
+
+        &--active {
+            background-color: $themeDarkAlt;
+        }
+    }
+
+    &__button-text {
+        font-weight: 600;
+    }
+
+    &__modal {
+        padding: 16px;
+        background-color: $white;
+    }
+
+    &__order {
+        padding: 10px 0;
+        display: grid;
+        grid-template-columns: 240px 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        column-gap: 11px;
+        grid-auto-flow: column;
+        align-content: center;
+
+        button {
+            grid-row: span 2;
+            align-self: center;
+        }
+    }
+
+    &__order-text {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 100%;
+        overflow: hidden;
+        color: $neutralPrimary;
+    }
+
+    &__queue-btn {
+        color: $themePrimary;
+    }
+}

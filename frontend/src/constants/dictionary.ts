@@ -1,0 +1,5 @@
+export enum DICTIONARY_TYPE {
+    PRODUCT_SKU = 'PRODUCT_SKU',
+    USER_COUNTRY = 'USER_COUNTRY',
+    TAG = 'TAG'
+}

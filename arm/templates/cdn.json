@@ -1,0 +1,128 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "cdnName": {
+            "defaultValue": "[concat(resourceGroup().name,'-cdn')]",
+            "type": "String"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+            "description": "Specifies the location in which the Azure Storage resources should be deployed."
+            }
+        },
+        "sku": {
+            "type": "string",
+            "defaultValue": "Standard_Microsoft"
+        },
+        "hostHeader": {
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Cdn/profiles",
+            "apiVersion": "2020-04-15",
+            "name": "[parameters('cdnName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('sku')]"
+            },
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.Cdn/profiles/endpoints",
+            "apiVersion": "2020-04-15",
+            "name": "[concat(parameters('cdnName'), '/', parameters('cdnName'), '-endpoint')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Cdn/profiles', parameters('cdnName'))]"
+            ],
+            "properties": {
+                "originHostHeader": "[parameters('hostHeader')]",
+                "isHttpAllowed": true,
+                "isHttpsAllowed": true,
+                "queryStringCachingBehavior": "IgnoreQueryString",
+                "origins": [
+                    {
+                        "name": "origin-0",
+                        "properties": {
+                            "hostName": "[parameters('hostHeader')]",
+                            "httpPort": 80,
+                            "httpsPort": 443,
+                            "originHostHeader": "[parameters('hostHeader')]"
+                        }
+                    }
+                ],
+                "isCompressionEnabled": false,
+                "deliveryPolicy": {
+                    "description": "delivery_policy",
+                    "rules": [
+                        {
+                            "name": "ClientRouting",
+                            "order": 1,
+                            "conditions": [
+                                {
+                                    "name": "UrlPath",
+                                    "parameters": {
+                                        "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleUrlPathMatchConditionParameters",
+                                        "operator": "BeginsWith",
+                                        "negateCondition": true,
+                                        "matchValues": [
+                                            "/static"
+                                        ],
+                                        "transforms": []
+                                    }
+                                },
+                                {
+                                    "name": "UrlPath",
+                                    "parameters": {
+                                        "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleUrlPathMatchConditionParameters",
+                                        "operator": "Equal",
+                                        "negateCondition": true,
+                                        "matchValues": [
+                                            "/config.json"
+                                        ],
+                                        "transforms": []
+                                    }
+                                },
+                                {
+                                    "name": "UrlPath",
+                                    "parameters": {
+                                        "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleUrlPathMatchConditionParameters",
+                                        "operator": "Equal",
+                                        "negateCondition": true,
+                                        "matchValues": [
+                                            "/favicon.ico"
+                                        ],
+                                        "transforms": []
+                                    }
+                                }
+                            ],
+                            "actions": [
+                                {
+                                    "name": "UrlRewrite",
+                                    "parameters": {
+                                        "@odata.type": "#Microsoft.Azure.Cdn.Models.DeliveryRuleUrlRewriteActionParameters",
+                                        "sourcePattern": "/",
+                                        "destination": "/index.html",
+                                        "preserveUnmatchedPath": false
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "cdnHostName": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Cdn/profiles/endpoints',parameters('cdnName'),concat(parameters('cdnName'), '-endpoint'))).hostName]"
+        }
+    }
+}

@@ -1,0 +1,495 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "ehubName": {
+          "defaultValue": "[concat(uniqueString(resourceGroup().id),'-ehub')]",
+          "type": "String"
+      },
+      "location": {
+          "type": "string",
+          "defaultValue": "[resourceGroup().location]",
+          "metadata": {
+              "description": "Specifies the location in which the Azure Storage resources should be deployed."
+          }
+      },
+      "eventHubSku": {
+          "type": "string",
+          "allowedValues": [ "Basic", "Standard" ],
+          "defaultValue": "Standard",
+          "metadata": {
+              "description": "Specifies the messaging tier for Event Hub Namespace."
+          }
+      },
+      "ehubCapacity": {
+          "type": "int",
+          "defaultValue": 1
+      },
+      "ehubMaximumThroughputUnits": {
+          "type": "int",
+          "defaultValue": 8
+      },
+      "ehubNumPartitions": {
+          "type": "int",
+          "defaultValue": 8
+      },
+      "dfphubNumPartitions": {
+          "type": "int",
+          "defaultValue": 8
+      },
+      "ehubMessageRetentionInDays": {
+          "type": "int",
+          "defaultValue": 7
+      }
+  },
+  "variables": {
+      "dfphubPolicyName": "dfpSend"
+  },
+  "resources": [
+      {
+          "type": "Microsoft.EventHub/namespaces",
+          "apiVersion": "2018-01-01-preview",
+          "name": "[parameters('ehubName')]",
+          "location": "[parameters('location')]",
+          "sku": {
+              "name": "[parameters('eventHubSku')]",
+              "tier": "[parameters('eventHubSku')]",
+              "capacity": "[parameters('ehubCapacity')]"
+          },
+          "properties": {
+              "zoneRedundant": false,
+              "isAutoInflateEnabled": true,
+              "maximumThroughputUnits": "[parameters('ehubMaximumThroughputUnits')]",
+              "kafkaEnabled": true
+          }
+      },
+      {
+          "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+          "apiVersion": "2017-04-01",
+          "name": "[concat(parameters('ehubName'), '/RootManageSharedAccessKey')]",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+          ],
+          "properties": {
+              "rights": [
+                  "Listen",
+                  "Manage",
+                  "Send"
+              ]
+          }
+      },
+      {
+          "type": "Microsoft.EventHub/namespaces/eventhubs",
+          "apiVersion": "2017-04-01",
+          "name": "[concat(parameters('ehubName'), '/dfp-hub')]",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+          ],
+          "properties": {
+              "messageRetentionInDays": "[parameters('ehubMessageRetentionInDays')]",
+              "partitionCount": "[parameters('dfphubNumPartitions')]",
+              "status": "Active"
+          }
+      },
+      {
+          "type": "Microsoft.EventHub/namespaces/eventhubs",
+          "apiVersion": "2017-04-01",
+          "name": "[concat(parameters('ehubName'), '/item-assignment-event-hub')]",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+          ],
+          "properties": {
+              "messageRetentionInDays": "[parameters('ehubMessageRetentionInDays')]",
+              "partitionCount": "[parameters('ehubNumPartitions')]",
+              "status": "Active"
+          }
+      },
+      {
+          "type": "Microsoft.EventHub/namespaces/eventhubs",
+          "apiVersion": "2017-04-01",
+          "name": "[concat(parameters('ehubName'), '/item-label-event-hub')]",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+          ],
+          "properties": {
+              "messageRetentionInDays": "[parameters('ehubMessageRetentionInDays')]",
+              "partitionCount": "[parameters('ehubNumPartitions')]",
+              "status": "Active"
+          }
+      },
+      {
+          "type": "Microsoft.EventHub/namespaces/eventhubs",
+          "apiVersion": "2017-04-01",
+          "name": "[concat(parameters('ehubName'), '/item-lock-event-hub')]",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+          ],
+          "properties": {
+              "messageRetentionInDays": "[parameters('ehubMessageRetentionInDays')]",
+              "partitionCount": "[parameters('ehubNumPartitions')]",
+              "status": "Active"
+          }
+      },
+      {
+            "type": "Microsoft.EventHub/namespaces/eventhubs",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-resolution-event-hub')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {
+                "messageRetentionInDays": "[parameters('ehubMessageRetentionInDays')]",
+                "partitionCount": "[parameters('ehubNumPartitions')]",
+                "status": "Active"
+            }
+      },
+      {
+          "type": "Microsoft.EventHub/namespaces/eventhubs",
+          "apiVersion": "2017-04-01",
+          "name": "[concat(parameters('ehubName'), '/overall-size-event-hub')]",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+          ],
+          "properties": {
+              "messageRetentionInDays": "[parameters('ehubMessageRetentionInDays')]",
+              "partitionCount": "[parameters('ehubNumPartitions')]",
+              "status": "Active"
+          }
+      },
+      {
+          "type": "Microsoft.EventHub/namespaces/eventhubs",
+          "apiVersion": "2017-04-01",
+          "name": "[concat(parameters('ehubName'), '/queue-size-event-hub')]",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+          ],
+          "properties": {
+              "messageRetentionInDays": "[parameters('ehubMessageRetentionInDays')]",
+              "partitionCount": "[parameters('ehubNumPartitions')]",
+              "status": "Active"
+          }
+      },
+      {
+          "type": "Microsoft.EventHub/namespaces/eventhubs",
+          "apiVersion": "2017-04-01",
+          "name": "[concat(parameters('ehubName'), '/queue-update-event-hub')]",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+          ],
+          "properties": {
+              "messageRetentionInDays": "[parameters('ehubMessageRetentionInDays')]",
+              "partitionCount": "[parameters('ehubNumPartitions')]",
+              "status": "Active"
+          }
+      },
+      {
+          "type": "Microsoft.EventHub/namespaces/networkRuleSets",
+          "apiVersion": "2018-01-01-preview",
+          "name": "[concat(parameters('ehubName'), '/default')]",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+          ],
+          "properties": {
+              "defaultAction": "Allow",
+              "virtualNetworkRules": [],
+              "ipRules": []
+          }
+      },
+       {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/authorizationRules",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/dfp-hub/', variables('dfphubPolicyName'))]",
+            "location": "West US",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'dfp-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/dfp-hub/$Default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'dfp-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]",
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs/authorizationRules',parameters('ehubName'), 'dfp-hub', variables('dfphubPolicyName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-assignment-event-hub/$Default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-assignment-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-label-event-hub/$Default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-label-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-lock-event-hub/$Default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-lock-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-resolution-event-hub/$Default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-resolution-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/overall-size-event-hub/$Default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'overall-size-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/queue-size-event-hub/$Default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'queue-size-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/queue-update-event-hub/$Default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'queue-update-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-assignment-event-hub/mr-analytics')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-assignment-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-label-event-hub/mr-analytics')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-label-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-lock-event-hub/mr-analytics')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-lock-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-resolution-event-hub/mr-analytics')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-resolution-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/overall-size-event-hub/mr-analytics')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'overall-size-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/queue-size-event-hub/mr-analytics')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'queue-size-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/queue-update-event-hub/mr-analytics')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'queue-update-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/dfp-hub/mr-queues')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'dfp-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-assignment-event-hub/mr-queues')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-assignment-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-label-event-hub/mr-queues')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-label-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-lock-event-hub/mr-queues')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-lock-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/item-resolution-event-hub/mr-queues')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'item-resolution-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/overall-size-event-hub/mr-queues')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'overall-size-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/queue-size-event-hub/mr-queues')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'queue-size-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/queue-update-event-hub/mr-queues')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'queue-update-event-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/eventhubs/consumergroups",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/dfp-hub/mr-queues-local')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces/eventhubs', parameters('ehubName'), 'dfp-hub')]",
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {}
+        }
+  ],
+  "outputs": {
+      "ehubResourceId": {
+        "type": "string",
+        "value": "[resourceId('Microsoft.EventHub/namespaces',parameters('ehubName'))]"
+      }
+  }
+}

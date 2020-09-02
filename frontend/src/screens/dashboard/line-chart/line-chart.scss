@@ -1,0 +1,30 @@
+@import "../../../styles/variables";
+
+.line-chart {
+  $spinnerHalfWidth: 70px;
+  $spinnerHalfHeight: 22px;
+
+  margin-bottom: 40px;
+
+  position: relative;
+
+
+  &__spinner {
+    position: absolute;
+    top: calc(50% - #{$spinnerHalfHeight});
+    right: calc(50% - #{$spinnerHalfWidth});
+    z-index: 100;
+  }
+
+  &__chart {
+    height: 375px;
+
+    &--blured {
+      filter: blur(7px);
+    }
+  }
+
+  &--empty {
+    fill-opacity: 20%;
+  }
+}

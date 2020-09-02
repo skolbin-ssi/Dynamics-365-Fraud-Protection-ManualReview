@@ -1,0 +1,3 @@
+rootProject.name = 'msd365fp-manual-review'
+
+include 'queues', 'analytics', 'model', 'cosmos-utilities', 'dfp-auth-starter', 'azure-graph-client'

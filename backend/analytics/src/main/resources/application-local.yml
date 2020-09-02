@@ -1,0 +1,23 @@
+mr:
+  tasks:
+    resolution-send-task:
+      enabled: false
+      delay: PT1M
+    collect-analyst-info-task:
+      enabled: false
+    send-alerts-task:
+      enabled: false
+    alert-template-reconciliation-task:
+      enabled: false
+
+logging:
+  level:
+    com:
+      griddynamics: TRACE
+
+azure:
+  keyvault:
+    # Use service principle to authenticate locally
+    client-key: ${CLIENT_SECRET}
+    client-id: ${CLIENT_ID}
+    tenant-id: ${TENANT_ID}

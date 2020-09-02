@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "prefix": {
+            "value": "armbased-tst"
+        },
+        "subscriptionId": {
+            "value": "0cf0b616-8add-4f2e-b426-ff243e283635"
+        },
+        "tenantId": {
+            "value": "74143e14-36bb-4cd2-bdb9-65d0f8b5b360"
+        },
+        "envType": {
+            "value": "Dev"
+        },
+        "primaryRegion": {
+            "value": "westus"
+        },
+        "secondaryRegion": {
+            "value": "eastus"
+        },
+        "throuhgputAnalyticsDb": {
+            "value": 1100
+        },
+        "throuhgputQueuesDb": {
+            "value": 500
+        },
+        "ehubMaximumThroughputUnits": {
+            "value": 1
+        },
+        "ehubNumPartitions": {
+            "value": 4
+        },
+        "dfphubNumPartitions": {
+            "value": 4
+        },
+        "cdnSku": {
+            "value": "Standard_Microsoft"
+        },
+        "feLogLevel": {
+            "value": "info"
+        },
+        "mapAccountSku": {
+            "value": "S1"
+        },
+        "appBackendSku": {
+            "value": "B2"
+        },
+        "appBackendNumOfWorkers": {
+            "value": 1
+        },
+        "appJavaOpts": {
+            "value": "-Xms3072m -Xmx3072m"
+        },
+        "mailUsername": {
+            "value": "dfp-mr-notificator@outlook.com"
+        },
+        "mailSmtpHost": {
+            "value": "smtp.office365.com"
+        }
+    }
+}

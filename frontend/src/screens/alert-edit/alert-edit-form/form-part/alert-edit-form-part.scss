@@ -1,0 +1,16 @@
+@import "../../../../styles/variables";
+
+.alert-edit-form-part {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid $neutralLight;
+  padding-bottom: 24px;
+
+  &__title {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 24px;
+    margin-bottom: 16px;
+    margin-top: 20px;
+  }
+}

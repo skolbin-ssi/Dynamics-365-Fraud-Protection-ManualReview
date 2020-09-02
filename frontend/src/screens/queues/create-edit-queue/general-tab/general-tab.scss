@@ -1,0 +1,137 @@
+@import '../../../../styles/variables';
+@import '../create-edit-queue.scss';
+
+$warningFontSize: 14px;
+$wideSelectorWidth: 352px;
+$columnGap: 16px;
+
+.general-tab {
+
+    &__no-further-changes-warning {
+        margin-top: 8px;
+        flex-shrink: 0;
+
+        span {
+            font-size: $warningFontSize;
+        }
+
+        &-icon {
+            color: $highRiskColor;
+        }
+    }
+
+    &__field {
+        border-top: 1px solid $neutralLight;
+
+        &:first-of-type {
+            border: none;
+        }
+    }
+
+    &__name-field {
+        $nameFieldHeight: 44px;
+        height: $nameFieldHeight + 30px;
+
+        .ms-TextField-fieldGroup {
+            height: $nameFieldHeight;
+        }
+    }
+
+    &__order-organization {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        column-gap: $columnGap;
+        align-items: flex-end;
+    }
+
+    &__order-organization-buttons {
+        grid-column: span 4;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: $columnGap;
+    }
+
+    &__order-organization-explanation {
+        grid-column: span 6;
+        list-style: none;
+
+        li:before {
+            content: "\2022";
+            color: $themePrimary;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+            font-size: 1.5em;
+        }
+    }
+
+    &__order-sort-by {
+        grid-column: span 6;
+
+        .is-disabled, .is-disabled * {
+            cursor: not-allowed;
+        }
+    }
+
+    &__order-sort-direction {
+        grid-column: span 4;
+
+        .is-disabled, .is-disabled * {
+            cursor: not-allowed;
+        }
+    }
+
+    &__processing-deadline {
+        display: grid;
+        grid-template-columns: $wideSelectorWidth 1fr;
+        align-items: center;
+        column-gap: $columnGap;
+
+        > div {
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+
+    &__enable-processing-deadline {
+        &.is-disabled, &.is-disabled * {
+            cursor: not-allowed;
+        }
+    }
+
+    &__deadline-picker {
+        width: 94px;
+
+        &.disabled {
+            cursor: not-allowed;
+        }
+    }
+
+    &__deadline-warning {
+        margin-top: 16px;
+
+        span {
+            font-size: $warningFontSize;
+        }
+    }
+
+    &__label-field {
+        display: grid;
+        grid-template-columns: repeat(2, 150px);
+        grid-template-rows: repeat(2, 32px);
+        grid-auto-flow: column;
+        align-items: center;
+    }
+
+    &__labels-field-item {
+        padding: 4px 0;
+
+        &.disabled {
+            cursor: not-allowed;
+            * {
+                cursor: not-allowed;
+            }
+        }
+    }
+}

@@ -1,0 +1,70 @@
+@import "../../styles/variables";
+
+.alert-edit {
+  max-height: 100%;
+  display: grid;
+  grid-template-rows: 48px minmax(0, 1fr);
+
+  &__action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    height: 48px;
+    box-shadow: inset 0 -1px 0 $neutralLight;
+
+    &-left {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    &-btn {
+      min-height: 30px;
+
+      &-delete {
+        justify-self: flex-end;
+      }
+    }
+  }
+
+  &__header-title {
+    display: inline-block;
+    font-size: 20px;
+    margin-bottom: 25px;
+  }
+
+  &__form {
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 600px minmax(0, 1fr);
+    overflow: scroll;
+    position: relative;
+  }
+
+  &__translucent-overlay {
+    opacity: .9;
+    background-color: $white;
+  }
+
+  &__info-badge {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+
+    &-green {
+      color: $themePrimary;
+    }
+
+    &-red {
+      color: $highRiskColor;
+    }
+  }
+
+  &__info-badge-icon {
+    margin-right: 10px;
+    font-size: 1.4em;
+  }
+}

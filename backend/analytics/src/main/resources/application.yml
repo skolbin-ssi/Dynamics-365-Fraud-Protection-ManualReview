@@ -1,0 +1,176 @@
+logging:
+  group:
+    azures: com.microsoft.azure.spring.autoconfigure.aad, com.azure.messaging.eventhubs.PartitionBasedLoadBalancer
+  level:
+    azures: WARN
+
+mr:
+  task-reset-timeout-multiplier: 4.0
+  task-warning-timeout-multiplier: 2.0
+  tasks:
+    resolution-send-task:
+      enabled: true
+      delay: PT1M
+      timeout: PT5M
+      max-retries: 10
+      initial-retry-delay: PT10M
+      max-retry-delay: P1D
+    collect-analyst-info-task:
+      enabled: true
+      delay: PT10M
+    send-alerts-task:
+      enabled: true
+      delay: PT1M
+    alert-template-reconciliation-task:
+      enabled: true
+      delay: PT10M
+  task-executor:
+    corepool-size: 5
+    max-pool-size: 10
+    queue-capacity: 25
+azure:
+  cosmosdb:
+    uri: ${COSMOSDB_ENDPOINT}
+    key: ${azure-cosmosdb-key:${COSMOSDB_KEY}}
+    database: AnalyticsDB
+    default-ttl: P1827D
+  activedirectory:
+    client-id: ${CLIENT_ID}
+    session-stateless: true
+    app-id-uri: api://${CLIENT_ID}
+  dfp:
+    purchase-status-event-url: https://${TENANT_SHORT_NAME}-${TENANT_ID}.api.dfp.dynamics-int.com/v1.0/merchantservices/events/PurchaseStatus
+  graph-api:
+    role-assignments-url: https://graph.microsoft.com/v1.0/servicePrincipals/${DFP_SP_ID}/appRoleAssignedTo
+    user-role-assignments-url-template: https://graph.microsoft.com/v1.0/users/#user_id#/appRoleAssignments?$filter=resourceId eq ${DFP_SP_ID}
+    users-url: https://graph.microsoft.com/v1.0/users
+    user-url-template: https://graph.microsoft.com/v1.0/users/#user_id#
+    app-service-principal-url: https://graph.microsoft.com/v1.0/servicePrincipals/${DFP_SP_ID}
+    user-photo-url-template: https://graph.microsoft.com/beta/users/#user_id#/photo/$value
+    role-mapping:
+      ManualReviewFraudManager: ADMIN_MANAGER
+      ManualReviewSeniorAnalyst: SENIOR_ANALYST
+      ManualReviewAnalyst: ANALYST
+      Sandbox_ManualReviewFraudManager: ADMIN_MANAGER
+      Sandbox_ManualReviewSeniorAnalyst: SENIOR_ANALYST
+      Sandbox_ManualReviewAnalyst: ANALYST
+  dfp-auth:
+    token-cache-size: 500
+    token-cache-retention: PT10M
+  keyvault:
+    # Use managed identity to authenticate
+    enabled: true
+    uri: ${KEYVAULT_ENDPOINT}
+
+swagger:
+  auth-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/authorize?resource=${CLIENT_ID}
+  # the https://cors-anywhere.herokuapp.com/ prefix is only for dev environments
+  token-url: https://cors-anywhere.herokuapp.com/https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+  token-scope: ${azure.activedirectory.app-id-uri}/.default
+
+spring:
+  application:
+    name: mr-analytics
+  security:
+    oauth2:
+      client:
+        registration:
+          azure-graph-api:
+            client-id: ${CLIENT_ID}
+            client-secret: ${client-secret:${CLIENT_SECRET}}
+            authorization-grant-type: client_credentials
+            scope: https://graph.microsoft.com/.default
+          azure-dfp-api:
+            client-id: ${CLIENT_ID}
+            client-secret: ${client-secret:${CLIENT_SECRET}}
+            authorization-grant-type: client_credentials
+            scope: https://api.dfp.microsoft-int.com/.default
+        provider:
+          azure-graph-api:
+            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+          azure-dfp-api:
+            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+  cloud:
+    azure:
+      eventhub:
+        connection-String: ${spring-cloud-azure-eventhub-connection-string:${EVENT_HUB_CONNECTION_STRING}}
+        checkpoint-storage-account: ${EVENT_HUB_OFFSET_STORAGE_NAME}
+        checkpoint-access-key: ${spring-cloud-azure-eventhub-checkpoint-access-key:${EVENT_HUB_OFFSET_STORAGE_KEY}}
+        bindings:
+          input:
+            consumer:
+              checkpoint-mode: MANUAL
+    stream:
+      eventhub:
+        bindings:
+          #          WARNING!!! Don't use checkpoint-mode: TIME and checkpoint-mode: BATCH
+          #          because of https://github.com/microsoft/spring-cloud-azure/issues/755
+          #          and https://github.com/microsoft/spring-cloud-azure/commit/ac6fef38ac99c8a843227d1d785eaf30584ada67#diff-ba40671ca26e6582be133cddb4973ab8
+          item-resolution-event-input:
+            consumer:
+              start-position: EARLIEST
+              checkpoint-mode: RECORD
+          item-assignment-event-input:
+            consumer:
+              start-position: EARLIEST
+              checkpoint-mode: RECORD
+          item-label-event-input:
+            consumer:
+              start-position: EARLIEST
+              checkpoint-mode: RECORD
+          item-lock-event-input:
+            consumer:
+              start-position: EARLIEST
+              checkpoint-mode: RECORD
+          queue-size-event-input:
+            consumer:
+              start-position: EARLIEST
+              checkpoint-mode: RECORD
+          queue-update-event-input:
+            consumer:
+              start-position: EARLIEST
+              checkpoint-mode: RECORD
+          overall-size-event-input:
+            consumer:
+              start-position: EARLIEST
+              checkpoint-mode: RECORD
+      bindings:
+        item-resolution-event-input:
+          destination: item-resolution-event-hub
+          group: ${spring.application.name}
+        item-assignment-event-input:
+          destination: item-assignment-event-hub
+          group: ${spring.application.name}
+        item-label-event-input:
+          destination: item-label-event-hub
+          group: ${spring.application.name}
+        item-lock-event-input:
+          destination: item-lock-event-hub
+          group: ${spring.application.name}
+        queue-size-event-input:
+          destination: queue-size-event-hub
+          group: ${spring.application.name}
+        queue-update-event-input:
+          destination: queue-update-event-hub
+          group: ${spring.application.name}
+        overall-size-event-input:
+          destination: overall-size-event-hub
+          group: ${spring.application.name}
+  aop:
+    proxyTargetClass: true
+  mail:
+    host: ${MAIL_SMTP_HOST}
+    port: ${MAIL_SMTP_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${spring-mail-password:${MAIL_PASSWORD}}
+    transportProtocol: smtp
+    smtpAuth: true
+    smtpStartTls: true
+
+resilience4j.retry:
+  instances:
+    cosmosOptimisticUpdate:
+      maxRetryAttempts: 3
+      waitDuration: 0s
+      retryExceptions:
+        - com.microsoft.azure.spring.data.cosmosdb.exception.CosmosDBAccessException

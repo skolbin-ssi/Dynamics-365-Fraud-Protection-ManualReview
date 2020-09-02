@@ -1,0 +1,104 @@
+// Fluent UI default theme
+$themePrimary: #0078d4;
+$themeLighterAlt: #eff6fc;
+$themeLighter: #deecf9;
+$themeLight: #c7e0f4;
+$themeTertiary: #71afe5;
+$themeSecondary: #2b88d8;
+$themeDarkAlt: #106ebe;
+$themeDark: #005a9e;
+$themeDarker: #004578;
+$neutralLighterAlt: #faf9f8;
+$neutralLighter: #f3f2f1;
+$neutralLight: #edebe9;
+$neutralQuaternaryAlt: #e1dfdd;
+$neutralQuaternary: #d0d0d0;
+$neutralTertiaryAlt: #c8c6c4;
+$neutralTertiary: #a19f9d;
+$neutralSecondary: #605e5c;
+$neutralPrimaryAlt: #3b3a39;
+$neutralPrimary: #323130;
+$neutralDark: #201f1e;
+$black: #000000;
+$white: #ffffff;
+
+// Custom variables
+$headerHeight: 48px;
+$collapsedLeftNavigationWidth: 48px;
+$expandedLeftNavigationWidth: 230px;
+
+$verticalTabHeight: 44px;
+
+$highRiskColor: #D83B01;
+$mediumRiskColor: #FFC80A;
+$lowRiskColor: #A19F9D;
+
+$approveFill: rgba(95, 210, 85, 0.2);
+$approveFillHover: rgba(95, 210, 85, 0.3);
+$approveFillActive: rgba(95, 210, 85, 0.4);
+$approveLabelBackground: #DFF6DD;
+
+$rejectFill: rgba(245, 135, 145, 0.2);
+$rejectFillHover: rgba(245, 135, 145, 0.3);
+$rejectFillActive: rgba(245, 135, 145, 0.4);
+$rejectedLabelBackground: #FDE7E9;
+
+$approveColor: #107C10;
+$rejectColor: #D83B01;
+
+$vividMostColor: #FF8E09;
+$vividMediumColor: #F0C694;
+$vividLightColor: #FFF4E6;
+
+$gray: #8A8886;
+
+//___ charts variables ___
+
+// background color for a charts, when no data
+$chartOpacityBackgroundColor: rgba(255, 255, 255, 0.8);
+
+// __ bar chart __
+
+$approveMatchedColor: #87BD87;
+$approvedUnmatchedColor: #DFF6DD;
+$rejectMatchedColor: #E36772;
+$rejectUnmatchedColor: #FAC3C8;
+
+// __ fraud score counter colors threshold __
+
+$lowScoreColor: #039A60;
+$lowMediumScoreColor: #C6BF23;
+$highMediumScoreColor: #FFAD02;
+$highScoreColor: #D83B01;
+
+$rainbow-circle-background: conic-gradient(from 180deg at 50% 78.78%, $highScoreColor -98.91deg, $lowScoreColor 100.13deg, $lowMediumScoreColor 151.7deg, $highMediumScoreColor 206.21deg, $highScoreColor 261.09deg, $lowScoreColor 460.13deg);
+
+//font sizes
+$warningFontSize: 14px;
+
+
+//defaults
+$defaultBlurFilterValue: 7px;
+
+
+// mixins
+
+@function getSvgDataImageUri($svgIcon) {
+  @return "data:image/svg+xml;charset=UTF-8,#{$svgIcon}"
+}
+
+@mixin backgroundSvgIcon($svgIcon) {
+  background: url("#{ getSvgDataImageUri($svgIcon)}") no-repeat;
+}
+
+
+// SVG Icons
+$svgSortArrowDown: "<svg width='9' height='16' viewBox='0 0 9 16' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M7.65625 11.3984L8.36719 12.1016L4.51562 15.9531L0.65625 12.1016L1.36719 11.3984L4.00781 14.0391L4 0.0234375H5L5.00781 14.0469L7.65625 11.3984Z' fill='black'/></svg>";
+
+
+// __ demand supply chart __
+
+$colorRemaining: #BF82F1;
+$colorReviewed: #2B88D8;
+$colorReceived: #FF9314;
+$colorReleased: #605E5C;

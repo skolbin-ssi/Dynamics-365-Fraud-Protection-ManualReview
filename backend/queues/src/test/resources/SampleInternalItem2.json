@@ -1,0 +1,92 @@
+{
+  "id": "1905323278411",
+  "active": false,
+  "label": {},
+  "purchase": {
+    "PurchaseId": "1905323278411",
+    "AssessmentType": "protect",
+    "OriginalOrderId": "1905323278411",
+    "MerchantLocalDate": "2019-11-22T00:30:56+04:00",
+    "TotalAmount": 1.0,
+    "TotalAmountInUSD": 1.0,
+    "SalesTax": 0.0,
+    "SalesTaxInUSD": 0.0,
+    "Currency": "USD",
+    "CurrencyConversionFactor": 1.0,
+    "ShippingMethod": "manual",
+    "User": {
+      "UserId": "null",
+      "CreationDate": "2019-11-15T17:14:14Z",
+      "UpdateDate": "2019-11-21T20:30:54Z",
+      "FirstName": "Aleksei",
+      "LastName": "Sokolov",
+      "Country": "AL",
+      "ZipCode": "34567",
+      "Language": "en",
+      "Email": "asokolov@griddynamics.com",
+      "MembershipId": "null",
+      "ProfileType": "Consumer",
+      "ProfileName": "asokolov@griddynamics.com",
+      "DisplayName": "asokolov@griddynamics.com",
+      "IsEmailValidated": true,
+      "IsPhoneNumberValidated": false,
+      "MerchantLocalDate": "2019-11-22T00:30:56+04:00"
+    },
+    "DeviceContext": {
+      "DeviceContextId": "72ea90b57778fef7e70de53abcae6865",
+      "RoutingType": "fixed",
+      "ConnectionType": "tx",
+      "PurchaseId": "1905323278411",
+      "MerchantLocalDate": "2019-11-22T00:30:56+04:00",
+      "IPAddress": "88.147.153.174",
+      "IPLatitude": 51.54308,
+      "IPLongitude": 45.99874,
+      "IPCity": "saratov",
+      "IPCountry": "ru",
+      "IPState": "saratovskaya oblast'"
+    },
+    "AddressList": [],
+    "PaymentInstrumentList": [
+      {
+        "PaymentInstrumentId": "0cb95c0b-3b71-4df8-a42f-1b9828d4a29b_SYSGENERATED",
+        "PurchaseAmount": 1.0,
+        "PurchaseAmountInUSD": 1.0,
+        "Type": "bogus",
+        "Email": "asokolov@griddynamics.com",
+        "MerchantLocalDate": "2019-11-22T00:30:56+04:00"
+      }
+    ],
+    "ProductList": [
+      {
+        "ProductId": "4369850433610",
+        "ProductName": "VirtualProduct",
+        "SalesPrice": 1.0,
+        "SalesPriceInUSD": 1.0,
+        "Currency": "USD",
+        "CurrencyConversionFactor": 1.0,
+        "IsFree": true,
+        "PurchasePrice": 1.0,
+        "PurchasePriceInUSD": 1.0,
+        "Quantity": 1.0,
+        "ShippingMethod": "manual"
+      }
+    ],
+    "BankEventsList": [],
+    "CustomData": {},
+    "PreviousPurchaseList": []
+  },
+  "assessmentResult": {
+    "RiskScore": 89,
+    "MerchantRuleDecision": "Approve",
+    "ReasonCodes": "",
+    "PolicyApplied": "Default",
+    "PurchaseStatusList": [],
+    "MIDFlag": "Standard"
+  },
+  "decision": {
+    "riskScore": 89,
+    "reasonCodes": ""
+  },
+  "lock": {},
+  "ttl": -1
+}

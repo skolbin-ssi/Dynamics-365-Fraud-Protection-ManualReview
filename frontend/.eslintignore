@@ -1,0 +1,5 @@
+node_modules
+config
+scripts
+public
+src/setupProxy.js

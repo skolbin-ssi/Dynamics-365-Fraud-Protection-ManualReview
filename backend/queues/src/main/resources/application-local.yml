@@ -1,0 +1,31 @@
+mr:
+  tasks:
+    residual-queue-reconciliation-task:
+      enabled: false
+    queue-size-calculation-task:
+      enabled: false
+    overall-size-calculation-task:
+      enabled: false
+    item-assignment-reconciliation-task:
+      enabled: false
+    item-unlock-task:
+      enabled: false
+    dictionary-reconciliation-task:
+      enabled: false
+    item-enrichment-task:
+      enabled: false
+    queue-assignment-reconciliation-task:
+      enabled: false
+
+logging:
+  level:
+    com:
+      griddynamics: TRACE
+
+azure:
+  keyvault:
+    # Use service principle to authenticate locally
+    enabled: true
+    client-key: ${CLIENT_SECRET}
+    client-id: ${CLIENT_ID}
+    tenant-id: ${TENANT_ID}

@@ -1,0 +1,1149 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "prefix": {
+      "type": "string",
+      "defaultValue": "[uniqueString(deployment().name)]"
+    },
+    "envType": {
+      "type": "string",
+      "allowedValues": [
+        "Dev",
+        "Prod"
+      ]
+    },
+    "subscriptionId": {
+      "type": "string"
+    },
+    "deploymentIdentity": {
+      "type": "string"
+    },
+    "deploymentStorageAccount": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string"
+    },
+    "keyVaultName": {
+      "type": "string"
+    },
+    "primaryRegion": {
+      "type": "string",
+      "defaultValue": "westus"
+    },
+    "secondaryRegion": {
+      "type": "string",
+      "defaultValue": "westus"
+    },
+    "feStorageAccountSku": {
+      "type": "string",
+      "defaultValue": "Standard_RAGRS"
+    },
+    "feLogLevel": {
+      "type": "string",
+      "defaultValue": "info"
+    },
+    "mapAccountSku": {
+      "type": "string",
+      "defaultValue": "S0"
+    },
+    "defaultConsistencyLevel": {
+        "type": "string",
+        "defaultValue": "Session"
+    },
+    "throuhgputAnalyticsDb": {
+      "type": "int",
+      "defaultValue": 900
+    },
+    "throuhgputQueuesDb": {
+      "type": "int",
+      "defaultValue": 400
+    },
+    "offsetsStorageAccountSku": {
+      "type": "string",
+      "defaultValue": "Standard_LRS"
+    },
+    "ehubMaximumThroughputUnits": {
+      "type": "int",
+      "defaultValue": 8
+    },
+    "ehubNumPartitions": {
+      "type": "int",
+      "defaultValue": 8
+    },
+    "dfphubNumPartitions": {
+      "type": "int",
+      "defaultValue": 8
+    },
+    "cdnSku": {
+      "type": "string",
+      "defaultValue": "Standard_Microsoft"
+    },
+    "customDomain": {
+      "type": "string",
+      "defaultValue": "UNDEFINED"
+    },
+    "appBackendSku": {
+      "type": "string",
+      "defaultValue": "S1"
+    },
+    "appBackendNumOfWorkers": {
+      "type": "int",
+      "defaultValue": 1
+    },
+    "appClientId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "appSpId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "mapsGroupId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "appJavaOpts": {
+      "type": "string"
+    },
+    "mailUsername": {
+      "type": "string"
+    },
+    "mailSmtpHost": {
+      "type": "string"
+    },
+    "mailSmtpPort": {
+      "type": "string",
+      "defaultValue": "587"
+    },
+    "dfpSpId": {
+      "type": "string"
+    },
+    "tenantShortName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "commonPrefix": "[parameters('prefix')]",
+    "templateBaseUri": "[deployment().properties.templateLink.uri]",
+    "storageAccountTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/storageAccount.json')]",
+    "cosmosDbTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/cosmosDb.json')]",
+    "ehubTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/eventHub.json')]",
+    "linuxAppTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/linuxApp.json')]",
+    "keyVaultTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/vaultSecrets.json')]",
+    "appinsightTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/applicationInsight.json')]",
+    "dashboard1TemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/dashboard1.json')]",
+    "logWorkspaceTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/logAnalytics.json')]",
+    "mapAccountTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/azureMapAccount.json')]",
+    "powershellAppRestartTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/scriptPsAppRestart.json')]",
+    "powershellDeployFrontendTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/scriptPsDeployFrontend.json')]",
+    "powershellDeployFrontendScriptUri": "[replace(variables('templateBaseUri'),'main.json','deploy_frontend.ps1')]",
+    "powershellFDEnableHTTPSTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/scriptPsFDEnableHTTPS.json')]",
+    "powershellPurgeCDNTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/scriptPsPurgeCDN.json')]",
+    "cdnTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/cdn.json')]",
+    "fdTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/frontDoor.json')]",
+    "storageAccountNameFE": "[replace(toLower(concat(variables('commonPrefix'), 'static')),'-','')]",
+    "mapAccountName": "[concat(variables('commonPrefix'), '-map')]",
+    "cosmosDbAccountName": "[concat(variables('commonPrefix'), '-storage')]",
+    "ehubName": "[concat(variables('commonPrefix'), '-ehub')]",
+    "ehubSecondaryName": "[concat(variables('commonPrefix'), '-secondary-ehub')]",
+    "storageAccountNameOffsets": "[replace(toLower(concat(variables('commonPrefix'), 'offsets')),'-','')]",
+    "storageAccountNameSecondaryOffsets": "[replace(toLower(concat(variables('commonPrefix'), 'secoffsets')),'-','')]",
+    "appQueuesPackageUrl": "[replace(variables('templateBaseUri'),'main.json','queues/target.zip')]",
+    "appQueuesName": "[concat(variables('commonPrefix'), '-queues')]",
+    "appQueuesSecondaryName": "[concat(variables('commonPrefix'), '-queues-secondary')]",
+    "appAnalyticsPackageUrl": "[replace(variables('templateBaseUri'),'main.json','analytics/target.zip')]",
+    "appAnalyticsName": "[concat(variables('commonPrefix'), '-analytics')]",
+    "appAnalyticsSecondaryName": "[concat(variables('commonPrefix'), '-analytics-secondary')]",
+    "appInsightName": "[concat(variables('commonPrefix'), '-app-insights')]",
+    "appInsightSecondaryName": "[concat(variables('commonPrefix'), '-secondary-app-insights')]",
+    "springProfile": "[if(equals(parameters('envType'),'Prod'),'-Dspring.profiles.active=prod','-Dspring.profiles.active=int')]",
+    "springProfileSecondary": "[if(equals(parameters('envType'),'Prod'),'-Dspring.profiles.active=prod,prod-secondary','-Dspring.profiles.active=int,int-secondary')]",
+    "appJavaOpts": "[concat(parameters('appJavaOpts'),' -javaagent:/home/site/wwwroot/applicationinsights-agent.jar -Dserver.port=80',' ',variables('springProfile'))]",
+    "appJavaOptsSecondary": "[concat(parameters('appJavaOpts'),' -javaagent:/home/site/wwwroot/applicationinsights-agent.jar -Dserver.port=80',' ',variables('springProfileSecondary'))]",
+    "LogWorkspaceName": "[concat(variables('commonPrefix'), '-log-analytics-ws')]",
+    "LogWorkspaceSecondaryName": "[concat(variables('commonPrefix'), '-secondary-log-analytics-ws')]",
+    "cdnName": "[concat(variables('commonPrefix'), '-cdn')]",
+    "fdName": "[variables('commonPrefix')]",
+    "keyVaultEndpoint": "[concat('https://',parameters('keyVaultName'),'.vault.azure.net/')]"
+  },
+  "resources": [
+    {                                              // FE Storage Account
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "storageAccountTemplateFE",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('storageAccountTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[variables('storageAccountNameFE')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "sku": {
+            "value": "[parameters('feStorageAccountSku')]"
+          }
+        }
+      }
+    },
+    {                                              // FE Azure Maps Account
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "mapAccountTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('mapAccountTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "mapsAccountName": {
+            "value": "[variables('mapAccountName')]"
+          },
+          "sku": {
+            "value": "[parameters('mapAccountSku')]"
+          },
+          "principalId": {
+            "value": "[parameters('mapsGroupId')]"
+          }
+        }
+      }
+    },
+    {                                                // CosmosDb
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "cosmosDbTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('cosmosDbTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "cosmosDbAccountName": {
+            "value": "[variables('cosmosDbAccountName')]"
+          },
+          "defaultConsistencyLevel": {
+            "value": "[parameters('defaultConsistencyLevel')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "primaryRegion": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "secondaryRegion": {
+            "value": "[parameters('secondaryRegion')]"
+          },
+          "throuhgputAnalyticsDb": {
+            "value": "[parameters('throuhgputAnalyticsDb')]"
+          },
+          "throuhgputQueuesDb": {
+            "value": "[parameters('throuhgputQueuesDb')]"
+          }
+        }
+      }
+    },
+    {                                                // Event Hub
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "ehubTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('ehubTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "ehubName": {
+            "value": "[variables('ehubName')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "ehubMaximumThroughputUnits": {
+            "value": "[parameters('ehubMaximumThroughputUnits')]"
+          },
+          "ehubNumPartitions": {
+            "value": "[parameters('ehubNumPartitions')]"
+          },
+          "dfphubNumPartitions": {
+            "value": "[parameters('dfphubNumPartitions')]"
+          }
+        }
+      }
+    },
+    {                                                // Event Hub SECONDARY
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "ehubSecondaryTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('ehubTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "ehubName": {
+            "value": "[variables('ehubSecondaryName')]"
+          },
+          "location": {
+            "value": "[parameters('secondaryRegion')]"
+          },
+          "ehubMaximumThroughputUnits": {
+            "value": "[parameters('ehubMaximumThroughputUnits')]"
+          },
+          "ehubNumPartitions": {
+            "value": "[parameters('ehubNumPartitions')]"
+          },
+          "dfphubNumPartitions": {
+            "value": "[parameters('dfphubNumPartitions')]"
+          }
+        }
+      }
+    },
+    {                                              // Offsets Storage Account
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "storageAccountTemplateOffsets",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('storageAccountTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[variables('storageAccountNameOffsets')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "sku": {
+            "value": "[parameters('offsetsStorageAccountSku')]"
+          }
+        }
+      }
+    },
+    {                                              // Offsets Storage Account SECONDARY REGION
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "storageAccountSecondaryTemplateOffsets",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('storageAccountTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "storageAccountName": {
+            "value": "[variables('storageAccountNameSecondaryOffsets')]"
+          },
+          "location": {
+            "value": "[parameters('secondaryRegion')]"
+          },
+          "sku": {
+            "value": "[parameters('offsetsStorageAccountSku')]"
+          }
+        }
+      }
+    },
+    {                                              // Fill Key Vault Secrets
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "keyVaultTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/cosmosDbTemplate",
+        "Microsoft.Resources/deployments/ehubTemplate",
+        "Microsoft.Resources/deployments/ehubSecondaryTemplate",
+        "Microsoft.Resources/deployments/storageAccountTemplateOffsets",
+        "Microsoft.Resources/deployments/storageAccountSecondaryTemplateOffsets"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('keyVaultTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "cosmosDbAccountName": {
+            "value": "[variables('cosmosDbAccountName')]"
+          },
+          "ehubName": {
+            "value": "[variables('ehubName')]"
+          },
+          "ehubSecondaryName": {
+            "value": "[variables('ehubSecondaryName')]"
+          },
+          "ehubOffsetStorageName": {
+            "value": "[reference('storageAccountTemplateOffsets').outputs.storageAccountName.value]"
+          },
+          "ehubOffsetStorageSecondaryName": {
+            "value": "[reference('storageAccountSecondaryTemplateOffsets').outputs.storageAccountName.value]"
+          }
+        }
+      }
+    },
+    {                                              // Web App Queues
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "applicationQueuesTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/cosmosDbTemplate",
+        "Microsoft.Resources/deployments/ehubTemplate",
+        "Microsoft.Resources/deployments/storageAccountTemplateOffsets",
+        "Microsoft.Resources/deployments/applicationInsightTemplate",
+        "Microsoft.Resources/deployments/keyVaultTemplate",
+        "Microsoft.Resources/deployments/LogWorkspaceTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('linuxappTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "webAppName": {
+            "value": "[variables('appQueuesName')]"
+          },
+          "packageUrl": {
+            "value": "[variables('appQueuesPackageUrl')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "sku": {
+            "value": "[parameters('appBackendSku')]"
+          },
+          "numberOfWorkers": {
+            "value": "[parameters('appBackendNumOfWorkers')]"
+          },
+          "powershellAppRestartTemplateUri": {
+            "value": "[variables('powershellAppRestartTemplateUri')]"
+          },
+          "deploymentIdentity": {
+            "value": "[parameters('deploymentIdentity')]"
+          },
+          "deploymentStorageAccount": {
+            "value": "[parameters('deploymentStorageAccount')]"
+          },
+          "deploymentResourceGroup": {
+            "value": "[resourceGroup().name]"
+          },
+          "cosmosDbAccountName": {
+            "value": "[variables('cosmosDbAccountName')]"
+          },
+          "ehubOffsetStorageName": {
+            "value": "[reference('storageAccountTemplateOffsets').outputs.storageAccountName.value]"
+          },
+          "appClientId": {
+            "value": "[parameters('appClientId')]"
+          },
+          "appSpId": {
+            "value": "[parameters('appSpId')]"
+          },
+          "tenantId": {
+            "value": "[parameters('tenantId')]"
+          },
+          "appJavaOpts": {
+            "value": "[variables('appJavaOpts')]"
+          },
+          "mailUsername": {
+            "value": "[parameters('mailUsername')]"
+          },
+          "mailSmtpHost": {
+            "value": "[parameters('mailSmtpHost')]"
+          },
+          "mailSmtpPort": {
+            "value": "[parameters('mailSmtpPort')]"
+          },
+          "dfpSpId": {
+            "value": "[parameters('dfpSpId')]"
+          },
+          "tenantShortName": {
+            "value": "[parameters('tenantShortName')]"
+          },
+          "keyVaultEndpoint": {
+            "value": "[variables('keyVaultEndpoint')]"
+          },
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          },
+          "appInsightName": {
+            "value": "[variables('appInsightName')]"
+          },
+          "logWorkspaceName": {
+            "value": "[variables('LogWorkspaceName')]"
+          }
+        }
+      }
+    },
+    {                                              // Web App Queues SECONDARY REGION
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "applicationQueuesSecondaryTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/cosmosDbTemplate",
+        "Microsoft.Resources/deployments/ehubSecondaryTemplate",
+        "Microsoft.Resources/deployments/storageAccountSecondaryTemplateOffsets",
+        "Microsoft.Resources/deployments/applicationInsightSecondaryTemplate",
+        "Microsoft.Resources/deployments/keyVaultTemplate",
+        "Microsoft.Resources/deployments/LogWorkspaceSecondaryTemplate",
+        "Microsoft.Resources/deployments/applicationQueuesTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('linuxappTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "webAppName": {
+            "value": "[variables('appQueuesSecondaryName')]"
+          },
+          "packageUrl": {
+            "value": "[variables('appQueuesPackageUrl')]"
+          },
+          "location": {
+            "value": "[parameters('secondaryRegion')]"
+          },
+          "sku": {
+            "value": "[parameters('appBackendSku')]"
+          },
+          "numberOfWorkers": {
+            "value": "[parameters('appBackendNumOfWorkers')]"
+          },
+          "powershellAppRestartTemplateUri": {
+            "value": "[variables('powershellAppRestartTemplateUri')]"
+          },
+          "deploymentIdentity": {
+            "value": "[parameters('deploymentIdentity')]"
+          },
+          "deploymentStorageAccount": {
+            "value": "[parameters('deploymentStorageAccount')]"
+          },
+          "deploymentResourceGroup": {
+            "value": "[resourceGroup().name]"
+          },
+          "cosmosDbAccountName": {
+            "value": "[variables('cosmosDbAccountName')]"
+          },
+          "ehubOffsetStorageName": {
+            "value": "[reference('storageAccountSecondaryTemplateOffsets').outputs.storageAccountName.value]"
+          },
+          "appClientId": {
+            "value": "[parameters('appClientId')]"
+          },
+          "appSpId": {
+            "value": "[parameters('appSpId')]"
+          },
+          "tenantId": {
+            "value": "[parameters('tenantId')]"
+          },
+          "appJavaOpts": {
+            "value": "[variables('appJavaOptsSecondary')]"
+          },
+          "mailUsername": {
+            "value": "[parameters('mailUsername')]"
+          },
+          "mailSmtpHost": {
+            "value": "[parameters('mailSmtpHost')]"
+          },
+          "mailSmtpPort": {
+            "value": "[parameters('mailSmtpPort')]"
+          },
+          "dfpSpId": {
+            "value": "[parameters('dfpSpId')]"
+          },
+          "tenantShortName": {
+            "value": "[parameters('tenantShortName')]"
+          },
+          "keyVaultEndpoint": {
+            "value": "[variables('keyVaultEndpoint')]"
+          },
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          },
+          "appInsightName": {
+            "value": "[variables('appInsightSecondaryName')]"
+          },
+          "logWorkspaceName": {
+            "value": "[variables('LogWorkspaceSecondaryName')]"
+          }
+        }
+      }
+    },
+    {                                              // Web App Analytics
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "applicationAnalyticsTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/cosmosDbTemplate",
+        "Microsoft.Resources/deployments/ehubTemplate",
+        "Microsoft.Resources/deployments/storageAccountTemplateOffsets",
+        "Microsoft.Resources/deployments/applicationInsightTemplate",
+        "Microsoft.Resources/deployments/keyVaultTemplate",
+        "Microsoft.Resources/deployments/LogWorkspaceTemplate",
+        "Microsoft.Resources/deployments/applicationQueuesSecondaryTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('linuxappTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "webAppName": {
+            "value": "[variables('appAnalyticsName')]"
+          },
+          "packageUrl": {
+            "value": "[variables('appAnalyticsPackageUrl')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "sku": {
+            "value": "[parameters('appBackendSku')]"
+          },
+          "numberOfWorkers": {
+            "value": "[parameters('appBackendNumOfWorkers')]"
+          },
+          "powershellAppRestartTemplateUri": {
+            "value": "[variables('powershellAppRestartTemplateUri')]"
+          },
+          "deploymentIdentity": {
+            "value": "[parameters('deploymentIdentity')]"
+          },
+          "deploymentStorageAccount": {
+            "value": "[parameters('deploymentStorageAccount')]"
+          },
+          "deploymentResourceGroup": {
+            "value": "[resourceGroup().name]"
+          },
+          "cosmosDbAccountName": {
+            "value": "[variables('cosmosDbAccountName')]"
+          },
+          "ehubOffsetStorageName": {
+            "value": "[reference('storageAccountTemplateOffsets').outputs.storageAccountName.value]"
+          },
+          "appClientId": {
+            "value": "[parameters('appClientId')]"
+          },
+          "appSpId": {
+            "value": "[parameters('appSpId')]"
+          },
+          "tenantId": {
+            "value": "[parameters('tenantId')]"
+          },
+          "appJavaOpts": {
+            "value": "[variables('appJavaOpts')]"
+          },
+          "mailUsername": {
+            "value": "[parameters('mailUsername')]"
+          },
+          "mailSmtpHost": {
+            "value": "[parameters('mailSmtpHost')]"
+          },
+          "mailSmtpPort": {
+            "value": "[parameters('mailSmtpPort')]"
+          },
+          "dfpSpId": {
+            "value": "[parameters('dfpSpId')]"
+          },
+          "tenantShortName": {
+            "value": "[parameters('tenantShortName')]"
+          },
+          "keyVaultEndpoint": {
+            "value": "[variables('keyVaultEndpoint')]"
+          },
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          },
+          "appInsightName": {
+            "value": "[variables('appInsightName')]"
+          },
+          "logWorkspaceName": {
+            "value": "[variables('LogWorkspaceName')]"
+          }
+        }
+      }
+    },
+    {                                              // Web App Analytics SECONDARY REGIONS
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "applicationAnalyticsSecondaryTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/cosmosDbTemplate",
+        "Microsoft.Resources/deployments/ehubSecondaryTemplate",
+        "Microsoft.Resources/deployments/storageAccountSecondaryTemplateOffsets",
+        "Microsoft.Resources/deployments/applicationInsightSecondaryTemplate",
+        "Microsoft.Resources/deployments/keyVaultTemplate",
+        "Microsoft.Resources/deployments/LogWorkspaceSecondaryTemplate",
+        "Microsoft.Resources/deployments/applicationAnalyticsTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('linuxappTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "webAppName": {
+            "value": "[variables('appAnalyticsSecondaryName')]"
+          },
+          "packageUrl": {
+            "value": "[variables('appAnalyticsPackageUrl')]"
+          },
+          "location": {
+            "value": "[parameters('secondaryRegion')]"
+          },
+          "sku": {
+            "value": "[parameters('appBackendSku')]"
+          },
+          "numberOfWorkers": {
+            "value": "[parameters('appBackendNumOfWorkers')]"
+          },
+          "powershellAppRestartTemplateUri": {
+            "value": "[variables('powershellAppRestartTemplateUri')]"
+          },
+          "deploymentIdentity": {
+            "value": "[parameters('deploymentIdentity')]"
+          },
+          "deploymentStorageAccount": {
+            "value": "[parameters('deploymentStorageAccount')]"
+          },
+          "deploymentResourceGroup": {
+            "value": "[resourceGroup().name]"
+          },
+          "cosmosDbAccountName": {
+            "value": "[variables('cosmosDbAccountName')]"
+          },
+          "ehubOffsetStorageName": {
+            "value": "[reference('storageAccountSecondaryTemplateOffsets').outputs.storageAccountName.value]"
+          },
+          "appClientId": {
+            "value": "[parameters('appClientId')]"
+          },
+          "appSpId": {
+            "value": "[parameters('appSpId')]"
+          },
+          "tenantId": {
+            "value": "[parameters('tenantId')]"
+          },
+          "appJavaOpts": {
+            "value": "[variables('appJavaOptsSecondary')]"
+          },
+          "mailUsername": {
+            "value": "[parameters('mailUsername')]"
+          },
+          "mailSmtpHost": {
+            "value": "[parameters('mailSmtpHost')]"
+          },
+          "mailSmtpPort": {
+            "value": "[parameters('mailSmtpPort')]"
+          },
+          "dfpSpId": {
+            "value": "[parameters('dfpSpId')]"
+          },
+          "tenantShortName": {
+            "value": "[parameters('tenantShortName')]"
+          },
+          "keyVaultEndpoint": {
+            "value": "[variables('keyVaultEndpoint')]"
+          },
+          "keyVaultName": {
+            "value": "[parameters('keyVaultName')]"
+          },
+          "appInsightName": {
+            "value": "[variables('appInsightSecondaryName')]"
+          },
+          "logWorkspaceName": {
+            "value": "[variables('LogWorkspaceSecondaryName')]"
+          }
+        }
+      }
+    },
+    {                                              // Application insights
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "applicationInsightTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('appinsightTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "appInsightName": {
+            "value": "[variables('appInsightName')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          }
+        }
+      }
+    },
+    {                                              // Application insights SECONDARY
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "applicationInsightSecondaryTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('appinsightTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "appInsightName": {
+            "value": "[variables('appInsightSecondaryName')]"
+          },
+          "location": {
+            "value": "[parameters('secondaryRegion')]"
+          }
+        }
+      }
+    },             
+    {                                              // Application insights Dashboard 1
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "dashboard1Template",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/applicationInsightTemplate",
+        "Microsoft.Resources/deployments/cosmosDbTemplate",
+        "Microsoft.Resources/deployments/ehubTemplate",
+        "Microsoft.Resources/deployments/applicationQueuesTemplate",
+        "Microsoft.Resources/deployments/applicationAnalyticsTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('dashboard1TemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "dashboardName": {
+            "value": "[concat(reference('applicationInsightTemplate').outputs.appInsightsAppId.value,'-dashboard')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "appInsightsName": {
+            "value": "[variables('appInsightName')]"
+          },
+          "appInsightsResourceId": {
+            "value": "[reference('applicationInsightTemplate').outputs.appInsightsResourceId.value]"
+          },
+          "subscriptionId": {
+            "value": "[parameters('subscriptionId')]"
+          },
+          "rgName": {
+              "value": "[resourceGroup().name]"
+          },
+          "cosmosDbAccountName": {
+            "value": "[variables('cosmosDbAccountName')]"
+          },
+          "cosmosDbId": {
+            "value": "[reference('cosmosDbTemplate').outputs.CosmosDbAccountResourceId.value]"
+          },
+          "ehubName": {
+            "value": "[variables('ehubName')]"
+          },
+          "ehubId": {
+            "value": "[reference('ehubTemplate').outputs.ehubResourceId.value]"
+          },
+          "appSiteQueuesName": {
+            "value": "[variables('appQueuesName')]"
+          },
+          "appSiteQueuesId": {
+              "value": "[reference('applicationQueuesTemplate').outputs.appSiteResourceId.value]"
+          },
+          "appSiteAnalyticsName": {
+              "value": "[variables('appAnalyticsName')]"
+          },
+          "appSiteAnalyticsId": {
+              "value": "[reference('applicationAnalyticsTemplate').outputs.appSiteResourceId.value]"
+          },
+          "prefix": {
+            "value": "[variables('commonPrefix')]"
+          }
+        }
+      }
+    },
+    {                                              // Log Analytics Workspace
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "LogWorkspaceTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('logWorkspaceTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "logWorkspaceName": {
+            "value": "[variables('LogWorkspaceName')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          }
+        }
+      }
+    },
+    {                                              // Log Analytics Workspace SECONDARY
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "LogWorkspaceSecondaryTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('logWorkspaceTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "logWorkspaceName": {
+            "value": "[variables('LogWorkspaceSecondaryName')]"
+          },
+          "location": {
+            "value": "[parameters('secondaryRegion')]"
+          }
+        }
+      }
+    },
+    {                                                // Power Shell deploy Frontend
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "powershellTemplateDeployFrontend",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/storageAccountTemplateFE",
+        "Microsoft.Resources/deployments/mapAccountTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('powershellDeployFrontendTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "identity": {
+            "value": "[parameters('deploymentIdentity')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('deploymentStorageAccount')]"
+          },
+          "primaryScriptUri": {
+            "value": "[variables('powershellDeployFrontendScriptUri')]"
+          },
+          "srcSA":{
+            "value": "[parameters('deploymentStorageAccount')]"
+          },
+          "srcCont":{
+              "value": "web"
+          },
+          "srcRG":{
+              "value": "[resourceGroup().name]"
+          },
+          "dstSA":{
+              "value": "[reference('storageAccountTemplateFE').outputs.storageAccountName.value]"
+          },
+          "dstRG":{
+              "value": "[resourceGroup().name]"
+          },
+          "logLevel":{
+              "value": "[parameters('feLogLevel')]"
+          },
+          "clientId":{
+              "value": "[parameters('appClientId')]"
+          },
+          "tenantId":{
+              "value": "[parameters('tenantId')]"
+          },
+          "mapClientId":{
+              "value": "[reference('mapAccountTemplate').outputs.mapsAccountClientId.value]"
+          }
+        }
+      }
+    },
+    {                                                // CDN
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "cdnTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/storageAccountTemplateFE"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('cdnTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "cdnName": {
+            "value": "[variables('cdnName')]"
+          },
+          "location": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "sku": {
+            "value": "[parameters('cdnSku')]"
+          },
+          "hostHeader": {
+            "value": "[replace(replace(reference('storageAccountTemplateFE').outputs.primaryEndpointWeb.value,'https://',''),'/','')]"
+          }
+        }
+      }
+    },
+    {                                                // Power Shell Purge CDN
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "powershellPurgeCDN",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/cdnTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('powershellPurgeCDNTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "identity": {
+            "value": "[parameters('deploymentIdentity')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('deploymentStorageAccount')]"
+          },
+          "rgName": {
+            "value": "[resourceGroup().name]"
+          },
+          "cdnName": {
+            "value": "[variables('cdnName')]"
+          }
+        }
+      }
+    },
+    {                                                // Front Door
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "fdTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/cdnTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('fdTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "fdName": {
+            "value": "[variables('fdName')]"
+          },
+          "appAnalyticsAddress": {
+              "value": "[createArray(reference('applicationAnalyticsTemplate').outputs.defaultHostName.value,reference('applicationAnalyticsSecondaryTemplate').outputs.defaultHostName.value)]"
+          },
+          "appQueuesAddress": {
+              "value": "[createArray(reference('applicationQueuesTemplate').outputs.defaultHostName.value,reference('applicationQueuesSecondaryTemplate').outputs.defaultHostName.value)]"
+          },
+          "cdnAddress": {
+              "value": "[reference('cdnTemplate').outputs.cdnHostName.value]"
+          },
+          "customDomain": {
+              "value": "[parameters('customDomain')]"
+          }
+        }
+      }
+    },
+    {                                                // Power Shell Enable HTTPS on Front Doors custom domain
+      "condition": "[not(equals(parameters('customDomain'),'UNDEFINED'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "powershellTemplateFDEnableHTTPS",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/fdTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('powershellFDEnableHTTPSTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "identity": {
+            "value": "[parameters('deploymentIdentity')]"
+          },
+          "storageAccountName": {
+            "value": "[parameters('deploymentStorageAccount')]"
+          },
+          "rgName": {
+            "value": "[resourceGroup().name]"
+          },
+          "fdName": {
+            "value": "[variables('fdName')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "FrontDoorsDefaultEndpoint": {
+      "type": "string",
+      "value": "[concat('https://',variables('fdName'), '.azurefd.net')]"
+    }
+  }
+}

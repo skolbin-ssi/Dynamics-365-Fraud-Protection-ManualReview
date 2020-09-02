@@ -1,0 +1,12 @@
+@import "../../../../styles/variables";
+
+.queue-table-header {
+    padding: 14px 8px;
+    display: flex;
+    justify-content: flex-end;
+
+    &__number-of-items {
+        color: $neutralPrimary;
+        margin-right: 6px;
+    }
+}

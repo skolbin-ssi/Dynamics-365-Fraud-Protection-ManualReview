@@ -1,0 +1,15 @@
+.switch-tabs {
+  &__switch-items {
+    display: flex;
+    align-items:  center;
+  }
+
+  &__switch-item {
+    margin-left: 20px;
+  }
+
+  &__switch-tab {
+    padding: 0 0 10px;
+  }
+
+}

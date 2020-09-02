@@ -1,0 +1,140 @@
+@import "../../../styles/variables";
+
+.data-table-compact {
+  position: relative;
+  .ms-DetailsHeader {
+    .ms-DetailsHeader-cell {
+     &:hover {
+       background: none;
+     }
+    }
+
+    .ms-DetailsHeader-cell:not(:first-child) {
+      .ms-DetailsHeader-cellTitle {
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+
+    .ms-DetailsHeader-cell:nth-child(2) {
+      .ms-DetailsHeader-cellName {
+        display: flex;
+        justify-content: flex-end;
+        width: 100px;
+        position: relative;
+        overflow: visible;
+
+        &::before {
+          top: 12px;
+          width: 12px;
+          left: 20px;
+          height: 20px;
+          position: absolute;
+          content: '';
+          @include backgroundSvgIcon($svgSortArrowDown)
+        }
+      }
+    }
+  }
+
+  &__first-column-content {
+    display: flex;
+    width: 100%;
+    outline: none;
+  }
+
+  &__clickable-row {
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__right-aligned-cell {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__content-row {
+    display: flex;
+    align-items: center;
+  }
+
+  &__checkbox {
+    margin-right: 8px;
+    border: 2px;
+
+    .ms-Checkbox-checkmark {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    &.is-checked:hover {
+      filter: brightness(0.8);
+
+    }
+
+    &:not(.is-checked):hover {
+      .ms-Checkbox-checkmark {
+        color: $neutralPrimary;
+
+        background: none;
+      }
+    }
+
+  }
+
+  &__score-cell {
+    line-height: 16px;
+    color: $black;
+  }
+
+  &__cell-label {
+    display: flex;
+    height: 16px;
+    width: 26px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    font-size: 9px;
+    margin-left: 4px;
+
+    &--approved {
+      background: $approveLabelBackground;
+      color: $approveColor;
+    }
+
+    &--watched {
+      background: $neutralLight;
+      color: $neutralPrimary;
+    }
+
+    &--rejected {
+      background: $rejectedLabelBackground;
+      color: $highRiskColor;
+    }
+  }
+
+  &__icon {
+    position: absolute;
+    top: 30px;
+    left: 675px;
+    color: $neutralDark;
+
+    &--analyst {
+      left: 443px;
+    }
+  }
+
+  &__analyst {
+    margin-left: 24px;
+
+    .ms-Persona-primaryText {
+      color: $neutralDark;
+    }
+  }
+}

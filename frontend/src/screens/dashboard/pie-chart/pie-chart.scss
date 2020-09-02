@@ -1,0 +1,24 @@
+@import "../../../styles/variables";
+
+.pie-chart {
+  width: inherit;
+  height: inherit;
+  position: relative;
+
+  &__text-wrap {
+    top: 0;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    position: absolute;
+    align-items: center;
+    z-index: -1;
+  }
+
+  &__text {
+    width: 115px;
+    text-align: center;
+    color: $neutralPrimary;
+  }
+}

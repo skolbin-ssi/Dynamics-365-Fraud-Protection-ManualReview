@@ -1,0 +1,54 @@
+@import "../../../styles/variables";
+
+.switch-header {
+  &__sub-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title-wrap {
+    display: flex;
+    align-items: baseline;
+  }
+
+  &__main-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: $neutralPrimary;
+    margin-right: 2px;
+  }
+
+  &__sub-title {
+    font-size: 12px;
+    color: $neutralSecondary;
+  }
+
+  &__switch {
+    display: flex;
+    align-items: flex-start;
+    font-size: 14px;
+
+    &:last-child {
+      justify-self: end;
+    }
+  }
+
+  &__switch-title {
+    color: $neutralSecondary;
+  }
+
+  &__switch-items {
+    display: flex;
+    align-items:  center;
+  }
+
+  &__switch-item {
+    margin-left: 20px;
+  }
+
+  &__switch-tab {
+    padding: 0 0 10px;
+  }
+
+}

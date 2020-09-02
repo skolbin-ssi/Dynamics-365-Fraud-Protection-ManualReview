@@ -1,0 +1,19 @@
+@import "../../styles/variables";
+
+.alert-settings {
+  &__action-bar {
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    height: 48px;
+    box-shadow: inset 0 -1px 0 $neutralLight;
+
+    &-btn {
+      min-height: 30px;
+    }
+  }
+
+  &__alerts-list {
+    padding: 32px;
+  }
+}

@@ -1,0 +1,19 @@
+@import "../../../styles/variables";
+
+.left-navigation {
+  box-shadow: inset -1px 0px 0px $neutralQuaternaryAlt;
+  padding-right: 1px; // to compensate inset shadow
+  background: $neutralLighter;
+  overflow: hidden;
+  width: $collapsedLeftNavigationWidth;
+
+  &-expanded {
+    width: $expandedLeftNavigationWidth;
+    flex-shrink: 0;
+  }
+
+  &__expand-button {
+    width: $collapsedLeftNavigationWidth;
+    height: $collapsedLeftNavigationWidth;
+  }
+}

@@ -1,0 +1,86 @@
+mr:
+  task-reset-timeout-multiplier: 4.0
+  task-warning-timeout-multiplier: 2.0
+  tasks:
+    residual-queue-reconciliation-task:
+      delay: PT10M
+    queue-size-calculation-task:
+      delay: PT10M
+    overall-size-calculation-task:
+      delay: PT10M
+    item-assignment-reconciliation-task:
+      delay: PT1M
+      timeout: PT5M
+      comprehensive-check:
+        period: PT30M
+      partial-check:
+        observed-period: PT5M
+    item-unlock-task:
+      delay: PT1M
+    item-enrichment-task:
+      delay: PT1M
+      timeout: PT5M
+      enrichment-delay: PT30S
+    dictionary-reconciliation-task:
+      delay: PT1M
+    queue-assignment-reconciliation-task:
+      delay: PT10M
+  items:
+    unlock-timeout: PT5M
+    near-to-timeout: PT1M
+    near-to-sla: P2D
+  dictionary:
+    ttl: PT10M
+
+
+azure:
+  cosmosdb:
+    default-ttl: P183D
+  graph-api:
+    role-assignments-url: https://graph.microsoft.com/v1.0/servicePrincipals/${DFP_SP_ID}/appRoleAssignedTo
+    user-role-assignments-url-template: https://graph.microsoft.com/v1.0/users/#user_id#/appRoleAssignments?$filter=resourceId eq ${DFP_SP_ID}
+    users-url: https://graph.microsoft.com/v1.0/users
+    user-url-template: https://graph.microsoft.com/v1.0/users/#user_id#
+    app-service-principal-url: https://graph.microsoft.com/v1.0/servicePrincipals/${DFP_SP_ID}
+    user-photo-url-template: https://graph.microsoft.com/beta/users/#user_id#/photo/$value
+    role-mapping:
+      ManualReviewFraudManager: ADMIN_MANAGER
+      ManualReviewSeniorAnalyst: SENIOR_ANALYST
+      ManualReviewAnalyst: ANALYST
+      Sandbox_ManualReviewFraudManager: ADMIN_MANAGER
+      Sandbox_ManualReviewSeniorAnalyst: SENIOR_ANALYST
+      Sandbox_ManualReviewAnalyst: ANALYST
+  dfp:
+    graph-explorer-url: https://${TENANT_SHORT_NAME}-${TENANT_ID}.api.dfp.dynamics-int.com/knowledgegateway/customersupport/v1.0/explorer/traversal
+    purchase-event-url: https://intz.api.dfp.dynamics-int.com/v1.0/merchantservices/events/Purchase
+    bank-event-url: https://intz.api.dfp.dynamics-int.com/v1.0/merchantservices/events/BankEvent
+  dfp-auth:
+    token-cache-size: 500
+    token-cache-retention: PT10M
+
+swagger:
+  auth-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/authorize?resource=${CLIENT_ID}
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          azure-graph-api:
+            scope: https://graph.microsoft.com/.default
+          azure-dfp-api:
+            scope: https://api.dfp.microsoft-int.com/.default
+        provider:
+          azure-graph-api:
+            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+          azure-dfp-api:
+            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+
+resilience4j.retry:
+  instances:
+    cosmosOptimisticCapture:
+      maxRetryAttempts: 30
+      waitDuration: 10ms
+    cosmosOptimisticUpdate:
+      maxRetryAttempts: 3
+      waitDuration: 100ms

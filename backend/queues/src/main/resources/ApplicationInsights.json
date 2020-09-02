@@ -1,0 +1,24 @@
+{
+  "instrumentationSettings": {
+    "preview": {
+      "roleName": "queues",
+      "heartbeat": {
+        "intervalSeconds": 60
+      },
+      "instrumentation": {
+        "logging": {
+          "threshold": "INFO"
+        },
+        "micrometer": {
+          "enabled": true
+        }
+      },
+      "selfDiagnostics": {
+        "destination": "file",
+        "directory": "/var/log/applicationinsights",
+        "level": "INFO",
+        "maxSizeMB": 10
+      }
+    }
+  }
+}

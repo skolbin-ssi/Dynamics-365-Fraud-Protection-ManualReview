@@ -1,0 +1,94 @@
+@import '../../styles/variables';
+
+.vertical-tab {
+    width: 100%;
+    height: $verticalTabHeight;
+    padding: 10px 4px;
+    color: $neutralPrimary;
+    text-decoration: none;
+    background: inherit;
+    cursor: pointer;
+    border: none;
+    &:focus {
+        outline: none;
+    }
+    .inner-area {
+        padding-left: 10px;
+        border-left: 2px solid transparent;
+        height: 24px;
+        display: flex;
+        align-items: center;
+    }
+    .tab-icon {
+        margin-right: 24px;
+        color: $themePrimary;
+    }
+
+
+    &:hover {
+        background: $neutralLighter;
+        color: $themePrimary;
+        .link-icon {
+            color: $themePrimary;
+        }
+    }
+
+    &:active {
+        background: $neutralLighter;
+        color: $black;
+        .link-icon {
+            color: $themeDark;
+        }
+    }
+
+    &.selected {
+        background: $neutralLight;
+        color: $neutralPrimary;
+        span {
+            font-weight: 600 !important;
+        }
+        .inner-area {
+            border-color: $themeDark;
+        }
+        .link-icon {
+            color: $themeDarkAlt;
+        }
+    }
+
+    &.selected:hover {
+        background: $neutralLighter;
+        color: $themePrimary;
+        span {
+            font-weight: 600 !important;
+        }
+        .inner-area {
+            border-color: $themeDark;
+        }
+        .link-icon {
+            color: $themePrimary;
+        }
+    }
+
+    &.selected:active {
+        background: $neutralLight;
+        color: $black;
+        span {
+            font-weight: 600 !important;
+        }
+        .inner-area {
+            border-color: $themeDark;
+        }
+        .link-icon {
+            color: $themeDarkAlt;
+        }
+    }
+
+    &:disabled {
+        color: $neutralTertiary;
+        background: transparent;
+        cursor: not-allowed;
+        .link-icon {
+            color: $neutralTertiary;
+        }
+    }
+}

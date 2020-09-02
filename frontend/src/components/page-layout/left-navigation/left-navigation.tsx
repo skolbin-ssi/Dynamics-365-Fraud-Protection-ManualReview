@@ -1,0 +1,97 @@
+import React, { Component } from 'react';
+import autoBind from 'autobind-decorator';
+import cn from 'classnames';
+import { Stack } from '@fluentui/react/lib/Stack';
+import { IconButton } from '@fluentui/react/lib/Button';
+import {
+    ALERTS_MANAGEMENT,
+    DASHBOARD_MANAGEMENT,
+    PERMISSION,
+    QUEUE_MANAGEMENT,
+    ROUTES
+} from '../../../constants';
+import { CurrentUserStore } from '../../../view-services';
+import { LeftNavLinkProps, LeftNavLink } from './left-nav-link';
+import './left-navigation.scss';
+
+export interface LeftNavigationProps {
+    isExpanded: boolean;
+    onToggleExpanded: (isExpanded: boolean) => void;
+    userStore: CurrentUserStore
+}
+
+export interface LeftNavigationItemConfig extends LeftNavLinkProps {
+    permission: PERMISSION
+}
+
+export const CN = 'left-navigation';
+
+@autoBind
+export class LeftNavigation extends Component<LeftNavigationProps, never> {
+    private topNavLinks: LeftNavigationItemConfig[] = [
+        {
+            name: 'Dashboard',
+            link: ROUTES.DASHBOARD_QUEUES_PERFORMANCE,
+            icon: 'SpeedHigh',
+            permission: DASHBOARD_MANAGEMENT.ACCESS
+        },
+        {
+            name: 'Queues',
+            link: ROUTES.build.queues(),
+            icon: 'BuildQueue',
+            permission: QUEUE_MANAGEMENT.ACCESS
+        },
+        {
+            name: 'Alerts',
+            link: ROUTES.ALERT_SETTINGS,
+            icon: 'AlertSettings',
+            permission: ALERTS_MANAGEMENT.ACCESS
+        }
+    ];
+
+    toggleIsExpanded() {
+        const { isExpanded, onToggleExpanded } = this.props;
+        onToggleExpanded(!isExpanded);
+    }
+
+    @autoBind
+    renderLinks(links: LeftNavigationItemConfig[]) {
+        const { userStore } = this.props;
+
+        return links
+            .filter(({ permission }) => userStore.checkUserCan(permission))
+            .map(navLink => {
+                const { name, link, icon } = navLink;
+                return (
+                    <LeftNavLink
+                        name={name}
+                        link={link}
+                        icon={icon}
+                        key={`left-nav-link-${name}`}
+                    />
+                );
+            });
+    }
+
+    render() {
+        const { isExpanded } = this.props;
+
+        return (
+            <Stack
+                as="aside"
+                verticalFill
+                className={cn(CN, { [`${CN}-expanded`]: isExpanded })}
+            >
+                <IconButton
+                    iconProps={{
+                        iconName: 'GlobalNavButton',
+                        styles: {}
+                    }}
+                    className={`${CN}__expand-button`}
+                    onClick={this.toggleIsExpanded}
+                />
+                {this.renderLinks(this.topNavLinks)}
+            </Stack>
+        );
+    }
+}

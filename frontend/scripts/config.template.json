@@ -1,0 +1,8 @@
+{
+  "apiBaseUrl": "/api",
+  "logLevel": "${LOG_LEVEL}",
+  "baseAuthUrl": "https://login.microsoftonline.com",
+  "clientId": "${CLIENT_ID}",
+  "tenant": "${TENANT}",
+  "mapClientId": "${MAP_CLIENT_ID}"
+}

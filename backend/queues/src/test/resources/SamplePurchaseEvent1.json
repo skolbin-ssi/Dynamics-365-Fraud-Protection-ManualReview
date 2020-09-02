@@ -1,0 +1,17 @@
+[
+  {
+    "ruleName": "MR-feed-rule",
+    "eventType": "PURCHASE",
+    "correlationId": "203f039a-a817-48ef-aabc-277b5f892dbb",
+    "eventId": "0aec2421-0111-4309-af8a-30007bfd1524",
+    "attributes": {
+      "test": "123"
+    },
+    "name": "FraudProtection.Trace.Rule",
+    "version": "1",
+    "metadata": {
+      "tenantId": "74143e14-36bb-4cd2-bdb9-65d0f8b5b360",
+      "timestamp": "2020-08-12T14:45:07.2207134Z"
+    }
+  }
+]

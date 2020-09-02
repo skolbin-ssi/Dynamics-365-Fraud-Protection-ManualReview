@@ -1,0 +1,99 @@
+@import '../../../styles/variables';
+
+.item-details {
+  $root: &;
+
+  &__status-data {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  &__back-to-queues {
+    color: $themePrimary;
+  }
+
+  &__order-details-layout {
+    overflow-y: auto;
+    padding: 8px 24px 22px 24px;
+    background: $neutralLighter;
+  }
+
+  &__order-details-heading {
+    position: relative;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    height: 58px;
+
+    &-fraud-score {
+      position: absolute;
+      top: 0;
+    }
+
+    &-fraud-score-placeholder {
+      width: 220px;
+      height: 28px;
+    }
+  }
+
+  &__order-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column-gap: 16px;
+
+    #{$root}__full-width {
+      grid-column: span 3;
+    }
+
+    #{$root}__one-third {
+      grid-column: span 1;
+    }
+  }
+
+  &__heading-title {
+    color: $black;
+    font-weight: 600;
+    min-width: 120px;
+  }
+
+  &__order-id-part {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding: 0 24px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__order-controls-part {
+    min-width: 80px;
+  }
+
+  &__order-id-title {
+    color: $neutralTertiary;
+  }
+
+  &__order-id {
+    color: $themePrimary;
+  }
+
+  &__mode-icon {
+    width: 40px;
+    height: 40px;
+    color: $neutralPrimary;
+
+    &.is-checked {
+      background: $themePrimary;
+
+      .ms-Button-icon {
+        color: $white;
+      }
+    }
+  }
+}

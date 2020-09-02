@@ -1,0 +1,11 @@
+[
+  {
+    "allowedMemberTypes": [
+      "Application"
+    ],
+    "description": "Role for retrieving resolutions",
+    "displayName": "RESOLUTION_VIEWER",
+    "isEnabled": true,
+    "value": "RESOLUTION_VIEWER"
+  }
+]

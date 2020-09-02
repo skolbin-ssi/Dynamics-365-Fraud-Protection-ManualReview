@@ -1,0 +1,202 @@
+@import '../../styles/variables';
+
+.queue-tiles {
+	$root: &;
+
+	width: 100%;
+	height: 100%;
+	padding: 40px 130px;
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	background-color: $neutralLighterAlt;
+
+	&__center-aligned {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	&__queues-title {
+		font-weight: 600;
+		margin-bottom: 24px;
+	}
+
+	&__queues {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 17px;
+	}
+
+	&__tile {
+		height: 200px;
+		padding: 24px;
+		box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.13), 0 0.3px 0.9px rgba(0, 0, 0, 0.1);
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: space-between;
+		background-color: $white;
+		cursor: pointer;
+		overflow: hidden;
+
+		&:hover {
+			box-shadow: 0 6.4px 14.4px rgba(0, 0, 0, 0.13), 0 1.2px 3.6px rgba(0, 0, 0, 0.1);
+
+			.queue-tiles__queue-title {
+				color: $themeDarkAlt;
+				text-decoration: underline;
+			}
+
+			.queue-tiles__controls {
+				display: flex;
+				opacity: 1;
+			}
+		}
+
+		&:focus {
+			outline: none;
+		}
+	}
+
+	&__data {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		// transition: all .5s ease-in-out;
+
+		&-top {
+			flex-grow: 1;
+		}
+	}
+
+	&__faces-wrapper {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+
+		&-divider {
+			width: 1px;
+			height: 24px;
+			background-color: $neutralLight;
+			margin: 0 8px;
+		}
+
+		#{$root}__faces {
+			&--supervisors {
+				.ms-Facepile-members {
+					overflow: visible;
+				}
+
+				.ms-Facepile-member {
+					position: relative;
+					&::after {
+						position: absolute;
+						right: -3px;
+						top: -3px;
+						content: '';
+						width: 12px;
+						height: 12px;
+						background: $white url('../../assets/icon/crown.png') center center no-repeat;
+						background-size: 7px 7px;
+						border-radius: 6px;
+						box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.13), 0 0.3px 0.9px rgba(0, 0, 0, 0.1);
+					}
+				}
+			}
+		}
+	}
+
+	&__queue-title {
+		display: inline-block;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		max-width: 100%;
+		overflow: hidden;
+		margin-bottom: 5px;
+		font-weight: 600;
+	}
+
+	&__meta {
+		width: 100%;
+		> *:first-child {
+			color: $neutralTertiary;
+			display: inline-block;
+		}
+
+		> *:last-child {
+			color: $neutralSecondary;
+			display: inline-block;
+		}
+	}
+
+	&__controls {
+		display: none;
+		flex-direction: row;
+		justify-content: flex-start;
+	}
+
+	&__setting-btn,
+	&__start-review-btn {
+		display: flex;
+		background: none;
+		align-items: center;
+		padding: 0;
+		margin-top: 16px;
+		border: none;
+		cursor: pointer;
+		width: 125px;
+
+		&:hover {
+			color: $themeDarkAlt;
+			span {
+				font-weight: 600 !important;
+			}
+		}
+
+		&.disabled {
+			color: $neutralTertiary;
+			cursor: default;
+			opacity: .5;
+		}
+
+		&:focus {
+			outline: none;
+		}
+	}
+
+	&__setting-icon,
+	&__start-review-icon {
+		background-color: $themeLighterAlt;
+		height: 28px;
+		width: 28px;
+		border-radius: 4px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-right: 8px;
+		color: $themeDarkAlt;
+	}
+
+	&__queue-tiles-header {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 38px;
+
+		#{$root}__type-selector {
+			margin-left: 30px;
+			flex-grow: 1;
+		}
+	}
+
+	&__add-new-item-btn {
+
+		&-icon {
+			color: $themePrimary;
+		}
+	}
+}

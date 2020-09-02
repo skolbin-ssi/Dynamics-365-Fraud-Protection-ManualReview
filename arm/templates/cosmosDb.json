@@ -1,0 +1,585 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "cosmosDbAccountName": {
+          "defaultValue": "[concat(uniqueString(resourceGroup().id),'-storage')]",
+          "type": "String"
+      },
+      "location": {
+        "type": "string",
+        "defaultValue": "[resourceGroup().location]",
+        "metadata": {
+          "description": "Specifies the location in which the Azure Storage resources should be deployed."
+        }
+      },
+      "primaryRegion":{
+        "type":"string",
+        "metadata": {
+          "description": "The primary replica region for the Cosmos DB account."
+        }
+      },
+      "secondaryRegion":{
+        "type":"string",
+        "metadata": {
+          "description": "The secondary replica region for the Cosmos DB account."
+        }
+      },
+      "defaultConsistencyLevel": {
+        "type": "string",
+        "defaultValue": "Session",
+        "allowedValues": [ "Eventual", "ConsistentPrefix", "Session", "BoundedStaleness", "Strong" ],
+        "metadata": {
+          "description": "The default consistency level of the Cosmos DB account."
+        }
+      },
+      "maxStalenessPrefix": {
+        "type": "int",
+        "minValue": 10,
+        "defaultValue": 100000,
+        "maxValue": 2147483647,
+        "metadata": {
+          "description": "Max stale requests. Required for BoundedStaleness. Valid ranges, Single Region: 10 to 1000000. Multi Region: 100000 to 1000000."
+        }
+      },
+      "maxIntervalInSeconds": {
+        "type": "int",
+        "minValue": 5,
+        "defaultValue": 300,
+        "maxValue": 86400,
+        "metadata": {
+          "description": "Max lag time (seconds). Required for BoundedStaleness. Valid ranges, Single Region: 5 to 84600. Multi Region: 300 to 86400."
+        }
+      },    
+      "automaticFailover": {
+        "type": "bool",
+        "defaultValue": true,
+        "allowedValues": [ true, false ],
+        "metadata": {
+          "description": "Enable automatic failover for regions"
+        }
+      },
+      "throuhgputAnalyticsDb": {
+        "type": "int",
+        "defaultValue": 100
+      },
+      "throuhgputQueuesDb": {
+        "type": "int",
+        "defaultValue": 100
+      }
+  },
+  "variables": {
+    "cosmosDbAccountName": "[toLower(parameters('cosmosDbAccountName'))]",
+    "locations": 
+    [ 
+      {
+        "locationName": "[parameters('primaryRegion')]",
+        "failoverPriority": 0,
+        "isZoneRedundant": false
+      }, 
+      {
+        "locationName": "[parameters('secondaryRegion')]",
+        "failoverPriority": 1,
+        "isZoneRedundant": false
+      }
+    ],
+    "consistencyPolicy": {
+        "Eventual": {
+            "defaultConsistencyLevel": "Eventual"
+        },
+        "ConsistentPrefix": {
+            "defaultConsistencyLevel": "ConsistentPrefix"
+        },
+        "Session": {
+            "defaultConsistencyLevel": "Session"
+        },
+        "BoundedStaleness": {
+            "defaultConsistencyLevel": "BoundedStaleness",
+            "maxStalenessPrefix": "[parameters('maxStalenessPrefix')]",
+            "maxIntervalInSeconds": "[parameters('maxIntervalInSeconds')]"
+        },
+        "Strong": {
+            "defaultConsistencyLevel": "Strong"
+        }
+    },
+    "isMatchRegexp": "function isMatchRegexp(str, pattern) {let regex = RegExp(pattern); return regex.test(str);}",
+    "getTimestampBucket": "function getTimestampBucket(start_timestamp, period_in_seconds, target_timestamp){return Math.floor((target_timestamp - start_timestamp) / period_in_seconds);}"
+  },
+  "resources": [
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts",
+          "apiVersion": "2020-04-01",
+          "name": "[variables('cosmosDbAccountName')]",
+          "location": "[parameters('location')]",
+          "kind": "GlobalDocumentDB",
+          "properties": {
+              "publicNetworkAccess": "Enabled",
+              "enableAutomaticFailover": "[parameters('automaticFailover')]",
+              "enableMultipleWriteLocations": false,
+              "isVirtualNetworkFilterEnabled": false,
+              "virtualNetworkRules": [],
+              "disableKeyBasedMetadataWriteAccess": false,
+              "enableFreeTier": false,
+              "enableAnalyticalStorage": false,
+              "databaseAccountOfferType": "Standard",
+              "consistencyPolicy": "[variables('consistencyPolicy')[parameters('defaultConsistencyLevel')]]",
+              "locations": "[variables('locations')]",
+              "capabilities": [],
+              "ipRules": []
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "AnalyticsDB"
+              },
+              "options": {
+                "throughput": "[parameters('throuhgputAnalyticsDb')]"
+              }
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/QueuesDB')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "QueuesDB"
+              },
+              "options": {
+                "throughput": "[parameters('throuhgputQueuesDb')]"
+              }
+          }
+      },
+      {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/Alert')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Alert",
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "defaultTtl": -1
+                },
+                "options": {}
+            }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/CollectedAnalystInfo')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "CollectedAnalystInfo",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/CollectedQueueInfo')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "CollectedQueueInfo",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+       {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/ConfigurableAppSetting')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "ConfigurableAppSetting",
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "defaultTtl": -1
+                },
+                "options": {}
+            }
+        },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/QueuesDB/Dictionaries')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'QueuesDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "Dictionaries",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/ItemLabelActivities')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "ItemLabelActivities",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/ItemLockActivities')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "ItemLockActivities",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/ItemPlacementActivities')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "ItemPlacementActivities",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/QueuesDB/Items')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'QueuesDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "Items",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/QueuesDB/Queues')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'QueuesDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "Queues",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/QueueSizeCalculationActivities')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "QueueSizeCalculationActivities",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/Resolution')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "Resolution",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+      {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(parameters('cosmosDbAccountName'), '/QueuesDB/Settings')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'QueuesDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "Settings",
+                    "partitionKey": {
+                        "paths": [
+                            "/id"
+                        ],
+                        "kind": "Hash"
+                    },
+                    "defaultTtl": -1
+                },
+                "options": {}
+            }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/Task')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "Task",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/QueuesDB/Task')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'QueuesDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "Task",
+                  "partitionKey": {
+                      "paths": [
+                          "/id"
+                      ],
+                      "kind": "Hash"
+                  },
+                  "defaultTtl": -1
+              },
+              "options": {}
+          }
+      },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/userDefinedFunctions",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/Alert/getTimestampBucket')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosDbAccountName'), 'AnalyticsDB', 'Alert')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "getTimestampBucket",
+                    "body": "[variables('getTimestampBucket')]"
+                },
+                "options": {}
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/userDefinedFunctions",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/ItemLabelActivities/getTimestampBucket')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosDbAccountName'), 'AnalyticsDB', 'ItemLabelActivities')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "getTimestampBucket",
+                    "body": "[variables('getTimestampBucket')]"
+                },
+                "options": {}
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/userDefinedFunctions",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/ItemPlacementActivities/getTimestampBucket')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosDbAccountName'), 'AnalyticsDB', 'ItemPlacementActivities')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "getTimestampBucket",
+                    "body": "[variables('getTimestampBucket')]"
+                },
+                "options": {}
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/userDefinedFunctions",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(parameters('cosmosDbAccountName'), '/AnalyticsDB/QueueSizeCalculationActivities/getTimestampBucket')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosDbAccountName'), 'AnalyticsDB', 'QueueSizeCalculationActivities')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'AnalyticsDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "getTimestampBucket",
+                    "body": "[variables('getTimestampBucket')]"
+                },
+                "options": {}
+            }
+        },
+        {
+            "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/userDefinedFunctions",
+            "apiVersion": "2020-04-01",
+            "name": "[concat(parameters('cosmosDbAccountName'), '/QueuesDB/Items/isMatchRegexp')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosDbAccountName'), 'QueuesDB', 'Items')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'QueuesDB')]",
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+            ],
+            "properties": {
+                "resource": {
+                    "id": "isMatchRegexp",
+                    "body": "[variables('isMatchRegexp')]"
+                },
+                "options": {}
+            }
+        }
+  ],
+  "outputs": {
+      "CosmosDbAccountResourceId": {
+        "type": "string",
+        "value": "[resourceId('Microsoft.DocumentDb/databaseAccounts',variables('cosmosDbAccountName'))]"
+      }
+  }
+}

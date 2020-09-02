@@ -1,0 +1,28 @@
+@import "../../../styles/variables";
+
+.blur-loader {
+  $spinnerHalfWidth: 70px;
+  $spinnerHalfHeight: 22px;
+
+  width: 100%;
+  height: inherit;
+  position: relative;
+
+  &__content {
+    height: inherit;
+
+    &--blured {
+      filter: blur(#{$defaultBlurFilterValue});
+    }
+  }
+
+  &__spinner-container {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

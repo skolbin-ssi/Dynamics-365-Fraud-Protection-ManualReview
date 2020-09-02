@@ -1,0 +1,122 @@
+@import "../../../styles/variables";
+
+.alert-edit-form {
+  overflow: auto;
+
+  &__sub-title {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 20px;
+    margin-bottom: 20px;
+
+    &-description {
+      font-size: 14px;
+      line-height: 20px;
+    }
+  }
+
+  &__scope-section:last-child {
+    margin-top: 50px;
+  }
+
+  &__analyze-content {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-column-gap: 24px;
+  }
+
+  &__metric-type {
+    grid-column: span 3;
+  }
+
+  &__period-value-field {
+    grid-column: span 1;
+  }
+
+  &__threshold-type {
+    grid-column: span 2;
+  }
+
+  &__assignments-name-cell {
+    height: 100%;
+    line-height: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: $neutralDark;
+
+    strong {
+      font-weight: normal;
+    }
+  }
+
+  &__assignments-supervisor-cell {
+    height: 100%;
+    line-height: 100%;
+    display: flex;
+    align-items: center;
+
+    .ms-Toggle {
+      margin-bottom: 0;
+    }
+  }
+
+  &__assignments-remove-cell {
+    display: flex;
+    align-items: center;
+  }
+
+  &__assignments-remove-button {
+    color: $neutralSecondary;
+    width: 30px;
+    height: 100%;
+    border-radius: 2px;
+
+    &:hover {
+      background-color: $neutralQuaternaryAlt;
+      color: $neutralPrimary;
+    }
+
+    i {
+      font-size: 12px;
+    }
+  }
+
+  &__analyst-table {
+    margin: 16px 0;
+    border-top: 1px solid $neutralLighter;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  &__analyst-table-row {
+    height: 48px;
+    border-bottom: 1px solid $neutralLighter;
+    display: flex;
+    align-items: center;
+  }
+
+  &__analysts-people-selector {
+    width: 260px;
+    height: 40px;
+    margin-bottom: 15px;
+    overflow: hidden;
+  }
+
+  &__analysts-suggestion {
+    width: 260px;
+
+    .ms-Suggestions-item {
+      padding: 4px;
+    }
+  }
+
+  &__selector-persona {
+    height: 40px;
+    padding: 5px 10px;
+  }
+
+  &__no-analysts {
+    margin: 15px 0 25px;
+  }
+}

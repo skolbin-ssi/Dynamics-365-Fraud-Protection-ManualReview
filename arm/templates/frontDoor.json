@@ -1,0 +1,276 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "fdName": {
+            "defaultValue": "[concat(resourceGroup().name,'-front-door')]",
+            "type": "String"
+        },
+        "appAnalyticsAddress": {
+            "type": "array"
+        },
+        "appQueuesAddress": {
+            "type": "array"
+        },
+        "cdnAddress": {
+            "type": "string"
+        },
+        "customDomain": {
+            "type": "string",
+            "defaultValue": "UNDEFINED"
+        },
+        "sessionAffinityEnabledState": {
+            "type": "string",
+            "allowedValues": [
+                "Enabled",
+                "Disabled"
+            ],
+            "defaultValue": "Disabled",
+            "metadata": {
+                "description": "Whether to allow session affinity on this host. Valid options are 'Enabled' or 'Disabled'."
+            }
+        },
+        "sessionAffinityTtlSeconds": {
+            "type": "int",
+            "metadata": {
+                "description": "The TTL to use in seconds for session affinity, if applicable."
+            },
+            "defaultValue": 0
+        }
+    },
+    "variables": {
+        "frontendDefaultEndpoints": [
+            {
+                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/FrontendEndpoints/DefaultFrontendEndpoint')]",
+                "name": "DefaultFrontendEndpoint",
+                "properties": {
+                    "hostName": "[concat(parameters('fdName'), '.azurefd.net')]",
+                    "sessionAffinityEnabledState": "[parameters('sessionAffinityEnabledState')]",
+                    "sessionAffinityTtlSeconds": "[parameters('sessionAffinityTtlSeconds')]",
+                    "resourceState": "Enabled"
+                }
+            }
+        ],
+        "frontendDefaultEndpointsRouting": [
+            {
+                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/FrontendEndpoints/DefaultFrontendEndpoint')]"
+            }
+        ],
+        "frontendCustomEndpoints": [
+            {
+                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/FrontendEndpoints/CustomFrontendEndpoint')]",
+                "name": "CustomFrontendEndpoint",
+                "properties": {
+                    "hostName": "[parameters('customDomain')]",
+                    "sessionAffinityEnabledState": "[parameters('sessionAffinityEnabledState')]",
+                    "sessionAffinityTtlSeconds": "[parameters('sessionAffinityTtlSeconds')]",
+                    "resourceState": "Enabled"
+                }
+            }
+        ],
+        "frontendCustomEndpointsRouting": [
+            {
+                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/FrontendEndpoints/CustomFrontendEndpoint')]"
+            }
+        ],
+        "frontendEndpoints": "[if(equals(parameters('customDomain'),'UNDEFINED'),variables('frontendDefaultEndpoints'),concat(variables('frontendDefaultEndpoints'),variables('frontendCustomEndpoints')))]",
+        "frontendEndpointsRouting": "[if(equals(parameters('customDomain'),'UNDEFINED'),variables('frontendDefaultEndpointsRouting'),concat(variables('frontendDefaultEndpointsRouting'),variables('frontendCustomEndpointsRouting')))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/frontdoors",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('fdName')]",
+            "location": "Global",
+            "properties": {
+                "resourceState": "Enabled",
+                "backendPools": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/BackendPools/be-analytics')]",
+                        "name": "be-analytics",
+                        "properties": {
+                            "copy": [
+                                {
+                                    "name": "backends",
+                                    "count": "[length(parameters('appAnalyticsAddress'))]",
+                                    "input": {
+                                        "address": "[parameters('appAnalyticsAddress')[copyIndex('backends')]]",
+                                        "httpPort": 80,
+                                        "httpsPort": 443,
+                                        "priority": "[copyIndex('backends',1)]",
+                                        "weight": 50,
+                                        "backendHostHeader": "[parameters('appAnalyticsAddress')[copyIndex('backends')]]",
+                                        "enabledState": "Enabled"
+                                    }
+                                }
+                            ],
+                            "healthProbeSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/healthProbeSettings/DefaultProbeSettings')]"
+                            },
+                            "loadBalancingSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/loadBalancingSettings/DefaultLoadBalancingSettings')]"
+                            },
+                            "resourceState": "Enabled"
+                        }
+                    },
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/BackendPools/be-queues')]",
+                        "name": "be-queues",
+                        "properties": {
+                            "copy": [
+                                {
+                                    "name": "backends",
+                                    "count": "[length(parameters('appQueuesAddress'))]",
+                                    "input": {
+                                        "address": "[parameters('appQueuesAddress')[copyIndex('backends')]]",
+                                        "httpPort": 80,
+                                        "httpsPort": 443,
+                                        "priority": "[copyIndex('backends',1)]",
+                                        "weight": 50,
+                                        "backendHostHeader": "[parameters('appQueuesAddress')[copyIndex('backends')]]",
+                                        "enabledState": "Enabled"
+                                    }
+                                }
+                            ],
+                            "healthProbeSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/healthProbeSettings/DefaultProbeSettings')]"
+                            },
+                            "loadBalancingSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/loadBalancingSettings/DefaultLoadBalancingSettings')]"
+                            },
+                            "resourceState": "Enabled"
+                        }
+                    },
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/BackendPools/fe')]",
+                        "name": "fe",
+                        "properties": {
+                            "backends": [
+                                {
+                                    "address": "[parameters('cdnAddress')]",
+                                    "httpPort": 80,
+                                    "httpsPort": 443,
+                                    "priority": 1,
+                                    "weight": 50,
+                                    "backendHostHeader": "[parameters('cdnAddress')]",
+                                    "enabledState": "Enabled"
+                                }
+                            ],
+                            "healthProbeSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/healthProbeSettings/DefaultProbeSettings')]"
+                            },
+                            "loadBalancingSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/loadBalancingSettings/DefaultLoadBalancingSettings')]"
+                            },
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "healthProbeSettings": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/HealthProbeSettings/DefaultProbeSettings')]",
+                        "name": "DefaultProbeSettings",
+                        "properties": {
+                            "intervalInSeconds": 30,
+                            "path": "/",
+                            "protocol": "Https",
+                            "resourceState": "Enabled",
+                            "enabledState": "Enabled",
+                            "healthProbeMethod": "Head"
+                        }
+                    }
+                ],
+                "frontendEndpoints": "[variables('frontendEndpoints')]",
+                "loadBalancingSettings": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/LoadBalancingSettings/DefaultLoadBalancingSettings')]",
+                        "name": "DefaultLoadBalancingSettings",
+                        "properties": {
+                            "additionalLatencyMilliseconds": 0,
+                            "sampleSize": 4,
+                            "successfulSamplesRequired": 2,
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "routingRules": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/RoutingRules/be-analytics-rule')]",
+                        "name": "be-analytics-rule",
+                        "properties": {
+                            "frontendEndpoints": "[variables('frontendEndpointsRouting')]",
+                            "acceptedProtocols": [
+                                "Https"
+                            ],
+                            "patternsToMatch": [
+                                "/api/resolutions/*",
+                                "/api/collected-info/*",
+                                "/api/dashboards/*",
+                                "/api/alerts/*"
+                            ],
+                            "enabledState": "Enabled",
+                            "resourceState": "Enabled",
+                            "routeConfiguration": {
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "forwardingProtocol": "HttpsOnly",
+                                "backendPool": {
+                                    "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/backendPools/be-analytics')]"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/RoutingRules/be-queues-rule')]",
+                        "name": "be-queues-rule",
+                        "properties": {
+                            "frontendEndpoints": "[variables('frontendEndpointsRouting')]",
+                            "acceptedProtocols": [
+                                "Https"
+                            ],
+                            "patternsToMatch": [
+                                "/api/*"
+                            ],
+                            "enabledState": "Enabled",
+                            "resourceState": "Enabled",
+                            "routeConfiguration": {
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "forwardingProtocol": "HttpsOnly",
+                                "backendPool": {
+                                    "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/backendPools/be-queues')]"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/RoutingRules/fe-rule')]",
+                        "name": "fe-rule",
+                        "properties": {
+                            "frontendEndpoints": "[variables('frontendEndpointsRouting')]",
+                            "acceptedProtocols": [
+                                "Https"
+                            ],
+                            "patternsToMatch": [
+                                "/*"
+                            ],
+                            "enabledState": "Enabled",
+                            "resourceState": "Enabled",
+                            "routeConfiguration": {
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "forwardingProtocol": "HttpsOnly",
+                                "backendPool": {
+                                    "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('fdName')), '/backendPools/fe')]"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "backendPoolsSettings": {
+                    "enforceCertificateNameCheck": "Enabled",
+                    "sendRecvTimeoutSeconds": 30
+                },
+                "enabledState": "Enabled",
+                "friendlyName": "[parameters('fdName')]"
+            }
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "default-mail-template",
+  "name": "Mail Templates",
+  "type": "MAIL_TEMPLATES",
+  "value": {
+    "subject": "Alert: [alertName]",
+    "template": "Condition of the \"[alertName]\" alert has been met. \nThe \"[metric]\" calculated for last [period] hours is equal to \n[calcvalue]\nthat [operator] [value] threshold."
+  }
+}

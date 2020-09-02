@@ -1,0 +1,110 @@
+@import "../../../styles/variables";
+
+.accuracy-data-table {
+  position: relative;
+
+  .ms-DetailsHeader {
+    .ms-DetailsHeader-cell {
+      &:hover {
+        background: none;
+      }
+    }
+
+    .ms-DetailsHeader-cell:not(:first-child) {
+      .ms-DetailsHeader-cellTitle {
+        display: flex;
+        justify-content: flex-end;
+        white-space: pre-line;
+        text-align: end;
+        line-height: 18px;
+      }
+    }
+
+    .ms-DetailsHeader-cell:last-child {
+      .ms-DetailsHeader-cellName {
+        width: 100px;
+        position: relative;
+        overflow: visible;
+
+        &::before {
+          top: 0;
+          width: 12px;
+          left: 5px;
+          height: 20px;
+          position: absolute;
+          content: '';
+          @include backgroundSvgIcon($svgSortArrowDown)
+        }
+      }
+    }
+  }
+
+  &__score-cell {
+    line-height: 16px;
+    color: $black;
+
+    &--low {
+      color: $highScoreColor;
+    }
+
+    &--medium-low {
+      color: $lowMediumScoreColor;
+    }
+
+    &--medium-high {
+      color: $highMediumScoreColor;
+    }
+
+    &--high {
+      color: $lowScoreColor;
+    }
+  }
+
+  &__content-row {
+    display: flex;
+    align-items: center;
+  }
+
+  &__checkbox {
+    margin-right: 8px;
+    border: 2px;
+
+    .ms-Checkbox-checkmark {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    &.is-checked:hover {
+      filter: brightness(0.8);
+
+    }
+
+    &:not(.is-checked):hover {
+      .ms-Checkbox-checkmark {
+        color: $neutralPrimary;
+
+        background: none;
+      }
+    }
+
+  }
+
+  &__right-aligned-cell {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__icon {
+    position: absolute;
+    top: 20px;
+    right: 90px;
+    color: #201f1e;
+  }
+
+  &__approve-column-text {
+    font-weight: bold;
+  }
+}

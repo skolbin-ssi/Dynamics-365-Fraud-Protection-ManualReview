@@ -1,0 +1,49 @@
+@import '../../../styles/variables';
+
+.review-notes {
+    list-style: none;
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-inline-start: 0;
+
+    &__note {
+        list-style: none;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    &__note-heading {
+        padding-bottom: 12px;
+        border-bottom: 1px solid $neutralLight;
+        display: grid;
+        grid-template-columns: 24px auto;
+        grid-template-rows: repeat(2, auto);
+        column-gap: 16px;
+        color: $neutralPrimary;
+        align-items: center;
+    }
+
+    &__note-photo {
+        grid-row: span 2;
+        overflow: hidden;
+        width: 100%;
+        border-radius: 50%;
+    }
+
+    &__note-name {
+        font-weight: 600;
+        margin-top: -4px;
+    }
+
+    &__note-content {
+        padding: 12px 0;
+        color: $neutralPrimary;
+
+        pre {
+            font: inherit;
+            margin: 0;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+    }
+}

@@ -122,6 +122,43 @@
     },
     "tenantShortName": {
       "type": "string"
+    },
+    "alertReceivers": {
+      "type": "array",
+      "defaultValue": []
+    },
+    "NoIncomingEventsDfphubEvaluationFrequency": {
+        "type": "string",
+        "defaultValue": "PT1H",
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H"
+        ]
+    },
+    "NoIncomingEventsDfphubWindowSize": {
+        "type": "string",
+        "defaultValue": "P1D",
+        "allowedValues": [
+          "PT1M",
+          "PT5M",
+          "PT15M",
+          "PT30M",
+          "PT1H",
+          "PT6H",
+          "PT12H",
+          "P1D"
+        ]
+    },
+    "NoIncomingEventsDfphubThreshold": {
+        "type": "int",
+        "defaultValue": 0
+    },
+    "exceptionsThresholdAlert": {
+            "type": "int",
+            "defaultValue": 200
     }
   },
   "variables": {
@@ -143,6 +180,7 @@
     "powershellPurgeCDNTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/scriptPsPurgeCDN.json')]",
     "cdnTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/cdn.json')]",
     "fdTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/frontDoor.json')]",
+    "alertsTemplateUri": "[replace(variables('templateBaseUri'),'main.json','templates/alerts.json')]",
     "storageAccountNameFE": "[replace(toLower(concat(variables('commonPrefix'), 'static')),'-','')]",
     "mapAccountName": "[concat(variables('commonPrefix'), '-map')]",
     "cosmosDbAccountName": "[concat(variables('commonPrefix'), '-storage')]",
@@ -166,7 +204,9 @@
     "LogWorkspaceSecondaryName": "[concat(variables('commonPrefix'), '-secondary-log-analytics-ws')]",
     "cdnName": "[concat(variables('commonPrefix'), '-cdn')]",
     "fdName": "[variables('commonPrefix')]",
-    "keyVaultEndpoint": "[concat('https://',parameters('keyVaultName'),'.vault.azure.net/')]"
+    "keyVaultEndpoint": "[concat('https://',parameters('keyVaultName'),'.vault.azure.net/')]",
+    "actionGroupName": "[concat(variables('commonPrefix'), '-email-action-group')]"
+
   },
   "resources": [
     {                                              // FE Storage Account
@@ -875,9 +915,6 @@
           "appInsightsName": {
             "value": "[variables('appInsightName')]"
           },
-          "appInsightsResourceId": {
-            "value": "[reference('applicationInsightTemplate').outputs.appInsightsResourceId.value]"
-          },
           "subscriptionId": {
             "value": "[parameters('subscriptionId')]"
           },
@@ -910,6 +947,76 @@
           },
           "prefix": {
             "value": "[variables('commonPrefix')]"
+          },
+          "fdName": {
+            "value": "[variables('fdName')]"
+          }
+        }
+      }
+    },
+       {                                              // Application insights SECONDARY REGION Dashboard 1
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "dashboard1SecondaryTemplate",
+      "resourceGroup": "[resourceGroup().name]",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/applicationInsightSecondaryTemplate",
+        "Microsoft.Resources/deployments/cosmosDbTemplate",
+        "Microsoft.Resources/deployments/ehubSecondaryTemplate",
+        "Microsoft.Resources/deployments/applicationQueuesSecondaryTemplate",
+        "Microsoft.Resources/deployments/applicationAnalyticsSecondaryTemplate"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('dashboard1TemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "dashboardName": {
+            "value": "[concat(reference('applicationInsightSecondaryTemplate').outputs.appInsightsAppId.value,'-dashboard')]"
+          },
+          "location": {
+            "value": "[parameters('secondaryRegion')]"
+          },
+          "appInsightsName": {
+            "value": "[variables('appInsightSecondaryName')]"
+          },
+          "subscriptionId": {
+            "value": "[parameters('subscriptionId')]"
+          },
+          "rgName": {
+              "value": "[resourceGroup().name]"
+          },
+          "cosmosDbAccountName": {
+            "value": "[variables('cosmosDbAccountName')]"
+          },
+          "cosmosDbId": {
+            "value": "[reference('cosmosDbTemplate').outputs.CosmosDbAccountResourceId.value]"
+          },
+          "ehubName": {
+            "value": "[variables('ehubSecondaryName')]"
+          },
+          "ehubId": {
+            "value": "[reference('ehubSecondaryTemplate').outputs.ehubResourceId.value]"
+          },
+          "appSiteQueuesName": {
+            "value": "[variables('appQueuesSecondaryName')]"
+          },
+          "appSiteQueuesId": {
+              "value": "[reference('applicationQueuesSecondaryTemplate').outputs.appSiteResourceId.value]"
+          },
+          "appSiteAnalyticsName": {
+              "value": "[variables('appAnalyticsSecondaryName')]"
+          },
+          "appSiteAnalyticsId": {
+              "value": "[reference('applicationAnalyticsSecondaryTemplate').outputs.appSiteResourceId.value]"
+          },
+          "prefix": {
+            "value": "[variables('commonPrefix')]"
+          },
+          "fdName": {
+            "value": "[variables('fdName')]"
           }
         }
       }
@@ -1135,6 +1242,82 @@
           },
           "fdName": {
             "value": "[variables('fdName')]"
+          }
+        }
+      }
+    },
+    {                                                // Alerts
+      "condition": "[not(equals(length(parameters('alertReceivers')),0))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "alertsTemplate",
+      "dependsOn": [
+        "Microsoft.Resources/deployments/fdTemplate",
+        "Microsoft.Resources/deployments/powershellTemplateFDEnableHTTPS"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('alertsTemplateUri')]",
+          "contentVersion":"1.0.0.0"
+        },
+        "parameters": {
+          "prefix": {
+            "value": "[parameters('prefix')]"
+          },
+          "primaryRegion": {
+            "value": "[parameters('primaryRegion')]"
+          },
+          "secondaryRegion": {
+            "value": "[parameters('secondaryRegion')]"
+          },
+          "fdName": {
+            "value": "[variables('fdName')]"
+          },
+          "actionGroupName": {
+            "value": "[variables('actionGroupName')]"
+          },
+          "alertReceivers": {
+            "value": "[parameters('alertReceivers')]"
+          },
+          "appInsightName": {
+            "value": "[variables('appInsightName')]"
+          },
+          "appInsightSecondaryName": {
+            "value": "[variables('appInsightSecondaryName')]"
+          },
+          "appAnalyticsAddress": {
+              "value": "[createArray(reference('applicationAnalyticsTemplate').outputs.defaultHostName.value,reference('applicationAnalyticsSecondaryTemplate').outputs.defaultHostName.value)]"
+          },
+          "appQueuesAddress": {
+              "value": "[createArray(reference('applicationQueuesTemplate').outputs.defaultHostName.value,reference('applicationQueuesSecondaryTemplate').outputs.defaultHostName.value)]"
+          },
+          "cdnAddress": {
+              "value": "[reference('cdnTemplate').outputs.cdnHostName.value]"
+          },
+          "backendAppList": {
+            "value": "[createArray(variables('appAnalyticsName'),variables('appQueuesName'))]"
+          },
+          "backendAppSecondaryList": {
+            "value": "[createArray(variables('appAnalyticsSecondaryName'),variables('appQueuesSecondaryName'))]"
+          },
+          "ehubName": {
+            "value": "[variables('ehubName')]"
+          },
+          "ehubSecondaryName": {
+            "value": "[variables('ehubSecondaryName')]"
+          },
+          "NoIncomingEventsDfphubEvaluationFrequency": {
+            "value": "[parameters('NoIncomingEventsDfphubEvaluationFrequency')]"
+          },
+          "NoIncomingEventsDfphubWindowSize": {
+              "value": "[parameters('NoIncomingEventsDfphubWindowSize')]"
+          },
+          "NoIncomingEventsDfphubThreshold": {
+              "value": "[parameters('NoIncomingEventsDfphubThreshold')]"
+          },
+          "exceptionsThresholdAlert": {
+            "value": "[parameters('exceptionsThresholdAlert')]"
           }
         }
       }

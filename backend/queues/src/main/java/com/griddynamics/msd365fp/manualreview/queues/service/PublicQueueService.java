@@ -97,7 +97,7 @@ public class PublicQueueService {
         streamService.sendQueueUpdateEvent(queue);
 
         // trigger the task for assignment recalculation
-        taskService.forceTaskRunByName(ITEM_STATE_TASK_NAME);
+        taskService.forceTaskRunByName(ITEM_ASSIGNMENT_TASK_NAME);
 
         return QueueViewUtility.getAllQueueViews(queue, true)
                 .map(qv -> modelMapper.map(qv, QueueViewDTO.class))
@@ -148,7 +148,7 @@ public class PublicQueueService {
         streamService.sendQueueUpdateEvent(queue);
 
         // trigger the task for assignment recalculation
-        taskService.forceTaskRunByName(ITEM_STATE_TASK_NAME);
+        taskService.forceTaskRunByName(ITEM_ASSIGNMENT_TASK_NAME);
 
         return QueueViewUtility.getAllQueueViews(queue, true)
                 .map(qv -> modelMapper.map(qv, QueueViewDTO.class))

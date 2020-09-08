@@ -50,7 +50,6 @@ public class PublicItemService {
     @Setter(onMethod = @__({@Value("${azure.cosmosdb.default-ttl}")}))
     private Duration defaultTtl;
 
-
     public ItemDTO getItem(@NonNull final String itemId, @Nullable final String queueId) throws NotFoundException {
         QueueView queueView = null;
         if (queueId != null) {

@@ -5,14 +5,16 @@ import cx from 'classnames';
 
 import { Text } from '@fluentui/react/lib/Text';
 import { Checkbox } from '@fluentui/react/lib/Checkbox';
-import {
-    DetailsListLayoutMode, IColumn, SelectionMode
-} from '@fluentui/react/lib/DetailsList';
-import { Persona, PersonaSize, IPersonaProps } from '@fluentui/react/lib/Persona';
+import { DetailsListLayoutMode, IColumn, SelectionMode } from '@fluentui/react/lib/DetailsList';
+import { IPersonaProps, Persona, PersonaSize } from '@fluentui/react/lib/Persona';
 import { ShimmeredDetailsList } from '@fluentui/react/lib/ShimmeredDetailsList';
 
 import { AnalystPerformance, BasicEntityPerformance } from '../../../models/dashboard';
-import { DEFAULT_DATA_LIST_SHIMMER_LINES_NUMBER } from '../../../constants';
+import {
+    DEFAULT_DATA_LIST_SHIMMER_LINES_NUMBER,
+    OVERTURNED_DISPLAY_LABELS,
+    OVERTURNED_LABELS
+} from '../../../constants';
 
 import './accuracy-data-table.scss';
 import { User } from '../../../models/user';
@@ -37,14 +39,13 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
             // eslint-disable-next-line react/destructuring-assignment
             name: this.props.isAnalystTable ? 'Analyst' : 'Queue',
             minWidth: 50,
-            maxWidth: 470,
             onRender: this.renderFirstColumn,
 
         },
         {
             key: 'approve-applied',
-            name: 'Approve applied',
-            minWidth: 50,
+            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.GOOD],
+            minWidth: 90,
             maxWidth: 90,
             className: `${CN}__right-aligned-cell`,
             onRender: ({ approvedApplied }) => (
@@ -57,9 +58,9 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
         },
         {
             key: 'approved-overturned',
-            name: 'Approved overturned',
-            minWidth: 50,
-            maxWidth: 120,
+            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.OVERTURNED_GOOD],
+            minWidth: 90,
+            maxWidth: 90,
             className: `${CN}__right-aligned-cell`,
             onRender: ({ approvedOverturned }) => (
                 <div className={`${CN}__content-row`}>
@@ -71,9 +72,9 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
         },
         {
             key: 'approve-accuracy',
-            name: 'Approve accuracy',
-            minWidth: 50,
-            maxWidth: 90,
+            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.RATE_OVERTURNED_GOOD],
+            minWidth: 110,
+            maxWidth: 110,
             className: `${CN}__right-aligned-cell`,
             onRender: ({ approvedAccuracy }) => (
                 <div className={`${CN}__content-row`}>
@@ -92,9 +93,9 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
         },
         {
             key: 'rejected-applied',
-            name: 'Rejected applied',
-            minWidth: 50,
-            maxWidth: 90,
+            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.BAD],
+            minWidth: 80,
+            maxWidth: 80,
             className: `${CN}__right-aligned-cell`,
             onRender: ({ rejectedApplied }) => (
                 <div className={`${CN}__content-row`}>
@@ -105,9 +106,9 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
             ),
         }, {
             key: 'rejected-overturned',
-            name: 'Rejected overturned',
-            minWidth: 50,
-            maxWidth: 120,
+            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.OVERTURNED_BAD],
+            minWidth: 80,
+            maxWidth: 80,
             className: `${CN}__right-aligned-cell`,
             onRender: ({ rejectedOverturned }) => (
                 <div className={`${CN}__content-row`}>
@@ -118,9 +119,9 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
             ),
         }, {
             key: 'rejected-accuracy',
-            name: 'Rejected accuracy',
-            minWidth: 50,
-            maxWidth: 90,
+            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.RATE_OVERTURNED_BAD],
+            minWidth: 110,
+            maxWidth: 110,
             className: `${CN}__right-aligned-cell`,
             onRender: ({ rejectedAccuracy }) => (
                 <div className={`${CN}__content-row`}>
@@ -138,9 +139,9 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
             ),
         }, {
             key: 'accuracy-average-rate',
-            name: 'Accuracy average rate',
-            minWidth: 100,
-            maxWidth: 100,
+            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.RATE_AVERAGE_OVERTURNED],
+            minWidth: 110,
+            maxWidth: 110,
             className: `${CN}__right-aligned-cell ${CN}__accuracy-sorting-arrow`,
             onRender: ({ accuracyAverage }) => (
                 <div className={`${CN}__content-row`}>

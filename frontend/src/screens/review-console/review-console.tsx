@@ -16,6 +16,7 @@ import OrderLockedIllustrationSvg from '../../assets/order-locked.svg';
 import { LABEL, ROUTES } from '../../constants';
 import { ApiServiceError } from '../../data-services/base-api-service';
 import { MrUserError } from '../../models/exceptions';
+import { Item } from '../../models';
 import { TYPES } from '../../types';
 import { CurrentUserStore, LockedItemsStore } from '../../view-services';
 import { ReviewConsoleScreenStore } from '../../view-services/review-console';
@@ -101,6 +102,10 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         }
     }
 
+    isItemHeldByCurrentUser(reviewItem: Item | null): boolean {
+        return reviewItem?.hold?.ownerId === this.userStore?.user?.id;
+    }
+
     @autoBind
     handleGoToQueuesClick() {
         // if there are no more items in a queue we should proceed to the page with tiles - not the one with queue data
@@ -169,7 +174,14 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         }
 
         if (queue && reviewItem) {
-            this.reviewConsoleScreenStore.startReview(queue, reviewItem);
+            // The user should NOT start reviewing the selected item, but the top one instead,
+            // if the queue is locked and the selected item isn't held be the current user.
+            const shouldTopItemBeSelectedForReview = queue.sortingLocked && !this.isItemHeldByCurrentUser(reviewItem);
+
+            this.reviewConsoleScreenStore.startReview(
+                queue,
+                shouldTopItemBeSelectedForReview ? null : reviewItem
+            );
         }
 
         if (queueId && itemId) {
@@ -261,6 +273,7 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         const itemReviewPermission = this.reviewPermissionStore.itemReviewPermissions(reviewItem);
         const isReviewAllowed = (permission ? permission.isAllowed : true) && itemReviewPermission.isAllowed;
         let reasonToPreventReview: JSX.Element | string = permission?.reason || '';
+
         if (reasonToPreventReview === QUEUE_REVIEW_PROHIBITION_REASONS.CANNOT_LOCK_TWO_ITEMS_ON_QUEUE) {
             const lockedItemOnQueue = this.lockedItemsStore.lockedItems!.find(item => item.lockedOnQueueId === queue?.queueId);
             const goToLockedItem = () => this.handleGoToLockedItemClick(lockedItemOnQueue!.lockedOnQueueId as string, lockedItemOnQueue!.id);
@@ -305,7 +318,9 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         return (
             <StartReviewPanel
                 onStartReviewCallback={this.startReviewProcess}
-                isQueueSortingLocked={queue.sortingLocked}
+                // Items held by the current  user should be available for review
+                // See MDMR-475 for more details
+                isItemReviewLocked={queue.sortingLocked && !this.isItemHeldByCurrentUser(reviewItem)}
                 notes={reviewItem?.notes || []}
                 isReviewAllowed={isReviewAllowed}
                 reasonToPreventReview={reasonToPreventReview}

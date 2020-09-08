@@ -6,6 +6,7 @@ import { resolve } from 'inversify-react';
 import { IconButton } from '@fluentui/react/lib/Button';
 import { Callout } from '@fluentui/react/lib/Callout';
 import { QueuesScreenStore } from '../../../../view-services';
+import { encodeStringForCSS } from '../../../../utils';
 import { TYPES } from '../../../../types';
 
 import './queue-item-tags.scss';
@@ -49,8 +50,8 @@ export class QueueItemTags extends Component<QueueItemTagProps, never> {
             itemId
         } = this.props;
         const { displayTagsItemId } = this.queuesScreenStore;
-        const iconClass = `${CN}-${itemId}`;
-        const isCalloutVisible = displayTagsItemId === itemId;
+        const iconClass = `${CN}-${encodeStringForCSS(itemId)}`;
+        const isCalloutVisible = displayTagsItemId === itemId && !!tags?.length;
 
         return (
             <>

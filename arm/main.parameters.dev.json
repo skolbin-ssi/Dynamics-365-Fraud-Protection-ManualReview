@@ -21,7 +21,7 @@
             "value": "eastus"
         },
         "throuhgputAnalyticsDb": {
-            "value": 1100
+            "value": 1000
         },
         "throuhgputQueuesDb": {
             "value": 500
@@ -58,6 +58,23 @@
         },
         "mailSmtpHost": {
             "value": "smtp.office365.com"
+        },
+        "alertReceivers": {
+            "value": [
+                "ms_gd_engineering@griddynamics.com"
+            ]
+        },
+        "NoIncomingEventsDfphubEvaluationFrequency": {
+            "value": "PT1H"
+        },
+        "NoIncomingEventsDfphubThreshold": {
+            "value": 0
+        },
+        "NoIncomingEventsDfphubWindowSize": {
+            "value": "P1D"
+        },
+        "exceptionsThresholdAlert": {
+            "value": 200
         }
     }
 }

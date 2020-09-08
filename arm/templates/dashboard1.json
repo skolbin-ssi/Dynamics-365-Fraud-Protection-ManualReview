@@ -3,7 +3,6 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "dashboardName": {
-            "defaultValue": "61414f76-0b17-4bac-b03b-a2ec21c0a3ee-dashboard ",
             "type": "String"
         },
         "location": {
@@ -13,25 +12,17 @@
               "description": "Specifies the location in which the Azure Storage resources should be deployed."
           }
         },
-        "appInsightsResourceId": {
-            "defaultValue": " /subscriptions/0cf0b616-8add-4f2e-b426-ff243e283635/resourceGroups/msd365fp-mr-stage-be/providers/Microsoft.Insights/components/msd365fp-mr-stage-app-insights",
-            "type": "String"
-        },
         "appInsightsName": {
-            "type": "string",
-            "defaultValue": "[parameters('appInsightsName')]"
+            "type": "string"
         },
         "subscriptionId": {
-            "type": "string",
-            "defaultValue": "0cf0b616-8add-4f2e-b426-ff243e283635 "
+            "type": "string"
         },
         "rgName": {
-            "type": "string",
-            "defaultValue": "msd365fp-mr-stage-be "
+            "type": "string"
         },
         "cosmosDbAccountName": {
-            "type": "string",
-            "defaultValue": "msd365fp-mr-stage-storage "
+            "type": "string"
         },
         "cosmosDbId": {
             "type": "string"
@@ -56,11 +47,15 @@
         },
         "prefix": {
             "type": "string"
+        },
+        "fdName": {
+            "type": "string"
         }
     },
     "variables": {
+        "appInsightsResourceId": "[resourceId('microsoft.insights/components/', parameters('appInsightsName'))]",
         "singleQuote": "'",
-        "queuesQuery": "[concat('requests\n| where (cloud_RoleName has ',variables('singleQuote'), parameters('prefix'),variables('singleQuote'), ' and (name has ',variables('singleQuote'),'/api/queues/',variables('singleQuote'),') and success == true\n| summarize avgDuration=avg(duration) by bin(timestamp, 5m), name\n| project avgDuration, name, timestamp\n| render timechart\n')]",
+        "queuesQuery": "[concat('requests\n| where (cloud_RoleName has ',variables('singleQuote'), parameters('prefix'),variables('singleQuote'), ') and (name has ',variables('singleQuote'),'/api/queues/',variables('singleQuote'),') and success == true\n| summarize avgDuration=avg(duration) by bin(timestamp, 5m), name\n| project avgDuration, name, timestamp\n| render timechart\n')]",
         "dashboardsQuery": "[concat('requests\n| where (cloud_RoleName has ',variables('singleQuote'),parameters('prefix'),variables('singleQuote'),') and (name has ',variables('singleQuote'),'/api/dashboards',variables('singleQuote'),') and success == true\n| summarize avgDuration=avg(duration) by bin(timestamp, 5m), name\n| project avgDuration, name, timestamp\n| render timechart\n')]",
         "itemsQuery": "[concat('requests\n| where (cloud_RoleName has ',variables('singleQuote'),parameters('prefix'),variables('singleQuote'),') and (name has ',variables('singleQuote'),'/api/items/',variables('singleQuote'),') and success == true\n| summarize avgDuration=avg(duration) by bin(timestamp, 5m), name\n| project avgDuration, name, timestamp\n| render timechart\n')]"
     },
@@ -89,7 +84,7 @@
                         "inputs": [
                         {
                             "name": "id",
-                            "value": "[parameters('appInsightsResourceId')]"
+                            "value": "[variables('appInsightsResourceId')]"
                         },
                         {
                             "name": "Version",
@@ -153,7 +148,7 @@
                         },
                         {
                             "name": "ResourceId",
-                            "value": "[parameters('appInsightsResourceId')]"
+                            "value": "[variables('appInsightsResourceId')]"
                         }
                         ],
                         "type": "Extension/AppInsightsExtension/PartType/QuickPulseButtonSmallPart",
@@ -287,7 +282,7 @@
                         "inputs": [
                         {
                             "name": "ComponentId",
-                            "value": "[parameters('appInsightsResourceId')]"
+                            "value": "[variables('appInsightsResourceId')]"
                         }
                         ],
                         "type": "Extension/AppInsightsExtension/PartType/SearchNavButtonOverviewAdaptedPart",
@@ -392,7 +387,7 @@
                         "inputs": [
                         {
                             "name": "ResourceId",
-                            "value": "[parameters('appInsightsResourceId')]"
+                            "value": "[variables('appInsightsResourceId')]"
                         },
                         {
                             "name": "DataModel",
@@ -455,7 +450,7 @@
                         "inputs": [
                         {
                             "name": "ResourceId",
-                            "value": "[parameters('appInsightsResourceId')]"
+                            "value": "[variables('appInsightsResourceId')]"
                         },
                         {
                             "name": "DataModel",
@@ -502,7 +497,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "performanceCounters/processIOBytesPerSecond",
                                     "aggregationType": 4,
@@ -548,7 +543,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "performanceCounters/processIOBytesPerSecond",
                                     "aggregationType": 4,
@@ -601,7 +596,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "requests/failed",
                                     "aggregationType": 7,
@@ -637,7 +632,7 @@
                                     "extensionName": "HubsExtension",
                                     "bladeName": "ResourceMenuBlade",
                                     "parameters": {
-                                    "id": "[parameters('appInsightsResourceId')]",
+                                    "id": "[variables('appInsightsResourceId')]",
                                     "menuid": "failures"
                                     }
                                 }
@@ -658,7 +653,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "requests/failed",
                                     "aggregationType": 7,
@@ -695,7 +690,7 @@
                                     "extensionName": "HubsExtension",
                                     "bladeName": "ResourceMenuBlade",
                                     "parameters": {
-                                    "id": "[parameters('appInsightsResourceId')]",
+                                    "id": "[variables('appInsightsResourceId')]",
                                     "menuid": "failures"
                                     }
                                 }
@@ -722,7 +717,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "requests/duration",
                                     "aggregationType": 4,
@@ -758,7 +753,7 @@
                                     "extensionName": "HubsExtension",
                                     "bladeName": "ResourceMenuBlade",
                                     "parameters": {
-                                    "id": "[parameters('appInsightsResourceId')]",
+                                    "id": "[variables('appInsightsResourceId')]",
                                     "menuid": "performance"
                                     }
                                 }
@@ -779,7 +774,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "requests/duration",
                                     "aggregationType": 4,
@@ -816,7 +811,7 @@
                                     "extensionName": "HubsExtension",
                                     "bladeName": "ResourceMenuBlade",
                                     "parameters": {
-                                    "id": "[parameters('appInsightsResourceId')]",
+                                    "id": "[variables('appInsightsResourceId')]",
                                     "menuid": "performance"
                                     }
                                 }
@@ -843,7 +838,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "performanceCounters/memoryAvailableBytes",
                                     "aggregationType": 4,
@@ -889,7 +884,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "performanceCounters/memoryAvailableBytes",
                                     "aggregationType": 4,
@@ -942,7 +937,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "exceptions/server",
                                     "aggregationType": 7,
@@ -954,7 +949,7 @@
                                 },
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "dependencies/failed",
                                     "aggregationType": 7,
@@ -1000,7 +995,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "exceptions/server",
                                     "aggregationType": 7,
@@ -1012,7 +1007,7 @@
                                 },
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "dependencies/failed",
                                     "aggregationType": 7,
@@ -1065,7 +1060,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "performanceCounters/processorCpuPercentage",
                                     "aggregationType": 4,
@@ -1077,7 +1072,7 @@
                                 },
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "performanceCounters/processCpuPercentage",
                                     "aggregationType": 4,
@@ -1123,7 +1118,7 @@
                                 "metrics": [
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "performanceCounters/processorCpuPercentage",
                                     "aggregationType": 4,
@@ -1135,7 +1130,7 @@
                                 },
                                 {
                                     "resourceMetadata": {
-                                    "id": "[parameters('appInsightsResourceId')]"
+                                    "id": "[variables('appInsightsResourceId')]"
                                     },
                                     "name": "performanceCounters/processCpuPercentage",
                                     "aggregationType": 4,
@@ -1176,7 +1171,7 @@
                     "position": {
                         "x": 0,
                         "y": 8,
-                        "colSpan": 6,
+                        "colSpan": 4,
                         "rowSpan": 4
                     },
                     "metadata": {
@@ -1238,9 +1233,9 @@
                     },
                     "19": {
                     "position": {
-                        "x": 6,
+                        "x": 4,
                         "y": 8,
-                        "colSpan": 6,
+                        "colSpan": 4,
                         "rowSpan": 4
                     },
                     "metadata": {
@@ -1313,6 +1308,75 @@
                     }
                     },
                     "20": {
+                        "position": {
+                            "x": 8,
+                            "y": 8,
+                            "colSpan": 4,
+                            "rowSpan": 4
+                        },
+                        "metadata": {
+                            "inputs": [
+                                {
+                                "name": "options",
+                                "isOptional": true
+                                },
+                                {
+                                "name": "sharedTimeRange",
+                                "isOptional": true
+                                }
+                            ],
+                            "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+                            "settings": {
+                                "content": {
+                                    "options": {
+                                        "chart": {
+                                        "metrics": [
+                                            {
+                                            "resourceMetadata": {
+                                                "id": "[resourceId('Microsoft.Network/frontdoors', parameters('fdName'))]"
+                                            },
+                                            "name": "BackendHealthPercentage",
+                                            "aggregationType": 4,
+                                            "namespace": "microsoft.network/frontdoors",
+                                            "metricVisualization": {
+                                                "displayName": "Backend Health Percentage",
+                                                "resourceDisplayName": "[parameters('prefix')]"
+                                            }
+                                            }
+                                        ],
+                                        "title": "[concat('Avg Backend Health Percentage for ',parameters('prefix'),' by Backend')]",
+                                        "titleKind": 1,
+                                        "visualization": {
+                                            "chartType": 2,
+                                            "legendVisualization": {
+                                            "isVisible": true,
+                                            "position": 2,
+                                            "hideSubtitle": false
+                                            },
+                                            "axisVisualization": {
+                                            "x": {
+                                                "isVisible": true,
+                                                "axisType": 2
+                                            },
+                                            "y": {
+                                                "isVisible": true,
+                                                "axisType": 1
+                                            }
+                                            },
+                                            "disablePinning": true
+                                        },
+                                        "grouping": {
+                                            "dimension": "Backend",
+                                            "sort": 2,
+                                            "top": 10
+                                        }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "21": {
                     "position": {
                         "x": 0,
                         "y": 12,
@@ -1334,7 +1398,7 @@
                         }
                     }
                     },
-                    "21": {
+                    "22": {
                     "position": {
                         "x": 6,
                         "y": 12,
@@ -1356,7 +1420,7 @@
                         }
                     }
                     },
-                    "22": {
+                    "23": {
                     "position": {
                         "x": 0,
                         "y": 13,
@@ -1456,7 +1520,7 @@
                         }
                     }
                     },
-                    "23": {
+                    "24": {
                     "position": {
                         "x": 6,
                         "y": 13,
@@ -1556,7 +1620,7 @@
                         }
                     }
                     },
-                    "24": {
+                    "25": {
                     "position": {
                         "x": 0,
                         "y": 17,
@@ -1632,7 +1696,7 @@
                         }
                     }
                     },
-                    "25": {
+                    "26": {
                     "position": {
                         "x": 0,
                         "y": 20,
@@ -1647,7 +1711,7 @@
                             "SubscriptionId": "[parameters('subscriptionId')]",
                             "ResourceGroup": "[parameters('rgName')]",
                             "Name": "[parameters('appInsightsName')]",
-                            "ResourceId": "[parameters('appInsightsResourceId')]"
+                            "ResourceId": "[variables('appInsightsResourceId')]"
                             },
                             "isOptional": true
                         },
@@ -1733,7 +1797,7 @@
                         }
                     }
                     },
-                    "26": {
+                    "27": {
                     "position": {
                         "x": 6,
                         "y": 20,
@@ -1748,7 +1812,7 @@
                             "SubscriptionId": "[parameters('subscriptionId')]",
                             "ResourceGroup": "[parameters('rgName')]",
                             "Name": "[parameters('appInsightsName')]",
-                            "ResourceId": "[parameters('appInsightsResourceId')]"
+                            "ResourceId": "[variables('appInsightsResourceId')]"
                             },
                             "isOptional": true
                         },
@@ -1834,7 +1898,7 @@
                         }
                     }
                     },
-                    "27": {
+                    "28": {
                     "position": {
                         "x": 0,
                         "y": 24,
@@ -1849,7 +1913,7 @@
                             "SubscriptionId": "[parameters('subscriptionId')]",
                             "ResourceGroup": "[parameters('rgName')]",
                             "Name": "[parameters('appInsightsName')]",
-                            "ResourceId": "[parameters('appInsightsResourceId')]"
+                            "ResourceId": "[variables('appInsightsResourceId')]"
                             },
                             "isOptional": true
                         },
@@ -1935,7 +1999,7 @@
                         }
                     }
                     },
-                    "28": {
+                    "29": {
                     "position": {
                         "x": 6,
                         "y": 24,
@@ -1950,7 +2014,7 @@
                             "SubscriptionId": "[parameters('subscriptionId')]",
                             "ResourceGroup": "[parameters('rgName')]",
                             "Name": "[parameters('appInsightsName')]",
-                            "ResourceId": "[parameters('appInsightsResourceId')]"
+                            "ResourceId": "[variables('appInsightsResourceId')]"
                             },
                             "isOptional": true
                         },
@@ -1979,7 +2043,7 @@
                         },
                         {
                             "name": "Query",
-                            "value": "requests\n| where (cloud_RoleName has 'msd365fp-mr') and (name has 'TaskService') and success == true\n| project duration, replace('TaskService.', '', name), timestamp\n| render timechart\n",
+                            "value": "[concat('requests\n| where (cloud_RoleName has ','\"',parameters('prefix'),'\") and (name has \"TaskService\") and success == true\n| project duration, replace(\"TaskService.\", \"\", name), timestamp\n| render timechart\n')]",
                             "isOptional": true
                         },
                         {
@@ -2036,7 +2100,7 @@
                     }
                 }
                 },
-                "29": {
+                "30": {
                 "position": {
                     "x": 0,
                     "y": 28,
@@ -2051,7 +2115,7 @@
                         "SubscriptionId": "[parameters('subscriptionId')]",
                         "ResourceGroup": "[parameters('rgName')]",
                         "Name": "[parameters('appInsightsName')]",
-                        "ResourceId": "[parameters('appInsightsResourceId')]"
+                        "ResourceId": "[variables('appInsightsResourceId')]"
                         },
                         "isOptional": true
                     },

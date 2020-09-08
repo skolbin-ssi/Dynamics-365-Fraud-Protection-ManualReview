@@ -1,3 +1,6 @@
+/**
+ * Report - represents CSV report model
+ */
 export interface Report {
     /**
      * name - report name

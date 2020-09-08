@@ -65,22 +65,26 @@ public class ItemService {
 
     private void saveEmptyItem(PurchaseEvent event) {
         String id = event.getEventId();
-        log.info("Event with purchase ID [{}] has been received from the DFP by rule [{}].", id, event.getRuleName());
+        log.info("Event [{}] has been received from the DFP rule [{}].", id, event.getRuleName());
 
-        // Create and save the item
-        Item item = Item.builder()
-                .id(id)
-                .active(false)
-                .imported(OffsetDateTime.now())
-                ._etag(id)
-                .build();
-        try {
-            itemRepository.save(item);
-            log.info("Item [{}] has been saved to the storage.", id);
-        } catch (CosmosDBAccessException e){
-            log.info("Item [{}] has not been saved to the storage because it's already exist.", id);
-        } catch (Exception e){
-            log.warn("Item [{}] has not been saved to the storage: {}", id, e.getMessage());
+        if ("purchase".equalsIgnoreCase(event.getEventType())) {
+            // Create and save the item
+            Item item = Item.builder()
+                    .id(id)
+                    .active(false)
+                    .imported(OffsetDateTime.now())
+                    ._etag(id)
+                    .build();
+            try {
+                itemRepository.save(item);
+                log.info("Item [{}] has been saved to the storage.", id);
+            } catch (CosmosDBAccessException e) {
+                log.info("Item [{}] has not been saved to the storage because it's already exist.", id);
+            } catch (Exception e) {
+                log.warn("Item [{}] has not been saved to the storage: {}", id, e.getMessage());
+            }
+        } else {
+            log.info("The event type of [{}] is [{}]. The event has been ignored.", id, event.getEventType());
         }
     }
 
@@ -260,11 +264,11 @@ public class ItemService {
                                     unassigned = true;
                                 }
                                 boolean unlocked = false;
-                                if (item.getLock() != null && queue.getId().equals(item.getLock().getQueueId())){
+                                if (item.getLock() != null && queue.getId().equals(item.getLock().getQueueId())) {
                                     item.unlock();
                                     unlocked = true;
                                 }
-                                if (item.getHold() != null && queue.getId().equals(item.getHold().getQueueId())){
+                                if (item.getHold() != null && queue.getId().equals(item.getHold().getQueueId())) {
                                     item.setHold(null);
                                     item.setLabel(new ItemLabel());
                                     item.getNotes().add(ItemNote.builder()
@@ -273,7 +277,7 @@ public class ItemService {
                                             .userId(oldItem.getHold().getOwnerId())
                                             .build());
                                 }
-                                if (item.getEscalation() != null && queue.getId().equals(item.getEscalation().getQueueId())){
+                                if (item.getEscalation() != null && queue.getId().equals(item.getEscalation().getQueueId())) {
                                     item.setEscalation(null);
                                     item.setLabel(new ItemLabel());
                                     item.getNotes().add(ItemNote.builder()

@@ -1,4 +1,5 @@
 import { DEFAULT_QUEUES_PER_PAGE } from './default';
+import { COLORS } from '../styles/variables';
 
 export enum PERFORMANCE_RATING {
     ALL = 'ALL',
@@ -98,6 +99,7 @@ export enum DASHBOARD_SEARCH_OPTIONS {
     ANALYSTS = 'ANALYSTS',
     QUEUES = 'QUEUES'
 }
+
 export const DASHBOARD_SEARCH_DISPLAY_OPTIONS = {
     [DASHBOARD_SEARCH_OPTIONS.ANALYSTS]: 'Analysts',
     [DASHBOARD_SEARCH_OPTIONS.QUEUES]: 'Queues'
@@ -162,3 +164,79 @@ export const OVERTURNED_ACTIONS_REPORT_KEYS = {
     [OVERTURNED_ACTIONS_CHART_KEYS.REJECTED_ACCURACY]: 'rejected accuracy',
     [OVERTURNED_ACTIONS_CHART_KEYS.ACCURACY_AVERAGE]: 'accuracy average rate',
 };
+
+export const OVERTURNED_CHART_DATUM_LABELS = {
+    [OVERTURNED_CHART_KEYS.APPROVED_MATCHED]: 'approveMatched',
+    [OVERTURNED_CHART_KEYS.APPROVED_UNMATCHED]: 'approveUnmatched',
+    [OVERTURNED_CHART_KEYS.REJECTED_MATCHED]: 'rejectMatched',
+    [OVERTURNED_CHART_KEYS.REJECTED_UNMATCHED]: 'rejectUnmatched'
+};
+
+export enum OVERTURNED_LABELS {
+    GOOD = 'GOOD',
+    BAD = 'BAD',
+    OVERTURNED_GOOD = 'OVERTURNED_GOOD',
+    OVERTURNED_BAD = 'OVERTURNED_BAD',
+    RATE_OVERTURNED_GOOD = 'RATE_OVERTURNED_GOOD',
+    RATE_OVERTURNED_BAD = 'RATE_OVERTURNED_BAD',
+    RATE_AVERAGE_OVERTURNED = 'RATE_AVERAGE_OVERTURNED'
+}
+export const OVERTURNED_DISPLAY_LABELS = {
+    [OVERTURNED_LABELS.GOOD]: 'Good actions applied',
+    [OVERTURNED_LABELS.BAD]: 'Bad actions applied',
+    [OVERTURNED_LABELS.OVERTURNED_GOOD]: 'Overturned good actions',
+    [OVERTURNED_LABELS.OVERTURNED_BAD]: 'Overturned bad actions',
+    [OVERTURNED_LABELS.RATE_OVERTURNED_GOOD]: 'Good actions overturned rate',
+    [OVERTURNED_LABELS.RATE_OVERTURNED_BAD]: 'Bad actions overturned rate',
+    [OVERTURNED_LABELS.RATE_AVERAGE_OVERTURNED]: 'Average overturned rate'
+};
+
+export const OVERTURNED_ACTIONS_DISPLAY_NAMES = {
+    [OVERTURNED_CHART_KEYS.APPROVED_MATCHED]: {
+        label: [OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.GOOD]],
+        color: COLORS.barChart.approveMatched
+    },
+    [OVERTURNED_CHART_KEYS.APPROVED_UNMATCHED]: {
+        label: [OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.OVERTURNED_GOOD]],
+        color: COLORS.barChart.approvedUnmatched
+    },
+    [OVERTURNED_CHART_KEYS.REJECTED_MATCHED]: {
+        label: [OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.BAD]],
+        color: COLORS.barChart.rejectMatched
+    },
+    [OVERTURNED_CHART_KEYS.REJECTED_UNMATCHED]: {
+        label: [OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.OVERTURNED_BAD]],
+        color: COLORS.barChart.rejectUnmatched
+    }
+};
+
+export const OVERTURNED_CHART_DATUM_KEYS = {
+    approveUnmatched: OVERTURNED_LABELS.OVERTURNED_GOOD,
+    approveMatched: OVERTURNED_LABELS.GOOD,
+    rejectMatched: OVERTURNED_LABELS.BAD,
+    rejectUnmatched: OVERTURNED_LABELS.OVERTURNED_BAD
+};
+
+export const OVERTURNED_LABELS_TO_OVERTURNED_CHART_KEYS_COLORS = new Map<OVERTURNED_LABELS, { color: string, label: string}>([
+    [
+        OVERTURNED_LABELS.GOOD, {
+            color: COLORS.barChart.approveMatched,
+            label: 'approveMatched'
+        }
+    ], [
+        OVERTURNED_LABELS.OVERTURNED_GOOD, {
+            color: COLORS.barChart.approvedUnmatched,
+            label: 'approveUnmatched'
+        }
+    ], [
+        OVERTURNED_LABELS.BAD, {
+            color: COLORS.barChart.rejectMatched,
+            label: 'rejectMatched'
+        }
+    ], [
+        OVERTURNED_LABELS.OVERTURNED_BAD, {
+            color: COLORS.barChart.rejectUnmatched,
+            label: 'rejectUnmatched'
+        }
+    ]
+]);

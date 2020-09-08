@@ -57,21 +57,21 @@ public class TaskService {
     @PostConstruct
     private void initializeTasks() {
         this.taskExecutions = Map.of(
-                QUEUE_ASSIGNMENT_TASK, task ->
+                QUEUE_ASSIGNMENT_TASK_NAME, task ->
                         queueService.reconcileQueueAssignments(),
                 ENRICHMENT_TASK_NAME, task ->
                         itemService.enrichAllPoorItems(false),
                 OVERALL_SIZE_TASK_NAME, task ->
                         streamService.sendOverallSizeEvent(itemService.countActiveItems()),
-                QUEUE_STATE_TASK_NAME, task ->
+                QUEUE_SIZE_TASK_NAME, task ->
                         queueService.fetchSizesForQueues(),
                 RESIDUAL_QUEUE_TASK_NAME, task ->
                         queueService.reviseResidualQueue(),
                 ITEM_UNLOCK_TASK_NAME, task ->
                         itemService.unlockItemsByTimeout(),
-                DICTIONARY_VALIDATION_TASK_NAME, task ->
+                DICTIONARY_TASK_NAME, task ->
                         dictionaryService.updateDictionariesByStorageData(),
-                ITEM_STATE_TASK_NAME, this::itemStateFetch
+                ITEM_ASSIGNMENT_TASK_NAME, this::itemStateFetch
         );
 
         Optional<Map.Entry<String, ApplicationProperties.TaskProperties>> incorrectTimingTask = applicationProperties.getTasks().entrySet().stream()

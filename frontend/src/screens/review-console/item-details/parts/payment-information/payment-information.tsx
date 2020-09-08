@@ -15,14 +15,14 @@ export class PaymentInformation extends BaseTileRenderer<PaymentInformationProps
     renderPaymentInfo() {
         const { item } = this.props;
 
-        const paymentInstrument = item.purchase.paymentInstrumentList[0];
+        const paymentInstrument = item.purchase?.paymentInstrumentList[0];
 
         const renderingConfig: KeyValueItem[] = [
-            { key: 'Payment instrument Id', value: paymentInstrument.paymentInstrumentId },
-            { key: 'Payment method', value: paymentInstrument.type },
-            { key: 'Card type', value: paymentInstrument.cardType },
-            { key: 'Holder name', value: paymentInstrument.holderName },
-            { key: 'BIN', value: paymentInstrument.BIN }
+            { key: 'Payment instrument Id', value: paymentInstrument?.paymentInstrumentId },
+            { key: 'Payment method', value: paymentInstrument?.type },
+            { key: 'Card type', value: paymentInstrument?.cardType },
+            { key: 'Holder name', value: paymentInstrument?.holderName },
+            { key: 'BIN', value: paymentInstrument?.BIN }
 
         ];
 

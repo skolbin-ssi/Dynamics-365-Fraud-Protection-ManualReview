@@ -54,22 +54,34 @@ foreach ($la in @($logWorkspace, $logWorkspaceSecondary)) {
     --force true -y
 }
 
-Write-Host "Removing service principal $prefix"
-Remove-AzADServicePrincipal `
-  -DisplayName $prefix `
-  -Force
+# remove AD service principal
+if (Get-AzADServicePrincipal -DisplayName $prefix -ErrorAction Ignore) {
+  Write-Host "Removing Azure AD service principal $prefix"
+  Remove-AzADServicePrincipal `
+    -DisplayName $prefix `
+    -Force
+}
 
-Write-Host "Removing Azure AD application $prefix"
-Remove-AzADApplication `
-  -DisplayName $prefix `
-  -Force
+# remove AD application
+if (Get-AzADApplication -DisplayName $prefix -ErrorAction Ignore) {
+  Write-Host "Removing Azure AD application $prefix"
+  Remove-AzADApplication `
+    -DisplayName $prefix `
+    -Force
+}
 
-Write-Host "Removing Azure AD group $mapsGroupName"
-Remove-AzADGroup `
-  -DisplayName $mapsGroupName `
-  -Force
+# remove AD maps group
+if (Get-AzADGroup -DisplayName $mapsGroupName -ErrorAction Ignore) {
+  Write-Host "Removing Azure AD group $mapsGroupName"
+  Remove-AzADGroup `
+    -DisplayName $mapsGroupName `
+    -Force
+}
 
-Write-Host "Removing resource group"$deploymentResourceGroup
-Remove-AzResourceGroup -Name $deploymentResourceGroup -Force
+# remove deployment resource group
+if (Get-AzResourceGroup -Name $deploymentResourceGroup -ErrorAction Ignore) {
+  Write-Host "Removing resource group"$deploymentResourceGroup
+  Remove-AzResourceGroup -Name $deploymentResourceGroup -Force
+}
 
 [System.Console]::Beep()

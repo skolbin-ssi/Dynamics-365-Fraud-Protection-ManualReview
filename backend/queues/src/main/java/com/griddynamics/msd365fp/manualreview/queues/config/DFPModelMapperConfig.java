@@ -4,6 +4,7 @@ import com.griddynamics.msd365fp.manualreview.model.Decision;
 import com.griddynamics.msd365fp.manualreview.model.dfp.*;
 import com.griddynamics.msd365fp.manualreview.model.dfp.raw.*;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
+import org.apache.commons.collections4.CollectionUtils;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
@@ -62,7 +63,8 @@ public class DFPModelMapperConfig {
         Map<String, PaymentInstrument> paymentInstrumentMap = new HashMap<>();
         Map<String, Product> productMap = new HashMap<>();
         Map<String, BankEvent> bankEventMap = new HashMap<>();
-        Map<String, Address> addressMap = new HashMap<>();
+        Map<String, Address> shippingAddressMap = new HashMap<>();
+        Map<String, Address> billingAddressMap = new HashMap<>();
         Map<String, PreviousPurchase> previousPurchaseMap = new HashMap<>();
         AssesmentResult assesmentResult = new AssesmentResult();
         Map<String, PurchaseStatus> purchaseStatusMap = new HashMap<>();
@@ -73,14 +75,14 @@ public class DFPModelMapperConfig {
         entity.getEdges().forEach(edge -> {
             switch (edge.getName()) {
                 case "PurchaseAddress":
-                    modelMapper.map(edge.getData(), addressMap.computeIfAbsent(
+                    modelMapper.map(edge.getData(), shippingAddressMap.computeIfAbsent(
                             ((PurchaseAddressEdgeData) edge.getData()).getAddressId(),
                             key -> new Address()));
                     break;
                 case "PaymentInstrumentAddress":
                     PaymentInstrumentAddressEdgeData edgeData =
                             ((PaymentInstrumentAddressEdgeData) edge.getData());
-                    modelMapper.map(edge.getData(), addressMap.computeIfAbsent(
+                    modelMapper.map(edge.getData(), billingAddressMap.computeIfAbsent(
                             edgeData.getAddressId(),
                             key -> new Address()));
                     paymentInstrumentMap
@@ -126,7 +128,12 @@ public class DFPModelMapperConfig {
         entity.getNodes().forEach(node -> {
             switch (node.getName()) {
                 case "Address":
-                    modelMapper.map(node.getData(), addressMap.computeIfAbsent(node.getId(), key -> new Address()));
+                    if (shippingAddressMap.containsKey(node.getId())) {
+                        modelMapper.map(node.getData(), shippingAddressMap.get(node.getId()));
+                    }
+                    if (billingAddressMap.containsKey(node.getId())) {
+                        modelMapper.map(node.getData(), billingAddressMap.get(node.getId()));
+                    }
                     break;
                 case "BankEvent":
                     modelMapper.map(node.getData(), bankEventMap.computeIfAbsent(node.getId(), key -> new BankEvent()));
@@ -159,7 +166,7 @@ public class DFPModelMapperConfig {
         });
 
         purchase.setPreviousPurchaseList(new ArrayList<>(previousPurchaseMap.values()));
-        purchase.setAddressList(new ArrayList<>(addressMap.values()));
+        purchase.setAddressList(new ArrayList<>(CollectionUtils.union(shippingAddressMap.values(), billingAddressMap.values())));
         purchase.setBankEventsList(new ArrayList<>(bankEventMap.values()));
         purchase.setDeviceContext(deviceContext);
         purchase.setPaymentInstrumentList(new ArrayList<>(paymentInstrumentMap.values()));

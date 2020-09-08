@@ -58,7 +58,13 @@ export function isoStringToLocalMothDayFormat(isoDateTimeString: string) {
 
     const dateObj = new Date(isoDateTimeString);
 
-    return `${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
+    let month: number | string = dateObj.getMonth() + 1;
+    month = month < 10 ? `0${month}` : month;
+
+    let day: number| string = dateObj.getDate();
+    day = day < 10 ? `0${day}` : day;
+
+    return `${month}/${day}`;
 }
 
 /**

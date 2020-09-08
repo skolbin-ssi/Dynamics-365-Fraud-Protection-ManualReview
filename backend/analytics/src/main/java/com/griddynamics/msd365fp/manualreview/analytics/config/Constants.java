@@ -1,24 +1,28 @@
 package com.griddynamics.msd365fp.manualreview.analytics.config;
 
 
-import lombok.experimental.UtilityClass;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 
-@UtilityClass
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S2386")
 public class Constants {
 
     public static final String DEFAULT_PAGE_REQUEST_SIZE_STR = "1000";
     public static final int DEFAULT_PAGE_REQUEST_SIZE = 1000;
-    public static final String RESOLUTION_CONTAINER_NAME = "Resolution";
+
+    public static final String RESOLUTION_CONTAINER_NAME = "Resolutions";
     public static final String ITEM_LABEL_ACTIVITY_CONTAINER_NAME = "ItemLabelActivities";
     public static final String ITEM_LOCK_ACTIVITY_CONTAINER_NAME = "ItemLockActivities";
     public static final String COLLECTED_QUEUE_INFO_CONTAINER_NAME = "CollectedQueueInfo";
     public static final String COLLECTED_ANALYST_INFO_CONTAINER_NAME = "CollectedAnalystInfo";
     public static final String ITEM_PLACEMENT_ACTIVITY_CONTAINER_NAME = "ItemPlacementActivities";
     public static final String QUEUE_SIZE_CALCULATION_ACTIVITY_CONTAINER_NAME = "QueueSizeCalculationActivities";
-    public static final String TASK_CONTAINER_NAME = "Task";
-    public static final String ALERT_CONTAINER_NAME = "Alert";
-    public static final String APP_SETTINGS_CONTAINER_NAME = "ConfigurableAppSetting";
+    public static final String TASK_CONTAINER_NAME = "Tasks";
+    public static final String ALERT_CONTAINER_NAME = "Alerts";
+    public static final String APP_SETTINGS_CONTAINER_NAME = "ConfigurableAppSettings";
+
     public static final String REGISTRATION_NAME = "azure-dfp-api";
 
     public static final String OVERALL_SIZE_ID = "overall";

@@ -1,24 +1,6 @@
 {
   "nodes": [
     {
-      "nodeIdAttribute": "AddressId",
-      "id": "D42CDFFCDE8E935E3ECEFCE26002A997",
-      "name": "Address",
-      "data": {
-        "AdditionalParams": {
-          "NormalizedAddress": "{\n  \"Status\": \"None\",\n  \"MailabilityScore\": \"0\",\n  \"ResultPercentage\": \"0.00\",\n  \"AddressType\": \"U\",\n  \"Address\": {\n    \"Street1\": null,\n    \"Street2\": null,\n    \"Street3\": null,\n    \"State\": null,\n    \"Country\": \"US\",\n    \"City\": \"San Ramon\",\n    \"Zipcode\": \"90345\",\n    \"District\": null,\n    \"Latitude\": null,\n    \"Longitude\": null\n  }\n}"
-        },
-        "AddressId": "D42CDFFCDE8E935E3ECEFCE26002A997",
-        "Street1": "dfgdfgdf",
-        "Street2": "string",
-        "Street3": "string",
-        "City": "San Ramon",
-        "State": "CA",
-        "ZipCode": "90345",
-        "CountryRegion": "US"
-      }
-    },
-    {
       "nodeIdAttribute": "DeviceContextId",
       "id": "72ea90b57778fef7e70de53abcae6865",
       "name": "DeviceContext",
@@ -691,10 +673,10 @@
       "name": "PurchaseAddress",
       "data": {
         "PurchaseId": "27ffe40e-a6a2-4217-a3bb-ee9df4d43234",
-        "AddressId": "D42CDFFCDE8E935E3ECEFCE26002A997",
+        "AddressId": "0516c562-4b1b-4110-9c7b-763520db4858_SYSGENERATED",
         "Type": "SHIPPING",
-        "FirstName": "aaa",
-        "LastName": "bbb"
+        "FirstName": "Aleksei",
+        "LastName": "Sokolov"
       }
     },
     {

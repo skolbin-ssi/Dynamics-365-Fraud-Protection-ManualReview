@@ -1,8 +1,10 @@
 package com.griddynamics.msd365fp.manualreview.queues.config;
 
-import lombok.experimental.UtilityClass;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-@UtilityClass
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@SuppressWarnings("java:S2386")
 public class Constants {
 
     public static final int TOP_ELEMENT_IN_CONTAINER_PAGE_SIZE = 1;
@@ -16,9 +18,9 @@ public class Constants {
 
     public static final String ITEMS_CONTAINER_NAME = "Items";
     public static final String QUEUES_CONTAINER_NAME = "Queues";
-    public static final String TASK_CONTAINER_NAME = "Task";
+    public static final String TASK_CONTAINER_NAME = "Tasks";
     public static final String DICTIONARIES_CONTAINER_NAME = "Dictionaries";
-    public static final String SETTINGS_CONTAINER_NAME = "Settings";
+    public static final String SETTINGS_CONTAINER_NAME = "ConfigurableAppSettings";
 
     public static final int DEFAULT_CACHE_CONTROL_SECONDS = 1800;
 
@@ -47,13 +49,13 @@ public class Constants {
     public static final String MESSAGE_ITEM_LOCKING_IN_ABSTRACT_QUEUE = "Item can't be locked under an abstract queue";
 
     public static final String RESIDUAL_QUEUE_TASK_NAME = "residual-queue-reconciliation-task";
-    public static final String QUEUE_STATE_TASK_NAME = "queue-size-calculation-task";
+    public static final String QUEUE_SIZE_TASK_NAME = "queue-size-calculation-task";
     public static final String OVERALL_SIZE_TASK_NAME = "overall-size-calculation-task";
-    public static final String ITEM_STATE_TASK_NAME = "item-assignment-reconciliation-task";
+    public static final String ITEM_ASSIGNMENT_TASK_NAME = "item-assignment-reconciliation-task";
     public static final String ITEM_UNLOCK_TASK_NAME = "item-unlock-task";
-    public static final String DICTIONARY_VALIDATION_TASK_NAME = "dictionary-reconciliation-task";
+    public static final String DICTIONARY_TASK_NAME = "dictionary-reconciliation-task";
     public static final String ENRICHMENT_TASK_NAME = "item-enrichment-task";
-    public static final String QUEUE_ASSIGNMENT_TASK = "queue-assignment-reconciliation-task";
+    public static final String QUEUE_ASSIGNMENT_TASK_NAME = "queue-assignment-reconciliation-task";
 
     public static final String DATETIME_PATTERN_DFP = "MM/dd/yyyy HH:mm:ss xxxxx";
 

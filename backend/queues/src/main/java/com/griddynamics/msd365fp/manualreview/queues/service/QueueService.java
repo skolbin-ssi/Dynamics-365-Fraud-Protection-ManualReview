@@ -66,6 +66,7 @@ public class QueueService {
                     .build();
             QueueViewUtility.addViewToQueue(newResidualQueue, QueueViewType.REGULAR);
             queueRepository.save(newResidualQueue);
+            streamService.sendQueueUpdateEvent(newResidualQueue);
             log.info("New [{}] with ID [{}] has been created.", RESIDUAL_QUEUE_NAME, newResidualQueue.getId());
         } else if (!managers.isEmpty()) {
             for (Queue queue : residualQueues) {
@@ -79,6 +80,7 @@ public class QueueService {
                             Objects.requireNonNullElse(queue.getSupervisors(), Collections.emptySet()));
                     queue.setSupervisors(updatedSupervisors);
                     queueRepository.save(queue);
+                    streamService.sendQueueUpdateEvent(queue);
                     log.info("Managers [{}] have been assigned as supervisors to [{}] with ID [{}].",
                             unassignedManagers, RESIDUAL_QUEUE_NAME, queue.getId());
                 }
@@ -122,11 +124,13 @@ public class QueueService {
         }
         if (CollectionUtils.isEmpty(queue.getSupervisors())) {
             queue.setSupervisors(managers);
+            queue.getReviewers().removeAll(managers);
             needToUpdate = true;
         }
         if (needToUpdate) {
             log.info("The queue [{}] were updated in order to reconcile assignments.", queue.getId());
             queueRepository.save(queue);
+            streamService.sendQueueUpdateEvent(queue);
         }
         return needToUpdate;
     }

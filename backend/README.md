@@ -38,8 +38,8 @@ and also has access to read Azure Key Vault secrets in required environment.
 The project is running under Gradle configuration and has multi-module architecture. There are two executable modules: 
 `queues` and `analytics` along with several libraries. Libraries are intended to separate
 common logic across reusable modules. It's not possible to run libraries apart from
-executable modules. You should build and run executable modules with `./gradlew` or `.\gradlew.bat` 
-scripts inside their folders.
+executable modules. You should build and run executable modules with `./gradlew` 
+(or `.\gradlew.bat` for Windows environment) scripts inside their folders.
 
 In case if you only need to build executable packages you can use
 ```shell script
@@ -85,7 +85,7 @@ To install the project locally please follow these steps:
 a terminal session if you run from console or in IDE run configuration if you work with it 
 (e.g. [run configuration in IDEA](https://www.jetbrains.com/help/objc/add-environment-variables-and-program-arguments.html#add-environment-variables)).
 2. Execute command `./gradlew clean build` in project root directory or run `clean` and then `build` tasks in IDE
-3. Define advanced variables for `bootRun` task in queues/analytics modules:
+3. (Optional) Define advanced variables for `bootRun` task in queues/analytics modules:
     * `SPRING_PROFILES_ACTIVE=local` activates `application-local.yml` configuration which overrides default `application.yml` file.
     * `SPRING_OUTPUT_ANSI_ENABLED=ALWAYS` prints colorful logs in console output.
     * `SERVER_PORT=8081` change the port of one spring application to 8081 to be able to run both of them simultaneously.
@@ -237,6 +237,9 @@ please setup outliners like on this picture:
 ```
 * Order of annotations on classes should be (the first one is the closest to class declaration): `org.springframework` >
 `org.projectlombok` > `io.swagger.core` > other
+* API naming should follow [common best practices](https://restfulapi.net/resource-naming)
+* Name of containers / tables should reflect it's content (e.g. if container stores especially RedHotChillyPepper 
+entities then the name should be `RedHotChillyPeppers` with notion of all attributes and in a plural form) 
 
 ### Logging
 

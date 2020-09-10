@@ -11,16 +11,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.griddynamics.msd365fp.manualreview.dfpauth.config.Constants.*;
+import static org.springframework.security.core.context.SecurityContextHolder.getContext;
 
 @UtilityClass
 public class UserPrincipalUtility {
 
+    public Authentication getAuth() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
     public String getUserId() {
-        return extractUserId(SecurityContextHolder.getContext().getAuthentication());
+        return extractUserId(getAuth());
     }
 
     public List<String> getUserRoles() {
-        return extractUserRoles(SecurityContextHolder.getContext().getAuthentication());
+        return extractUserRoles(getAuth());
     }
 
     public String extractUserId(Authentication auth) {

@@ -136,8 +136,9 @@ public class ModelMapperConfig {
             case REJECT:
                 return "OfflineManualReview_Fraud";
             case WATCH_NA:
+                return "ManualReview_WatchNA";
             case WATCH_INCONCLUSIVE:
-                return "OfflineManualReview_Watchlist";
+                return "ManualReview_Inclusive";
             default:
                 return null;
         }

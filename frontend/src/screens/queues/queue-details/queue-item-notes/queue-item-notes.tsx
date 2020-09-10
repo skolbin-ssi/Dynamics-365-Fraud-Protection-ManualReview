@@ -10,6 +10,7 @@ import { Persona, PersonaSize } from '@fluentui/react/lib/Persona';
 
 import { Note } from '../../../../models';
 import { QueuesScreenStore } from '../../../../view-services';
+import { encodeStringForCSS } from '../../../../utils';
 import { TYPES } from '../../../../types';
 
 import './queue-item-notes.scss';
@@ -47,8 +48,8 @@ export class QueueItemNote extends Component<QueueItemNoteProps, never> {
     render() {
         const { className, notes, itemId } = this.props;
         const { displayedNotesItemId } = this.queuesScreenStore;
-        const iconClass = `${CN}-${itemId}`;
-        const isCalloutVisible = displayedNotesItemId === itemId;
+        const iconClass = `${CN}-${encodeStringForCSS(itemId)}`;
+        const isCalloutVisible = displayedNotesItemId === itemId && !!notes?.length;
 
         return (
             <>

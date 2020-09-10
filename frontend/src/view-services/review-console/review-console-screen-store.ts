@@ -101,11 +101,11 @@ export class ReviewConsoleScreenStore {
     }
 
     @action
-    startReview(queue: Queue, item?: Item) {
-        if (queue.sortingLocked) {
-            this.getReviewItem(queue.viewId);
+    startReview(queue: Queue, item?: Item | null) {
+        if (item) {
+            this.getReviewItem(queue.viewId, item.id);
         } else {
-            this.getReviewItem(queue.viewId, (item as Item).id);
+            this.getReviewItem(queue.viewId);
         }
     }
 

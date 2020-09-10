@@ -63,15 +63,15 @@
     },
     "AddressList": [
       {
-        "AddressId": "9cb60ea7-fb76-4ae1-8650-660b4a3f7009_SYSGENERATED",
-        "Type": "BILLING",
+        "AddressId": "0516c562-4b1b-4110-9c7b-763520db4858_SYSGENERATED",
+        "Type": "SHIPPING",
         "FirstName": "Aleksei",
         "LastName": "Sokolov",
         "Street1": "Azina",
-        "Street2": "345678",
-        "City": "Saratov",
-        "ZipCode": "34567",
-        "CountryRegion": "AL"
+        "Street2": "5645",
+        "City": "London",
+        "ZipCode": "32343",
+        "CountryRegion": "UK"
       },
       {
         "AddressId": "0516c562-4b1b-4110-9c7b-763520db4858_SYSGENERATED",
@@ -85,17 +85,15 @@
         "CountryRegion": "UK"
       },
       {
-        "AddressId": "D42CDFFCDE8E935E3ECEFCE26002A997",
-        "Type": "SHIPPING",
-        "FirstName": "aaa",
-        "LastName": "bbb",
-        "Street1": "dfgdfgdf",
-        "Street2": "string",
-        "Street3": "string",
-        "City": "San Ramon",
-        "State": "CA",
-        "ZipCode": "90345",
-        "CountryRegion": "US"
+        "AddressId": "9cb60ea7-fb76-4ae1-8650-660b4a3f7009_SYSGENERATED",
+        "Type": "BILLING",
+        "FirstName": "Aleksei",
+        "LastName": "Sokolov",
+        "Street1": "Azina",
+        "Street2": "345678",
+        "City": "Saratov",
+        "ZipCode": "34567",
+        "CountryRegion": "AL"
       }
     ],
     "PaymentInstrumentList": [

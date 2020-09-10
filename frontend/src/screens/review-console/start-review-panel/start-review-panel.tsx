@@ -10,9 +10,10 @@ import { Note } from '../../../models';
 
 interface StartReviewPanelProps {
     /**
-     * isQueueSortingLocked - indicates whether sorting in queue is locked
+     * isItemReviewLocked - indicates whether item review is prohibited,
+     * for instance in locked queues.
      */
-    isQueueSortingLocked: boolean
+    isItemReviewLocked: boolean
     notes: Note[];
     isReviewAllowed: boolean;
     reasonToPreventReview?: JSX.Element | string;
@@ -25,7 +26,7 @@ const CN = 'start-review-panel';
 export const StartReviewPanel: React.FC<StartReviewPanelProps> = (
     {
         onStartReviewCallback,
-        isQueueSortingLocked,
+        isItemReviewLocked,
         notes,
         isReviewAllowed,
         reasonToPreventReview
@@ -45,7 +46,7 @@ export const StartReviewPanel: React.FC<StartReviewPanelProps> = (
 
     function renderReviewBlock() {
         // eslint-disable-next-line no-constant-condition
-        if (isQueueSortingLocked) {
+        if (isItemReviewLocked) {
             return renderMessageBar(
                 <>
                     It is not allowed to review transactions in random order because the queue is locked.

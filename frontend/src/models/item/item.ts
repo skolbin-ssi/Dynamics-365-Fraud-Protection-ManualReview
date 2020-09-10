@@ -129,12 +129,12 @@ export class Item {
         const isInProgress = !!this.lockedDate;
         const isOnHold = !!this.hold;
 
-        if (isOnHold) {
-            return ITEM_STATUS.ON_HOLD;
-        }
-
         if (isInProgress) {
             return ITEM_STATUS.IN_PROGRESS;
+        }
+
+        if (isOnHold) {
+            return ITEM_STATUS.ON_HOLD;
         }
 
         return ITEM_STATUS.AWAITING;

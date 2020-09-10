@@ -3,8 +3,8 @@ package com.griddynamics.msd365fp.manualreview.queues.service;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
 import com.griddynamics.msd365fp.manualreview.queues.model.dto.SettingsConfigurationDTO;
 import com.griddynamics.msd365fp.manualreview.queues.model.dto.SettingsDTO;
-import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Settings;
-import com.griddynamics.msd365fp.manualreview.queues.repository.SettingsRepository;
+import com.griddynamics.msd365fp.manualreview.queues.model.persistence.ConfigurableAppSettings;
+import com.griddynamics.msd365fp.manualreview.queues.repository.ConfigurableAppSettingsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SettingsService {
 
-    private final SettingsRepository settingsRepository;
+    private final ConfigurableAppSettingsRepository settingsRepository;
     private final ModelMapper modelMapper;
 
     public Collection<SettingsDTO> getSettings(final String type) {
@@ -30,7 +30,7 @@ public class SettingsService {
 
     public void createSettings(final SettingsConfigurationDTO settings) {
         log.info("Trying to create new settings: [{}]", settings);
-        Settings entity = modelMapper.map(settings, Settings.class);
+        ConfigurableAppSettings entity = modelMapper.map(settings, ConfigurableAppSettings.class);
         entity.setId(UUID.randomUUID().toString());
         entity.setActive(true);
         settingsRepository.save(entity);
@@ -39,7 +39,7 @@ public class SettingsService {
 
     public void updateSettings(final String id, final SettingsConfigurationDTO settings) throws NotFoundException {
         log.info("Trying to update settings by ID [{}]: [{}]", id, settings);
-        Settings entity = settingsRepository.findById(id)
+        ConfigurableAppSettings entity = settingsRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
         modelMapper.map(settings, entity);
         settingsRepository.save(entity);
@@ -48,7 +48,7 @@ public class SettingsService {
 
     public SettingsDTO deleteSettings(final String id) throws NotFoundException {
         log.info("Trying to delete settings by ID [{}].", id);
-        Settings entity = settingsRepository.findById(id)
+        ConfigurableAppSettings entity = settingsRepository.findById(id)
                 .orElseThrow(NotFoundException::new);
         entity.setActive(false);
         settingsRepository.save(entity);

@@ -71,8 +71,12 @@ if (!($APP_SP_ID))
 
     # Set admin consent
     Write-Host "= Set admin consent"
-    az ad app permission admin-consent --id "${CLIENT_ID}"
-    
+    # This operation sometimes raise an exception, do some retries
+    for ($i = 0; $i -lt 3; $i++) {
+        az ad app permission admin-consent --id "${CLIENT_ID}"
+        if ($LastExitCode -ne 0) { Start-Sleep -s 2 } else { break }
+    }
+
     if ($LastExitCode -ne 0) {
         throw "Last command failed, check logs"
     }

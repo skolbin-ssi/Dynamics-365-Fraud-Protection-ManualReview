@@ -28,7 +28,7 @@ export class LockedItemsStore {
 
         return this.lockedItems
             .reduce((acc: ItemLock[], item: Item): ItemLock[] => {
-                const seekedQueue = allQueues?.find(queue => queue.queueId === item.lockedOnQueueId);
+                const seekedQueue = allQueues?.find(queue => queue.viewId === item.lockedOnQueueViewId);
                 return seekedQueue
                     ? [...acc, { item, queue: seekedQueue }]
                     : acc;

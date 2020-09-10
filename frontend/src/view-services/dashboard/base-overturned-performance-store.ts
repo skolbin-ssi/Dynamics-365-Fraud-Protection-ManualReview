@@ -45,11 +45,7 @@ export class BaseOverturnedPerformanceStore<T extends BasicEntityPerformance> ex
 
             if (data.length) {
                 return BaseOverturnedPerformanceStore
-                    .calculateAccuracyData(toJS(data))
-                    .filter(datum => {
-                        const { key, ...metrics } = datum;
-                        return Object.values(metrics).some(metric => metric > 0);
-                    });
+                    .calculateAccuracyData(toJS(data));
             }
         }
 

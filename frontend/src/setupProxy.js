@@ -8,9 +8,10 @@ module.exports = function proxyConfiguration(app) {
     app.use(
         '/api',
         createProxyMiddleware({
-            // NOTE: in order to access local BackEnd installation replace target value
-            // target: 'http://localhost:8080/api',
-            target: 'https://dfp-manrev-dev.azurefd.net/api',
+            // NOTE: in order to access local BackEnd installation
+            // specify API_BASE_URL environment variable equal 'http://localhost:8080/api',
+            // for example in .env file
+            target: process.env.API_BASE_URL || 'https://dfp-manrev-dev.azurefd.net/api',
             secure: false,
             changeOrigin: true,
             // logLevel: 'debug',

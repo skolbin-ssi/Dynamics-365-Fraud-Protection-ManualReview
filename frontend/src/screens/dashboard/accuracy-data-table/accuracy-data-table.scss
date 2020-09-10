@@ -1,6 +1,7 @@
 @import "../../../styles/variables";
 
 .accuracy-data-table {
+  max-width: 1328px;
   position: relative;
 
   .ms-DetailsHeader {
@@ -13,6 +14,7 @@
     .ms-DetailsHeader-cell:not(:first-child) {
       .ms-DetailsHeader-cellTitle {
         display: flex;
+        padding: 0;
         justify-content: flex-end;
         white-space: pre-line;
         text-align: end;
@@ -29,7 +31,7 @@
         &::before {
           top: 0;
           width: 12px;
-          left: 5px;
+          left: -14px;
           height: 20px;
           position: absolute;
           content: '';

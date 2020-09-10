@@ -14,7 +14,8 @@ For quick project setup in development mode, you can execute the following comma
 
 > NOTE:
 > In order to access local Back End runtime instead of Cloud deployed version
-> you need to modify development proxy `target` configuration property under `./src/setupProxy.js:13`
+> you need to specify API_BASE_URL environment variable for instance in .env file
+> dev URL is used by default, find details in `./src/setupProxy.js`
 
 ```sh
 > cd ./msd365fp-manual-review/frontend

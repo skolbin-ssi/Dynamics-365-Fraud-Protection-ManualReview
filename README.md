@@ -51,3 +51,7 @@ example of a common pull request.
 
 Creator of the pull request have to merge it himself after he gets an approve from another developer. To apply pull
 request to the `development` branch recursive merge must be performed against the rebase or squash with rebase.
+
+## Microsoft Open Source code of conduct
+
+For additional information, see the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct).

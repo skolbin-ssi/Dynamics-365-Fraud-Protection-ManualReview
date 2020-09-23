@@ -1,0 +1,32 @@
+@import "../../../styles/variables";
+
+.entity-header {
+  &__header {
+    display: flex;
+    height: 100px;
+    justify-content: space-between;
+    align-items: center;
+
+    &-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: $neutralPrimary;
+    }
+  }
+
+  &__sub-header {
+    display: flex;
+    align-items: center;
+  }
+
+  &__persona {
+    margin-left: 20px;
+  }
+
+  &__persona-email {
+    margin-left: 12px;
+    font-size: 12px;
+    font-weight: normal;
+    color: $neutralSecondary;
+  }
+}

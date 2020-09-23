@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import autoBind from 'autobind-decorator';
 import { observer } from 'mobx-react';
@@ -54,19 +57,19 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
             ),
         },
         {
-            key: 'approved',
-            name: 'Approved',
+            key: 'good',
+            name: 'Good',
             minWidth: 50,
             maxWidth: 120,
             className: `${CN}__right-aligned-cell`,
             onRender: (queue: T) => (
                 <div className={`${CN}__content-row`}>
                     <Text variant="medium" className={`${CN}__score-cell`}>
-                        {queue.total.approved}
+                        {queue.total.good}
                     </Text>
-                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--approved`)}>
+                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--good`)}>
                         <span>
-                            {queue.approvedRatio}
+                            {queue.goodDecisionsRatio}
                             %
                         </span>
                     </div>
@@ -75,7 +78,7 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
         },
         {
             key: 'watched',
-            name: 'Watched',
+            name: 'Watch',
             minWidth: 50,
             maxWidth: 120,
             className: `${CN}__right-aligned-cell`,
@@ -86,7 +89,7 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
                     </Text>
                     <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--watched`)}>
                         <span>
-                            {queue.watchedRatio}
+                            {queue.watchDecisionsRatio}
                             %
                         </span>
                     </div>
@@ -94,19 +97,19 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
             ),
         },
         {
-            key: 'rejected',
-            name: 'Rejected',
+            key: 'bad',
+            name: 'Bad',
             minWidth: 50,
             maxWidth: 120,
             className: `${CN}__right-aligned-cell`,
             onRender: (queue: T) => (
                 <div className={`${CN}__content-row`}>
                     <Text variant="medium" className={`${CN}__score-cell`}>
-                        {queue.total.rejected}
+                        {queue.total.bad}
                     </Text>
-                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--rejected`)}>
+                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--bad`)}>
                         <span>
-                            {queue.rejectedRatio}
+                            {queue.badDecisionsRatio}
                             %
                         </span>
                     </div>
@@ -114,15 +117,15 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
             ),
         },
         {
-            key: 'hitRate',
-            name: 'In-tune rate',
-            minWidth: 50,
+            key: 'badDecisionsRate',
+            name: 'Bad decision rate',
+            minWidth: 80,
             maxWidth: 80,
             className: `${CN}__right-aligned-cell`,
             onRender: (queue: T) => (
                 <div className={`${CN}__content-row`}>
                     <Text variant="medium" className={`${CN}__score-cell`}>
-                        {queue.rejectedRatio}
+                        {queue.badDecisionsRatio}
                         %
                     </Text>
                 </div>
@@ -155,13 +158,6 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
     @autoBind
     renderFirstColumn(entity: BasicEntityPerformance) {
         const { onRowSelection, onRowClick, isAnalystTable } = this.props;
-
-        // if (isAnalystTable) {
-        //     // check if current user doesn't exist by API api/users/ call
-        //     if (!(entity as AnalystPerformance).analyst) {
-        //         return null;
-        //     }
-        // }
 
         const checkBoxStyles = {
             checkbox: {

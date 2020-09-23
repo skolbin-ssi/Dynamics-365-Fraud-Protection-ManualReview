@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Duration, parse } from 'iso8601-duration';
 import { action, computed, observable } from 'mobx';
 import { ALERT_METRIC_TYPE, ALERT_THRESHOLD_OPERATOR, PERIOD_DURATION_TYPE } from '../constants';
@@ -16,7 +19,7 @@ export class Alert {
     ownerId: string = '';
 
     @observable
-    metricType: ALERT_METRIC_TYPE = ALERT_METRIC_TYPE.APPROVAL_RATE;
+    metricType: ALERT_METRIC_TYPE = ALERT_METRIC_TYPE.GOOD_DECISION_RATE;
 
     @observable
     period: string = 'P1D';

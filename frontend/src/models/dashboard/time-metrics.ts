@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { parse, Duration } from 'iso8601-duration';
 import { computed, observable } from 'mobx';
 

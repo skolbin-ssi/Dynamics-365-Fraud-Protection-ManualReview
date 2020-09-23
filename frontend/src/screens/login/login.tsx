@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Spinner } from '@fluentui/react/lib/Spinner';
 import autobind from 'autobind-decorator';
 import { resolve } from 'inversify-react';

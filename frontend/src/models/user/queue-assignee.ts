@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { User } from './user';
 
 export class QueueAssignee extends User {

@@ -26,6 +26,8 @@ $white: #ffffff;
 $headerHeight: 48px;
 $collapsedLeftNavigationWidth: 48px;
 $expandedLeftNavigationWidth: 230px;
+$maxTableSwitchWidth: 1328px;
+$customFooterHeight: 50px;
 
 $verticalTabHeight: 44px;
 
@@ -33,18 +35,18 @@ $highRiskColor: #D83B01;
 $mediumRiskColor: #FFC80A;
 $lowRiskColor: #A19F9D;
 
-$approveFill: rgba(95, 210, 85, 0.2);
-$approveFillHover: rgba(95, 210, 85, 0.3);
-$approveFillActive: rgba(95, 210, 85, 0.4);
-$approveLabelBackground: #DFF6DD;
+$goodFill: rgba(95, 210, 85, 0.2);
+$goodFillHover: rgba(95, 210, 85, 0.3);
+$goodFillActive: rgba(95, 210, 85, 0.4);
+$goodLabelBackground: #DFF6DD;
 
-$rejectFill: rgba(245, 135, 145, 0.2);
-$rejectFillHover: rgba(245, 135, 145, 0.3);
-$rejectFillActive: rgba(245, 135, 145, 0.4);
-$rejectedLabelBackground: #FDE7E9;
+$badFill: rgba(245, 135, 145, 0.2);
+$badFillHover: rgba(245, 135, 145, 0.3);
+$badFillActive: rgba(245, 135, 145, 0.4);
+$badLabelBackground: #FDE7E9;
 
-$approveColor: #107C10;
-$rejectColor: #D83B01;
+$goodColor: #107C10;
+$badColor: #D83B01;
 
 $vividMostColor: #FF8E09;
 $vividMediumColor: #F0C694;
@@ -59,10 +61,10 @@ $chartOpacityBackgroundColor: rgba(255, 255, 255, 0.8);
 
 // __ bar chart __
 
-$approveMatchedColor: #87BD87;
-$approvedUnmatchedColor: #DFF6DD;
-$rejectMatchedColor: #E36772;
-$rejectUnmatchedColor: #FAC3C8;
+$goodMatchedColor: #87BD87;
+$goodUnmatchedColor: #DFF6DD;
+$badMatchedColor: #E36772;
+$badUnmatchedColor: #FAC3C8;
 
 // __ fraud score counter colors threshold __
 

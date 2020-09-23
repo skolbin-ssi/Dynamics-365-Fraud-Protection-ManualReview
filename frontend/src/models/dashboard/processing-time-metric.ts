@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { computed, observable } from 'mobx';
 import { Duration, toSeconds } from 'iso8601-duration';
 import { ProcessingTimeMetricDto } from '../../data-services/api-services/models/dashboard';

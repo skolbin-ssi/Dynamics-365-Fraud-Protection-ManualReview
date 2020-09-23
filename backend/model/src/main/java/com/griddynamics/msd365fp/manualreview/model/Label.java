@@ -1,10 +1,13 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.model;
 
 import java.io.Serializable;
 
 public enum Label implements Serializable {
-    ACCEPT(true),
-    REJECT(true),
+    GOOD(true),
+    BAD(true),
     HOLD(false),
     ESCALATE(false),
     WATCH_NA(true),

@@ -1,7 +1,12 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ERROR_SCREEN_STATES } from './error-screen-states';
 
 export const ROUTES = {
     LOGIN: '/login',
+
+    PERSONAL_PERFORMANCE: '/my/performance',
 
     DASHBOARD: '/dashboard',
     DASHBOARD_QUEUES_PERFORMANCE: '/dashboard/queues',

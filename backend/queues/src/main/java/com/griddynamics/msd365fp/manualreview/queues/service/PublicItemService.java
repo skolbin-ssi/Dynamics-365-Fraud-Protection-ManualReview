@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
@@ -210,8 +213,8 @@ public class PublicItemService {
                 .userId(UserPrincipalUtility.getUserId())
                 .build());
         switch (labelAssignment.getLabel()) {
-            case ACCEPT:
-            case REJECT:
+            case GOOD:
+            case BAD:
             case WATCH_NA:
             case WATCH_INCONCLUSIVE:
                 labelResolution(item, oldItem);
@@ -227,10 +230,6 @@ public class PublicItemService {
                         String.format("User [%s] attempted to label an item [%s] with unsupported label [%s].",
                                 actor, id, labelAssignment.getLabel()));
         }
-        // Send event "item was unlocked"
-        streamService.sendItemLockEvent(item, oldItem.getLock(), LockActionType.LABEL_APPLIED_RELEASE);
-        // Send labeling event
-        streamService.sendItemLabelEvent(item, oldItem);
     }
 
     @Retry(name = "cosmosOptimisticUpdate")

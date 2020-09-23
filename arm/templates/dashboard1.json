@@ -2200,7 +2200,166 @@
                     }
                     }
                 }
-                }
+                },
+                    "31": {
+                        "position": {
+                            "x": 0,
+                            "y": 32,
+                            "colSpan": 6,
+                            "rowSpan": 4
+                        },
+                        "metadata": {
+                            "inputs": [
+                                {
+                                    "name": "options",
+                                    "isOptional": true
+                                },
+                                {
+                                    "name": "sharedTimeRange",
+                                    "isOptional": true
+                                }
+                            ],
+                            "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+                            "settings": {
+                                "content": {
+                                    "options": {
+                                        "chart": {
+                                            "metrics": [
+                                                {
+                                                    "resourceMetadata": {
+                                                        "id": "[variables('appInsightsResourceId')]"
+                                                    },
+                                                    "name": "event-hub_sent",
+                                                    "aggregationType": 1,
+                                                    "namespace": "azure.applicationinsights",
+                                                    "metricVisualization": {
+                                                        "displayName": "event-hub_sent"
+                                                    }
+                                                },
+                                                {
+                                                    "resourceMetadata": {
+                                                        "id": "[variables('appInsightsResourceId')]"
+                                                    },
+                                                    "name": "event-hub_received",
+                                                    "aggregationType": 1,
+                                                    "namespace": "azure.applicationinsights",
+                                                    "metricVisualization": {
+                                                        "displayName": "event-hub_received"
+                                                    }
+                                                }
+                                            ],
+                                            "title": "EHub sent/received",
+                                            "titleKind": 2,
+                                            "visualization": {
+                                                "chartType": 2,
+                                                "legendVisualization": {
+                                                    "isVisible": true,
+                                                    "position": 2,
+                                                    "hideSubtitle": false
+                                                },
+                                                "axisVisualization": {
+                                                    "x": {
+                                                        "isVisible": true,
+                                                        "axisType": 2
+                                                    },
+                                                    "y": {
+                                                        "isVisible": true,
+                                                        "axisType": 1
+                                                    }
+                                                },
+                                                "disablePinning": true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "32": {
+                        "position": {
+                            "x": 6,
+                            "y": 32,
+                            "colSpan": 6,
+                            "rowSpan": 4
+                        },
+                        "metadata": {
+                            "inputs": [
+                                {
+                                    "name": "options",
+                                    "isOptional": true
+                                },
+                                {
+                                    "name": "sharedTimeRange",
+                                    "isOptional": true
+                                }
+                            ],
+                            "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+                            "settings": {
+                                "content": {
+                                    "options": {
+                                        "chart": {
+                                            "metrics": [
+                                                {
+                                                    "resourceMetadata": {
+                                                        "id": "[variables('appInsightsResourceId')]"
+                                                    },
+                                                    "name": "event-hub_rebalancing",
+                                                    "aggregationType": 1,
+                                                    "namespace": "azure.applicationinsights",
+                                                    "metricVisualization": {
+                                                        "displayName": "event-hub_rebalancing"
+                                                    }
+                                                },
+                                                {
+                                                    "resourceMetadata": {
+                                                        "id": "[variables('appInsightsResourceId')]"
+                                                    },
+                                                    "name": "event-hub_errors",
+                                                    "aggregationType": 1,
+                                                    "namespace": "azure.applicationinsights",
+                                                    "metricVisualization": {
+                                                        "displayName": "event-hub_errors"
+                                                    }
+                                                },
+                                                {
+                                                    "resourceMetadata": {
+                                                        "id": "[variables('appInsightsResourceId')]"
+                                                    },
+                                                    "name": "event-hub_sendingError",
+                                                    "aggregationType": 1,
+                                                    "namespace": "azure.applicationinsights",
+                                                    "metricVisualization": {
+                                                        "displayName": "event-hub_sendingError"
+                                                    }
+                                                }
+                                            ],
+                                            "title": "EHub errors and warnings",
+                                            "titleKind": 2,
+                                            "visualization": {
+                                                "chartType": 2,
+                                                "legendVisualization": {
+                                                    "isVisible": true,
+                                                    "position": 2,
+                                                    "hideSubtitle": false
+                                                },
+                                                "axisVisualization": {
+                                                    "x": {
+                                                        "isVisible": true,
+                                                        "axisType": 2
+                                                    },
+                                                    "y": {
+                                                        "isVisible": true,
+                                                        "axisType": 1
+                                                    }
+                                                },
+                                                "disablePinning": true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
             }
             }
         },

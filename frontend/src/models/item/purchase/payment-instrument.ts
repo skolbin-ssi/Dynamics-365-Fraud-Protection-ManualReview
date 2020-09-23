@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { PaymentInstrumentDTO } from '../../../data-services/api-services/models';
 import { Address } from './address';
 

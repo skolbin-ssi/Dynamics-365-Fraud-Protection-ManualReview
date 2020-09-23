@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.service;
 
 import com.azure.data.cosmos.PreconditionFailedException;
@@ -24,6 +27,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.FAIL_FAST_STATUS;
+import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.INCORRECT_CONFIG_STATUS;
 import static com.griddynamics.msd365fp.manualreview.analytics.config.ScheduledJobsConfig.*;
 import static com.griddynamics.msd365fp.manualreview.model.TaskStatus.READY;
 import static com.griddynamics.msd365fp.manualreview.model.TaskStatus.RUNNING;
@@ -38,6 +43,7 @@ import static com.griddynamics.msd365fp.manualreview.model.TaskStatus.RUNNING;
 @RequiredArgsConstructor
 public class TaskService {
 
+    private final StreamService streamService;
     private final ThreadPoolTaskExecutor taskExecutor;
     private final TaskRepository taskRepository;
     private final ResolutionService resolutionService;
@@ -46,15 +52,20 @@ public class TaskService {
     private final ApplicationProperties applicationProperties;
 
     private Map<String, TaskExecution<Object, Exception>> taskExecutions;
+    private Map<String, TaskCondition<Exception>> taskConditions;
 
 
     @PostConstruct
     private void initializeTasks() {
+        this.taskConditions = Map.of(
+                FAIL_FAST_TASK_NAME, this::failFastCondition);
+
         this.taskExecutions = Map.of(
                 ALERT_TEMPLATE_RECONCILIATION_TASK_NAME, task -> alertService.reconcileAlertTemplates(),
                 RESOLUTION_RETRY_TASK_NAME, task -> resolutionService.sendResolutionsToDFP(OffsetDateTime.now()),
                 COLLECT_ANALYST_INFO_TASK_NAME, task -> collectedInfoService.collectAnalystInfo(),
-                SEND_ALERTS_TASK_NAME, task -> alertService.sendAlerts()
+                SEND_ALERTS_TASK_NAME, task -> alertService.sendAlerts(),
+                FAIL_FAST_TASK_NAME, this::failFast
         );
 
         Optional<Map.Entry<String, ApplicationProperties.TaskProperties>> incorrectTimingTask = applicationProperties.getTasks().entrySet().stream()
@@ -66,14 +77,14 @@ public class TaskService {
             log.error("Task [{}] has incorrect timing configuration: {}",
                     incorrectTimingTask.get().getKey(),
                     incorrectTimingTask.get().getValue());
-            System.exit(1);
+            System.exit(INCORRECT_CONFIG_STATUS);
         }
         if (applicationProperties.getTaskWarningTimeoutMultiplier() < 1 ||
                 applicationProperties.getTaskWarningTimeoutMultiplier() > applicationProperties.getTaskResetTimeoutMultiplier()) {
             log.error("Incorrect timeout multiplier configuration: [{},{}]",
                     applicationProperties.getTaskWarningTimeoutMultiplier(),
                     applicationProperties.getTaskResetTimeoutMultiplier());
-            System.exit(1);
+            System.exit(INCORRECT_CONFIG_STATUS);
         }
     }
 
@@ -102,7 +113,7 @@ public class TaskService {
         }
         Task task = taskRepository.findById(taskName).orElseThrow(IncorrectConfigurationException::new);
 
-        return executeTask(task, taskProperties, taskExecutions.get(taskName));
+        return executeTask(task);
     }
 
     /**
@@ -131,7 +142,7 @@ public class TaskService {
 
                     // Execute task
                     if (task != null && isTaskReadyForExecutionNow(task, taskProperties)) {
-                        taskLaunched = executeTask(task, taskProperties, taskExecutions.get(taskName));
+                        taskLaunched = executeTask(task);
                     }
 
                     // Create task if absent
@@ -199,8 +210,12 @@ public class TaskService {
     /**
      * Scale-safe task executor.
      * <p>
-     * Wraps task execution with some common logic of acquiring task lock,
-     * releasing it and handling exceptional path.
+     * Wraps task execution with the common logic of condition checking,
+     * acquiring task lock, releasing it, and handling exceptional path.
+     * </p>
+     * Before task execution the conditions are checked:
+     * - task should be in a {@link TaskStatus#READY} status
+     * - if there is a precondition for task then it should return {@code true}
      * </p>
      * Scheduled task uses provided {@link Task} that should be retrieved
      * from the database. The executor sets {@link Task#getStatus()} into
@@ -216,24 +231,30 @@ public class TaskService {
      * {@link Task#getFailedStatusMessage()} is set to
      * {@link Exception#getMessage()} and new state saved into the database.
      *
-     * @param task           which should represet a lock object
-     *                       from shared database
-     * @param taskProperties represents local static task configuration from
-     *                       application properties
-     * @param taskExecution  the logic which executes during
-     *                       the {@link TaskStatus#RUNNING} stage
-     *                       of the {@link Task}
+     * @param task which should represent a lock object
+     *             from shared database
      * @return true if task has been sent to execution on the current instance
      */
     @SuppressWarnings("java:S2326")
-    private <T, E extends Exception> boolean executeTask(
-            Task task,
-            ApplicationProperties.TaskProperties taskProperties,
-            TaskExecution<T, E> taskExecution) {
+    private <T, E extends Exception> boolean executeTask(Task task) {
+        ApplicationProperties.TaskProperties taskProperties =
+                applicationProperties.getTasks().get(task.getId());
+        TaskExecution<Object, Exception> taskExecution = taskExecutions.get(task.getId());
+        TaskCondition<Exception> taskCondition = taskConditions.get(task.getId());
 
         // check possibility to execute
         if (!READY.equals(task.getStatus())) {
             return false;
+        }
+        if (taskCondition != null) {
+            try {
+                if (!taskCondition.check(task)) {
+                    return false;
+                }
+            } catch (Exception e) {
+                log.warn("Condition checking for [{}] task ended with an exception", task.getId(), e);
+                return false;
+            }
         }
 
         // acquire a lock
@@ -284,8 +305,32 @@ public class TaskService {
         return true;
     }
 
+
+    private boolean failFastCondition(Task task) {
+        boolean resourcesAreHealthy;
+        try {
+            resourcesAreHealthy = streamService.checkStreamingHealth();
+        } catch (Exception e) {
+            log.error("Exception during fail fast reconciliation.", e);
+            resourcesAreHealthy = false;
+        }
+        return !resourcesAreHealthy;
+    }
+
+    private boolean failFast(Task task) {
+        log.error("Fatal error has been discovered. Initiate fail-fast recovery.");
+        System.exit(FAIL_FAST_STATUS);
+        return true;
+    }
+
+
     @FunctionalInterface
     public interface TaskExecution<T, E extends Exception> {
         T apply(Task task) throws E;
+    }
+
+    @FunctionalInterface
+    public interface TaskCondition<E extends Exception> {
+        boolean check(Task task) throws E;
     }
 }

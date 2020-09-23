@@ -1,0 +1,12 @@
+@import "../../../../styles/variables";
+
+.total-review {
+  &__total-review-section {
+    margin-bottom: 56px;
+  }
+
+  &__switch-header,
+  &__total-review-table {
+    max-width: $maxTableSwitchWidth;
+  }
+}

@@ -1,17 +1,20 @@
-function isValidDateString(d: string) {
-    const timestamp = Date.parse(d);
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
-    return !Number.isNaN(timestamp);
-}
+import moment from 'moment-timezone';
+import { MomentInput } from 'moment';
+
+const LOCAL_DATE_STRING_FORMAT = 'M/D/YYYY';
+const LOCAL_TIME_STRING_FORMAT = 'h:mm:ss A';
+const LOCAL_STRING_FORMAT = `${LOCAL_DATE_STRING_FORMAT}, ${LOCAL_TIME_STRING_FORMAT}`;
+const LOCAL_STRING_FORMAT_WITH_TIMEZONE = `${LOCAL_DATE_STRING_FORMAT}, ${LOCAL_TIME_STRING_FORMAT} Z`;
 
 /**
- *  Returns date formatted to e.g.: January 2, 2020;
- * @param date - Date object
+ * Formats any MomentInput to a string e.g.: January 2, 2020;
+ * @param date - MomentInput
+ * @return - string
  */
-export const formatDateToFullMonthDayYear = (date: Date) => {
-    const fullMonthName = date.toLocaleString('default', { month: 'long' });
-    return `${fullMonthName} ${date.getDate()}, ${date.getFullYear()}`;
-};
+export const formatDateToFullMonthDayYear = (date: MomentInput): string => moment(date).format('MMMM D, YYYY');
 
 /**
  * Converts ISO DateTime string to local date string
@@ -41,52 +44,164 @@ export function isoStringToDateString(isoDateTimeString: string) {
 }
 
 /**
- * Converts  ISO DateTime string to local date string
- *
+ * Converts DateTime string to MM/DD format
  * e.g.: 2020-05-28T23:08:23.411Z  convert to => 05/28
  *
- * @param isoDateTimeString
- * @return {string} local date string in d/m format
+ * @param dateString - DateTime string
+ * @return {string} string in MM/DD format
  */
-export function isoStringToLocalMothDayFormat(isoDateTimeString: string) {
-    const timestamp = Date.parse(isoDateTimeString);
+export function formatToLocaleMonthDayFormat(dateString: string): string {
+    const dateMoment = moment(dateString);
 
-    // not a date string
-    if (Number.isNaN(timestamp)) {
-        return isoDateTimeString;
+    if (!dateMoment.isValid()) {
+        return dateString;
     }
 
-    const dateObj = new Date(isoDateTimeString);
-
-    let month: number | string = dateObj.getMonth() + 1;
-    month = month < 10 ? `0${month}` : month;
-
-    let day: number| string = dateObj.getDate();
-    day = day < 10 ? `0${day}` : day;
-
-    return `${month}/${day}`;
+    return dateMoment.format('MM/DD');
 }
 
 /**
- * Return date formatter to locale string e.g.: 10:23 AM, 06/06/2020
- * @param isoDateTimeString
- * @param placeholder
+ * If date is valid formats MomentInput to a local date string format,
+ * otherwise it returns a passed placeholder
+ * e.g.: Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time) ==> 9/8/2020
+ *
+ * @param date - MomentInput
+ * @param placeholder - string | JSX.Element
+ * @return - string | JSX.Element
  */
-export function formatISODateStringToLocaleString<T extends any>(isoDateTimeString: string, placeholder: T): string | T {
-    if (!isValidDateString(isoDateTimeString)) {
+export function formatToLocaleDateString(date: MomentInput, placeholder: string | JSX.Element | null): string | JSX.Element | null {
+    const dateMoment = moment(date);
+
+    if (!dateMoment.isValid()) {
         return placeholder;
     }
 
-    const date = new Date(isoDateTimeString);
-    return date.toLocaleString();
+    return dateMoment.format(LOCAL_DATE_STRING_FORMAT);
 }
 
 /**
- * Return date formatter to locale string e.g.: April 24, 2020
- * @param isoDateTimeString
+ * If date is valid formats MomentInput to a local time string format,
+ * otherwise it returns a passed placeholder
+ * e.g.: Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time) ==> 12:15:30 AM
+ *
+ * @param date - MomentInput
+ * @param placeholder - string | JSX.Element
+ * @return - string | JSX.Element
  */
-export function formatISODateStringToLocaleDateString(isoDateTimeString: string) {
-    const date = new Date(isoDateTimeString);
-    const shortMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return `${shortMonthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+export function formatToLocaleTimeString(date: MomentInput, placeholder: string | JSX.Element): string | JSX.Element {
+    const dateMoment = moment(date);
+
+    if (!dateMoment.isValid()) {
+        return placeholder;
+    }
+
+    return dateMoment.format(LOCAL_TIME_STRING_FORMAT);
+}
+
+/**
+ * If date is valid formats MomentInput to a local string format,
+ * otherwise it returns a passed placeholder
+ * e.g.: Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time) ==> 9/8/2020, 12:15:30 AM
+ *
+ * @param date - MomentInput
+ * @param placeholder - string | JSX.Element
+ * @return - string | JSX.Element
+ */
+export function formatToLocaleString(date: MomentInput, placeholder: string | JSX.Element): string | JSX.Element {
+    const dateMoment = moment(date);
+
+    if (!dateMoment.isValid()) {
+        return placeholder;
+    }
+
+    return dateMoment.format(LOCAL_STRING_FORMAT);
+}
+
+/**
+ * If date is valid formats MomentInput to a local string format,
+ * otherwise it returns a passed placeholder
+ * e.g.: Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time) ==> 9/8/2020, 12:15:30 AM
+ *
+ * @param date - MomentInput
+ * @param placeholder - string | JSX.Element
+ * @return - string | JSX.Element
+ */
+export function formatForNotes(date: MomentInput, placeholder: string | JSX.Element): string | JSX.Element {
+    const dateMoment = moment(date);
+
+    if (!dateMoment.isValid()) {
+        return placeholder;
+    }
+
+    return dateMoment.format(`${LOCAL_DATE_STRING_FORMAT} [at] ${LOCAL_TIME_STRING_FORMAT}`);
+}
+
+/**
+ * Converts date to UTC and if date is valid formats it to a local string,
+ * otherwise it returns a passed placeholder
+ * e.g.: Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time) ==> 9/8/2020, 9:15:30 AM
+ *
+ * @param date - MomentInput
+ * @param placeholder - string | JSX.Element
+ * @return - string | JSX.Element
+ */
+export function convertToUTCAndFormatToLocalString(date: MomentInput, placeholder: string | JSX.Element): string | JSX.Element {
+    const dateMoment = moment(date);
+
+    if (!dateMoment.isValid()) {
+        return placeholder;
+    }
+
+    return dateMoment.utc().format(LOCAL_STRING_FORMAT);
+}
+
+/**
+ * Parses MomentInput keeping the time zone
+ * and if date is valid formats it to a local string with shown time zone,
+ * otherwise it returns a passed placeholder
+ * e.g.: Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time) ==> 9/8/2020, 12:15:30 AM +03:00
+ *
+ * @param date - MomentInput
+ * @param placeholder - string | JSX.Element
+ * @return - string | JSX.Element
+ */
+export function formatToLocalStringWithPassedTimeZone(date: MomentInput, placeholder: string | JSX.Element): string | JSX.Element {
+    const dateMoment = moment.parseZone(date);
+
+    if (!dateMoment.isValid()) {
+        return placeholder;
+    }
+
+    return dateMoment.format(LOCAL_STRING_FORMAT_WITH_TIMEZONE);
+}
+
+/**
+ * Formats any MomentInput to a string e.g.: Apr 24, 2020
+ * @param date - MomentInput
+ * @return - string
+ */
+export function formatToMMMDYYY(date: MomentInput): string {
+    return moment(date).format('MMM D, YYYY');
+}
+
+/**
+ * Format any MomentInput to a string in a format of: {ddd MMM DD YYYY}
+ * e.g.: Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time) ==> Tue Sep 08 2020
+ *
+ * @param date - MomentInput
+ * @return - string
+ */
+export function formatTodddMMMDDYYYY(date: MomentInput): string {
+    return moment(date).format('ddd MMM DD YYYY');
+}
+
+/**
+ * Format any MomentInput to a string in a default moment format (ISO 8601 with local time zone)
+ * e.g.: Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time) ==> 2020-09-08T12:15:30+03:00
+ *
+ * @param date - MomentInput
+ * @return - string
+ */
+export function formatToISOStringWithLocalTimeZone(date: MomentInput): string {
+    return moment(date).format();
 }

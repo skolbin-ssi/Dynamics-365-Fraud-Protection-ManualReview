@@ -1,8 +1,8 @@
 plugins {
-	id 'io.freefair.lombok' version '5.1.1'
-	id 'org.springframework.boot' version '2.3.3.RELEASE'
-	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-	id 'java'
+    id 'io.freefair.lombok' version '5.1.1'
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java'
 }
 
 group = 'com.griddynamics.msd365fp.manual-review'
@@ -10,14 +10,14 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
-	jcenter()
+    mavenCentral()
+    jcenter()
 }
 
 jar {
@@ -25,11 +25,11 @@ jar {
 }
 
 dependencies {
-	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.2'
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.2'
-	implementation 'io.swagger.core.v3:swagger-annotations:2.1.2'
-	implementation 'org.apache.commons:commons-lang3:3.9'
-	implementation 'org.springframework:spring-core'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.2'
+    implementation 'io.swagger.core.v3:swagger-annotations:2.1.2'
+    implementation 'org.apache.commons:commons-lang3:3.9'
+    implementation 'org.springframework:spring-core'
 
 }
 

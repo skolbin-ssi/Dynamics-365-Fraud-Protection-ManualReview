@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export interface PreviousPurchaseDTO {
     PurchaseId: string;
     AssessmentType: string;

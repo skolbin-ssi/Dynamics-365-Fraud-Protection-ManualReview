@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
@@ -8,7 +11,7 @@ import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
 import com.griddynamics.msd365fp.manualreview.model.dfp.raw.ExplorerEntity;
 import com.griddynamics.msd365fp.manualreview.model.dfp.raw.PaymentInstrumentNodeData;
 import com.griddynamics.msd365fp.manualreview.model.dfp.raw.UserNodeData;
-import com.griddynamics.msd365fp.manualreview.model.event.dfp.PurchaseEvent;
+import com.griddynamics.msd365fp.manualreview.model.event.dfp.PurchaseEventBatch;
 import com.griddynamics.msd365fp.manualreview.model.event.type.LockActionType;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
@@ -31,7 +34,6 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -58,34 +60,31 @@ public class ItemService {
     @Setter(onMethod = @__({@Value("${mr.tasks.item-enrichment-task.enrichment-delay}")}))
     private Duration enrichmentDelay;
 
-    @PostConstruct
-    void init() {
-        streamService.setDfpEventConsumer(events -> events.forEach(this::saveEmptyItem));
-    }
+    public void saveEmptyItem(PurchaseEventBatch eventBatch) {
+        eventBatch.forEach(event -> {
+            String id = event.getEventId();
+            log.info("Event [{}] has been received from the DFP rule [{}].", id, event.getRuleName());
 
-    private void saveEmptyItem(PurchaseEvent event) {
-        String id = event.getEventId();
-        log.info("Event [{}] has been received from the DFP rule [{}].", id, event.getRuleName());
-
-        if ("purchase".equalsIgnoreCase(event.getEventType())) {
-            // Create and save the item
-            Item item = Item.builder()
-                    .id(id)
-                    .active(false)
-                    .imported(OffsetDateTime.now())
-                    ._etag(id)
-                    .build();
-            try {
-                itemRepository.save(item);
-                log.info("Item [{}] has been saved to the storage.", id);
-            } catch (CosmosDBAccessException e) {
-                log.info("Item [{}] has not been saved to the storage because it's already exist.", id);
-            } catch (Exception e) {
-                log.warn("Item [{}] has not been saved to the storage: {}", id, e.getMessage());
+            if ("purchase".equalsIgnoreCase(event.getEventType())) {
+                // Create and save the item
+                Item item = Item.builder()
+                        .id(id)
+                        .active(false)
+                        .imported(OffsetDateTime.now())
+                        ._etag(id)
+                        .build();
+                try {
+                    itemRepository.save(item);
+                    log.info("Item [{}] has been saved to the storage.", id);
+                } catch (CosmosDBAccessException e) {
+                    log.info("Item [{}] has not been saved to the storage because it's already exist.", id);
+                } catch (Exception e) {
+                    log.warn("Item [{}] has not been saved to the storage: {}", id, e.getMessage());
+                }
+            } else {
+                log.info("The event type of [{}] is [{}]. The event has been ignored.", id, event.getEventType());
             }
-        } else {
-            log.info("The event type of [{}] is [{}]. The event has been ignored.", id, event.getEventType());
-        }
+        });
     }
 
     public boolean enrichAllPoorItems(boolean forceEnrichment) throws BusyException {

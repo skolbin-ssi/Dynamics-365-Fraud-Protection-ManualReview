@@ -1,9 +1,14 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
 import com.griddynamics.msd365fp.manualreview.model.Label;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewType;
+import com.griddynamics.msd365fp.manualreview.queues.model.Bucket;
+import com.griddynamics.msd365fp.manualreview.queues.model.dto.RiskScoreOverviewDTO;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Queue;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepository;
 import com.griddynamics.msd365fp.manualreview.queues.repository.QueueRepository;
@@ -20,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -59,7 +65,7 @@ public class QueueService {
                     .id(UUID.randomUUID().toString())
                     .active(true)
                     .created(OffsetDateTime.now())
-                    .allowedLabels(Set.of(Label.ACCEPT, Label.REJECT, Label.WATCH_NA,
+                    .allowedLabels(Set.of(Label.GOOD, Label.BAD, Label.WATCH_NA,
                             Label.WATCH_INCONCLUSIVE))
                     .supervisors(managers)
                     .residual(true)
@@ -166,5 +172,22 @@ public class QueueService {
                 })
                 .collect(Collectors.toList());
         return updatedQueues.stream().collect(Collectors.toMap(Queue::getId, Queue::getSize));
+    }
+
+    public RiskScoreOverviewDTO getRiskScoreOverview(int bucketSize, String queueId) {
+        return new RiskScoreOverviewDTO(itemRepository.getRiskScoreDistribution(bucketSize, queueId)
+                .collect(
+                        Collectors.groupingBy(
+                                Bucket::getLowerBound,
+                                Collector.of(
+                                        RiskScoreOverviewDTO.RiskScoreBucketDTO::new,
+                                        (r, t) -> r.setCount(r.getCount() + t.getCount()),
+                                        (r, b) -> {
+                                            r.setCount(r.getCount() + b.getCount());
+                                            return r;
+                                        })
+                        )
+                )
+        );
     }
 }

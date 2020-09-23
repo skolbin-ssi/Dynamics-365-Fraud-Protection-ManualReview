@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.service.dashboard;
 
 import com.griddynamics.msd365fp.manualreview.analytics.model.ItemLabelingBucket;
@@ -259,12 +262,12 @@ public class ItemLabelingMetricService {
             ItemLabelingMetricDTO totalInfo = new ItemLabelingMetricDTO();
             lpm.forEach((date, lp) -> {
                 calculateDerivedItemLabelingMetrics(lp);
-                totalInfo.setApproved(totalInfo.getApproved() + lp.getApproved());
-                totalInfo.setRejected(totalInfo.getRejected() + lp.getRejected());
+                totalInfo.setGood(totalInfo.getGood() + lp.getGood());
+                totalInfo.setBad(totalInfo.getBad() + lp.getBad());
                 totalInfo.setWatched(totalInfo.getWatched() + lp.getWatched());
                 totalInfo.setOther(totalInfo.getOther() + lp.getOther());
-                totalInfo.setApproveOverturned(totalInfo.getApproveOverturned() + lp.getApproveOverturned());
-                totalInfo.setRejectOverturned(totalInfo.getRejectOverturned() + lp.getRejectOverturned());
+                totalInfo.setGoodOverturned(totalInfo.getGoodOverturned() + lp.getGoodOverturned());
+                totalInfo.setBadOverturned(totalInfo.getBadOverturned() + lp.getBadOverturned());
             });
             calculateDerivedItemLabelingMetrics(totalInfo);
             totalResult.put(id, totalInfo);
@@ -272,21 +275,21 @@ public class ItemLabelingMetricService {
     }
 
     private void calculateDerivedItemLabelingMetrics(final ItemLabelingMetricDTO lp) {
-        lp.setReviewed(lp.getRejected() + lp.getWatched() + lp.getApproved());
+        lp.setReviewed(lp.getBad() + lp.getWatched() + lp.getGood());
     }
 
     private void mapOverturnedDecisions(ItemLabelingBucket bucket, ItemLabelingMetricDTO performance) {
         switch (bucket.getLabel()) {
-            case ACCEPT:
+            case GOOD:
             case WATCH_INCONCLUSIVE:
             case WATCH_NA:
                 if (!"Approve".equals(bucket.getMerchantRuleDecision())) {
-                    performance.setApproveOverturned(performance.getApproveOverturned() + bucket.getCnt());
+                    performance.setGoodOverturned(performance.getGoodOverturned() + bucket.getCnt());
                 }
                 break;
-            case REJECT:
+            case BAD:
                 if (!"Reject".equals(bucket.getMerchantRuleDecision())) {
-                    performance.setRejectOverturned(performance.getRejectOverturned() + bucket.getCnt());
+                    performance.setBadOverturned(performance.getBadOverturned() + bucket.getCnt());
                 }
                 break;
             default:
@@ -295,15 +298,15 @@ public class ItemLabelingMetricService {
 
     private void mapDecisions(ItemLabelingBucket bucket, ItemLabelingMetricDTO performance) {
         switch (bucket.getLabel()) {
-            case ACCEPT:
-                performance.setApproved(performance.getApproved() + bucket.getCnt());
+            case GOOD:
+                performance.setGood(performance.getGood() + bucket.getCnt());
                 break;
             case WATCH_INCONCLUSIVE:
             case WATCH_NA:
                 performance.setWatched(performance.getWatched() + bucket.getCnt());
                 break;
-            case REJECT:
-                performance.setRejected(performance.getRejected() + bucket.getCnt());
+            case BAD:
+                performance.setBad(performance.getBad() + bucket.getCnt());
                 break;
             case ESCALATE:
                 performance.setEscalated(performance.getEscalated() + bucket.getCnt());

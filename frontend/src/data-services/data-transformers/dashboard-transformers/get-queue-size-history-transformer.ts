@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { DataTransformer } from '../../data-transformer';
 import { BaseDashboardTransformer } from './base-dashboard-transformer';
 import { QueueSizeHistory } from '../../../models/dashboard/deman-supply';

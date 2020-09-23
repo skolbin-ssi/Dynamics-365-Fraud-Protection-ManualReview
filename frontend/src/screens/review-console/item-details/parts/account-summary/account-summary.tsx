@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
 import { observer } from 'mobx-react';
@@ -6,7 +9,7 @@ import { IconButton } from '@fluentui/react/lib/Button';
 import { Price } from '../../../../../components/price';
 import { ExternalLink } from '../../../../../models';
 import { Item } from '../../../../../models/item';
-import { formatISODateStringToLocaleDateString, formatISODateStringToLocaleString } from '../../../../../utils/date';
+import { formatToMMMDYYY, formatToLocaleString } from '../../../../../utils/date';
 import { placeHold, stringToKebabCase } from '../../../../../utils/text';
 import { ItemDetailsKeyValue } from '../../item-details-key-value';
 import { ItemDetailsTile } from '../../item-details-tile';
@@ -125,7 +128,7 @@ export class AccountSummary extends Component<AccountSummaryProps, AccountSummar
                 {timeValidated && (
                     <span className={`${CN}__validated-info-date`}>
                         (
-                        {formatISODateStringToLocaleDateString(timeValidated)}
+                        {formatToMMMDYYY(timeValidated)}
                         )
                     </span>
                 )}
@@ -148,10 +151,10 @@ export class AccountSummary extends Component<AccountSummaryProps, AccountSummar
             { key: 'Language', value: user.language },
             { key: 'Time zone', value: user.timeZone },
             { key: 'Display name', value: user.displayName },
-            { key: 'Created', value: formatISODateStringToLocaleString(user.creationDate, valuePlaceholder(CN)) },
+            { key: 'Created', value: formatToLocaleString(user.creationDate, valuePlaceholder(CN)) },
             { key: 'Phone number', value: this.renderValidatedInfo(user.phoneNumber, user.isPhoneNumberValidated, user.phoneNumberValidatedDate), className: `${CN}__span-2` },
             { key: 'Profile name', value: user.profileName },
-            { key: 'Updated', value: formatISODateStringToLocaleString(user.updateDate, valuePlaceholder(CN)) },
+            { key: 'Updated', value: formatToLocaleString(user.updateDate, valuePlaceholder(CN)) },
             { key: 'Email', value: this.renderValidatedInfo(user.email, user.isEmailValidated, user.emailValidationDate), className: `${CN}__span-2` },
         ];
 

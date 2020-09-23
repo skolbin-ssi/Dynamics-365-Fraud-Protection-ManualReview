@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import autoBind from 'autobind-decorator';
 import cn from 'classnames';
@@ -8,10 +11,11 @@ import {
     DASHBOARD_MANAGEMENT,
     PERMISSION,
     QUEUE_MANAGEMENT,
-    ROUTES
+    ROUTES,
+    // USER_INFO_MANAGEMENT // TODO: Uncomment this code when security on the BE side will be done in a proper way
 } from '../../../constants';
 import { CurrentUserStore } from '../../../view-services';
-import { LeftNavLinkProps, LeftNavLink } from './left-nav-link';
+import { LeftNavLink, LeftNavLinkProps } from './left-nav-link';
 import './left-navigation.scss';
 
 export interface LeftNavigationProps {
@@ -29,6 +33,13 @@ export const CN = 'left-navigation';
 @autoBind
 export class LeftNavigation extends Component<LeftNavigationProps, never> {
     private topNavLinks: LeftNavigationItemConfig[] = [
+        // TODO: Uncomment this code when security on the BE side will be done in a proper way
+        // {
+        //     name: 'My performance',
+        //     link: ROUTES.PERSONAL_PERFORMANCE,
+        //     icon: 'UserGauge',
+        //     permission: USER_INFO_MANAGEMENT.ACCESS
+        // },
         {
             name: 'Dashboard',
             link: ROUTES.DASHBOARD_QUEUES_PERFORMANCE,

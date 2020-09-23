@@ -1,96 +1,81 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
-import com.griddynamics.msd365fp.manualreview.model.ItemLabel;
+import com.griddynamics.msd365fp.manualreview.ehub.durable.model.DurableEventHubProcessorClientRegistry;
+import com.griddynamics.msd365fp.manualreview.ehub.durable.model.DurableEventHubProducerClientRegistry;
+import com.griddynamics.msd365fp.manualreview.ehub.durable.streaming.DurableEventHubProcessorClient;
+import com.griddynamics.msd365fp.manualreview.ehub.durable.streaming.DurableEventHubProducerClient;
 import com.griddynamics.msd365fp.manualreview.model.ItemLock;
 import com.griddynamics.msd365fp.manualreview.model.event.Event;
-import com.griddynamics.msd365fp.manualreview.model.event.dfp.PurchaseEvent;
 import com.griddynamics.msd365fp.manualreview.model.event.internal.*;
 import com.griddynamics.msd365fp.manualreview.model.event.type.LockActionType;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Queue;
 import com.griddynamics.msd365fp.manualreview.queues.repository.QueueRepository;
-import com.griddynamics.msd365fp.manualreview.queues.streaming.*;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.StreamListener;
-import org.springframework.integration.annotation.ServiceActivator;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.MessageHeaders;
-import org.springframework.messaging.support.GenericMessage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.DEFAULT_QUEUE_PAGE_SIZE;
-import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.EVENT_HUB_SENDING_TIMEOUT_MS;
 
-/**
- * Streaming service defining common streaming operations.
- * Class which inherits this interface should have
- * {@link org.springframework.cloud.stream.annotation.EnableBinding} annotation
- * with provisioned event streams from
- * {@link com.griddynamics.msd365fp.manualreview.queues.streaming} package
- */
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@EnableBinding({
-        ItemAssignmentEventStream.class,
-        ItemResolutionEventStream.class,
-        ItemLockEventStream.class,
-        ItemLabelEventStream.class,
-        DFPEventStream.class,
-        QueueSizeEventStream.class,
-        QueueUpdateEventStream.class,
-        OverallSizeEventStream.class
-})
 public class StreamService {
 
+    public static final String ITEM_ASSIGNMENT_EVENT_HUB = "item-assignment-event-hub";
+    public static final String ITEM_LOCK_EVENT_HUB = "item-lock-event-hub";
+    public static final String QUEUE_SIZE_EVENT_HUB = "queue-size-event-hub";
+    public static final String OVERALL_SIZE_EVENT_HUB = "overall-size-event-hub";
+    public static final String ITEM_LABEL_EVENT_HUB = "item-label-event-hub";
+    public static final String ITEM_RESOLUTION_EVENT_HUB = "item-resolution-event-hub";
+    public static final String QUEUE_UPDATE_EVENT_HUB = "queue-update-event-hub";
     private final ModelMapper modelMapper;
-    private final ItemResolutionEventStream itemResolutionEventStream;
-    private final ItemAssignmentEventStream itemAssignmentEventStream;
-    private final ItemLockEventStream itemLockEventStream;
-    private final ItemLabelEventStream itemLabelEventStream;
-    private final QueueSizeEventStream queueSizeEventStream;
-    private final OverallSizeEventStream overallSizeEventStream;
-    private final QueueUpdateEventStream queueUpdateEventStream;
     private final QueueRepository queueRepository;
 
-    @Setter
-    private Consumer<Collection<PurchaseEvent>> dfpEventConsumer;
+    @Setter(onMethod = @__({@Autowired}))
+    private DurableEventHubProducerClientRegistry producerRegistry;
+    @Setter(onMethod = @__({@Autowired}))
+    private DurableEventHubProcessorClientRegistry processorRegistry;
 
-    @StreamListener(DFPEventStream.DFP_INPUT)
-    private void getOrderFromDFP(Collection<PurchaseEvent> events) {
-        if (dfpEventConsumer != null) {
-            dfpEventConsumer.accept(events);
-        }
+    public boolean checkStreamingHealth() {
+        long failures = 0;
+        failures += processorRegistry.values().stream()
+                .filter(DurableEventHubProcessorClient::requireRestart)
+                .count();
+        failures += producerRegistry.values().stream()
+                .filter(DurableEventHubProducerClient::requireRestart)
+                .count();
+        log.debug("Streaming healthcheck has discovered [{}] failures", failures);
+        return failures < 1;
     }
 
     /**
-     * Sends event to the {@link org.springframework.messaging.MessageChannel}
-     * which should be marked with {@link org.springframework.cloud.stream.annotation.Output}
-     * annotation.
+     * Sends event to the {@link DurableEventHubProducerClient}
      *
-     * @param event          which is sent to {@link org.springframework.messaging.MessageChannel}
-     * @param messageChannel allows you to define which messageChannel to choose
+     * @param event   the event object
+     * @param channel the name of producer
      * @return true when event was successfully sent
      */
-    public <T extends Event> boolean sendEvent(T event, MessageChannel messageChannel) {
-        boolean success = messageChannel.send(new GenericMessage<>(event), EVENT_HUB_SENDING_TIMEOUT_MS);
+    public <T extends Event> boolean sendEvent(T event, String channel) {
+        log.info("Sending event to [{}] with body: [{}]", channel, event);
+        boolean success = producerRegistry.get(channel).send(event);
         if (success) {
-            log.info("Event [{}] has been sent successfully.", event.getId());
+            log.info("Event [{}] sending has been started successfully.", event.getId());
         } else {
             log.warn("Event [{}] has not been sent: [{}]", event.getId(), event);
         }
@@ -147,8 +132,7 @@ public class StreamService {
                 .oldQueueIds(oldIds)
                 .actioned(OffsetDateTime.now())
                 .build();
-        log.info("Sending event to [{}] with body: [{}]", itemAssignmentEventStream.OUTPUT, event);
-        sendEvent(event, itemAssignmentEventStream.output());
+        sendEvent(event, ITEM_ASSIGNMENT_EVENT_HUB);
     }
 
     public void sendItemLockEvent(Item item, ItemLock prevLock, LockActionType actionType) {
@@ -168,20 +152,17 @@ public class StreamService {
             event.setOwnerId(item.getLock().getOwnerId());
             event.setLocked(item.getLock().getLocked());
         }
-        log.info("Sending event to [{}] with body: [{}]", itemLockEventStream.OUTPUT, event);
-        sendEvent(event, itemLockEventStream.output());
+        sendEvent(event, ITEM_LOCK_EVENT_HUB);
     }
 
     public boolean sendQueueSizeEvent(Queue queue) {
         QueueSizeUpdateEvent event = modelMapper.map(queue, QueueSizeUpdateEvent.class);
-        log.info("Sending event to [{}] with body: [{}]", queueSizeEventStream.OUTPUT, event);
-        return sendEvent(event, queueSizeEventStream.output());
+        return sendEvent(event, QUEUE_SIZE_EVENT_HUB);
     }
 
     public boolean sendOverallSizeEvent(int size) {
         OverallSizeUpdateEvent event = new OverallSizeUpdateEvent(size, OffsetDateTime.now());
-        log.info("Sending event to [{}] with body: [{}]", overallSizeEventStream.OUTPUT, event);
-        return sendEvent(event, overallSizeEventStream.output());
+        return sendEvent(event, OVERALL_SIZE_EVENT_HUB);
     }
 
     public void sendItemLabelEvent(final Item item, final Item oldItem) {
@@ -192,29 +173,17 @@ public class StreamService {
                 .decisionApplyingDuration(
                         Duration.between(oldItem.getLock().getLocked(), item.getLabel().getLabeled()))
                 .build();
-        log.info("Sending event to [{}] with body: [{}]", itemLabelEventStream.OUTPUT, event);
-        sendEvent(event, itemLabelEventStream.output());
+        sendEvent(event, ITEM_LABEL_EVENT_HUB);
     }
 
     public void sendItemResolvedEvent(final Item item) {
         ItemResolutionEvent event = modelMapper.map(item, ItemResolutionEvent.class);
-        log.info("Sending event to [{}] with body: [{}]", itemResolutionEventStream.OUTPUT, event);
-        sendEvent(event, itemResolutionEventStream.output());
+        sendEvent(event, ITEM_RESOLUTION_EVENT_HUB);
     }
 
     public void sendQueueUpdateEvent(final Queue queue) {
         QueueUpdateEvent event = modelMapper.map(queue, QueueUpdateEvent.class);
-        log.info("Sending event to [{}] with body: [{}]", queueUpdateEventStream.OUTPUT, event);
-        sendEvent(event, queueUpdateEventStream.output());
-    }
-
-    @ServiceActivator(inputChannel = DFPEventStream.ERROR_INPUT)
-    public void getDFPEventError(Message<?> message) {
-        logErrorMessage(message, DFPEventStream.DFP_INPUT);
-    }
-
-    private void logErrorMessage(Message<?> errorMessage, String originalInputChannel) {
-        log.warn("EventHub channel [{}] got an error message: [{}]", originalInputChannel, errorMessage);
+        sendEvent(event, QUEUE_UPDATE_EVENT_HUB);
     }
 
     //TODO: caching

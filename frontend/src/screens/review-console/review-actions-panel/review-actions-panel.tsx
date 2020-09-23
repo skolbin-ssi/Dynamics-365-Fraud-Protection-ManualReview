@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { IBasePicker, ITag, TagPicker } from '@fluentui/react/lib/Pickers';
 import React, { Component, createRef } from 'react';
 import cx from 'classnames';
@@ -160,18 +163,24 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
     }
 
     @autobind
-    renderHoldButton() {
+    renderHoldButton(isFullSize?: boolean) {
         const { blockActionButtons } = this.props;
 
         return (
             <button
                 type="button"
                 data-action={LABEL.HOLD}
-                className={`${CN}__hold-escalate-btn`}
+                className={cx(
+                    `${CN}__hold-escalate-btn`,
+                    { [`${CN}__hold-escalate-btn--full-size`]: isFullSize }
+                )}
                 onClick={this.handleLabelClick}
                 disabled={blockActionButtons}
             >
-                <FontIcon className={`${CN}__control-btn-icon`} iconName="HourGlass" />
+                <FontIcon
+                    className={`${CN}__control-btn-icon`}
+                    iconName="HourGlass"
+                />
                 <Text>Hold</Text>
             </button>
         );
@@ -367,8 +376,8 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
 
         const { allowedLabels, forEscalations } = queue;
 
-        const showApprove = allowedLabels.includes(LABEL.ACCEPT);
-        const showReject = allowedLabels.includes(LABEL.REJECT);
+        const showGood = allowedLabels.includes(LABEL.GOOD);
+        const showBad = allowedLabels.includes(LABEL.BAD);
         const showHold = allowedLabels.includes(LABEL.HOLD) && forEscalations;
         const showEscalate = allowedLabels.includes(LABEL.ESCALATE);
         const showWatchNA = allowedLabels.includes(LABEL.WATCH_NA);
@@ -384,38 +393,38 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
             >
                 <div className={`${CN}__label-buttons`}>
                     {
-                        showApprove && (
+                        showGood && (
                             <button
                                 type="button"
-                                data-action={LABEL.ACCEPT}
-                                className={cx(`${CN}__approve-btn`, { [`${CN}__approve-btn--full-width`]: !showReject })}
+                                data-action={LABEL.GOOD}
+                                className={`${CN}__good-btn`}
                                 onClick={this.handleLabelClick}
                                 disabled={blockActionButtons}
                             >
                                 <div className={`${CN}__btn-label-icon`}>
                                     <FontIcon iconName="CheckMark" className="link-icon" />
                                 </div>
-                                <Text>Approve</Text>
+                                <Text>{LABEL_NAMES[LABEL.GOOD]}</Text>
                             </button>
                         )
                     }
                     {
-                        showReject && (
+                        showBad && (
                             <button
                                 type="button"
-                                data-action={LABEL.REJECT}
-                                className={cx(`${CN}__reject-btn`, { [`${CN}__approve-btn--full-width`]: !showApprove })}
+                                data-action={LABEL.BAD}
+                                className={`${CN}__bad-btn`}
                                 onClick={this.handleLabelClick}
                                 disabled={blockActionButtons}
                             >
                                 <div className={`${CN}__btn-label-icon`}>
                                     <FontIcon iconName="ChromeMinimize" className="link-icon" />
                                 </div>
-                                <Text>Reject</Text>
+                                <Text>{LABEL_NAMES[LABEL.BAD]}</Text>
                             </button>
                         )
                     }
-                    {showHold && this.renderHoldButton()}
+                    {showHold && this.renderHoldButton(!showWatch)}
                     {showEscalate && this.renderEscalateButton(!showWatch)}
                     {showWatch && this.renderWatchButton(showWatchNA, showWatchInconclusive, !showEscalate && !showHold)}
                 </div>

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import {
     action, computed, observable
 } from 'mobx';
@@ -12,6 +15,7 @@ import { ItemHold } from './item-hold';
 import { Purchase } from './purchase';
 import { Note } from './note';
 import { DEFAULT_TIME_TO_TIMEOUT_COUNT, DEFAULT_TIMEOUT_COUNTDOWN_INTERVAL_MILLISECONDS, } from '../../constants';
+import { formatToLocaleDateString } from '../../utils/date';
 
 export enum ITEM_STATUS {
     IN_PROGRESS = 'In Progress',
@@ -112,7 +116,7 @@ export class Item {
 
     @computed
     get displayImportDateTime() {
-        return this.importDate ? this.importDate.toLocaleDateString() : null;
+        return formatToLocaleDateString(this.importDate, null);
     }
 
     @computed

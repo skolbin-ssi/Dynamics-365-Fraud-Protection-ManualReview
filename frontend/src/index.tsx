@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import 'typeface-roboto';
 import 'reflect-metadata';
 import './index.css';

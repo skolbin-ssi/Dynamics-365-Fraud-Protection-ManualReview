@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { PreviousPurchaseDTO } from '../../../data-services/api-services/models/previous-purchase-dto';
 
 export class PreviousPurchase {

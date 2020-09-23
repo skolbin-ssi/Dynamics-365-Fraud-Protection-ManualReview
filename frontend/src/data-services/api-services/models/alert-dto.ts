@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ALERT_METRIC_TYPE, ALERT_THRESHOLD_OPERATOR } from '../../../constants';
 
 interface AlertCheckDTO {

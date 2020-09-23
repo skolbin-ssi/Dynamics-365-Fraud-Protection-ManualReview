@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { LocalStorageService } from '../../utility-services/local-storage-service';
 
 export class AutoRefreshStorageItemManger {

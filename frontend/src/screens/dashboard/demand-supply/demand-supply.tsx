@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import autoBind from 'autobind-decorator';
@@ -27,9 +30,10 @@ import {
     CHART_AGGREGATION_PERIOD,
     CHART_AGGREGATION_PERIOD_DISPLAY, ROUTES,
 } from '../../../constants';
-import './demand-supply.scss';
 import { BlurLoader } from '../blur-loader';
-import { ReportsModalStore } from '../../../view-services/dashboard';
+import { ReportsModalStore } from '../../../view-services';
+
+import './demand-supply.scss';
 
 const CN = 'demand-supply-dashboard';
 

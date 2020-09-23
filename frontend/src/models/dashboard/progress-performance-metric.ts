@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { computed, observable } from 'mobx';
 
 import { PerformanceMetrics } from './performance-metrics';
@@ -39,25 +42,25 @@ export class ProgressPerformanceMetric implements ProgressMetricDto {
     }
 
     @computed
-    get approvedProgress(): CurrentProgress {
+    get goodDecisionsProgress(): CurrentProgress {
         return {
-            current: this.currentPeriod.approved,
+            current: this.currentPeriod.good,
             progress: ProgressPerformanceMetric
-                .calculateProgress(this.currentPeriod.approved, this.previousPeriod.approved)
+                .calculateProgress(this.currentPeriod.good, this.previousPeriod.good)
         };
     }
 
     @computed
-    get rejectedProgress(): CurrentProgress {
+    get badDecisionsProgress(): CurrentProgress {
         return {
-            current: this.currentPeriod.rejected,
+            current: this.currentPeriod.bad,
             progress: ProgressPerformanceMetric
-                .calculateProgress(this.currentPeriod.rejected, this.previousPeriod.rejected)
+                .calculateProgress(this.currentPeriod.bad, this.previousPeriod.bad)
         };
     }
 
     @computed
-    get watchedProgress(): CurrentProgress {
+    get watchDecisionsProgress(): CurrentProgress {
         return {
             current: this.currentPeriod.watched,
             progress: ProgressPerformanceMetric
@@ -66,7 +69,7 @@ export class ProgressPerformanceMetric implements ProgressMetricDto {
     }
 
     @computed
-    get escalatedProgress(): CurrentProgress {
+    get escalatedItemsProgress(): CurrentProgress {
         return {
             current: this.currentPeriod.escalated,
             progress: ProgressPerformanceMetric
@@ -84,25 +87,25 @@ export class ProgressPerformanceMetric implements ProgressMetricDto {
     }
 
     @computed
-    get annualApprovedProgress(): CurrentProgress {
+    get annualGoodDecisionsProgress(): CurrentProgress {
         return {
-            current: this.annualIncludingPeriod.approved,
+            current: this.annualIncludingPeriod.good,
             progress: ProgressPerformanceMetric
-                .calculateProgress(this.annualIncludingPeriod.approved, this.annualBeforePeriod.approved)
+                .calculateProgress(this.annualIncludingPeriod.good, this.annualBeforePeriod.good)
         };
     }
 
     @computed
-    get annualRejectedProgress(): CurrentProgress {
+    get annualBadDecisionsProgress(): CurrentProgress {
         return {
-            current: this.annualIncludingPeriod.rejected,
+            current: this.annualIncludingPeriod.bad,
             progress: ProgressPerformanceMetric
-                .calculateProgress(this.annualIncludingPeriod.rejected, this.annualBeforePeriod.rejected)
+                .calculateProgress(this.annualIncludingPeriod.bad, this.annualBeforePeriod.bad)
         };
     }
 
     @computed
-    get annualWatchedProgress(): CurrentProgress {
+    get annualWatchDecisionsProgress(): CurrentProgress {
         return {
             current: this.annualIncludingPeriod.watched,
             progress: ProgressPerformanceMetric
@@ -111,7 +114,7 @@ export class ProgressPerformanceMetric implements ProgressMetricDto {
     }
 
     @computed
-    get annualEscalatedProgress(): CurrentProgress {
+    get annualEscalatedItemsProgress(): CurrentProgress {
         return {
             current: this.annualIncludingPeriod.escalated,
             progress: ProgressPerformanceMetric
@@ -122,16 +125,16 @@ export class ProgressPerformanceMetric implements ProgressMetricDto {
     @computed
     get overviewReport() {
         return [
-            this.rejectedProgress,
+            this.badDecisionsProgress,
             this.annualReviewedProgress,
-            this.approvedProgress,
-            this.annualApprovedProgress,
-            this.watchedProgress,
-            this.annualWatchedProgress,
-            this.rejectedProgress,
-            this.annualRejectedProgress,
-            this.escalatedProgress,
-            this.annualEscalatedProgress,
+            this.goodDecisionsProgress,
+            this.annualGoodDecisionsProgress,
+            this.watchDecisionsProgress,
+            this.annualWatchDecisionsProgress,
+            this.badDecisionsProgress,
+            this.annualBadDecisionsProgress,
+            this.escalatedItemsProgress,
+            this.annualEscalatedItemsProgress,
         ];
     }
 

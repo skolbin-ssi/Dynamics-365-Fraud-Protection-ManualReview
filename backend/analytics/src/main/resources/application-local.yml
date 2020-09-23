@@ -1,5 +1,7 @@
 mr:
   tasks:
+    fail-fast-healthcheck-task:
+      enabled: false
     resolution-send-task:
       enabled: false
       delay: PT1M

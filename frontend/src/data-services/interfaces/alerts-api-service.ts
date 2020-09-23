@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { DeleteAlertResponse } from '../api-services/alerts-api-service/api-models/delete-alert-response';
 import { GetAlertResponse } from '../api-services/alerts-api-service/api-models/get-alert-response';
 import { GetAlertsResponse } from '../api-services/alerts-api-service/api-models/get-alerts-response';

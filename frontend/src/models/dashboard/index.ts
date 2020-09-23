@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export * from './queue-performance';
 export * from './analyst-performance';
 export * from './performance-metrics';

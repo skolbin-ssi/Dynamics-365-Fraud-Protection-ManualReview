@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.config;
 
 import lombok.AccessLevel;
@@ -35,7 +38,6 @@ public class Constants {
     public static final String[] ROLES_ALLOWED_FOR_ACCESS
             = new String[]{ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE};
 
-    public static final long EVENT_HUB_SENDING_TIMEOUT_MS = 10000L;
     public static final long TASK_RUNNER_RATE_MS = 30000L;
 
     public static final int DIGITS_MAX_VALID_INTEGER = 17;
@@ -56,6 +58,7 @@ public class Constants {
     public static final String DICTIONARY_TASK_NAME = "dictionary-reconciliation-task";
     public static final String ENRICHMENT_TASK_NAME = "item-enrichment-task";
     public static final String QUEUE_ASSIGNMENT_TASK_NAME = "queue-assignment-reconciliation-task";
+    public static final String FAIL_FAST_TASK_NAME = "fail-fast-healthcheck-task";
 
     public static final String DATETIME_PATTERN_DFP = "MM/dd/yyyy HH:mm:ss xxxxx";
 
@@ -63,4 +66,7 @@ public class Constants {
     public static final String CLIENT_REGISTRATION_AZURE_DFP_API = "azure-dfp-api";
 
     public static final String RESIDUAL_QUEUE_NAME = "# Residual Queue";
+
+    public static final int INCORRECT_CONFIG_STATUS = 1;
+    public static final int FAIL_FAST_STATUS = 2;
 }

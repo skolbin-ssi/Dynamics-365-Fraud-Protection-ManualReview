@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { CommandBarButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import { Facepile, IFacepilePersona, OverflowButtonType } from '@fluentui/react/lib/Facepile';
 import { FontIcon } from '@fluentui/react/lib/Icon';
@@ -20,6 +23,7 @@ import { Queue } from '../../../../models';
 import { TYPES } from '../../../../types';
 import { QueuesScreenStore } from '../../../../view-services';
 import { WindowSizeStore } from '../../../../view-services/misc/window-size-store';
+import { formatToLocaleDateString } from '../../../../utils/date';
 
 import './queue-header.scss';
 
@@ -144,7 +148,7 @@ export class QueueHeader extends Component<QueueHeaderProps, never> {
                     { queue.created && (
                         <>
                             <Text className={`${CN}__meta-title`}>Created: </Text>
-                            <Text className={`${CN}__meta-value`}>{ queue.created ? new Date(queue.created).toLocaleDateString() : 'N/A' }</Text>
+                            <Text className={`${CN}__meta-value`}>{ formatToLocaleDateString(queue.created, 'N/A') }</Text>
                         </>
                     )}
                     { queueLastUpdated && (

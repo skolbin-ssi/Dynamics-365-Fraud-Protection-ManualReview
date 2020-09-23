@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ProductDTO } from '../../../data-services/api-services/models/product-dto';
 import { BaseModel } from '../../misc';
 

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { IFacepilePersona } from '@fluentui/react/lib/Facepile';
 import { IPersonaProps } from '@fluentui/react/lib/Persona';
 import { action, computed, observable } from 'mobx';

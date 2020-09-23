@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { DefaultButton } from '@fluentui/react/lib/Button';
 import { Facepile, IFacepilePersona, OverflowButtonType } from '@fluentui/react/lib/Facepile';
 import { FontIcon } from '@fluentui/react/lib/Icon';
@@ -22,6 +25,7 @@ import { Queue } from '../../models';
 
 import { TYPES } from '../../types';
 import { AppStore, CurrentUserStore, QueuesScreenStore } from '../../view-services';
+import { formatToLocaleDateString } from '../../utils/date';
 
 import './queue-tiles.scss';
 
@@ -155,7 +159,7 @@ export class QueueTiles extends Component<QueueTilesComponentProps, never> {
                         <Text variant="large" className={`${CN}__queue-title`}>{ name }</Text>
                         <div className={`${CN}__meta`}>
                             <Text variant="smallPlus">Created:&nbsp;</Text>
-                            <Text variant="smallPlus">{ new Date(created).toLocaleDateString() }</Text>
+                            <Text variant="smallPlus">{ formatToLocaleDateString(created, '') }</Text>
                         </div>
                         <div className={`${CN}__meta`}>
                             <Text variant="smallPlus">Orders:&nbsp;</Text>

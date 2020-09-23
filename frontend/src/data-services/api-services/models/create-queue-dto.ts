@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { QueueViewDTO } from './queue-view-dto';
 
 type PostQueueRequestFields =

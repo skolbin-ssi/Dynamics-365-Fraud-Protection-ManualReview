@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import autoBind from 'autobind-decorator';
@@ -191,6 +194,7 @@ export class QueuesPerformance extends Component<QueuePerformanceProps, any> {
                         viewMap={TOP_QUEUES_DISPLAY_VIEW}
                     />
                     <DataGridList
+                        className={`${CN}__data-table`}
                         isLoading={isDataLoading}
                         onRowClick={this.handleRowClick}
                         onRowSelection={this.handleSelectionChange}

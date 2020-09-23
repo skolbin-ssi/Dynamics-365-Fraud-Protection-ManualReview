@@ -103,6 +103,7 @@
         }
     },
     "isMatchRegexp": "function isMatchRegexp(str, pattern) {let regex = RegExp(pattern); return regex.test(str);}",
+    "getBucketNumber": "function getBucketNumber(bucket_size, value) {return Math.floor(bucket_size / value);}",
     "getTimestampBucket": "function getTimestampBucket(start_timestamp, period_in_seconds, target_timestamp){return Math.floor((target_timestamp - start_timestamp) / period_in_seconds);}"
   },
   "resources": [
@@ -574,7 +575,24 @@
                 },
                 "options": {}
             }
-        }
+        },
+      {
+          "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers/userDefinedFunctions",
+          "apiVersion": "2020-04-01",
+          "name": "[concat(parameters('cosmosDbAccountName'), '/QueuesDB/Items/getBucketNumber')]",
+          "dependsOn": [
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers', parameters('cosmosDbAccountName'), 'QueuesDB', 'Items')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('cosmosDbAccountName'), 'QueuesDB')]",
+              "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('cosmosDbAccountName'))]"
+          ],
+          "properties": {
+              "resource": {
+                  "id": "getBucketNumber",
+                  "body": "[variables('getBucketNumber')]"
+              },
+              "options": {}
+          }
+      }
   ],
   "outputs": {
       "CosmosDbAccountResourceId": {

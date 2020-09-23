@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import { action, computed, observable } from 'mobx';
 
@@ -165,10 +168,10 @@ export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerforman
             const reportRawData = this.totalPerformance.totalDecisionsReport;
 
             const rawObjectData: UnparseObject = {
-                fields: ['approved', 'rejected', 'watched'],
+                fields: ['good', 'bad', 'watched'],
                 data: [
-                    formatMetricToPercentageString(+reportRawData.approved),
-                    formatMetricToPercentageString(+reportRawData.rejected),
+                    formatMetricToPercentageString(+reportRawData.good),
+                    formatMetricToPercentageString(+reportRawData.bad),
                     formatMetricToPercentageString(+reportRawData.watched)
                 ]
             };

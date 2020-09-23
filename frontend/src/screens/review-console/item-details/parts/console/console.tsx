@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
 import { observer } from 'mobx-react';

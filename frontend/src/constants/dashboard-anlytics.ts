@@ -1,6 +1,12 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { DEFAULT_QUEUES_PER_PAGE } from './default';
 import { COLORS } from '../styles/variables';
 
+/**
+ * Represents how many sorted items to display on the dashboard pages
+ */
 export enum PERFORMANCE_RATING {
     ALL = 'ALL',
     TEN = 'TEN',
@@ -120,123 +126,123 @@ export enum DASHBOARD_REPORT_PAGE {
 }
 
 /**
- * Overturned chart keys for the UI
+ * Overturn chart keys for the UI
  */
-export enum OVERTURNED_CHART_KEYS {
-    APPROVED_MATCHED = 'APPROVED_MATCHED',
-    APPROVED_UNMATCHED = 'APPROVED_UNMATCHED',
-    REJECTED_UNMATCHED = 'REJECTED_UNMATCHED',
-    REJECTED_MATCHED = 'REJECTED_MATCHED'
+export enum OVERTURN_CHART_KEYS {
+    GOOD = 'GOOD',
+    OVERTURNED_GOOD = 'OVERTURNED_GOOD',
+    BAD = 'BAD',
+    OVERTURNED_BAD = 'OVERTURNED_BAD'
 }
 
 /**
- * Overturned keys for generating CSV file
+ * Overturn chart keys for generating CSV file
  */
-export const OVERTURNED_CHART_REPORT_KEYS = {
-    [OVERTURNED_CHART_KEYS.APPROVED_MATCHED]: 'approved',
-    [OVERTURNED_CHART_KEYS.APPROVED_UNMATCHED]: 'approved overturned',
-    [OVERTURNED_CHART_KEYS.REJECTED_MATCHED]: 'rejected',
-    [OVERTURNED_CHART_KEYS.REJECTED_UNMATCHED]: 'rejected overturned'
+export const OVERTURN_CHART_REPORT_KEYS = {
+    [OVERTURN_CHART_KEYS.GOOD]: 'good',
+    [OVERTURN_CHART_KEYS.OVERTURNED_GOOD]: 'overturned good ',
+    [OVERTURN_CHART_KEYS.BAD]: 'bad',
+    [OVERTURN_CHART_KEYS.OVERTURNED_BAD]: 'overturned bad'
 };
 
 /**
- * Overturned actions chart keys for the UI
+ * Overturned decisions chart keys for the UI
  */
-export enum OVERTURNED_ACTIONS_CHART_KEYS {
-    APPROVED_APPLIED = 'APPROVED_APPLIED',
-    APPROVED_OVERTURNED = 'APPROVED_OVERTURNED',
-    APPROVED_ACCURACY = 'APPROVED_ACCURACY',
-    REJECTED_APPLIED = 'REJECTED_APPLIED',
-    REJECTED_OVERTURNED = 'REJECTED_OVERTURNED',
-    REJECTED_ACCURACY = 'REJECTED_ACCURACY',
-    ACCURACY_AVERAGE = 'ACCURACY_AVERAGE'
+export enum OVERTURNED_DECISIONS_CHART_KEYS {
+    GOOD_DECISIONS = 'GOOD_DECISIONS',
+    OVERTURNED_GOOD_DECISIONS = 'OVERTURNED_GOOD_DECISIONS',
+    GOOD_DECISION_OVERTURN_RATE = 'GOOD_DECISION_OVERTURN_RATE',
+    BAD_DECISIONS = 'BAD_DECISIONS',
+    OVERTURNED_BAD_DECISIONS = 'OVERTURNED_BAD_DECISIONS',
+    BAD_DECISION_OVERTURN_RATE = 'BAD_DECISION_OVERTURN_RATE',
+    AVERAGE_OVERTURN_RATE = 'AVERAGE_OVERTURN_RATE'
 }
 
 /**
- * Overturned actions keys for generating CSV file
+ * Overturned decisions chart keys for generating CSV file
  */
-export const OVERTURNED_ACTIONS_REPORT_KEYS = {
-    [OVERTURNED_ACTIONS_CHART_KEYS.APPROVED_APPLIED]: 'approved applied',
-    [OVERTURNED_ACTIONS_CHART_KEYS.APPROVED_OVERTURNED]: 'approved overturned',
-    [OVERTURNED_ACTIONS_CHART_KEYS.APPROVED_ACCURACY]: 'approved accuracy',
-    [OVERTURNED_ACTIONS_CHART_KEYS.REJECTED_APPLIED]: 'rejected applied',
-    [OVERTURNED_ACTIONS_CHART_KEYS.REJECTED_OVERTURNED]: 'rejected overturned',
-    [OVERTURNED_ACTIONS_CHART_KEYS.REJECTED_ACCURACY]: 'rejected accuracy',
-    [OVERTURNED_ACTIONS_CHART_KEYS.ACCURACY_AVERAGE]: 'accuracy average rate',
+export const OVERTURNED_DECISIONS_REPORT_KEYS = {
+    [OVERTURNED_DECISIONS_CHART_KEYS.GOOD_DECISIONS]: 'good decisions',
+    [OVERTURNED_DECISIONS_CHART_KEYS.OVERTURNED_GOOD_DECISIONS]: 'overturned good decisions',
+    [OVERTURNED_DECISIONS_CHART_KEYS.GOOD_DECISION_OVERTURN_RATE]: 'good decision overturn rate',
+    [OVERTURNED_DECISIONS_CHART_KEYS.BAD_DECISIONS]: 'bad decisions',
+    [OVERTURNED_DECISIONS_CHART_KEYS.OVERTURNED_BAD_DECISIONS]: 'overturned bad decisions',
+    [OVERTURNED_DECISIONS_CHART_KEYS.BAD_DECISION_OVERTURN_RATE]: 'bad decision overturn rate',
+    [OVERTURNED_DECISIONS_CHART_KEYS.AVERAGE_OVERTURN_RATE]: 'average overturn rate',
 };
 
-export const OVERTURNED_CHART_DATUM_LABELS = {
-    [OVERTURNED_CHART_KEYS.APPROVED_MATCHED]: 'approveMatched',
-    [OVERTURNED_CHART_KEYS.APPROVED_UNMATCHED]: 'approveUnmatched',
-    [OVERTURNED_CHART_KEYS.REJECTED_MATCHED]: 'rejectMatched',
-    [OVERTURNED_CHART_KEYS.REJECTED_UNMATCHED]: 'rejectUnmatched'
+export const OVERTURN_CHART_DATUM_LABELS = {
+    [OVERTURN_CHART_KEYS.GOOD]: 'good',
+    [OVERTURN_CHART_KEYS.OVERTURNED_GOOD]: 'overturnedGood',
+    [OVERTURN_CHART_KEYS.BAD]: 'bad',
+    [OVERTURN_CHART_KEYS.OVERTURNED_BAD]: 'overturnedBad'
 };
 
-export enum OVERTURNED_LABELS {
+export enum OVERTURN_LABELS {
     GOOD = 'GOOD',
     BAD = 'BAD',
     OVERTURNED_GOOD = 'OVERTURNED_GOOD',
     OVERTURNED_BAD = 'OVERTURNED_BAD',
-    RATE_OVERTURNED_GOOD = 'RATE_OVERTURNED_GOOD',
-    RATE_OVERTURNED_BAD = 'RATE_OVERTURNED_BAD',
-    RATE_AVERAGE_OVERTURNED = 'RATE_AVERAGE_OVERTURNED'
+    GOOD_DECISION_OVERTURN_RATE = 'GOOD_DECISION_OVERTURN_RATE',
+    BAD_DECISION_OVERTURN_RATE = 'BAD_DECISION_OVERTURN_RATE',
+    AVERAGE_OVERTURN_RATE = 'AVERAGE_OVERTURN_RATE'
 }
-export const OVERTURNED_DISPLAY_LABELS = {
-    [OVERTURNED_LABELS.GOOD]: 'Good actions applied',
-    [OVERTURNED_LABELS.BAD]: 'Bad actions applied',
-    [OVERTURNED_LABELS.OVERTURNED_GOOD]: 'Overturned good actions',
-    [OVERTURNED_LABELS.OVERTURNED_BAD]: 'Overturned bad actions',
-    [OVERTURNED_LABELS.RATE_OVERTURNED_GOOD]: 'Good actions overturned rate',
-    [OVERTURNED_LABELS.RATE_OVERTURNED_BAD]: 'Bad actions overturned rate',
-    [OVERTURNED_LABELS.RATE_AVERAGE_OVERTURNED]: 'Average overturned rate'
+export const OVERTURN_DISPLAY_LABELS = {
+    [OVERTURN_LABELS.GOOD]: 'Good decisions applied',
+    [OVERTURN_LABELS.BAD]: 'Bad decisions applied',
+    [OVERTURN_LABELS.OVERTURNED_GOOD]: 'Overturned good decisions',
+    [OVERTURN_LABELS.OVERTURNED_BAD]: 'Overturned bad decisions',
+    [OVERTURN_LABELS.GOOD_DECISION_OVERTURN_RATE]: 'Good decision overturn rate',
+    [OVERTURN_LABELS.BAD_DECISION_OVERTURN_RATE]: 'Bad decision overturn rate',
+    [OVERTURN_LABELS.AVERAGE_OVERTURN_RATE]: 'Average overturn rate'
 };
 
-export const OVERTURNED_ACTIONS_DISPLAY_NAMES = {
-    [OVERTURNED_CHART_KEYS.APPROVED_MATCHED]: {
-        label: [OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.GOOD]],
-        color: COLORS.barChart.approveMatched
+export const OVERTURNED_DECISIONS_DISPLAY_NAMES = {
+    [OVERTURN_CHART_KEYS.GOOD]: {
+        label: [OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.GOOD]],
+        color: COLORS.barChart.good
     },
-    [OVERTURNED_CHART_KEYS.APPROVED_UNMATCHED]: {
-        label: [OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.OVERTURNED_GOOD]],
-        color: COLORS.barChart.approvedUnmatched
+    [OVERTURN_CHART_KEYS.OVERTURNED_GOOD]: {
+        label: [OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.OVERTURNED_GOOD]],
+        color: COLORS.barChart.overturnedGood
     },
-    [OVERTURNED_CHART_KEYS.REJECTED_MATCHED]: {
-        label: [OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.BAD]],
-        color: COLORS.barChart.rejectMatched
+    [OVERTURN_CHART_KEYS.BAD]: {
+        label: [OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.BAD]],
+        color: COLORS.barChart.bad
     },
-    [OVERTURNED_CHART_KEYS.REJECTED_UNMATCHED]: {
-        label: [OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.OVERTURNED_BAD]],
-        color: COLORS.barChart.rejectUnmatched
+    [OVERTURN_CHART_KEYS.OVERTURNED_BAD]: {
+        label: [OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.OVERTURNED_BAD]],
+        color: COLORS.barChart.overturnedBad
     }
 };
 
-export const OVERTURNED_CHART_DATUM_KEYS = {
-    approveUnmatched: OVERTURNED_LABELS.OVERTURNED_GOOD,
-    approveMatched: OVERTURNED_LABELS.GOOD,
-    rejectMatched: OVERTURNED_LABELS.BAD,
-    rejectUnmatched: OVERTURNED_LABELS.OVERTURNED_BAD
+export const OVERTURN_CHART_DATUM_KEYS = {
+    good: OVERTURN_LABELS.GOOD,
+    overturnedGood: OVERTURN_LABELS.OVERTURNED_GOOD,
+    bad: OVERTURN_LABELS.BAD,
+    overturnedBad: OVERTURN_LABELS.OVERTURNED_BAD
 };
 
-export const OVERTURNED_LABELS_TO_OVERTURNED_CHART_KEYS_COLORS = new Map<OVERTURNED_LABELS, { color: string, label: string}>([
+export const OVERTURN_LABELS_TO_OVERTURN_CHART_KEYS_COLORS = new Map<OVERTURN_LABELS, { color: string, label: string}>([
     [
-        OVERTURNED_LABELS.GOOD, {
-            color: COLORS.barChart.approveMatched,
-            label: 'approveMatched'
+        OVERTURN_LABELS.GOOD, {
+            color: COLORS.barChart.good,
+            label: 'good'
         }
     ], [
-        OVERTURNED_LABELS.OVERTURNED_GOOD, {
-            color: COLORS.barChart.approvedUnmatched,
-            label: 'approveUnmatched'
+        OVERTURN_LABELS.OVERTURNED_GOOD, {
+            color: COLORS.barChart.overturnedGood,
+            label: 'overturnedGood'
         }
     ], [
-        OVERTURNED_LABELS.BAD, {
-            color: COLORS.barChart.rejectMatched,
-            label: 'rejectMatched'
+        OVERTURN_LABELS.BAD, {
+            color: COLORS.barChart.bad,
+            label: 'bad'
         }
     ], [
-        OVERTURNED_LABELS.OVERTURNED_BAD, {
-            color: COLORS.barChart.rejectUnmatched,
-            label: 'rejectUnmatched'
+        OVERTURN_LABELS.OVERTURNED_BAD, {
+            color: COLORS.barChart.overturnedBad,
+            label: 'overturnedBad'
         }
     ]
 ]);

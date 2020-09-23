@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
 import com.griddynamics.msd365fp.manualreview.queues.model.DictionaryType;
@@ -12,10 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,33 +58,40 @@ public class DictionaryService {
         log.info("Dictionary entity was created: [{}]", dictionaryEntity);
     }
 
-    public boolean updateDictionariesByStorageData() {
+    public boolean updateDictionariesByStorageData(OffsetDateTime previousRun, Duration period) {
         log.info("Trying to update dictionaries by storage data.");
-        Arrays.stream(DictionaryType.values())
+        Set<DictionaryType> confirmableTypes = Arrays.stream(DictionaryType.values())
                 .filter(obj -> Objects.nonNull(obj.getField()))
-                .forEach(type -> {
-                    itemRepository.findAllByFilterField(type.getField())
-                            .forEach(entry -> updateDictionary(type, entry));
-                });
+                .collect(Collectors.toSet());
+        confirmableTypes.forEach(type -> updateDictionary(type, previousRun == null ? null : previousRun.minus(period)));
         return true;
     }
 
-    private void updateDictionary(DictionaryType type, String entry) {
-        String entryId = String.format("%s:%s", type, entry);
-        Optional<DictionaryEntity> persisted = dictRepository.findById(entryId);
-        DictionaryEntity toSave = persisted.orElseGet(() -> {
-            DictionaryEntity newDict = new DictionaryEntity();
-            newDict.setId(entryId);
-            newDict.setType(type);
-            return newDict;
-        });
-        if (toSave.getConfirmed() == null) {
-            toSave.setValue(entry);
-            toSave.setConfirmed(OffsetDateTime.now());
-            toSave.setTtl(-1);
-            dictRepository.save(toSave);
-            log.info("Updated dictionary entry for ID [{}]: [{}]", entryId, toSave);
-        }
+    private void updateDictionary(DictionaryType type, OffsetDateTime checkpoint) {
+        Set<String> valuesFromData = itemRepository
+                .findFilterSamples(type.getField(), checkpoint);
+
+        if (valuesFromData.isEmpty()) return;
+
+        Map<String, DictionaryEntity> dictEntities = dictRepository.findAllByType(type).stream()
+                .collect(Collectors.toMap(DictionaryEntity::getValue, entity -> entity));
+
+        valuesFromData.stream()
+                .filter(value -> dictEntities.get(value) == null || dictEntities.get(value).getConfirmed() == null)
+                .forEach(value -> {
+                    DictionaryEntity toSave = dictEntities.getOrDefault(value, DictionaryEntity.builder()
+                            .id(String.format("%s:%s", type, value))
+                            .type(type)
+                            .value(value)
+                            .build());
+                    if (toSave.getConfirmed() == null) {
+                        toSave.setConfirmed(OffsetDateTime.now());
+                        toSave.setTtl(-1);
+                        dictRepository.save(toSave);
+                        log.info("Updated dictionary entry for ID [{}]: [{}]", toSave.getId(), value);
+                    }
+                });
+
     }
 
 }

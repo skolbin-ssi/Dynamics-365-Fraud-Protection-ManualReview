@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { BaseDashboardTransformer } from './base-dashboard-transformer';
 import { DataTransformer } from '../../data-transformer';
 import { AnalystPerformance } from '../../../models/dashboard';

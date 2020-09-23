@@ -47,6 +47,8 @@
   }
 
   &__table {
+    max-width: $maxTableSwitchWidth;
+
     .ms-DetailsHeader-cell {
       &:hover {
         background: none;

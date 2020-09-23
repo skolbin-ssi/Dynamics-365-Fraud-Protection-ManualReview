@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { FC } from 'react';
 import cn from 'classnames';
 
@@ -5,6 +8,7 @@ import { Persona, PersonaSize } from '@fluentui/react/lib/Persona';
 import { Text } from '@fluentui/react/lib/Text';
 
 import { Note } from '../../../models';
+import { formatForNotes } from '../../../utils/date';
 
 import './review-notes.scss';
 
@@ -23,9 +27,7 @@ export const ReviewNotes: FC<ReviewNotesProps> = (props: ReviewNotesProps) => {
             {
                 notes.map((note: Note, i) => {
                     const { note: content, user, created } = note;
-                    const formattedDate = created
-                        ? `${new Date(created).toLocaleDateString()} at ${new Date(created).toLocaleTimeString()}`
-                        : '';
+                    const formattedDate = formatForNotes(created, '');
                     const name = user ? user.name : 'Fraud Analyst';
 
                     return (

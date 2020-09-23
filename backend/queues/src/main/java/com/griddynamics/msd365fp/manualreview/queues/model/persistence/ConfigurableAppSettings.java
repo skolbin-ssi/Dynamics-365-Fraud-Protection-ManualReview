@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.model.persistence;
 
 import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;

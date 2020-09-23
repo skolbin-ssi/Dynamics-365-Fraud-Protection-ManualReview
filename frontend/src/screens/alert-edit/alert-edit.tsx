@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { CommandBarButton } from '@fluentui/react/lib/Button';
 import { Overlay } from '@fluentui/react/lib/Overlay';
 import { Spinner } from '@fluentui/react/lib/Spinner';

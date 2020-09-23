@@ -1,6 +1,10 @@
 @import "../../../styles/variables";
 
 .analysts-performance {
+  &__switch-header {
+    max-width: $maxTableSwitchWidth;
+  }
+
   &__header {
     display: flex;
     height: 100px;

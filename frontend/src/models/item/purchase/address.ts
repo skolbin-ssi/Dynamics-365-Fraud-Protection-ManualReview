@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { AddressDTO } from '../../../data-services/api-services/models';
 
 export enum ADDRESS_TYPE {

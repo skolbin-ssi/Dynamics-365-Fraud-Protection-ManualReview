@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
 import com.griddynamics.msd365fp.manualreview.model.ItemLock;
@@ -236,12 +239,12 @@ class PublicItemServiceTest {
                         .queueId(TEST_QUEUE_ID)
                         .build())
                 .build();
-        LabelDTO labelDto = new LabelDTO(Label.ACCEPT);
+        LabelDTO labelDto = new LabelDTO(Label.GOOD);
         Queue queue = Queue.builder()
                 .active(true)
                 .id(TEST_QUEUE_ID)
                 .created(QUEUE_CREATE_DATE_TIME)
-                .allowedLabels(Collections.singleton(Label.ACCEPT))
+                .allowedLabels(Collections.singleton(Label.GOOD))
                 .name("Common Queue")
                 .residual(false)
                 .sorting(new QueueSortSettings())
@@ -294,12 +297,12 @@ class PublicItemServiceTest {
                         .queueId(TEST_QUEUE_ID)
                         .build())
                 .build();
-        LabelDTO labelDto = new LabelDTO(Label.ACCEPT);
+        LabelDTO labelDto = new LabelDTO(Label.GOOD);
         Queue queue = Queue.builder()
                 .active(true)
                 .id(TEST_QUEUE_ID)
                 .created(QUEUE_CREATE_DATE_TIME)
-                .allowedLabels(Collections.singleton(Label.ACCEPT))
+                .allowedLabels(Collections.singleton(Label.GOOD))
                 .name("Common Queue")
                 .residual(false)
                 .sorting(new QueueSortSettings())

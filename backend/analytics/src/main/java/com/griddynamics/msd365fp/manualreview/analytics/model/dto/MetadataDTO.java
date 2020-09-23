@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.model.dto;
 
 import lombok.Data;
@@ -5,7 +8,7 @@ import lombok.Data;
 import java.time.OffsetDateTime;
 
 /**
- * Metadata properties for the {@link LabelEventDTO}.
+ * Metadata properties for the {@link PurchaseStatusDTO}.
  */
 @Data
 public class MetadataDTO {

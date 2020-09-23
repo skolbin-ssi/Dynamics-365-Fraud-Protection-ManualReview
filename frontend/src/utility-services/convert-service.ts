@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import papa, { UnparseConfig, UnparseObject } from 'papaparse';
 
 export type UnparseTypes = Array<Object> | Array<Array<any>> | UnparseObject;

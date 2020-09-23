@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Container } from 'inversify';
 import { TYPES } from '../types';
 import { Logger } from '../utility-services';

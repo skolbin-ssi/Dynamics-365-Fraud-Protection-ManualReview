@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Queue, User } from '../../../models';
 import { UserBuilder } from '../../../utility-services';
 import { QueueViewDTO } from '../../api-services/models';

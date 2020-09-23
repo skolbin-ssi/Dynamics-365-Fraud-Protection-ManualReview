@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { SETTING_TYPE } from '../../constants';
 import { Setting } from '../../models';
 

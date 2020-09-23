@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import autobind from 'autobind-decorator';
@@ -135,7 +138,8 @@ export class GeneralTab extends Component<GeneralTabProps, never> {
         const { queueMutationModalStoreInstance } = this.props;
         const {
             queueMutationStore,
-            blockDisableProcessingDeadline,
+            blockDisablingProcessingDeadline,
+            blockUpdatingProcessingDeadline,
             blockNameChange
         } = queueMutationModalStoreInstance;
         const {
@@ -232,7 +236,7 @@ export class GeneralTab extends Component<GeneralTabProps, never> {
                                     checked={enableProcessingDeadline}
                                     onChange={this.handleProcessingDeadlineToggled}
                                     className={`${CN}__enable-processing-deadline`}
-                                    disabled={blockDisableProcessingDeadline}
+                                    disabled={blockDisablingProcessingDeadline}
                                 />
                                 <Text>Deadline:&nbsp;&nbsp;</Text>
                             </div>
@@ -243,7 +247,7 @@ export class GeneralTab extends Component<GeneralTabProps, never> {
                                     onDecrement={this.decrementProcessingDeadlineDaysChanged}
                                     value={`${processingDeadlineDays} day${processingDeadlineDays === 1 ? '' : 's'}`}
                                     onValidate={this.validateProcessingDeadlineDaysManualInput}
-                                    disabled={!enableProcessingDeadline || blockDisableProcessingDeadline}
+                                    disabled={!enableProcessingDeadline || blockUpdatingProcessingDeadline}
                                 />
                                 <SpinButton
                                     className={cn(`${CN}__deadline-picker`, { disabled: !enableProcessingDeadline })}
@@ -251,7 +255,7 @@ export class GeneralTab extends Component<GeneralTabProps, never> {
                                     onDecrement={this.decrementProcessingDeadlineHoursChanged}
                                     value={`${processingDeadlineHours} hour${processingDeadlineHours === 1 ? '' : 's'}`}
                                     onValidate={this.validateProcessingDeadlineHoursManualInput}
-                                    disabled={!enableProcessingDeadline || blockDisableProcessingDeadline}
+                                    disabled={!enableProcessingDeadline || blockUpdatingProcessingDeadline}
                                 />
                             </div>
                         </div>

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.service;
 
 import com.griddynamics.msd365fp.manualreview.analytics.config.ModelMapperConfig;
@@ -90,7 +93,7 @@ class StreamServiceTest {
                 .build();
 
         // Separate event into actions
-        streamService.getItemAssignmentEvent(event);
+        streamService.processItemAssignmentEvent(event);
 
         // Check how much times each repository has been called and capture saved result
         verify(itemPlacementActivityRepository, times(2)).saveAll(placementCaptor.capture());
@@ -123,7 +126,7 @@ class StreamServiceTest {
                 .build();
 
         // Separate event into actions
-        streamService.getItemLockEvent(event);
+        streamService.processItemLockEvent(event);
 
         // Check how much times each repository has been called and capture saved result
         verify(itemLockActivityRepository, times(1)).save(lockCaptor.capture());
@@ -158,7 +161,7 @@ class StreamServiceTest {
                 .build();
 
         // Separate event into actions
-        streamService.getItemAssignmentEvent(event);
+        streamService.processItemAssignmentEvent(event);
 
         // Check how much times each repository has been called and capture saved result
         verify(performanceRepository, times(1)).save(performanceCaptor.capture());
@@ -172,11 +175,11 @@ class StreamServiceTest {
         // Verify the contents of the saved result
         ItemLabelActivityEntity actualResult1 = performanceCaptor.getValue();
         assertEquals(TEST_ITEM_ID, actualResult1.getId());
-        assertEquals(Label.ACCEPT, actualResult1.getLabel());
+        assertEquals(Label.GOOD, actualResult1.getLabel());
 
         Resolution actualResult2 = resolutionCaptor.getValue();
         assertEquals(TEST_ITEM_ID, actualResult2.getId());
-        assertEquals(Label.ACCEPT, actualResult2.getLabel().getValue());
+        assertEquals(Label.GOOD, actualResult2.getLabel().getValue());
 
 //        List<ItemPlacementActivityEntity> actualResult3 = new ArrayList<>();
 //        placementCaptor.getValue().forEach(actualResult3::add);
@@ -208,7 +211,7 @@ class StreamServiceTest {
                 .build();
 
         // Separate event into actions
-        streamService.getItemAssignmentEvent(event);
+        streamService.processItemAssignmentEvent(event);
 
         // Check how much times each repository has been called and capture saved result
         verify(performanceRepository, times(1)).save(performanceCaptor.capture());
@@ -260,7 +263,7 @@ class StreamServiceTest {
                 .build();
 
         // Separate event into actions
-        streamService.getItemLockEvent(event);
+        streamService.processItemLockEvent(event);
 
         // Check how much times each repository has been called and capture saved result
         verify(itemLockActivityRepository, times(1)).save(lockCaptor.capture());
@@ -292,7 +295,7 @@ class StreamServiceTest {
                 .build();
 
         // Separate event into actions
-        streamService.getItemAssignmentEvent(event);
+        streamService.processItemAssignmentEvent(event);
 
         // Check how much times each repository has been called and capture saved result
         verify(itemPlacementActivityRepository, times(1)).saveAll(placementCaptor.capture());
@@ -325,7 +328,7 @@ class StreamServiceTest {
                 .updated(QUEUE_UPDATE_DATE_TIME)
                 .build();
 
-        streamService.getQueueSizeUpdateEvent(event);
+        streamService.processQueueSizeUpdateEvent(event);
 
         verify(queueSizeCalculationActivityRepository).save(queueSizeCalculationCaptor.capture());
 

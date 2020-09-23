@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { resolve } from 'inversify-react';
@@ -42,9 +45,10 @@ import { QueueView } from '../../../models';
 import { CurrentProgress } from '../../../models/dashboard/progress-performance-metric';
 import { ExpandableGroup } from '../../queues/queues-list/expandable-group';
 
-import './demand-supply-by-queue.scss';
-import { ReportsModalStore } from '../../../view-services/dashboard';
+import { ReportsModalStore } from '../../../view-services';
 import { SwitchTabs } from '../../../components/switch-tabs';
+
+import './demand-supply-by-queue.scss';
 
 const CN = 'demand-supply-by-queue-dashboard';
 
@@ -538,6 +542,22 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
         );
     }
 
+    renderNoDataMessage() {
+        return (
+            <div className={cx(`${CN}__realtime-data-header`, `${CN}__realtime-data-header--data-not-available`)}>
+
+                <MessageBar
+                    messageBarType={MessageBarType.warning}
+                    messageBarIconProps={{ iconName: 'Warning', className: `${CN}__warning-message-icon` }}
+                >
+                    <div className={cx(`${CN}__real-time-title`, `${CN}__real-time-title--data-not-available`)}>
+                        Right now there are no items near to SLA or near to Timeout
+                    </div>
+                </MessageBar>
+            </div>
+        );
+    }
+
     renderNoRealTimeDataMessage() {
         return (
             <div className={cx(`${CN}__realtime-data-header`, `${CN}__realtime-data-header--no-data`)}>
@@ -578,7 +598,7 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
 
     renderRealTimeDataSection() {
         const {
-            lastQueueItemsUpdated, isQueueItemsLoading, isAutoRefreshEnabled
+            lastQueueItemsUpdated, isQueueItemsLoading, isAutoRefreshEnabled, isQueueItemsDataAvailable
         } = this.demandQueuePerformanceStore;
 
         return (
@@ -610,6 +630,7 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
                         </div>
                     </div>
                 </div>
+                {isQueueItemsDataAvailable && this.renderNoDataMessage()}
                 <section className={`${CN}__real-time-data`}>
                     <div className={`${CN}__queue-items-tables`}>
                         {this.renderRegularQueueItemsDataTable()}

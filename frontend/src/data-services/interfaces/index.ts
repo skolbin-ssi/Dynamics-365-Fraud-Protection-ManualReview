@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export * from './configuration-api-service';
 export * from './queue-api-service';
 export * from './item-api-service';

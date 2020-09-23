@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React from 'react';
 import cx from 'classnames';
 import autobind from 'autobind-decorator';
@@ -8,10 +11,10 @@ import { WarningChartMessage } from '../warning-chart-message';
 import { AccuracyChartDatum } from '../../../view-services/dashboard/base-overturned-performance-store';
 import { formatDateToFullMonthDayYear } from '../../../utils/date';
 import {
-    OVERTURNED_ACTIONS_DISPLAY_NAMES,
-    OVERTURNED_CHART_DATUM_KEYS,
-    OVERTURNED_CHART_KEYS,
-    OVERTURNED_LABELS_TO_OVERTURNED_CHART_KEYS_COLORS
+    OVERTURNED_DECISIONS_DISPLAY_NAMES,
+    OVERTURN_CHART_DATUM_KEYS,
+    OVERTURN_CHART_KEYS,
+    OVERTURN_LABELS_TO_OVERTURN_CHART_KEYS_COLORS
 } from '../../../constants';
 
 import './bar-chart.scss';
@@ -19,7 +22,10 @@ import './bar-chart.scss';
 import { generateTicksValues } from './generate-ticks-values';
 
 interface OverturnedChartDatumAccumulator {
-    approveUnmatched: number, approveMatched: number, rejectMatched: number, rejectUnmatched: number
+    good: number,
+    overturnedGood: number,
+    bad: number,
+    overturnedBad: number
 }
 
 /**
@@ -27,7 +33,7 @@ interface OverturnedChartDatumAccumulator {
  *
  * This function is intentionally create in order to resolve the issue when some of the datum points
  * has 0, nullish values if that is that case, then some of the provided colors under color property
- * of Responsive bar whould be shifted in unpredictable orders, and it brakes representation of actual
+ * of Responsive bar would be shifted in unpredictable orders, and it brakes representation of actual
  * data to be displayed on the dashboard, thus such solution will aim to avoid such issue
  *
  * For more details please refer:
@@ -44,23 +50,23 @@ function getBarChartKeysAndColorsValues(data: AccuracyChartDatum[]) {
 
     // order of the keys must be in the defined order for the representation
     const dataSum: OverturnedChartDatumAccumulator = data.reduce((acc, next) => ({
-        approveMatched: acc.approveMatched + Math.abs(next.approveMatched),
-        approveUnmatched: acc.approveUnmatched + Math.abs(next.approveUnmatched),
-        rejectMatched: acc.rejectMatched + Math.abs(next.rejectMatched),
-        rejectUnmatched: acc.rejectUnmatched + Math.abs(next.rejectUnmatched),
+        good: acc.good + Math.abs(next.good),
+        overturnedGood: acc.overturnedGood + Math.abs(next.overturnedGood),
+        bad: acc.bad + Math.abs(next.bad),
+        overturnedBad: acc.overturnedBad + Math.abs(next.overturnedBad),
 
     }), {
-        approveUnmatched: 0, approveMatched: 0, rejectMatched: 0, rejectUnmatched: 0
+        overturnedGood: 0, good: 0, bad: 0, overturnedBad: 0
     });
 
     Object.keys(dataSum).forEach(key => {
         const value = dataSum[key as keyof OverturnedChartDatumAccumulator];
 
-        // filter keys if every decision exists (approveUnmatched, approveMatched, rejectMatched, rejectUnmatched)
+        // filter keys if every decision exists (overturnedGood, good, bad, overturnedBad)
         // total sum is greater then 0
         if (value > 0) {
-            const overturnedChartDatumKey = OVERTURNED_CHART_DATUM_KEYS[key as keyof OverturnedChartDatumAccumulator];
-            const { color, label } = OVERTURNED_LABELS_TO_OVERTURNED_CHART_KEYS_COLORS.get(overturnedChartDatumKey)!;
+            const overturnedChartDatumKey = OVERTURN_CHART_DATUM_KEYS[key as keyof OverturnedChartDatumAccumulator];
+            const { color, label } = OVERTURN_LABELS_TO_OVERTURN_CHART_KEYS_COLORS.get(overturnedChartDatumKey)!;
             keys.push(label);
             colors.push(color);
         }
@@ -95,16 +101,16 @@ const CN = 'bar-chart';
 
 export class BarChart extends React.Component<BarChartProps, never> {
     static getLabels() {
-        const approve = OVERTURNED_ACTIONS_DISPLAY_NAMES[OVERTURNED_CHART_KEYS.APPROVED_MATCHED];
-        const approveOverturned = OVERTURNED_ACTIONS_DISPLAY_NAMES[OVERTURNED_CHART_KEYS.APPROVED_UNMATCHED];
-        const reject = OVERTURNED_ACTIONS_DISPLAY_NAMES[OVERTURNED_CHART_KEYS.REJECTED_MATCHED];
-        const rejectOverturned = OVERTURNED_ACTIONS_DISPLAY_NAMES[OVERTURNED_CHART_KEYS.REJECTED_UNMATCHED];
+        const good = OVERTURNED_DECISIONS_DISPLAY_NAMES[OVERTURN_CHART_KEYS.GOOD];
+        const overturnedGood = OVERTURNED_DECISIONS_DISPLAY_NAMES[OVERTURN_CHART_KEYS.OVERTURNED_GOOD];
+        const bad = OVERTURNED_DECISIONS_DISPLAY_NAMES[OVERTURN_CHART_KEYS.BAD];
+        const overturnedBad = OVERTURNED_DECISIONS_DISPLAY_NAMES[OVERTURN_CHART_KEYS.OVERTURNED_BAD];
 
         return {
-            approve,
-            approveOverturned,
-            reject,
-            rejectOverturned
+            good,
+            overturnedGood,
+            bad,
+            overturnedBad
         };
     }
 
@@ -155,48 +161,48 @@ export class BarChart extends React.Component<BarChartProps, never> {
 
     renderTopLegends() {
         const {
-            approve,
-            approveOverturned,
-            reject,
-            rejectOverturned
+            good,
+            overturnedGood,
+            bad,
+            overturnedBad
         } = BarChart.getLabels();
 
         return (
             <div className={`${CN}__top-legend`}>
                 <div>
-                    <div style={{ background: approve.color }} className={`${CN}__legend-color-indicator`} />
+                    <div style={{ background: good.color }} className={`${CN}__legend-color-indicator`} />
                     <div
-                        style={{ color: approve.color, filter: 'brightness(0.9)' }}
+                        style={{ color: good.color, filter: 'brightness(0.9)' }}
                         className={`${CN}__legend-label-text`}
                     >
-                        {approve.label}
+                        {good.label}
                     </div>
                 </div>
                 <div>
-                    <div style={{ background: reject.color }} className={`${CN}__legend-color-indicator`} />
+                    <div style={{ background: bad.color }} className={`${CN}__legend-color-indicator`} />
                     <div
-                        style={{ color: reject.color, filter: 'brightness(0.9)' }}
+                        style={{ color: bad.color, filter: 'brightness(0.9)' }}
                         className={`${CN}__legend-label-text`}
                     >
-                        {reject.label}
+                        {bad.label}
                     </div>
                 </div>
                 <div>
-                    <div style={{ background: approveOverturned.color }} className={`${CN}__legend-color-indicator`} />
+                    <div style={{ background: overturnedGood.color }} className={`${CN}__legend-color-indicator`} />
                     <div
-                        style={{ color: approve.color }}
+                        style={{ color: good.color }}
                         className={`${CN}__legend-label-text`}
                     >
-                        {approveOverturned.label}
+                        {overturnedGood.label}
                     </div>
                 </div>
                 <div>
-                    <div style={{ background: rejectOverturned.color }} className={`${CN}__legend-color-indicator`} />
+                    <div style={{ background: overturnedBad.color }} className={`${CN}__legend-color-indicator`} />
                     <div
-                        style={{ color: reject.color }}
+                        style={{ color: bad.color }}
                         className={`${CN}__legend-label-text`}
                     >
-                        {rejectOverturned.label}
+                        {overturnedBad.label}
                     </div>
                 </div>
             </div>
@@ -210,17 +216,17 @@ export class BarChart extends React.Component<BarChartProps, never> {
             id,
             data: {
                 originalDate,
-                approveUnmatched,
-                approveMatched,
-                rejectMatched,
-                rejectUnmatched
+                overturnedGood: overturnedGoodValue,
+                good: goodValue,
+                bad: badValue,
+                overturnedBad: overturnedBadValue,
             }
         } = extendedDatum as unknown as { data: AccuracyChartDatum } & BarExtendedDatum;
         const {
-            approve,
-            approveOverturned,
-            reject,
-            rejectOverturned
+            good,
+            overturnedGood,
+            bad,
+            overturnedBad
         } = BarChart.getLabels();
 
         return (
@@ -230,24 +236,24 @@ export class BarChart extends React.Component<BarChartProps, never> {
                 </div>
                 <div className={`${CN}__tooltip-content`}>
                     <div className={`${CN}__tooltip-row`}>
-                        {this.renderTooltipColorIndicator(approveOverturned.color)}
-                        <div>{approveOverturned.label}</div>
-                        <div className={`${CN}__tooltip-value`}>{formatValue(approveUnmatched)}</div>
+                        {this.renderTooltipColorIndicator(overturnedGood.color)}
+                        <div>{overturnedGood.label}</div>
+                        <div className={`${CN}__tooltip-value`}>{formatValue(overturnedGoodValue)}</div>
                     </div>
                     <div className={`${CN}__tooltip-row`}>
-                        {this.renderTooltipColorIndicator(approve.color)}
-                        <div>{approve.label}</div>
-                        <div className={`${CN}__tooltip-value`}>{formatValue(approveMatched)}</div>
+                        {this.renderTooltipColorIndicator(good.color)}
+                        <div>{good.label}</div>
+                        <div className={`${CN}__tooltip-value`}>{formatValue(goodValue)}</div>
                     </div>
                     <div className={`${CN}__tooltip-row`}>
-                        {this.renderTooltipColorIndicator(reject.color)}
-                        <div>{reject.label}</div>
-                        <div className={`${CN}__tooltip-value`}>{formatValue(rejectMatched)}</div>
+                        {this.renderTooltipColorIndicator(bad.color)}
+                        <div>{bad.label}</div>
+                        <div className={`${CN}__tooltip-value`}>{formatValue(badValue)}</div>
                     </div>
                     <div className={`${CN}__tooltip-row`}>
-                        {this.renderTooltipColorIndicator(rejectOverturned.color)}
-                        <div>{rejectOverturned.label}</div>
-                        <div className={`${CN}__tooltip-value`}>{formatValue(rejectUnmatched)}</div>
+                        {this.renderTooltipColorIndicator(overturnedBad.color)}
+                        <div>{overturnedBad.label}</div>
+                        <div className={`${CN}__tooltip-value`}>{formatValue(overturnedBadValue)}</div>
                     </div>
                 </div>
             </div>
@@ -300,8 +306,8 @@ export class BarChart extends React.Component<BarChartProps, never> {
                         }
                     }}
                 />
-                <div className={`${CN}__approve-label`}>GOOD</div>
-                <div className={`${CN}__reject-label`}>BAD</div>
+                <div className={`${CN}__good-label`}>GOOD</div>
+                <div className={`${CN}__bad-label`}>BAD</div>
                 {this.renderTopLegends()}
                 {this.renderNoDataWarningMessage()}
                 {this.renderNoSelectedItemsWarningMessage()}

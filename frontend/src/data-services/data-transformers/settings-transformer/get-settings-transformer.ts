@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Setting } from '../../../models';
 import { SettingDTO } from '../../api-services/models';
 import { GetSettingValuesResponse } from '../../api-services/settings-api-service/api-models/get-setting-values-response';

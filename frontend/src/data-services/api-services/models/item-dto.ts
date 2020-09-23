@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ItemHoldDTO } from './item-hold-dto';
 import { ItemLockDTO } from './item-lock-dto';
 import { ItemNoteDTO } from './item-note-dto';

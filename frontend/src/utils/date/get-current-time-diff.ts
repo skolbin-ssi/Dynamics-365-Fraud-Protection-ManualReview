@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export function getCurrentTimeDiff(date: Date): { days: number, hours: number} {
     const SECONDS_PER_ONE_HOUR = 3600;
     const HOURS_PER_ONE_DAY = 24;

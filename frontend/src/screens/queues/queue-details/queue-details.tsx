@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import autobind from 'autobind-decorator';
@@ -201,12 +204,13 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
     @autobind
     setItemToItemStore(selectedItem: Item) {
         const { queueStore: { selectedQueueId } } = this.props;
-        const { lockedById } = selectedItem;
+        const { lockedById, lockedOnQueueViewId } = selectedItem;
         const { user } = this.user;
         const isLockedByCurrent = lockedById === user?.id;
+        const isLockedInTheCurrentQueue = lockedOnQueueViewId === selectedQueueId;
 
         if (selectedQueueId) {
-            const pathname = isLockedByCurrent
+            const pathname = isLockedByCurrent && isLockedInTheCurrentQueue
                 ? ROUTES.build.itemDetailsReviewConsole(selectedQueueId, selectedItem.id)
                 : ROUTES.build.itemDetails(selectedQueueId, selectedItem.id);
             this.history.push({ pathname });

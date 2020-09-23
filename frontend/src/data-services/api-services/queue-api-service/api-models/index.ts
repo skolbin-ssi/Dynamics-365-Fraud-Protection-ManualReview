@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export * from './get-queue';
 export * from './get-queues';
 export * from './post-queue';

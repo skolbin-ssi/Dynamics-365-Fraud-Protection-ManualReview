@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { Text } from '@fluentui/react/lib/Text';

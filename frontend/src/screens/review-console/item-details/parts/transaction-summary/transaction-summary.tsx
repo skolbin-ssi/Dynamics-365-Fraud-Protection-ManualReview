@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import {
     ColumnActionsMode,
     DetailsList,
@@ -9,10 +12,14 @@ import { Text } from '@fluentui/react/lib/Text';
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
 import React, { Component } from 'react';
+
 import { Price } from '../../../../../components';
 import { Item } from '../../../../../models/item';
 import { PreviousPurchase } from '../../../../../models/item/purchase/previous-purchase';
-import { formatISODateStringToLocaleString } from '../../../../../utils/date';
+import {
+    formatToLocalStringWithPassedTimeZone,
+    convertToUTCAndFormatToLocalString,
+} from '../../../../../utils/date';
 import { stringToKebabCase } from '../../../../../utils/text';
 import { ItemDetailsTile } from '../../item-details-tile';
 import { ItemDetailsKeyValue } from '../../item-details-key-value';
@@ -40,7 +47,7 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
     private readonly purchaseHistoryColumns: IColumn[] = [
         {
             key: 'merchantLocalDate',
-            name: 'Transaction date',
+            name: 'Transaction date, UTC',
             minWidth: 150,
             maxWidth: 150,
             isPadded: true,
@@ -48,7 +55,7 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
             className: `${CN}__score-cell`,
             onRender: (pp: PreviousPurchase) => (
                 <Text variant="medium">
-                    {formatISODateStringToLocaleString(pp.merchantLocalDate, this.valuePlaceholder)}
+                    {convertToUTCAndFormatToLocalString(pp.merchantLocalDate, this.valuePlaceholder)}
                 </Text>
             )
         },
@@ -142,8 +149,8 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
 
         const renderingConfig = [
             { key: 'Original order ID', value: purchase.originalOrderId, className: `${CN}__id` },
-            { key: 'Customer local date', value: formatISODateStringToLocaleString(purchase.customerLocalDate, this.valuePlaceholder) },
-            { key: 'Merchant local date', value: formatISODateStringToLocaleString(purchase.merchantLocalDate, this.valuePlaceholder) },
+            { key: 'Customer local date', value: formatToLocalStringWithPassedTimeZone(purchase.customerLocalDate, this.valuePlaceholder) },
+            { key: 'Merchant local date', value: formatToLocalStringWithPassedTimeZone(purchase.merchantLocalDate, this.valuePlaceholder) },
             { key: 'Shipping Method', value: purchase.shippingMethod }
         ];
 

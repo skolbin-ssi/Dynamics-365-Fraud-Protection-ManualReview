@@ -1,20 +1,24 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.repository;
 
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemDataField;
 import com.griddynamics.msd365fp.manualreview.queues.model.ItemFilter;
-import com.griddynamics.msd365fp.manualreview.queues.model.QueueView;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewType;
+import com.griddynamics.msd365fp.manualreview.queues.model.Bucket;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
-import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public interface ItemRepositoryCustomMethods {
 
@@ -104,5 +108,10 @@ public interface ItemRepositoryCustomMethods {
             int size,
             String continuationToken);
 
-    Set<String> findAllByFilterField(ItemFilter.FilterField field);
+    Set<String> findFilterSamples(
+            @NonNull final ItemDataField field,
+            @Nullable final OffsetDateTime enrichedAfter);
+
+    Stream<Bucket> getRiskScoreDistribution(int bucketSize,
+                                            String queueId);
 }

@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 # This script intended to patch Azure AD App service principal permissions
 # when deploying from non-Windows environment, as it requires AzureAD
 # powershell module, which is not ported to non-Windows platform at time of

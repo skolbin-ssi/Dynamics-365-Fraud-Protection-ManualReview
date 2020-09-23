@@ -1,0 +1,4 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <turboFilter class="com.griddynamics.msd365fp.manualreview.ehub.durable.logging.EventHubSpamErrorFilter"/>
+</configuration>

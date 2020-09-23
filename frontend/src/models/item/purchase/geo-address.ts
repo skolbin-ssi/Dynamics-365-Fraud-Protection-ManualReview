@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { observable } from 'mobx';
 import { getMiles } from '../../../utils/math';
 import { Address } from './address';

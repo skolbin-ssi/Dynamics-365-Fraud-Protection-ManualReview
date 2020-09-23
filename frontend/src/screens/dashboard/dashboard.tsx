@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import autoBind from 'autobind-decorator';
 import { resolve } from 'inversify-react';
@@ -32,7 +35,7 @@ import {
 } from '../../constants';
 
 import './dashboard.scss';
-import { ReportsModal } from './reports-modal';
+import { ReportsModal } from '../../components/reports-modal';
 
 const CN = 'dashboard';
 
@@ -250,6 +253,7 @@ export class Dashboard extends Component<DashboardProps, any> {
                     onQueueSearchChange={this.handleQueueSearchChange}
                     onAnalystSearchChange={this.handlePersonSearchSelection}
                     dashboardScreenStore={this.dashboardScreenStore}
+                    renderSearchBar
                 />
                 {this.renderDashboardSegmentationHeader()}
                 <div className={`${CN}__content`}>

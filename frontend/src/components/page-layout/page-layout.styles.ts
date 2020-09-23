@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { IPanelStyles } from '@fluentui/react/lib/Panel';
 import { IButtonStyles } from '@fluentui/react/lib/Button';
 import { DefaultPalette } from '@fluentui/react/lib/Styling';

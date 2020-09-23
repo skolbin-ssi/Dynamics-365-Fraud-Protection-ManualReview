@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { observable } from 'mobx';
 import { DeviceContextDTO } from '../../../data-services/api-services/models/device-context-dto';
 import { Address, ADDRESS_TYPE } from './address';

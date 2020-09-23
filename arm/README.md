@@ -1,8 +1,9 @@
 # Pre-requisites
 1. Install Dynamics 365 Fraud Protection to your tenant in accordance with the [documentation](https://docs.microsoft.com/en-us/dynamics365/fraud-protection/provision-azure-tenant#provision-your-existing-azure-tenant)
 2. Create a mail account for alerts. The preferable provider is the [https://outlook.live.com/](https://outlook.live.com/)
+3. Create active subscription in Azure for solution resources. Remember Azure subscription id and tenant id for deployment steps.
 
-3. Install tools on deployment host:
+4. Install tools on deployment host:
    * Powershell version 7.0.3 [Instruction for Mac and Linux](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-macos?view=powershell-7), 5.1.0 (on Windows, should be pre-installed)
    * Powershell module 'Az' version 4.5.0 [Install instructions](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-4.5.0)
    * Powershell module 'Az.ManagedServiceIdentity'
@@ -70,19 +71,19 @@ When this parameter is absent in the configuration file, alerts will be disabled
 
 Depending on what you defined in deployment properties as the envType, the different property files will be used:
 * For `Dev` check all durations, URLs, and roles in:
-    * [queue service property file](https://github.com/griddynamics/msd365fp-manual-review/blob/master/backend/queues/src/main/resources/application-int.yml)
-    * [queue service property file for secondary region](https://github.com/griddynamics/msd365fp-manual-review/blob/master/backend/queues/src/main/resources/application-int-secondary.yml)
-    * [analytics service property file](https://github.com/griddynamics/msd365fp-manual-review/blob/master/backend/analytics/src/main/resources/application-int.yml)
-    * [analytics service property file for secondary region](https://github.com/griddynamics/msd365fp-manual-review/blob/master/backend/analytics/src/main/resources/application-int-secondary.yml)
+    * [queue service property file](../backend/queues/src/main/resources/application-int.yml)
+    * [queue service property file for secondary region](../backend/queues/src/main/resources/application-int-secondary.yml)
+    * [analytics service property file](../backend/analytics/src/main/resources/application-int.yml)
+    * [analytics service property file for secondary region](../backend/analytics/src/main/resources/application-int-secondary.yml)
 * For `Dev` check all durations, URLs, and roles in:
-    * [queue service property file](https://github.com/griddynamics/msd365fp-manual-review/blob/master/backend/queues/src/main/resources/application-prod.yml)
-    * [queue service property file for secondary region](https://github.com/griddynamics/msd365fp-manual-review/blob/master/backend/queues/src/main/resources/application-prod-secondary.yml)
-    * [analytics service property file](https://github.com/griddynamics/msd365fp-manual-review/blob/master/backend/analytics/src/main/resources/application-prod.yml)
-    * [analytics service property file for secondary region](https://github.com/griddynamics/msd365fp-manual-review/blob/master/backend/analytics/src/main/resources/application-prod-secondary.yml)
+    * [queue service property file](../backend/queues/src/main/resources/application-prod.yml)
+    * [queue service property file for secondary region](../backend/queues/src/main/resources/application-prod-secondary.yml)
+    * [analytics service property file](../backend/analytics/src/main/resources/application-prod.yml)
+    * [analytics service property file for secondary region](../backend/analytics/src/main/resources/application-prod-secondary.yml)
 * For both environment types all other parameters are specified in common files (common files have lower priority and 
 any value in env-specific property files will override values defined here):
-    * [common queue service property file](https://github.com/griddynamics/msd365fp-manual-review/blob/master/backend/queues/src/main/resources/application.yml)
-    * [commion analytics service property file](https://github.com/griddynamics/msd365fp-manual-review/blob/master/backend/analytics/src/main/resources/application.yml)
+    * [common queue service property file](../backend/queues/src/main/resources/application.yml)
+    * [commion analytics service property file](../backend/analytics/src/main/resources/application.yml)
 
 Configuration files are available in the future in AppService.
 WARNING! Redeployment will override any manual changes in configuration files.
@@ -211,3 +212,7 @@ In order to run cleanup execute command
 ```
 pwsh cleanup.ps1 -config <main.parameters.<X>.json>
 ```
+
+# Microsoft Open Source code of conduct
+
+For additional information, see the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct).

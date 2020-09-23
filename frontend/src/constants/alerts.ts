@@ -1,6 +1,10 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export enum ALERT_METRIC_TYPE {
-    APPROVE_ACCURACY = 'APPROVE_ACCURACY',
-    APPROVAL_RATE = 'APPROVAL_RATE'
+    AVERAGE_OVERTURN_RATE = 'AVERAGE_OVERTURN_RATE',
+    GOOD_DECISION_RATE = 'GOOD_DECISION_RATE',
+    BAD_DECISION_RATE = 'BAD_DECISION_RATE',
 }
 
 export enum ALERT_THRESHOLD_OPERATOR {
@@ -19,8 +23,9 @@ export enum PERIOD_DURATION_TYPE {
 }
 
 export const ALERT_METRIC_TYPE_DISPLAY = {
-    [ALERT_METRIC_TYPE.APPROVE_ACCURACY]: 'Accuracy, %',
-    [ALERT_METRIC_TYPE.APPROVAL_RATE]: 'Approval Rate'
+    [ALERT_METRIC_TYPE.AVERAGE_OVERTURN_RATE]: 'Average overturn rate, %',
+    [ALERT_METRIC_TYPE.GOOD_DECISION_RATE]: 'Good decision rate, %',
+    [ALERT_METRIC_TYPE.BAD_DECISION_RATE]: 'Bad decision rate, %',
 };
 
 export const ALERT_THRESHOLD_OPERATOR_DISPLAY = {

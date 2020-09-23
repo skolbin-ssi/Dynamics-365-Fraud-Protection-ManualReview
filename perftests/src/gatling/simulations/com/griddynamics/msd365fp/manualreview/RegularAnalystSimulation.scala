@@ -13,7 +13,6 @@ import scala.concurrent.duration._
 class RegularAnalystSimulation extends Simulation {
 
   val baseUrl = System.getenv("BASE_URL")
-
   val authToken = System.getenv("AUTH_TOKEN")
 
   val virtualUserFeeder = csv("virtualusers.csv").eager.queue
@@ -44,7 +43,6 @@ class RegularAnalystSimulation extends Simulation {
     .exec(RegularAnalystOpenQueuesView.action)
 
   setUp(scn.inject(
-    nothingFor(1 minute),
     atOnceUsers(5),
     rampUsers(10) during (5 minutes),
   )).protocols(httpProtocol)

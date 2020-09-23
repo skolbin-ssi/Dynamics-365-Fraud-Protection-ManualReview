@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.model.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;

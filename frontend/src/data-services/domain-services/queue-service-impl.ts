@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import {
     DEFAULT_QUEUE_ITEMS_PER_PAGE,

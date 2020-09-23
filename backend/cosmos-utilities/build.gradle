@@ -2,7 +2,7 @@ plugins {
     id 'io.freefair.lombok' version '5.1.1'
     id 'org.springframework.boot' version '2.3.3.RELEASE'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-	id 'java-library'
+    id 'java-library'
 }
 
 group = 'com.griddynamics.msd365fp.manual-review'
@@ -10,18 +10,14 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
-	jcenter()
-}
-
-ext {
-    set('azureVersion', "2.3.2")
+    mavenCentral()
+    jcenter()
 }
 
 bootJar {
@@ -33,13 +29,7 @@ jar {
 }
 
 dependencies {
-    compile project(path:':model', configuration: 'default')
+    compile project(path: ':model', configuration: 'default')
 
-    implementation 'com.microsoft.azure:spring-data-cosmosdb'
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "com.microsoft.azure:azure-spring-boot-bom:${azureVersion}"
-    }
+    implementation 'com.microsoft.azure:spring-data-cosmosdb:2.3.0'
 }

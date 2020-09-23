@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import autobind from 'autobind-decorator';
 import { resolve } from 'inversify-react';
@@ -88,12 +91,12 @@ export class Header extends Component<HeaderProps, never> {
                                     onClick={this.showUserPanel}
                                     styles={userNameTextStyles}
                                 >
-                                    {user.name}
+                                    {user?.name}
                                 </Text>
                                 <Persona
-                                    imageUrl={user.imageUrl}
+                                    imageUrl={user?.imageUrl}
                                     onClick={this.showUserPanel}
-                                    text={user.name}
+                                    text={user?.name}
                                     hidePersonaDetails
                                     size={PersonaSize.size28}
                                     styles={personaIconStyles}

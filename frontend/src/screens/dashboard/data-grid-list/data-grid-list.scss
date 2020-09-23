@@ -104,9 +104,9 @@
     font-size: 9px;
     margin-left: 4px;
 
-    &--approved {
-      background: $approveLabelBackground;
-      color: $approveColor;
+    &--good {
+      background: $goodLabelBackground;
+      color: $goodColor;
     }
 
     &--watched {
@@ -114,8 +114,8 @@
       color: $neutralPrimary;
     }
 
-    &--rejected {
-      background: $rejectedLabelBackground;
+    &--bad {
+      background: $badLabelBackground;
       color: $highRiskColor;
     }
   }

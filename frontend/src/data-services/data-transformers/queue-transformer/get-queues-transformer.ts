@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Queue } from '../../../models';
 import { GetQueuesResponse } from '../../api-services/queue-api-service/api-models';
 import { DataTransformer } from '../../data-transformer';

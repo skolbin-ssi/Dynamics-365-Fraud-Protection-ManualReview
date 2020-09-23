@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import {
     action,
@@ -14,7 +17,7 @@ import { DashboardScreenStore } from './dashboard-screen-store';
 
 import { TYPES } from '../../types';
 import { ItemPlacementMetrics, QueueSizeHistory } from '../../models/dashboard/deman-supply';
-import { excludeLocalTimeZoneDiff } from '../../utils/date';
+import { formatToISOStringWithLocalTimeZone } from '../../utils/date';
 import {
     QUEUE_VIEW_TYPE,
     STATISTIC_AGGREGATION,
@@ -206,8 +209,8 @@ export class DashboardDemandSupplyScreenStore {
         const aggregation = STATISTIC_AGGREGATION.get(this.aggregation)!;
 
         if (toDate && fromDate) {
-            const from = excludeLocalTimeZoneDiff(fromDate);
-            const to = excludeLocalTimeZoneDiff(toDate);
+            const from = formatToISOStringWithLocalTimeZone(fromDate);
+            const to = formatToISOStringWithLocalTimeZone(toDate);
 
             return { from, to, aggregation };
         }

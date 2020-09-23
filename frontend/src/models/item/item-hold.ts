@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ItemHoldDTO } from '../../data-services/api-services/models/item-hold-dto';
 
 export class ItemHold {

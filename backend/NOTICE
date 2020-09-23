@@ -1,0 +1,112 @@
+=========================================================================
+== This NOTICE file describes the dependencies, which used in          ==
+== the project.                                                        ==
+=========================================================================
+
+1. Group: org.projectlombok Name: lombok Version: 1.18.12
+    POM Project URL: https://projectlombok.org
+    POM License: The MIT License - https://projectlombok.org/LICENSE
+
+2. Group: com.fasterxml.jackson.core Name: jackson-annotations Version: 2.11.2
+    Project URL: http://github.com/FasterXML/jackson
+    POM License: The Apache Software License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+3. Group: com.fasterxml.jackson.core Name: jackson-databind Version: 2.11.2
+    Project URL: http://github.com/FasterXML/jackson
+    POM License: Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+    POM License: The Apache Software License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+4. Group: io.swagger.core.v3 Name: swagger-annotations Version: 2.1.2
+    POM License: Apache License 2.0 - http://www.apache.org/licenses/LICENSE-2.0.html
+
+5. Group: org.springdoc Name: springdoc-openapi-ui Version: 1.3.9
+    POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+    POM License: The Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+6. Group: org.springdoc Name: springdoc-openapi-webmvc-core Version: 1.3.9
+    POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+    POM License: The Apache License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+7. Group: io.github.resilience4j Name: resilience4j-spring-boot2 Version: 1.4.0
+    Project URL: https://github.com/resilience4j/resilience4j
+    POM License: Apache-2.0 - https://github.com/resilience4j/resilience4j/blob/master/LICENSE.txt
+
+8. Group: org.springframework.boot Name: spring-boot-starter-actuator Version: 2.3.3.RELEASE
+    POM Project URL: https://spring.io/projects/spring-boot
+    POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+9. Group: org.springframework.boot Name: spring-boot-starter-web Version: 2.3.3.RELEASE
+    POM Project URL: https://spring.io/projects/spring-boot
+    POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+10. Group: org.springframework.boot Name: spring-boot-starter-oauth2-client Version: 2.3.3.RELEASE
+    POM Project URL: https://spring.io/projects/spring-boot
+    POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+11. Group: org.springframework.boot Name: spring-boot-starter-mail Version: 2.3.3.RELEASE
+    POM Project URL: https://spring.io/projects/spring-boot
+    POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+12. Group: org.springframework.boot Name: spring-boot-starter-security Version: 2.3.3.RELEASE
+    POM Project URL: https://spring.io/projects/spring-boot
+    POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+13. Group: org.springframework Name: spring-webflux Version: 5.2.8.RELEASE
+    POM Project URL: https://github.com/spring-projects/spring-framework
+    POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+14. Group: org.springframework Name: spring-core Version: 5.2.8.RELEASE
+    POM Project URL: https://github.com/spring-projects/spring-framework
+    POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0
+
+15. Group: com.nimbusds Name: nimbus-jose-jwt Version: 7.9
+    Manifest Project URL: http://connect2id.com
+    POM Project URL: https://bitbucket.org/connect2id/nimbus-jose-jwt
+    POM License: The Apache Software License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+16. Group: com.google.guava Name: guava Version: 25.0-jre
+    Manifest Project URL: https://github.com/google/guava/
+    POM License: The Apache Software License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+17. Group: org.modelmapper Name: modelmapper Version: 2.3.7
+    POM License: Apache License, Version 2.0 - http://apache.org/licenses/LICENSE-2.0
+
+18. Group: org.apache.commons Name: commons-lang3 Version: 3.10
+    Project URL: https://commons.apache.org/proper/commons-lang/
+    POM License: Apache License, Version 2.0 - https://www.apache.org/licenses/LICENSE-2.0.txt
+
+19. Group: org.javers Name: javers-core Version: 5.10.5
+    POM Project URL: http://javers.org
+    POM License: The Apache Software License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+20. Group: com.github.javafaker Name: javafaker Version: 1.0.0
+    POM Project URL: http://github.com/DiUS/java-faker
+    POM License: The Apache Software License, Version 2.0 - http://www.apache.org/licenses/LICENSE-2.0.txt
+
+21. Group: com.microsoft.azure Name: azure-spring-boot-starter Version: 2.3.2
+    POM Project URL: https://github.com/Microsoft/azure-spring-boot
+    POM License: MIT - https://github.com/Microsoft/azure-spring-boot/blob/master/LICENSE
+
+22. Group: com.microsoft.azure Name: azure-cosmosdb-spring-boot-starter Version: 2.3.2
+    POM Project URL: https://github.com/Microsoft/azure-spring-boot
+    POM License: MIT - https://github.com/Microsoft/azure-spring-boot/blob/master/LICENSE
+
+23. Group: com.microsoft.azure Name: azure-active-directory-spring-boot-starter Version: 2.3.2
+    POM Project URL: https://github.com/Microsoft/azure-spring-boot
+    POM License: MIT - https://github.com/Microsoft/azure-spring-boot/blob/master/LICENSE
+
+24. Group: com.microsoft.azure Name: azure-keyvault-secrets-spring-boot-starter Version: 2.3.2
+    POM Project URL: https://github.com/Microsoft/azure-spring-boot
+    POM License: MIT - https://github.com/Microsoft/azure-spring-boot/blob/master/LICENSE
+
+25. Group: com.microsoft.azure Name: spring-data-cosmosdb Version: 2.3.0
+    POM Project URL: https://github.com/Microsoft/spring-data-cosmosdb
+    POM License: MIT - https://github.com/Microsoft/spring-data-cosmosdb/blob/master/LICENSE
+
+26. Group: com.azure Name: azure-messaging-eventhubs Version: 5.2.0
+    POM Project URL: https://github.com/Azure/azure-sdk-for-java
+    POM License: The MIT License (MIT) - http://opensource.org/licenses/MIT
+
+27. 26. Group: org.mockito Name: mockito-junit-jupiter Version: 2.23.0
+    POM Project URL: https://github.com/mockito/mockito
+    POM License: The MIT License (MIT) - https://github.com/mockito/mockito/blob/release/2.x/LICENSE

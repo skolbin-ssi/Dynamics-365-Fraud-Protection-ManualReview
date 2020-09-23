@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.model;
 
 import com.griddynamics.msd365fp.manualreview.model.Label;
@@ -17,8 +20,8 @@ public enum QueueViewType {
     REGULAR(
             false,
             Set.of(
-                    Label.ACCEPT,
-                    Label.REJECT,
+                    Label.GOOD,
+                    Label.BAD,
                     Label.WATCH_INCONCLUSIVE,
                     Label.WATCH_NA,
                     Label.ESCALATE),
@@ -26,8 +29,8 @@ public enum QueueViewType {
     ESCALATION(
             false,
             Set.of(
-                    Label.ACCEPT,
-                    Label.REJECT,
+                    Label.GOOD,
+                    Label.BAD,
                     Label.WATCH_INCONCLUSIVE,
                     Label.WATCH_NA,
                     Label.HOLD),

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ActionButton, IconButton } from '@fluentui/react/lib/Button';
 import {
     DetailsList,
@@ -63,8 +66,9 @@ export class AlertEditForm extends Component<AlertEditFormProps, AlertEditFormSt
     private queuesPickerRef: RefObject<IBasePicker<ITag>> = createRef();
 
     private metricOptions: MetricType[] = [
-        { text: ALERT_METRIC_TYPE_DISPLAY[ALERT_METRIC_TYPE.APPROVE_ACCURACY], key: ALERT_METRIC_TYPE.APPROVE_ACCURACY },
-        { text: ALERT_METRIC_TYPE_DISPLAY[ALERT_METRIC_TYPE.APPROVAL_RATE], key: ALERT_METRIC_TYPE.APPROVAL_RATE }
+        { text: ALERT_METRIC_TYPE_DISPLAY[ALERT_METRIC_TYPE.AVERAGE_OVERTURN_RATE], key: ALERT_METRIC_TYPE.AVERAGE_OVERTURN_RATE },
+        { text: ALERT_METRIC_TYPE_DISPLAY[ALERT_METRIC_TYPE.GOOD_DECISION_RATE], key: ALERT_METRIC_TYPE.GOOD_DECISION_RATE },
+        { text: ALERT_METRIC_TYPE_DISPLAY[ALERT_METRIC_TYPE.BAD_DECISION_RATE], key: ALERT_METRIC_TYPE.BAD_DECISION_RATE }
     ];
 
     private periodType: PeriodType[] = [

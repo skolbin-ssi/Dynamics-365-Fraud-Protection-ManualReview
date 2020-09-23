@@ -4,20 +4,20 @@
   height: inherit;
   position: relative;
 
-  &__approve-label {
+  &__good-label {
     position: absolute;
     top: 30%;
-    color: $approveMatchedColor;
+    color: $goodMatchedColor;
     font-size: 12px;
     font-weight: bold;
     filter: brightness(0.9);
     transform: rotate(-90deg);
   }
 
-  &__reject-label {
+  &__bad-label {
     position: absolute;
     bottom: 30%;
-    color: $rejectMatchedColor;
+    color: $badMatchedColor;
     font-size: 12px;
     font-weight: bold;
     transform: rotate(-90deg);

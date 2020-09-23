@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { User } from '../../../models';
 import { UserDTO } from '../../api-services/models/user-dto';
 import { GetCurrentUserResponse } from '../../api-services/user-api-service/api-models';

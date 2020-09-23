@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { FC, useEffect, useRef } from 'react';
 import cn from 'classnames';
 

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { resolve } from 'inversify-react';
 import React from 'react';
 import {

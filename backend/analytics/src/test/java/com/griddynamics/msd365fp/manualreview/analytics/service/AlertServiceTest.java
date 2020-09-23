@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -184,7 +187,7 @@ class AlertServiceTest {
         map.put("template", "test");
         appSettings.setValue(map);
         ItemLabelingMetricDTO totalMetric = new ItemLabelingMetricDTO();
-        totalMetric.setApproved(100);
+        totalMetric.setGood(100);
         totalMetric.setWatched(0);
         totalMetric.setReviewed(100);
         when(alertRepository.findByActiveTrue()).thenReturn(List.of(alert));
@@ -282,7 +285,7 @@ class AlertServiceTest {
     private AlertCreationDTO createAlertDTO() {
         AlertCreationDTO alertDTO = new AlertCreationDTO();
         alertDTO.setName("Test DTO");
-        alertDTO.setMetricType(MetricType.APPROVAL_RATE);
+        alertDTO.setMetricType(MetricType.GOOD_DECISION_RATE);
         alertDTO.setThresholdOperator(ThresholdOperator.LESS_THAN);
         alertDTO.setThresholdValue(80.0);
         return alertDTO;
@@ -294,7 +297,7 @@ class AlertServiceTest {
         alert.setOwnerId(userId);
         alert.setName("Test Alert");
         alert.setPeriod(Duration.ofDays(10));
-        alert.setMetricType(MetricType.APPROVAL_RATE);
+        alert.setMetricType(MetricType.GOOD_DECISION_RATE);
         alert.setThresholdOperator(ThresholdOperator.LESS_THAN);
         alert.setThresholdValue(80.0);
         alert.setActive(true);

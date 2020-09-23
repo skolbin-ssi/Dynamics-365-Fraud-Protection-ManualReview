@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import autoBind from 'autobind-decorator';
@@ -329,7 +332,8 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
                             <CHART_AGGREGATION_PERIOD>
                             activeTab={overturnedAggregation}
                             className={`${CN}__aggregation-header`}
-                            title="Overturned chart"
+                            title="Overturn chart"
+                            subTitle="Good decisions include Watch"
                             viewSwitchName="View:"
                             onViewChange={this.handleOverturnedChartAggregationChange}
                             viewMap={CHART_AGGREGATION_PERIOD_DISPLAY}
@@ -356,7 +360,7 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
                             <PERFORMANCE_RATING>
                             className={`${CN}__switch-header`}
                             activeTab={overturnedRating}
-                            subTitle="Data sorted by accuracy rate"
+                            subTitle="Data sorted by average overturn rate"
                             title={this.getOverturnedAnalystDataTableHeaderTitle()}
                             onViewChange={this.handleOverturnedPerformanceRatingChange}
                             viewMap={TOP_ANALYST_DISPLAY_VIEW}

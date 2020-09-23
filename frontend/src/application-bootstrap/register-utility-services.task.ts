@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { createBrowserHistory, History } from 'history';
 import { Container } from 'inversify';
 import { TYPES } from '../types';

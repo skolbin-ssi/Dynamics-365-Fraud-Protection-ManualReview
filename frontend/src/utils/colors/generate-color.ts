@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { digestMessageToHexHash } from '../text';
 import { rgbToHsl } from './rgb-to-hsl';
 import { hslToRgb } from './hsl-to-rgb';

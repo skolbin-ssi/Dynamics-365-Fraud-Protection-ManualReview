@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export function getQueueProcessingDeadline(nOfDays: number, nOfHours: number): string {
     return `P${+nOfDays}DT${nOfHours}H`;
 }

@@ -1,0 +1,43 @@
+plugins {
+    id 'io.freefair.lombok' version '5.1.1'
+    id 'org.springframework.boot' version '2.3.3.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'java-library'
+}
+
+group = 'com.griddynamics.msd365fp.manual-review'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+dependencies {
+    compile project(path: ':model', configuration: 'default')
+
+    implementation 'org.springframework.boot:spring-boot'
+    implementation 'org.springframework.boot:spring-boot-autoconfigure'
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+
+    implementation 'com.azure:azure-messaging-eventhubs:5.2.0'
+    implementation 'com.azure:azure-messaging-eventhubs-checkpointstore-blob:1.2.0'
+    implementation 'io.micrometer:micrometer-core:1.5.4'
+    implementation 'org.springframework:spring-core'
+    implementation 'org.springframework:spring-context'
+}

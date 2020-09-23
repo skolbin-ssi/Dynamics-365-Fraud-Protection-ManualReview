@@ -1,15 +1,14 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.config;
 
 import com.griddynamics.msd365fp.manualreview.analytics.config.properties.ApplicationProperties;
 import com.griddynamics.msd365fp.manualreview.analytics.config.properties.MailProperties;
-import com.griddynamics.msd365fp.manualreview.analytics.streaming.OverallSizeEventStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.stream.config.BindingServiceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.channel.DirectChannel;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @RequiredArgsConstructor

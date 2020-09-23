@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { BaseQueueTransformer } from './base-queue-transformer';
 import { DataTransformer } from '../../data-transformer';
 import { QueuesOverview, OverviewItem } from '../../../models/queues';

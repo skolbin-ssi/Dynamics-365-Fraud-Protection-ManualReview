@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { PerformanceMetricsDTO } from './performance-metrics-dto';
 
 export interface PeriodPerformanceMetrics {

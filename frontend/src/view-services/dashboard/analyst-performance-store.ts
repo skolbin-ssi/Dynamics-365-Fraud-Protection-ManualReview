@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import {
     action, computed, observable
 } from 'mobx';
@@ -18,6 +21,7 @@ import { DashboardRequestApiParams } from '../../data-services/interfaces/dashbo
 import { Report } from '../../models/misc';
 import { formatMetricToPercentageString } from '../../utils/text';
 import { User } from '../../models/user';
+import { PerformanceParsedQueryUrl } from '../../utility-services';
 
 @injectable()
 export class AnalystPerformanceStore extends BasePerformanceStore<QueuePerformance> {
@@ -48,7 +52,7 @@ export class AnalystPerformanceStore extends BasePerformanceStore<QueuePerforman
 
     /**
      *  Will load queues performance each time when any of autorun function dependencies
-     *  will changed (e.g: fromDate, toDate, aggregation)
+     *  will changed (e.g: fromDate, toDate, aggregation or analyst id)
      */
     @action
     loadData() {
@@ -189,6 +193,29 @@ export class AnalystPerformanceStore extends BasePerformanceStore<QueuePerforman
         }
     }
 
+    /**
+     *  Set initial values for the store, when page has mounted
+     *  and URL parameters are in the URL
+     *
+     * @param parsedQuery - parsed URL params
+     */
+    @action
+    setParsedUrlParams(parsedQuery: PerformanceParsedQueryUrl) {
+        const { aggregation, rating, ids } = parsedQuery;
+
+        if (ids) {
+            this.setUrlSelectedIds(ids);
+        }
+
+        if (aggregation) {
+            this.setAggregation(aggregation);
+        }
+
+        if (rating) {
+            this.setRating(rating);
+        }
+    }
+
     @computed
     get analystAsPersona() {
         if (this.analyst) {
@@ -201,6 +228,11 @@ export class AnalystPerformanceStore extends BasePerformanceStore<QueuePerforman
     @action
     clearAnalystId() {
         this.analystId = '';
+    }
+
+    @action
+    setAnalyst(analyst: User) {
+        this.analyst = analyst;
     }
 
     @action
@@ -242,10 +274,10 @@ export class AnalystPerformanceStore extends BasePerformanceStore<QueuePerforman
             const reportRawData = this.totalPerformance.totalDecisionsReport;
 
             const rawObjectData: UnparseObject = {
-                fields: ['approved', 'rejected', 'watched'],
+                fields: ['good', 'bad', 'watched'],
                 data: [
-                    formatMetricToPercentageString(+reportRawData.approved),
-                    formatMetricToPercentageString(+reportRawData.rejected),
+                    formatMetricToPercentageString(+reportRawData.good),
+                    formatMetricToPercentageString(+reportRawData.bad),
                     formatMetricToPercentageString(+reportRawData.watched)
                 ]
             };
@@ -264,27 +296,27 @@ export class AnalystPerformanceStore extends BasePerformanceStore<QueuePerforman
             const {
                 reviewedProgress,
                 annualReviewedProgress,
-                approvedProgress,
-                annualApprovedProgress,
-                watchedProgress,
-                annualWatchedProgress,
-                rejectedProgress,
-                annualRejectedProgress,
-                escalatedProgress,
-                annualEscalatedProgress
+                goodDecisionsProgress,
+                annualGoodDecisionsProgress,
+                watchDecisionsProgress,
+                annualWatchDecisionsProgress,
+                badDecisionsProgress,
+                annualBadDecisionsProgress,
+                escalatedItemsProgress,
+                annualEscalatedItemsProgress
             } = this.progressPerformanceMetric;
 
             let unparseObject: Object = {
                 'number of decisions': reviewedProgress.current,
                 'annual number of decisions': annualReviewedProgress.current,
-                'approved orders': approvedProgress.current,
-                'annual approved orders': annualApprovedProgress.current,
-                'watched orders': watchedProgress.current,
-                'annual watched orders': annualWatchedProgress.current,
-                'rejected orders': rejectedProgress.current,
-                'annual rejected orders': annualRejectedProgress.current,
-                'escalated orders': escalatedProgress.current,
-                'annual escalated orders': annualEscalatedProgress.current
+                'good decisions': goodDecisionsProgress.current,
+                'annual good decisions': annualGoodDecisionsProgress.current,
+                'watch decisions': watchDecisionsProgress.current,
+                'annual watch decisions': annualWatchDecisionsProgress.current,
+                'bad decisions': badDecisionsProgress.current,
+                'annual bad decisions': annualBadDecisionsProgress.current,
+                'escalated items': escalatedItemsProgress.current,
+                'annual escalated items': annualEscalatedItemsProgress.current
             };
 
             if (this.processingTimeMetric) {

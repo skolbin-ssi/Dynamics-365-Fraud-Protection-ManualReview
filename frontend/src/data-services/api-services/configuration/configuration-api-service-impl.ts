@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { BaseApiService } from '../../base-api-service';
 import { ConfigurationApiService } from '../../interfaces';
 import { GetConfigurationResponse } from './api-models';

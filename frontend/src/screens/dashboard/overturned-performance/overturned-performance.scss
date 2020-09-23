@@ -1,0 +1,12 @@
+@import "../../../styles/variables";
+
+.overturned-performance {
+  &__overturned-chart-container {
+    margin-bottom: 60px;
+    height: 500px;
+  }
+
+  &__switch-header {
+    max-width: $maxTableSwitchWidth;
+  }
+}

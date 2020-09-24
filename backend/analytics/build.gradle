@@ -67,7 +67,7 @@ test {
 
 task copyForArchiving(type: Copy) {
     dependsOn 'bootJar'
-    from "$buildDir/libs", "$buildDir/resources/main"
+    from "$buildDir/libs", "$buildDir/resources/main", "$buildDir/resources/main/applicationinsights-agent"
     include "*.jar", "ApplicationInsights.json"
     into "$buildDir/toArchive"
     rename 'analytics-(.*).jar', 'app.jar'

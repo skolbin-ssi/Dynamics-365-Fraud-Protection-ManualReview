@@ -127,7 +127,7 @@ all telemetry to the cloud.
 * `APPLICATIONINSIGHTS_CONFIGURATION_FILE` is optional. It sets the path for ApplicationInsights.json configuration which
 will override project default ApplicationInsights.json file.
 5. Run each built module with `java -Dspring.profiles.active=local
--javaagent:<project-dir>/backend/<module>/build/resources/main/applicationinsights-agent-3.0.0-PREVIEW.5.jar
+-javaagent:<project-dir>/backend/<module>/build/resources/main/applicationinsights-agent/applicationinsights-agent-3.0.0-PREVIEW.5.jar
 -jar <module>/build/libs/<module>-0.0.1-SNAPSHOT.jar` command. `<module>` is either `analytics` or `queues`.
 
 Here's an example of shared `${PROJECT_DIR}/.idea/runConfiguration/analytics__JAR_.xml` config exported with `msd365fp-mr-ai1`
@@ -137,7 +137,7 @@ and import it into your IDE.
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="analytics [JAR]" type="JarApplication">
     <option name="JAR_PATH" value="$PROJECT_DIR$/analytics/build/libs/analytics-0.0.1-SNAPSHOT.jar" />
-    <option name="VM_PARAMETERS" value="-javaagent:$PROJECT_DIR$/analytics/build/resources/main/applicationinsights-agent-3.0.0-PREVIEW.5.jar -Dserver.port=8081 -Dspring.profiles.active=local -Dspring.ansi.output.enabled=ALWAYS" />
+    <option name="VM_PARAMETERS" value="-javaagent:$PROJECT_DIR$/analytics/build/resources/main/applicationinsights-agent/applicationinsights-agent-3.0.0-PREVIEW.5.jar -Dserver.port=8081 -Dspring.profiles.active=local -Dspring.ansi.output.enabled=ALWAYS" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/analytics" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <envs>

@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "prefix": {
-            "value": "armbased-tst"
+            "value": "dfp-mr"
         },
         "subscriptionId": {
-            "value": "0cf0b616-8add-4f2e-b426-ff243e283635"
+            "value": "00000000-0000-0000-0000-000000000000"
         },
         "tenantId": {
-            "value": "74143e14-36bb-4cd2-bdb9-65d0f8b5b360"
+            "value": "00000000-0000-0000-0000-000000000000"
         },
         "envType": {
             "value": "Dev"
@@ -21,19 +21,19 @@
             "value": "eastus"
         },
         "throuhgputAnalyticsDb": {
-            "value": 1000
+            "value": 5000
         },
         "throuhgputQueuesDb": {
-            "value": 500
+            "value": 1500
         },
         "ehubMaximumThroughputUnits": {
-            "value": 1
+            "value": 8
         },
         "ehubNumPartitions": {
-            "value": 4
+            "value": 8
         },
         "dfphubNumPartitions": {
-            "value": 4
+            "value": 8
         },
         "cdnSku": {
             "value": "Standard_Microsoft"
@@ -60,7 +60,9 @@
             "value": "smtp.office365.com"
         },
         "alertReceivers": {
-            "value": []
+            "value": [
+                "dfp-mr-users@yourcompany.com"
+            ]
         },
         "NoIncomingEventsDfphubEvaluationFrequency": {
             "value": "PT1H"

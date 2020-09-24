@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /* eslint-disable max-classes-per-file */
 import { observable, computed } from 'mobx';
 import {

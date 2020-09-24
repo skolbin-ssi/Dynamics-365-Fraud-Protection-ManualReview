@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import { Spinner } from '@fluentui/react/lib/Spinner';
 
@@ -229,9 +232,13 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     }
 
     @autoBind
-    handleGoToLockedItemClick(queueId: string, itemId: string) {
-        this.history.push({ pathname: ROUTES.build.itemDetailsReviewConsole(queueId, itemId) });
-        this.reviewConsoleScreenStore.getItem(itemId, queueId);
+    handleGoToLockedItemClick(queueViewId: string, itemId: string) {
+        this.history.push({ pathname: ROUTES.build.itemDetailsReviewConsole(queueViewId, itemId) });
+        this.reviewConsoleScreenStore.getItem(itemId, queueViewId);
+
+        if (queueViewId !== this.reviewConsoleScreenStore.queue?.viewId) {
+            this.reviewConsoleScreenStore.getQueueData(queueViewId);
+        }
     }
 
     @autoBind
@@ -270,13 +277,15 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     renderStartReviewPanel() {
         const { queue, reviewItem } = this.reviewConsoleScreenStore;
         const permission = queue && this.reviewPermissionStore.queueReviewPermissions?.get(queue.viewId);
-        const itemReviewPermission = this.reviewPermissionStore.itemReviewPermissions(reviewItem);
+        const itemReviewPermission = this.reviewPermissionStore.itemReviewPermissions(reviewItem, queue);
         const isReviewAllowed = (permission ? permission.isAllowed : true) && itemReviewPermission.isAllowed;
-        let reasonToPreventReview: JSX.Element | string = permission?.reason || '';
+        let reasonToPreventReview: JSX.Element | string = permission?.reason || itemReviewPermission?.reason || '';
 
         if (reasonToPreventReview === QUEUE_REVIEW_PROHIBITION_REASONS.CANNOT_LOCK_TWO_ITEMS_ON_QUEUE) {
-            const lockedItemOnQueue = this.lockedItemsStore.lockedItems!.find(item => item.lockedOnQueueId === queue?.queueId);
-            const goToLockedItem = () => this.handleGoToLockedItemClick(lockedItemOnQueue!.lockedOnQueueId as string, lockedItemOnQueue!.id);
+            const lockedItemOnQueue = this.lockedItemsStore.lockedItems!
+                .find(item => item.lockedOnQueueViewId === queue?.viewId);
+            const goToLockedItem = () => this.handleGoToLockedItemClick(lockedItemOnQueue!.lockedOnQueueViewId as string, lockedItemOnQueue!.id);
+
             reasonToPreventReview = (
                 <>
                     <Text>
@@ -290,11 +299,11 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
             );
         }
 
-        if (itemReviewPermission.reason === ITEM_REVIEW_PROHIBITION_REASONS.ITEM_ON_HOLD_ON_OTHER_USER) {
+        if (reasonToPreventReview === ITEM_REVIEW_PROHIBITION_REASONS.ITEM_ON_HOLD_ON_OTHER_USER) {
             reasonToPreventReview = (
                 <>
                     <Text>
-                        { itemReviewPermission.reason }
+                        { reasonToPreventReview }
                     </Text>
                     <br />
                     However, you can&nbsp;
@@ -307,6 +316,28 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
                     >
                         <abbr title="start-review">start review</abbr>
                     </span>
+                </>
+            );
+        }
+
+        if (reasonToPreventReview === ITEM_REVIEW_PROHIBITION_REASONS.ITEM_IS_LOCKED_IN_ANOTHER_QUEUE) {
+            const goToLockedItem = () => this.handleGoToLockedItemClick(reviewItem!.lockedOnQueueViewId as string, reviewItem!.id);
+
+            const queueName = this.lockedItemsStore.itemLocks!
+                .find(({ item }) => reviewItem?.id === item.id)?.queue?.name;
+            reasonToPreventReview = queueName
+                ? `${reasonToPreventReview.replace('another queue', 'the queue')} "${queueName}"`
+                : reasonToPreventReview;
+
+            reasonToPreventReview = (
+                <>
+                    <Text>
+                        {reasonToPreventReview}
+                    </Text>
+                    <br />
+                    <DefaultButton iconProps={{ iconName: 'Forward' }} onClick={goToLockedItem} className={`${CN}__go-to-locked-item`}>
+                        Review it in the proper queue
+                    </DefaultButton>
                 </>
             );
         }

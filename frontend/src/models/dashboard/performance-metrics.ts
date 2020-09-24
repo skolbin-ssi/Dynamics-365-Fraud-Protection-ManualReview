@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { computed, observable } from 'mobx';
 
 import { PieDatum } from '@nivo/pie';
@@ -8,17 +11,17 @@ import { COLORS } from '../../styles/variables';
 export class PerformanceMetrics implements PerformanceMetricsDTO {
     @observable reviewed: number = 0;
 
-    @observable approved: number = 0;
+    @observable good: number = 0;
 
-    @observable rejected: number = 0;
+    @observable bad: number = 0;
 
     @observable watched: number = 0;
 
     @observable escalated: number = 0;
 
-    @observable approveOverturned: number = 0;
+    @observable goodOverturned: number = 0;
 
-    @observable rejectOverturned: number = 0;
+    @observable badOverturned: number = 0;
 
     hitRate: number = 0;
 
@@ -32,22 +35,22 @@ export class PerformanceMetrics implements PerformanceMetricsDTO {
 
     @computed
     get chartData(): PieDatum[] {
-        const { approved, rejected, watched } = this.getPieChartPerformanceMetricsInPercentages();
+        const { good, bad, watched } = this.getPieChartPerformanceMetricsInPercentages();
 
         return [
             {
-                id: 'Approve',
-                label: 'Approve',
-                value: this.approved,
-                color: COLORS.pieChart.approveColor,
-                percentage: approved,
+                id: 'Good',
+                label: 'Good',
+                value: this.good,
+                color: COLORS.pieChart.goodColor,
+                percentage: good,
             },
             {
-                id: 'Reject',
-                label: 'Reject',
-                value: this.rejected,
-                color: COLORS.pieChart.rejectColor,
-                percentage: rejected
+                id: 'Bad',
+                label: 'Bad',
+                value: this.bad,
+                color: COLORS.pieChart.badColor,
+                percentage: bad
             },
             {
                 id: 'Watch',
@@ -62,25 +65,25 @@ export class PerformanceMetrics implements PerformanceMetricsDTO {
     }
 
     private getPieChartPerformanceMetricsInPercentages() {
-        const total = this.approved + this.rejected + this.watched;
+        const total = this.good + this.bad + this.watched;
 
         const getPercent = (portion: number) => ((portion / total) * 100)
             .toFixed(1);
 
         return {
-            approved: getPercent(this.approved),
-            rejected: getPercent(this.rejected),
+            good: getPercent(this.good),
+            bad: getPercent(this.bad),
             watched: getPercent(this.watched)
         };
     }
 
     @computed
     get totalDecisionsReport() {
-        const { approved, rejected, watched } = this.getPieChartPerformanceMetricsInPercentages();
+        const { good, bad, watched } = this.getPieChartPerformanceMetricsInPercentages();
 
         return {
-            approved,
-            rejected,
+            good,
+            bad,
             watched
         };
     }

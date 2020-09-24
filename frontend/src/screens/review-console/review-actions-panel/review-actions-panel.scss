@@ -37,8 +37,8 @@ $gapSize: 32px;
     }
   }
 
-  &__approve-btn,
-  &__reject-btn {
+  &__good-btn,
+  &__bad-btn {
     cursor: pointer;
     width: 100%;
     border: none;
@@ -71,40 +71,40 @@ $gapSize: 32px;
     font-size: 1.4em;
   }
 
-  &__approve-btn {
-    background-color: $approveFill;
-    color: $approveColor;
+  &__good-btn {
+    background-color: $goodFill;
+    color: $goodColor;
     justify-self: end;
 
     &:hover {
-      background: $approveFillHover;
+      background: $goodFillHover;
     }
 
     &:active {
-      background: $approveFillActive;
+      background: $goodFillActive;
     }
   }
 
-  &__approve-btn &__btn-label-icon {
-    background-color: $approveColor;
+  &__good-btn &__btn-label-icon {
+    background-color: $goodColor;
   }
 
-  &__reject-btn {
-    background-color: $rejectFill;
-    color: $rejectColor;
+  &__bad-btn {
+    background-color: $badFill;
+    color: $badColor;
     justify-self: start;
 
     &:hover {
-      background: $rejectFillHover;
+      background: $badFillHover;
     }
 
     &:active {
-      background: $rejectFillActive;
+      background: $badFillActive;
     }
   }
 
-  &__reject-btn &__btn-label-icon {
-    background-color: $rejectColor;
+  &__bad-btn &__btn-label-icon {
+    background-color: $badColor;
   }
 
   &__hold-escalate-btn,

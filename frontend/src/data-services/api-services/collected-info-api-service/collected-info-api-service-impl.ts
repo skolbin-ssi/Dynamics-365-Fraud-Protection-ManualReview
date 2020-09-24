@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject } from 'inversify';
 
 import { BaseApiService } from '../../base-api-service';

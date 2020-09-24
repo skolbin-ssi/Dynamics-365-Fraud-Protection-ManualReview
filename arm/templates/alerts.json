@@ -83,6 +83,64 @@
         "NoIncomingEventsDfphubThreshold": {
             "type": "int",
             "defaultValue": 0
+        },
+        "metricalertTraceWarnSeverityEvaluationFrequency": {
+            "type": "string",
+            "defaultValue": "PT1M",
+            "allowedValues": [
+            "PT1M",
+            "PT5M",
+            "PT15M",
+            "PT30M",
+            "PT1H"
+            ]
+        },
+        "metricalertTraceWarnSeverityWindowSize": {
+            "type": "string",
+            "defaultValue": "PT5M",
+            "allowedValues": [
+            "PT1M",
+            "PT5M",
+            "PT15M",
+            "PT30M",
+            "PT1H",
+            "PT6H",
+            "PT12H",
+            "P1D"
+            ]
+        },
+        "metricalertTraceWarnSeverityThreshold": {
+            "type": "int",
+            "defaultValue": 100
+        },
+        "metricalertTraceErrorSeverityEvaluationFrequency": {
+            "type": "string",
+            "defaultValue": "PT1M",
+            "allowedValues": [
+            "PT1M",
+            "PT5M",
+            "PT15M",
+            "PT30M",
+            "PT1H"
+            ]
+        },
+        "metricalertTraceErrorSeverityWindowSize": {
+            "type": "string",
+            "defaultValue": "PT5M",
+            "allowedValues": [
+            "PT1M",
+            "PT5M",
+            "PT15M",
+            "PT30M",
+            "PT1H",
+            "PT6H",
+            "PT12H",
+            "P1D"
+            ]
+        },
+        "metricalertTraceErrorSeverityThreshold": {
+            "type": "int",
+            "defaultValue": 10
         }
     },
     "variables": {
@@ -122,7 +180,13 @@
         "scheduledqueryrulesTaskIdleTooLongName": "[concat(parameters('prefix'),'-task-idle-too-long-alert')]",
         "scheduledqueryrulesTaskIdleTooLongSecondaryName": "[concat(parameters('prefix'),'-secondary-task-idle-too-long-alert')]",
         "metricalertNoIncomingEventsDfphubName": "[concat(parameters('prefix'),'-no-incomeing-events-dfp-hub-alert')]",
-        "metricalertNoIncomingEventsDfphubSecondaryName": "[concat(parameters('prefix'),'-secondary-no-incomeing-events-dfp-hub-alert')]"
+        "metricalertNoIncomingEventsDfphubSecondaryName": "[concat(parameters('prefix'),'-secondary-no-incomeing-events-dfp-hub-alert')]",
+        "metricalertTraceWarnSeverityName": "[concat(parameters('prefix'),'-trace-severity-warn-alert')]",
+        "metricalertTraceWarnSeveritySecondaryName": "[concat(parameters('prefix'),'-secondary-trace-severity-warn-alert')]",
+        "metricalertTraceErrorSeverityName": "[concat(parameters('prefix'),'-trace-severity-error-alert')]",
+        "metricalertTraceErrorSeveritySecondaryName": "[concat(parameters('prefix'),'-secondary-trace-severity-error-alert')]",
+        "scheduledqueryrulesFatalErrorName": "[concat(parameters('prefix'),'-fatal-error-alert')]",
+        "scheduledqueryrulesFatalErrorSecondaryName": "[concat(parameters('prefix'),'-secondary-fatal-error-alert')]"
 
     },
     "resources": [
@@ -418,7 +482,7 @@
                     "queryType": "ResultCount"
                 },
                 "schedule": {
-                    "frequencyInMinutes": 15,
+                    "frequencyInMinutes": 10,
                     "timeWindowInMinutes": 30
                 },
                 "action": {
@@ -458,7 +522,7 @@
                     "queryType": "ResultCount"
                 },
                 "schedule": {
-                    "frequencyInMinutes": 15,
+                    "frequencyInMinutes": 10,
                     "timeWindowInMinutes": 30
                 },
                 "action": {
@@ -578,6 +642,276 @@
                         "webHookProperties": {}
                     }
                 ]
+            }
+        },
+        {                                                          // Alert for traces WARN level
+            "type": "microsoft.insights/metricalerts",
+            "apiVersion": "2018-03-01",
+            "name": "[variables('metricalertTraceWarnSeverityName')]",
+            "location": "global",
+            "dependsOn": [
+            ],
+            "properties": {
+                "description": "Number of traces with WARN severity is high",
+                "severity": 4,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.insights/components', parameters('appInsightName'))]"
+                ],
+                "evaluationFrequency": "[parameters('metricalertTraceWarnSeverityEvaluationFrequency')]",
+                "windowSize": "[parameters('metricalertTraceWarnSeverityWindowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "[parameters('metricalertTraceWarnSeverityThreshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricName": "traces/count",
+                            "dimensions": [
+                                {
+                                    "name": "trace/severityLevel",
+                                    "operator": "Include",
+                                    "values": [
+                                        "2"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Count",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Insights/components",
+                "targetResourceRegion": "[parameters('primaryRegion')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        },
+        {                                                          // Alert for traces WARN level SECONDARY REGION
+            "type": "microsoft.insights/metricalerts",
+            "apiVersion": "2018-03-01",
+            "name": "[variables('metricalertTraceWarnSeveritySecondaryName')]",
+            "location": "global",
+            "dependsOn": [
+            ],
+            "properties": {
+                "description": "Number of traces with WARN severity is high",
+                "severity": 4,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.insights/components', parameters('appInsightSecondaryName'))]"
+                ],
+                "evaluationFrequency": "[parameters('metricalertTraceWarnSeverityEvaluationFrequency')]",
+                "windowSize": "[parameters('metricalertTraceWarnSeverityWindowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "[parameters('metricalertTraceWarnSeverityThreshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricName": "traces/count",
+                            "dimensions": [
+                                {
+                                    "name": "trace/severityLevel",
+                                    "operator": "Include",
+                                    "values": [
+                                        "2"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Count",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Insights/components",
+                "targetResourceRegion": "[parameters('secondaryRegion')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        },
+        {                                                          // Alert for traces ERROR level
+            "type": "microsoft.insights/metricalerts",
+            "apiVersion": "2018-03-01",
+            "name": "[variables('metricalertTraceErrorSeverityName')]",
+            "location": "global",
+            "dependsOn": [
+            ],
+            "properties": {
+                "description": "Number of traces with ERROR severity is high",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.insights/components', parameters('appInsightName'))]"
+                ],
+                "evaluationFrequency": "[parameters('metricalertTraceErrorSeverityEvaluationFrequency')]",
+                "windowSize": "[parameters('metricalertTraceErrorSeverityWindowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "[parameters('metricalertTraceErrorSeverityThreshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricName": "traces/count",
+                            "dimensions": [
+                                {
+                                    "name": "trace/severityLevel",
+                                    "operator": "Include",
+                                    "values": [
+                                        "3"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Count",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Insights/components",
+                "targetResourceRegion": "[parameters('primaryRegion')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        },
+        {                                                          // Alert for traces ERROR level SECONDARY REGION
+            "type": "microsoft.insights/metricalerts",
+            "apiVersion": "2018-03-01",
+            "name": "[variables('metricalertTraceErrorSeveritySecondaryName')]",
+            "location": "global",
+            "dependsOn": [
+            ],
+            "properties": {
+                "description": "Number of traces with ERROR severity is high",
+                "severity": 3,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('microsoft.insights/components', parameters('appInsightSecondaryName'))]"
+                ],
+                "evaluationFrequency": "[parameters('metricalertTraceErrorSeverityEvaluationFrequency')]",
+                "windowSize": "[parameters('metricalertTraceErrorSeverityWindowSize')]",
+                "criteria": {
+                    "allOf": [
+                        {
+                            "threshold": "[parameters('metricalertTraceErrorSeverityThreshold')]",
+                            "name": "Metric1",
+                            "metricNamespace": "microsoft.insights/components",
+                            "metricName": "traces/count",
+                            "dimensions": [
+                                {
+                                    "name": "trace/severityLevel",
+                                    "operator": "Include",
+                                    "values": [
+                                        "3"
+                                    ]
+                                }
+                            ],
+                            "operator": "GreaterThan",
+                            "timeAggregation": "Count",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ],
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria"
+                },
+                "autoMitigate": true,
+                "targetResourceType": "Microsoft.Insights/components",
+                "targetResourceRegion": "[parameters('secondaryRegion')]",
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]",
+                        "webHookProperties": {}
+                    }
+                ]
+            }
+        },
+        {                                                     // Alert Fatal Error
+            "type": "microsoft.insights/scheduledqueryrules",
+            "apiVersion": "2018-04-16",
+            "name": "[variables('scheduledqueryrulesFatalErrorName')]",
+            "location": "[parameters('primaryRegion')]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "description": "Fatal error in backend application log",
+                "enabled": "true",
+                "source": {
+                    "query": "traces\n| where message contains \"fatal error\"",
+                    "authorizedResources": [],
+                    "dataSourceId": "[resourceId('microsoft.insights/components', parameters('appInsightName'))]",
+                    "queryType": "ResultCount"
+                },
+                "schedule": {
+                    "frequencyInMinutes": 10,
+                    "timeWindowInMinutes": 30
+                },
+                "action": {
+                    "severity": "3",
+                    "aznsAction": {
+                        "actionGroup": [
+                            "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
+                        ]
+                    },
+                    "trigger": {
+                        "thresholdOperator": "GreaterThan",
+                        "threshold": 0
+                    },
+                    "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+                }
+            }
+        },
+        {                                                     // Alert Fatal Error SECONDARY
+            "type": "microsoft.insights/scheduledqueryrules",
+            "apiVersion": "2018-04-16",
+            "name": "[variables('scheduledqueryrulesFatalErrorSecondaryName')]",
+            "location": "[parameters('secondaryRegion')]",
+            "dependsOn": [
+            ],
+            "properties": {
+                "description": "Fatal error in backend application log",
+                "enabled": "true",
+                "source": {
+                    "query": "traces\n| where message contains \"fatal error\"",
+                    "authorizedResources": [],
+                    "dataSourceId": "[resourceId('microsoft.insights/components', parameters('appInsightSecondaryName'))]",
+                    "queryType": "ResultCount"
+                },
+                "schedule": {
+                    "frequencyInMinutes": 10,
+                    "timeWindowInMinutes": 30
+                },
+                "action": {
+                    "severity": "3",
+                    "aznsAction": {
+                        "actionGroup": [
+                            "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
+                        ]
+                    },
+                    "trigger": {
+                        "thresholdOperator": "GreaterThan",
+                        "threshold": 0
+                    },
+                    "odata.type": "Microsoft.WindowsAzure.Management.Monitoring.Alerts.Models.Microsoft.AppInsights.Nexus.DataContracts.Resources.ScheduledQueryRules.AlertingAction"
+                }
             }
         }
     ]

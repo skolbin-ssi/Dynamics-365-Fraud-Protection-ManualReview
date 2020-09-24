@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import autoBind from 'autobind-decorator';
 import { observer } from 'mobx-react';
@@ -12,8 +15,8 @@ import { ShimmeredDetailsList } from '@fluentui/react/lib/ShimmeredDetailsList';
 import { AnalystPerformance, BasicEntityPerformance } from '../../../models/dashboard';
 import {
     DEFAULT_DATA_LIST_SHIMMER_LINES_NUMBER,
-    OVERTURNED_DISPLAY_LABELS,
-    OVERTURNED_LABELS
+    OVERTURN_DISPLAY_LABELS,
+    OVERTURN_LABELS
 } from '../../../constants';
 
 import './accuracy-data-table.scss';
@@ -43,117 +46,117 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
 
         },
         {
-            key: 'approve-applied',
-            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.GOOD],
+            key: 'good-decisions-applied',
+            name: OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.GOOD],
             minWidth: 90,
             maxWidth: 90,
             className: `${CN}__right-aligned-cell`,
-            onRender: ({ approvedApplied }) => (
+            onRender: ({ goodApplied }: BasicEntityPerformance) => (
                 <div className={`${CN}__content-row`}>
                     <Text variant="medium" className={`${CN}__score-cell`}>
-                        {approvedApplied}
+                        {goodApplied}
                     </Text>
                 </div>
             ),
         },
         {
-            key: 'approved-overturned',
-            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.OVERTURNED_GOOD],
+            key: 'overturned-good-decisions',
+            name: OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.OVERTURNED_GOOD],
             minWidth: 90,
             maxWidth: 90,
             className: `${CN}__right-aligned-cell`,
-            onRender: ({ approvedOverturned }) => (
+            onRender: ({ goodOverturned }: BasicEntityPerformance) => (
                 <div className={`${CN}__content-row`}>
                     <Text variant="medium" className={`${CN}__score-cell`}>
-                        {approvedOverturned}
+                        {goodOverturned}
                     </Text>
                 </div>
             ),
         },
         {
-            key: 'approve-accuracy',
-            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.RATE_OVERTURNED_GOOD],
+            key: 'good-decision-overturn-rate',
+            name: OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.GOOD_DECISION_OVERTURN_RATE],
             minWidth: 110,
             maxWidth: 110,
             className: `${CN}__right-aligned-cell`,
-            onRender: ({ approvedAccuracy }) => (
+            onRender: ({ goodOverturnRate }: BasicEntityPerformance) => (
                 <div className={`${CN}__content-row`}>
                     <Text
                         variant="medium"
                         className={cx(
                             `${CN}__score-cell`,
-                            this.getColorClassName(approvedAccuracy)
+                            this.getColorClassName(goodOverturnRate)
                         )}
                     >
-                        {approvedAccuracy}
+                        {goodOverturnRate}
                         %
                     </Text>
                 </div>
             ),
         },
         {
-            key: 'rejected-applied',
-            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.BAD],
+            key: 'bad-decisions-applied',
+            name: OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.BAD],
             minWidth: 80,
             maxWidth: 80,
             className: `${CN}__right-aligned-cell`,
-            onRender: ({ rejectedApplied }) => (
+            onRender: ({ badApplied }: BasicEntityPerformance) => (
                 <div className={`${CN}__content-row`}>
                     <Text variant="medium" className={`${CN}__score-cell`}>
-                        {rejectedApplied}
+                        {badApplied}
                     </Text>
                 </div>
             ),
         }, {
-            key: 'rejected-overturned',
-            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.OVERTURNED_BAD],
+            key: 'overturned-bad-decisions',
+            name: OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.OVERTURNED_BAD],
             minWidth: 80,
             maxWidth: 80,
             className: `${CN}__right-aligned-cell`,
-            onRender: ({ rejectedOverturned }) => (
+            onRender: ({ badOverturned }: BasicEntityPerformance) => (
                 <div className={`${CN}__content-row`}>
                     <Text variant="medium" className={`${CN}__score-cell`}>
-                        {rejectedOverturned}
+                        {badOverturned}
                     </Text>
                 </div>
             ),
         }, {
-            key: 'rejected-accuracy',
-            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.RATE_OVERTURNED_BAD],
+            key: 'bad-decision-overturn-rate',
+            name: OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.BAD_DECISION_OVERTURN_RATE],
             minWidth: 110,
             maxWidth: 110,
             className: `${CN}__right-aligned-cell`,
-            onRender: ({ rejectedAccuracy }) => (
+            onRender: ({ badOverturnRate }: BasicEntityPerformance) => (
                 <div className={`${CN}__content-row`}>
                     <Text
                         variant="medium"
                         className={
                             cx(`${CN}__score-cell`,
-                                this.getColorClassName(rejectedAccuracy))
+                                this.getColorClassName(badOverturnRate))
                         }
                     >
-                        {rejectedAccuracy}
+                        {badOverturnRate}
                         %
                     </Text>
                 </div>
             ),
         }, {
-            key: 'accuracy-average-rate',
-            name: OVERTURNED_DISPLAY_LABELS[OVERTURNED_LABELS.RATE_AVERAGE_OVERTURNED],
+            key: 'average-overturn-rate',
+            name: OVERTURN_DISPLAY_LABELS[OVERTURN_LABELS.AVERAGE_OVERTURN_RATE],
             minWidth: 110,
             maxWidth: 110,
             className: `${CN}__right-aligned-cell ${CN}__accuracy-sorting-arrow`,
-            onRender: ({ accuracyAverage }) => (
+            onRender: ({ averageOverturnRate }: BasicEntityPerformance) => (
                 <div className={`${CN}__content-row`}>
                     <Text
                         variant="medium"
                         className={cx(
                             `${CN}__score-cell`,
-                            `${CN}__approve-column-text`,
-                            this.getColorClassName(accuracyAverage)
+                            `${CN}__good-column-text`,
+                            this.getColorClassName(averageOverturnRate)
                         )}
                     >
-                        {accuracyAverage}
+                        {averageOverturnRate}
                         %
                     </Text>
                 </div>

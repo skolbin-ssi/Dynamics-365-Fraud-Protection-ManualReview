@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { SEVERITY } from '../logger';
 
 export interface Configuration {

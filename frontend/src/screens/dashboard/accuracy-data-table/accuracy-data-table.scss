@@ -1,7 +1,7 @@
 @import "../../../styles/variables";
 
 .accuracy-data-table {
-  max-width: 1328px;
+  max-width: $maxTableSwitchWidth;
   position: relative;
 
   .ms-DetailsHeader {
@@ -46,7 +46,7 @@
     color: $black;
 
     &--low {
-      color: $highScoreColor;
+      color: $lowScoreColor;
     }
 
     &--medium-low {
@@ -58,7 +58,7 @@
     }
 
     &--high {
-      color: $lowScoreColor;
+      color: $highScoreColor;
     }
   }
 
@@ -106,7 +106,7 @@
     color: #201f1e;
   }
 
-  &__approve-column-text {
+  &__good-column-text {
     font-weight: bold;
   }
 }

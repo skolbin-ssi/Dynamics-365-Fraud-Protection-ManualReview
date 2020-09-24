@@ -3,9 +3,13 @@
 .dashboard-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 0 32px ;
   box-shadow: inset 0px -1px 0px #{$neutralLight};
+
+  &--aligned {
+    justify-content: space-between;
+  }
 
   &__search {
     display: flex;
@@ -18,12 +22,12 @@
 
   &__date-selection {
     display: flex;
-    width: 440px;
+    width: 465px;
     justify-content: space-between;
   }
 
   &__dropdown, &__date-picker {
-    width: 144px;
+    width: 150px;
     border-radius: 2px;
   }
 

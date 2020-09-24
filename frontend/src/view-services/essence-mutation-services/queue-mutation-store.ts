@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import { action, computed, observable } from 'mobx';
 import {
@@ -81,7 +84,7 @@ export class QueueMutationStore {
      */
     @observable fields: CreateEditQueueModalFields = {
         name: '',
-        labels: [LABEL.ACCEPT, LABEL.REJECT],
+        labels: [LABEL.GOOD, LABEL.BAD],
         sortingLocked: false,
         sortBy: SORTING_FIELD.IMPORT_DATE,
         sortDirection: SORTING_ORDER.ASC,
@@ -135,7 +138,7 @@ export class QueueMutationStore {
     /**
      * We cannot unset processing deadline if it was set before
      */
-    @computed get blockDisableProcessingDeadline() {
+    @computed get blockDisablingProcessingDeadline() {
         return this.mutationType === QUEUE_MUTATION_TYPES.UPDATE
             && this.isInitialDeadlineSet;
     }
@@ -167,13 +170,13 @@ export class QueueMutationStore {
                 /**
                  * The label is blocked, if:
                  * ALL LABELS: it's an EDIT dialog
-                 * APPROVE, REJECT: always, as they're mandatory
+                 * GOOD, BAD: always, as they're mandatory
                  * HOLD - if no ESCALATE is selected
                  */
                 if (
                     isEditDialog
-                    || labels.includes(LABEL.ACCEPT)
-                    || labels.includes(LABEL.REJECT)
+                    || labels.includes(LABEL.GOOD)
+                    || labels.includes(LABEL.BAD)
                     || (labels.includes(LABEL.HOLD) && !this.fields.labels.includes(LABEL.ESCALATE))
                 ) {
                     isDisabled = true;
@@ -406,15 +409,16 @@ export class QueueMutationStore {
     async updateQueueAndUpdateQueueInList(queueToUpdate: QueueToUpdate) {
         const { viewId } = queueToUpdate;
         let queueMutationResult;
-        let updatedQueue;
         try {
             queueMutationResult = await this.queueService.updateQueue(queueToUpdate);
-            updatedQueue = await this.queueStore.loadSingleQueue(viewId, true);
         } catch (e) {
             // to handle validation errors from backend
             return e;
         }
-        this.queueScreenStore.markQueueAsSelectedAndLoadItems(updatedQueue);
+
+        this.queueScreenStore.refreshQueueAndLockedItems(viewId);
+        this.queueStore.markQueueAsSelectedById(viewId);
+
         return queueMutationResult;
     }
 
@@ -537,10 +541,11 @@ export class QueueMutationStore {
             const queueForSettings = await this.queueStore.loadSingleQueue(queue.queueId);
 
             this.initialQueue = queueForSettings;
+            // we shouldn't take viewId from the response as it has viewId === queueId in this case
+            this.viewId = queue.viewId;
 
             const {
                 queueId,
-                viewId,
                 name,
                 allowedLabels,
                 sortBy,
@@ -567,7 +572,6 @@ export class QueueMutationStore {
             this.fields.filters = filters;
 
             this.queueId = queueId;
-            this.viewId = viewId;
             this.isResidual = residual;
             this.forEscalation = forEscalations;
         } finally {

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { PurchaseStatusDTO } from './purchase-status-dto';
 
 export interface AssessmentResultDTO {

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { injectable, inject } from 'inversify';
 import { action, observable, computed } from 'mobx';
 import { TYPES } from '../types';

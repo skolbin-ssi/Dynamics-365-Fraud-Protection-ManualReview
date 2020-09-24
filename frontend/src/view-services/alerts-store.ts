@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import { action, observable } from 'mobx';
 import { ALERT_MUTATION_TYPE } from '../constants';

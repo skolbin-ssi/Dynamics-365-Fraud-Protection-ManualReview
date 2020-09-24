@@ -1,8 +1,9 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.config;
 
-import com.griddynamics.msd365fp.manualreview.analytics.model.dto.LabelEventDTO;
 import com.griddynamics.msd365fp.manualreview.analytics.model.dto.PurchaseStatusDTO;
-import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.ItemLabelActivityEntity;
 import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.ItemLockActivityEntity;
 import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.QueueSizeCalculationActivityEntity;
 import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.Resolution;
@@ -29,9 +30,7 @@ public class ModelMapperConfig {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setSkipNullEnabled(true);
-        addResolutionToLabelEventConverter(modelMapper);
         addResolutionToPurchaseStatusConverter(modelMapper);
-        addItemLabelToItemLabelActivityEntityConverter(modelMapper);
         addItemLockEventToLockActivityEntryConverter(modelMapper);
         addQueueSizeUpdateEventToQueueSizeCalculationActivityEntityConverter(modelMapper);
         addOverallSizeUpdateEventToQueueSizeCalculationActivityEntityConverter(modelMapper);
@@ -79,19 +78,6 @@ public class ModelMapperConfig {
         });
     }
 
-    private void addItemLabelToItemLabelActivityEntityConverter(ModelMapper modelMapper) {
-        TypeMap<ItemLabel, ItemLabelActivityEntity> typeMap = modelMapper.addMappings(new PropertyMap<ItemLabel, ItemLabelActivityEntity>() {
-            @Override
-            protected void configure() {
-                skip(destination.getId());
-            }
-        });
-        Converter<Label, String> merchantRuleDecisionConverter = ctx -> mapStatusType(ctx.getSource());
-        typeMap.addMappings(mapper -> mapper.map(ItemLabel::getAuthorId, ItemLabelActivityEntity::setAnalystId));
-        typeMap.addMappings(mapper -> mapper.map(ItemLabel::getValue, ItemLabelActivityEntity::setLabel));
-        typeMap.addMappings(mapper -> mapper.using(merchantRuleDecisionConverter).map(ItemLabel::getValue, ItemLabelActivityEntity::setMerchantRuleDecision));
-    }
-
     private void addResolutionToPurchaseStatusConverter(ModelMapper modelMapper) {
         TypeMap<Resolution, PurchaseStatusDTO> typeMap = modelMapper.createTypeMap(Resolution.class, PurchaseStatusDTO.class);
         Converter<ItemLabel, String> reasonConverter = ctx -> mapReason(ctx.getSource());
@@ -102,15 +88,6 @@ public class ModelMapperConfig {
         });
         typeMap.addMappings(mapper -> mapper.map(Resolution::getId, PurchaseStatusDTO::setPurchaseId));
         typeMap.addMappings(mapper -> mapper.map(r -> r.getLabel().getLabeled(), PurchaseStatusDTO::setStatusDate));
-    }
-
-    private void addResolutionToLabelEventConverter(ModelMapper modelMapper) {
-        TypeMap<Resolution, LabelEventDTO> typeMap = modelMapper.createTypeMap(Resolution.class, LabelEventDTO.class);
-        typeMap.addMappings(mapper -> mapper.map(Resolution::getId, LabelEventDTO::setLabelObjectId));
-        Converter<ItemLabel, String> labelStateConverter = ctx -> mapLabelState(ctx.getSource());
-        typeMap.addMappings(mapper -> mapper.using(labelStateConverter).map(Resolution::getLabel, LabelEventDTO::setLabelState));
-        typeMap.addMappings(mapper -> mapper.map(Resolution::getImported, LabelEventDTO::setEffectiveStartDate));
-        typeMap.addMappings(mapper -> mapper.map(r -> r.getLabel().getLabeled(), LabelEventDTO::setEffectiveEndDate));
     }
 
     private String mapQueueSizeUpdateEventId(OverallSizeUpdateEvent event) {
@@ -131,9 +108,9 @@ public class ModelMapperConfig {
 
     private String mapReason(ItemLabel value) {
         switch (value.getValue()) {
-            case ACCEPT:
+            case GOOD:
                 return "OfflineManualReview_General";
-            case REJECT:
+            case BAD:
                 return "OfflineManualReview_Fraud";
             case WATCH_NA:
                 return "ManualReview_WatchNA";
@@ -146,27 +123,15 @@ public class ModelMapperConfig {
 
     private String mapStatusType(Label value) {
         switch (value) {
-            case ACCEPT:
+            case GOOD:
             case WATCH_NA:
             case WATCH_INCONCLUSIVE:
                 return "Approved";
-            case REJECT:
+            case BAD:
                 return "Rejected";
             default:
                 return null;
         }
     }
 
-    private String mapLabelState(ItemLabel value) {
-        switch (value.getValue()) {
-            case ACCEPT:
-            case WATCH_NA:
-            case WATCH_INCONCLUSIVE:
-                return "Accepted";
-            case REJECT:
-                return "Fraud";
-            default:
-                return null;
-        }
-    }
 }

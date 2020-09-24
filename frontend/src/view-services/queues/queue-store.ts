@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import { action, computed, observable } from 'mobx';
 import { QueueService } from '../../data-services';
@@ -143,7 +146,7 @@ export class QueueStore {
             this.refreshingQueueIds.push(queueViewId);
         }
         const updatedQueue = await this.queueService.getQueue(queueViewId);
-        this.refreshingQueueIds = this.refreshingQueueIds.filter(id => id !== queueViewId);
+        this.refreshingQueueIds = this.refreshingQueueIds.filter(viewId => viewId !== queueViewId);
 
         // updates selected queue details in the list
         if (this.queues) {
@@ -186,7 +189,7 @@ export class QueueStore {
         const escalatedQueueToSelect = this.escalatedQueues?.find(({ viewId }) => viewId === queueViewId);
         let queueToSelect = regularQueueToSelect || escalatedQueueToSelect || null;
 
-        // TODO: probably 404 instaed of this fallback to select first
+        // TODO: probably 404 instead of this fallback to select first
         if (!queueToSelect) {
             const [firstQueue] = this.queues;
             queueToSelect = firstQueue;

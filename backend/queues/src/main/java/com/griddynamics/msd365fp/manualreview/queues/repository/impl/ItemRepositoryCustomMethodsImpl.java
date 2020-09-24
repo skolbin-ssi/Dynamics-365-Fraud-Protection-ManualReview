@@ -1,27 +1,29 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.repository.impl;
 
 import com.azure.data.cosmos.CosmosItemProperties;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.ExtendedCosmosContainer;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
-import com.griddynamics.msd365fp.manualreview.queues.model.ItemFilter;
-import com.griddynamics.msd365fp.manualreview.queues.model.ItemQuery;
-import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewType;
+import com.griddynamics.msd365fp.manualreview.queues.model.*;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepositoryCustomMethods;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.*;
+import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.TOP_ELEMENT_IN_CONTAINER_CONTINUATION;
+import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.TOP_ELEMENT_IN_CONTAINER_PAGE_SIZE;
 
 /**
  * Custom queries implementation.
@@ -255,38 +257,16 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
     }
 
     @Override
-    public Set<String> findAllByFilterField(ItemFilter.FilterField field) {
-        String path = field.getPath();
-        String query = "SELECT i%s as prop FROM i";
-        if (path.contains("[]")) {
-            String[] splittedPath = path.split("\\[]");
-            String collectionName = splittedPath[0];
-            String property = "";
-            if (splittedPath.length > 1) {
-                property = splittedPath[1].substring(1); // removing first dot
-            }
-            query = String.format(query + " IN c.%s", "." + property, collectionName);
-        } else {
-            query = String.format(query, "." + path);
-        }
-        return new HashSet<>(executeQueryForField(query));
+    public Set<String> findFilterSamples(
+            @NonNull final ItemDataField field,
+            @Nullable final OffsetDateTime enrichedAfter) {
+        return ItemQuery.constructor("i")
+                .filterFieldIsDefined(field)
+                .and().enrichedAfter(enrichedAfter)
+                .constructSampleExecutor(itemsContainer, field)
+                .execute();
     }
 
-    private List<String> executeQueryForField(String query) {
-        String continuationToken = null;
-        List<String> items = new ArrayList<>();
-        do {
-            ExtendedCosmosContainer.Page res =
-                    itemsContainer.runCrossPartitionPageableQuery(query, DEFAULT_QUEUE_PAGE_SIZE, continuationToken);
-            continuationToken = res.getContinuationToken();
-            items.addAll(res.getContent()
-                    // TODO: add support for non-string properties
-                    .map(i -> i.getString("prop"))
-                    .filter(Strings::isNotBlank)
-                    .collect(Collectors.toList()));
-        } while (continuationToken != null);
-        return items;
-    }
 
     @Override
     public Map<String, Long> countLockedItemsPerQueues(Collection<String> queueIds) {
@@ -350,4 +330,34 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
                 .execute(size, continuationToken);
     }
 
+    @Override
+    public Stream<Bucket> getRiskScoreDistribution(final int bucketSize,
+                                                   final String queueId) {
+        return itemsContainer.runCrossPartitionQuery(
+                String.format(
+                        "SELECT VALUE root FROM ( "
+                                + "SELECT "
+                                + "    temp.risk_score_bucket * %1$s as lowerBound, "
+                                + "    Count(1) as count "
+                                + "FROM ("
+                                + "SELECT "
+                                + "    udf.getBucketNumber(c.assessmentResult.RiskScore,%1$s) as risk_score_bucket "
+                                + "FROM c "
+                                + "WHERE "
+                                + "    c.active "
+                                + "    AND IS_DEFINED(c.assessmentResult.RiskScore) "
+                                + "    AND NOT IS_NULL(c.assessmentResult.RiskScore) "
+                                + "    %2$s "
+                                + ") AS temp "
+                                + "GROUP BY temp.risk_score_bucket "
+                                + ") AS root",
+                        bucketSize,
+                        StringUtils.isEmpty(queueId) ? "" :
+                                String.format("AND ARRAY_CONTAINS(c.queueIds, '%1$s')", queueId)
+                )
+        )
+                .map(cip -> itemsContainer.castCosmosObjectToClassInstance(cip.toJson(), Bucket.class))
+                .filter(Optional::isPresent)
+                .map(Optional::get);
+    }
 }

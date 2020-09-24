@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { BankEventDTO } from '../../../data-services/api-services/models/bank-event-dto';
 
 export class BankEvent {

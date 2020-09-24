@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { History } from 'history';
 import { Container } from 'inversify';
 import React from 'react';

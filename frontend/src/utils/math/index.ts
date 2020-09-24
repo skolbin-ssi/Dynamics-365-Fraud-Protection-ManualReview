@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { roundNumberToDigit } from './round-number-to-digit';
 
 export * from './distance-convertion';

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { injectable } from 'inversify';
 import { action, computed, observable } from 'mobx';
 import { CreateQueueModalTabs, QUEUE_MUTATION_TYPES } from '../constants';

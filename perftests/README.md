@@ -52,8 +52,8 @@ Instantiate virtual machine where the tests will be running:
 ### Create Users for Tests
 
 To create users for perfomance testing, first you will need to read this 
-[section](https://docs.google.com/document/d/1we5YZDPwda8MTp-6FHqsfEwEfzBZi_Wi3AeLrfzcaug/edit#heading=h.tlh7rl7b6vua) 
-of technical specification. In the [MR access](https://docs.google.com/document/d/1we5YZDPwda8MTp-6FHqsfEwEfzBZi_Wi3AeLrfzcaug/edit#heading=h.cn9kcybosyyr)
+[Permissions for users](https://microsoft.sharepoint.com/:w:/r/teams/LinkedInMRTool/Shared%20Documents/General/Engineering/Manual%20Review%20tool%20-%20Technical%20Specification.docx?d=w90393e00ea5446dea32f0dc310ed08f9&csf=1&web=1&e=xngeEm) 
+of technical specification. In the [MR access](https://microsoft.sharepoint.com/:w:/r/teams/LinkedInMRTool/Shared%20Documents/General/Engineering/Manual%20Review%20tool%20-%20Technical%20Specification.docx?d=w90393e00ea5446dea32f0dc310ed08f9&csf=1&web=1&e=xngeEm)
 section you will find the instruction on how to create a user in DFP. You will need three users with different roles. Each role has approptiate
 simulations to run, for example, dashboards are only accessible by senior analysts and managers, so regular analyst won't be able to test them.
 
@@ -63,6 +63,5 @@ you need.
 
 ### Additional Links
 
-Jira Epic: https://griddynamics.atlassian.net/browse/MDMR-454
 Gatling Documentation: https://gatling.io/docs/current/general/
 Gatling Gradle plugin: https://github.com/lkishalmi/gradle-gatling-plugin

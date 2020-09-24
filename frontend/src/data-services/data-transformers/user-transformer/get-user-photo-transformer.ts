@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { GetUserPhotoResponse } from '../../api-services/user-api-service/api-models';
 import { ApiServiceResponse } from '../../base-api-service';
 import { DataTransformer } from '../../data-transformer';

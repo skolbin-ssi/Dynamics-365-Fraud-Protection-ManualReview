@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { GetConfigurationResponse } from '../../data-services/api-services/configuration/api-models';
 import { SEVERITY } from '../logger';
 import { ConfigAuthentication, ConfigMaps, Configuration } from './configuration';

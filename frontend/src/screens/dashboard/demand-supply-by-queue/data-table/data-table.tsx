@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React from 'react';
 import cx from 'classnames';
 
@@ -5,7 +8,7 @@ import { Text } from '@fluentui/react/lib/Text';
 import { Facepile } from '@fluentui/react/lib/Facepile';
 import { PersonaSize } from '@fluentui/react/lib/Persona';
 import { ShimmeredDetailsList } from '@fluentui/react/lib/ShimmeredDetailsList';
-import { DetailsListLayoutMode, SelectionMode, IColumn } from '@fluentui/react/lib/DetailsList';
+import { SelectionMode, IColumn } from '@fluentui/react/lib/DetailsList';
 import { FontIcon } from '@fluentui/react/lib/Icon';
 import { TooltipHost } from '@fluentui/react/lib/Tooltip';
 
@@ -48,8 +51,7 @@ export class DataTable<T extends Item> extends React.Component<DataTableProps<T>
         {
             key: 'order-id',
             name: 'Order ID',
-            minWidth: 280,
-            maxWidth: 280,
+            minWidth: 100,
             headerClassName: `${CN}__data-header-cell`,
             onRender: (item: Item) => {
                 const { onClickCallback } = this.props;
@@ -137,8 +139,8 @@ export class DataTable<T extends Item> extends React.Component<DataTableProps<T>
         {
             key: 'analyst',
             name: 'Analyst',
-            minWidth: 50,
-            maxWidth: 50,
+            minWidth: 80,
+            maxWidth: 80,
             headerClassName: cx(`${CN}__data-header-cell`, `${CN}__analysts-header-cell`),
             className: `${CN}__analysts-col`,
             onRender: (item: Item) => {
@@ -212,10 +214,10 @@ export class DataTable<T extends Item> extends React.Component<DataTableProps<T>
     render() {
         const { data } = this.props;
         return (
+
             <div className={`${CN}__table-wrap`}>
                 <ShimmeredDetailsList
                     enableShimmer={!data}
-                    layoutMode={DetailsListLayoutMode.justified}
                     className={`${CN}__table`}
                     selectionMode={SelectionMode.none}
                     columns={this.columns}

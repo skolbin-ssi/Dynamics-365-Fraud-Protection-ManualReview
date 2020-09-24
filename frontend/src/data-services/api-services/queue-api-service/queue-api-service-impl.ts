@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import { QUEUE_VIEW_TYPE } from '../../../constants';
 import { TYPES } from '../../../types';

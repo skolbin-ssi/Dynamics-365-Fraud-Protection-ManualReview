@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import { computed } from 'mobx';
 import { ROLE } from '../constants';
@@ -15,7 +18,8 @@ export enum QUEUE_REVIEW_PROHIBITION_REASONS {
 }
 
 export enum ITEM_REVIEW_PROHIBITION_REASONS {
-    ITEM_ON_HOLD_ON_OTHER_USER = 'You cannot review an item that was put on hold by other user'
+    ITEM_ON_HOLD_ON_OTHER_USER = 'You cannot review an item that was put on hold by other user',
+    ITEM_IS_LOCKED_IN_ANOTHER_QUEUE = 'This item is locked in another queue'
 }
 
 interface ReviewPermission {
@@ -83,7 +87,7 @@ export class ReviewPermissionStore {
         return new Map();
     }
 
-    itemReviewPermissions(item: Item | null): ItemReviewPermission {
+    itemReviewPermissions(item: Item | null, queue: Queue | null): ItemReviewPermission {
         const { user } = this.currentUserStore;
 
         if (
@@ -95,6 +99,18 @@ export class ReviewPermissionStore {
             return {
                 isAllowed: false,
                 reason: ITEM_REVIEW_PROHIBITION_REASONS.ITEM_ON_HOLD_ON_OTHER_USER
+            };
+        }
+
+        if (
+            item
+            && item.lockedOnQueueViewId
+            && queue
+            && item.lockedOnQueueViewId !== queue.viewId
+        ) {
+            return {
+                isAllowed: false,
+                reason: ITEM_REVIEW_PROHIBITION_REASONS.ITEM_IS_LOCKED_IN_ANOTHER_QUEUE
             };
         }
 

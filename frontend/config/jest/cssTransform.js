@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 'use strict';
 
 // This is a custom Jest transformer turning style imports into empty objects.

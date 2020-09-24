@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.validation;
 
 import com.griddynamics.msd365fp.manualreview.model.Label;
@@ -13,7 +16,7 @@ public class LabelSetValidator implements ConstraintValidator<ValidLabelSet, Set
         if (labels.contains(Label.HOLD) && !labels.contains(Label.ESCALATE)) {
             return false;
         }
-        return labels.contains(Label.ACCEPT) && labels.contains(Label.REJECT);
+        return labels.contains(Label.GOOD) && labels.contains(Label.BAD);
     }
 
 }

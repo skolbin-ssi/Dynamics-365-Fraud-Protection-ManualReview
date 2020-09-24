@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { BaseCollectedInfoTransformer } from './base-collected-info-transformer';
 import { DataTransformer } from '../../data-transformer';
 import {

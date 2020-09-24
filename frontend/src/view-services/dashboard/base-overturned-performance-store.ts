@@ -1,25 +1,52 @@
-import { computed, toJS } from 'mobx';
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
+import { action, computed, toJS } from 'mobx';
 
 import { BasePerformanceStore } from './base-performance-store';
 
 import { BasicEntityPerformance } from '../../models/dashboard';
 import { PeriodPerformanceMetrics } from '../../data-services/api-services/models/dashboard';
-import { isoStringToLocalMothDayFormat } from '../../utils/date';
+import { formatToLocaleMonthDayFormat } from '../../utils/date';
 import { calculatePercentageRatio } from '../../utils/math';
-import { OVERTURNED_CHART_KEYS, OVERTURNED_CHART_REPORT_KEYS, PERFORMANCE_RATING_TO_NUMBER } from '../../constants';
+import { OVERTURN_CHART_KEYS, OVERTURN_CHART_REPORT_KEYS, PERFORMANCE_RATING_TO_NUMBER } from '../../constants';
 import { Report } from '../../models/misc';
 import { formatMetricToPercentageString } from '../../utils/text';
+import { PerformanceParsedQueryUrl } from '../../utility-services';
 
 export interface AccuracyChartDatum {
     originalDate: string,
-    approveUnmatched: number;
-    approveMatched: number;
-    rejectUnmatched: number;
-    rejectMatched: number;
+    good: number;
+    overturnedGood: number;
+    bad: number;
+    overturnedBad: number;
     key: string
 }
 
 export class BaseOverturnedPerformanceStore<T extends BasicEntityPerformance> extends BasePerformanceStore<T> {
+    /**
+     *  Set initial values for the store, when page has mounted
+     *  and URL parameters are in the URL
+     *
+     * @param parsedQuery - parsed URL params
+     */
+    @action
+    setParsedUrlParams(parsedQuery: PerformanceParsedQueryUrl) {
+        const { overturnedAggregation, overturnedRating, overturnedIds } = parsedQuery;
+
+        if (overturnedIds) {
+            this.setUrlSelectedIds(overturnedIds);
+        }
+
+        if (overturnedAggregation) {
+            this.setAggregation(overturnedAggregation);
+        }
+
+        if (overturnedRating) {
+            this.setRating(overturnedRating);
+        }
+    }
+
     @computed
     get getPerformanceData() {
         const quantity = PERFORMANCE_RATING_TO_NUMBER.get(this.rating);
@@ -60,32 +87,32 @@ export class BaseOverturnedPerformanceStore<T extends BasicEntityPerformance> ex
                         const currentAnalystData = analystData[date];
 
                         return {
-                            approved: aggregationResult.approved + currentAnalystData.approved,
-                            rejected: aggregationResult.rejected + currentAnalystData.rejected,
+                            good: aggregationResult.good + currentAnalystData.good,
+                            bad: aggregationResult.bad + currentAnalystData.bad,
                             watched: aggregationResult.watched + currentAnalystData.watched,
-                            approveOverturned: aggregationResult.approveOverturned + currentAnalystData.approveOverturned,
-                            rejectOverturned: aggregationResult.rejectOverturned + currentAnalystData.rejectOverturned,
+                            goodOverturned: aggregationResult.goodOverturned + currentAnalystData.goodOverturned,
+                            badOverturned: aggregationResult.badOverturned + currentAnalystData.badOverturned,
                         };
                     }, {
-                        approved: 0,
-                        rejected: 0,
+                        good: 0,
+                        bad: 0,
                         watched: 0,
-                        approveOverturned: 0,
-                        rejectOverturned: 0,
+                        goodOverturned: 0,
+                        badOverturned: 0,
                     });
 
                 const {
-                    approved, rejected, watched, approveOverturned, rejectOverturned
+                    good, bad, watched, goodOverturned, badOverturned
                 } = aggregationData;
 
-                const total = approved + rejected + watched;
+                const total = good + bad + watched;
 
                 const barData: AccuracyChartDatum = {
-                    key: isoStringToLocalMothDayFormat(date),
-                    approveUnmatched: calculatePercentageRatio(approveOverturned, total, 0),
-                    approveMatched: calculatePercentageRatio((approved + watched - approveOverturned), total, 0),
-                    rejectUnmatched: -calculatePercentageRatio(rejectOverturned, total, 0),
-                    rejectMatched: -calculatePercentageRatio((rejected - rejectOverturned), total, 0),
+                    key: formatToLocaleMonthDayFormat(date),
+                    overturnedGood: calculatePercentageRatio(goodOverturned, total, 0),
+                    good: calculatePercentageRatio((good + watched - goodOverturned), total, 0),
+                    overturnedBad: -calculatePercentageRatio(badOverturned, total, 0),
+                    bad: -calculatePercentageRatio((bad - badOverturned), total, 0),
                     originalDate: date
                 };
 
@@ -107,14 +134,14 @@ export class BaseOverturnedPerformanceStore<T extends BasicEntityPerformance> ex
 
                 return {
                     date: accuracyChartDatum.originalDate,
-                    [OVERTURNED_CHART_REPORT_KEYS[OVERTURNED_CHART_KEYS.APPROVED_MATCHED]]:
-                        formatter(accuracyChartDatum.approveMatched),
-                    [OVERTURNED_CHART_REPORT_KEYS[OVERTURNED_CHART_KEYS.APPROVED_UNMATCHED]]:
-                        formatter(accuracyChartDatum.approveUnmatched),
-                    [OVERTURNED_CHART_REPORT_KEYS[OVERTURNED_CHART_KEYS.REJECTED_MATCHED]]:
-                        formatter(accuracyChartDatum.rejectMatched),
-                    [OVERTURNED_CHART_REPORT_KEYS[OVERTURNED_CHART_KEYS.REJECTED_UNMATCHED]]:
-                        formatter(accuracyChartDatum.rejectUnmatched)
+                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.GOOD]]:
+                        formatter(accuracyChartDatum.good),
+                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.OVERTURNED_GOOD]]:
+                        formatter(accuracyChartDatum.overturnedGood),
+                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.BAD]]:
+                        formatter(accuracyChartDatum.bad),
+                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.OVERTURNED_BAD]]:
+                        formatter(accuracyChartDatum.overturnedBad)
                 };
             });
 
@@ -142,6 +169,6 @@ export class BaseOverturnedPerformanceStore<T extends BasicEntityPerformance> ex
     }
 
     private sortByDescendingAccuracyAverageRate(a: T, b: T) {
-        return b.accuracyAverage - a.accuracyAverage;
+        return b.averageOverturnRate - a.averageOverturnRate;
     }
 }

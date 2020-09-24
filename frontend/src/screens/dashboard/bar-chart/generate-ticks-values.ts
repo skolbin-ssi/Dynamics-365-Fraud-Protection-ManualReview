@@ -1,5 +1,8 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { AccuracyChartDatum } from '../../../view-services/dashboard/base-overturned-performance-store';
-import { isoStringToLocalMothDayFormat } from '../../../utils/date';
+import { formatToLocaleMonthDayFormat } from '../../../utils/date';
 
 /**
  * Returns calculated number of tick values for the chart
@@ -19,7 +22,7 @@ export function generateTicksValues(data: AccuracyChartDatum[], maxTicksCount = 
 
     return data.reduce((accum, next, currentIndex) => {
         if (currentIndex % divisor === 0) {
-            return [...accum, isoStringToLocalMothDayFormat(next.originalDate)];
+            return [...accum, formatToLocaleMonthDayFormat(next.originalDate)];
         }
 
         return [...accum];

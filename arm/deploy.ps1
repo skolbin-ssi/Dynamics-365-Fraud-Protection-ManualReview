@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 # Requirements
 # Install-Module -Name Az.ManagedServiceIdentity -AllowPrerelease
 
@@ -21,6 +24,7 @@ $applications = @{
   "queues"    =  "../backend/queues"
   "analytics" = "../backend/analytics"
 }
+$version = Get-Date -Format FileDateTimeUniversal
 # Path to fronend build directory
 $frontendBuildPath = "../frontend/scripts"
 
@@ -105,7 +109,9 @@ function ProvideCleanContainer {
   else 
   {
       Write-Host "= Clean container $storageContainer"
-      Get-AzStorageBlob -Container $storageContainer -Context $storageContext | Remove-AzStorageBlob
+      Get-AzStorageBlob -Container $storageContainer -Context $storageContext `
+        | Where-Object { $_.Name -notMatch '^.*target.*zip' } `
+        | Remove-AzStorageBlob
   }
 }
 
@@ -354,16 +360,29 @@ Write-Host "=== Create container for frontend code"
 ProvideCleanContainer -storageContainer $frontendContainer -storageContext $ctx
 Write-Host "=== Upload frontend static code"
 Get-ChildItem -Path "build/frontend/*" -File -Recurse | Set-AzStorageBlobContent -Container $frontendContainer -Context $ctx -Force | Format-List -Property Name
-# Remove frontend static from temporary artifact path to prevent double copy to deploy storage account
-Remove-Item "${baseDir}/build/frontend" -Recurse
 
 
 # Preparing storage container for templates
 Write-Host "=== Create container for templates"
 ProvideCleanContainer -storageContainer $deploymentContainer -storageContext $ctx
+Write-Host "=== Upload application artifacts"
+foreach ($app in $applications.GetEnumerator()) {
+    # Keep last two versions, remove the rest
+    Get-AzStorageBlob -Container $deploymentContainer -Context $ctx `
+        | Where-object { $_.Name -Match "^$($app.Name).*target.*zip" } `
+        | Sort-Object LastModified -desc `
+        | Select-Object -Skip 2 `
+        | Remove-AzStorageBlob
+    # Upload new version
+    Set-AzStorageBlobContent `
+        -Container $deploymentContainer `
+        -Context $ctx `
+        -File "build/$($app.Name)/target.zip" `
+        -Blob "$($app.Name)/target-${version}.zip" `
+        -Force
+}
 Write-Host "=== Upload templates"
-Get-ChildItem -Include 'target.zip' -File -Recurse | Set-AzStorageBlobContent -Container $deploymentContainer -Context $ctx -Force | Format-List -Property Name
-Get-ChildItem -Include '*.json' -Exclude '*parameters*','*manifest*' -File -Recurse | Set-AzStorageBlobContent -Container $deploymentContainer -Context $ctx -Force | Format-List -Property Name
+Get-ChildItem -Include '*.json' -Exclude '*parameters*','*manifest*','config.json' -File -Recurse | Set-AzStorageBlobContent -Container $deploymentContainer -Context $ctx -Force | Format-List -Property Name
 Get-ChildItem -Path "deploy_frontend.ps1" -File -Recurse | Set-AzStorageBlobContent -Container $deploymentContainer -Context $ctx -Force | Format-List -Property Name
 
 
@@ -420,6 +439,8 @@ $deployment = New-AzResourceGroupDeployment `
     -deploymentIdentity $spId.Id `
     -deploymentStorageAccount $deploymentStorageAccount `
     -tenantShortName $tenantShortName `
+    -appQueuesPackageUrl ("https://${deploymentStorageAccount}.blob.core.windows.net/deploy/queues/target-${version}.zip" + $token) `
+    -appAnalyticsPackageUrl ("https://${deploymentStorageAccount}.blob.core.windows.net/deploy/analytics/target-${version}.zip" + $token) `
     -keyVaultName $keyVaultName
 
 

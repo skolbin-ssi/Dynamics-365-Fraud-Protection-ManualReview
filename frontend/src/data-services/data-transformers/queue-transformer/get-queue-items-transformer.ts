@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Item } from '../../../models';
 import { UserBuilder } from '../../../utility-services';
 import { ItemDTO } from '../../api-services/models';

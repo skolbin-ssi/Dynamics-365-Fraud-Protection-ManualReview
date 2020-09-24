@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { DashboardRequestApiParams } from './dashboard-api-service';
 
 import { QueueSizeHistory, ItemPlacementMetrics } from '../../models/dashboard/deman-supply';

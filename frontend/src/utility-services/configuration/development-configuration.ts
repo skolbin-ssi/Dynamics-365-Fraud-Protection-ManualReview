@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Configuration } from './configuration';
 import { SEVERITY } from '../logger/logger';
 

@@ -1,5 +1,7 @@
 mr:
   tasks:
+    fail-fast-healthcheck-task:
+      enabled: false
     residual-queue-reconciliation-task:
       enabled: false
     queue-size-calculation-task:

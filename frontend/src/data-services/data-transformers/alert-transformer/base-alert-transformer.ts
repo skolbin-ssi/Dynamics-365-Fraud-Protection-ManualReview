@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Alert } from '../../../models';
 import { AlertDTO } from '../../api-services/models';
 import { BaseTransformer } from '../base-transformer';

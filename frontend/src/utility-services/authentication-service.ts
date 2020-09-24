@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { History, Location } from 'history';
 import * as Msal from 'msal';
 import { inject, injectable } from 'inversify';

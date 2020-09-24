@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { DefaultPalette, DefaultFontStyles } from '@fluentui/react/lib/Styling';
 import { IStackStyles } from '@fluentui/react/lib/Stack';
 import { ISearchBoxStyles } from '@fluentui/react/lib/SearchBox';

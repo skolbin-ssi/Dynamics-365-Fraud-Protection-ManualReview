@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { CommandBarButton } from '@fluentui/react/lib/Button';
 import autobind from 'autobind-decorator';
 import { History } from 'history';

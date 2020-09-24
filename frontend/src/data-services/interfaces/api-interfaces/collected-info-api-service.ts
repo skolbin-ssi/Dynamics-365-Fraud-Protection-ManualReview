@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ApiServiceResponse } from '../../base-api-service';
 import { GetUserResponse } from '../../api-services/collected-info-api-service/analyst/api-models';
 import { GetUsersResponse } from '../../api-services/user-api-service/api-models';

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { stringToKebabCase } from './string-to-kebab-case';
 
 describe('patterns.stringToKebabcase', () => {

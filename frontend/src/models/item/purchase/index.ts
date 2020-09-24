@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export * from './purchase';
 export * from './device-context';
 export * from './purchase-user';

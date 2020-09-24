@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import autoBind from 'autobind-decorator';
 import { observer } from 'mobx-react';
@@ -30,21 +33,26 @@ interface DashboardHeaderProps {
      * displayBackButton - shows or hide go back button depending
      * on the current visited page
      */
-    displayBackButton: boolean;
+    displayBackButton?: boolean;
     dashboardScreenStore: DashboardScreenStore;
     /**
      * isSearchBarDisplayed - show/hide dashboard header search filed based on the user role
      */
     isSearchBarDisplayed?: boolean;
 
-    onQueueSearchChange(queue: Queue): void;
+    onQueueSearchChange?(queue: Queue): void;
 
-    onAnalystSearchChange(analyst: IPersonaProps): void;
+    onAnalystSearchChange?(analyst: IPersonaProps): void;
 
     /**
      * onGoBackClick - callback, on go back button click
      */
-    onGoBackClick(): void;
+    onGoBackClick?(): void;
+
+    /**
+     * renderSearchBar - render or not the search bar
+     */
+    renderSearchBar?: boolean
 }
 
 interface DashboardHeaderState {
@@ -53,6 +61,7 @@ interface DashboardHeaderState {
     toDate: Date | undefined,
 }
 
+// TODO: Move this component to the shared components as it is used in {PersonalPerformance, Dashboards} components
 @observer
 export class DashboardHeader extends Component<DashboardHeaderProps, DashboardHeaderState> {
     private maxDate: Date = new Date();
@@ -213,20 +222,24 @@ export class DashboardHeader extends Component<DashboardHeaderProps, DashboardHe
 
     render() {
         const {
-            dashboardScreenStore, onQueueSearchChange, onAnalystSearchChange, displayBackButton, isSearchBarDisplayed
+            dashboardScreenStore, onQueueSearchChange, onAnalystSearchChange, displayBackButton, isSearchBarDisplayed, renderSearchBar
         } = this.props;
         const { fromDate, toDate } = this.state;
         return (
 
-            <div className={CN}>
-                <div className={cx(`${CN}__search`, { [`${CN}__search--hide`]: isSearchBarDisplayed })}>
-                    {displayBackButton && this.renderGoBackButton()}
-                    <DashboardSearch
-                        onAnalystSearchChange={onAnalystSearchChange}
-                        onQueueSearchChange={onQueueSearchChange}
-                        dashboardScreenStore={dashboardScreenStore}
-                    />
-                </div>
+            <div className={cx(CN, { [`${CN}--aligned`]: renderSearchBar })}>
+                {
+                    renderSearchBar && (
+                        <div className={cx(`${CN}__search`, { [`${CN}__search--hide`]: isSearchBarDisplayed })}>
+                            {displayBackButton && this.renderGoBackButton()}
+                            <DashboardSearch
+                                onAnalystSearchChange={onAnalystSearchChange!}
+                                onQueueSearchChange={onQueueSearchChange!}
+                                dashboardScreenStore={dashboardScreenStore}
+                            />
+                        </div>
+                    )
+                }
                 <div className={`${CN}__date-selection`}>
                     <Dropdown
                         onChange={(ev, option) => this.handleDropdownChange(option)}

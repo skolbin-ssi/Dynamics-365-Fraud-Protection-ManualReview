@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // eslint-disable-next-line max-classes-per-file
 import {
     action, autorun, computed, IReactionDisposer, observable, reaction,
@@ -16,7 +19,10 @@ import { Item, Queue, Report } from '../../models';
 import { COLORS } from '../../styles/variables';
 import { CollectedInfoService, DashboardService, QueueService } from '../../data-services/interfaces';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
-import { excludeLocalTimeZoneDiff, getCurrentTimeDiff } from '../../utils/date';
+import {
+    getCurrentTimeDiff,
+    formatToISOStringWithLocalTimeZone,
+} from '../../utils/date';
 import { CurrentProgress } from '../../models/dashboard/progress-performance-metric';
 import { ItemPlacementMetrics, QueueSizeHistory } from '../../models/dashboard/deman-supply';
 import {
@@ -317,8 +323,8 @@ export class DemandQueuePerformanceStore {
         const aggregation = STATISTIC_AGGREGATION.get(this.aggregation)!;
 
         if (toDate && fromDate) {
-            const from = excludeLocalTimeZoneDiff(fromDate);
-            const to = excludeLocalTimeZoneDiff(toDate);
+            const from = formatToISOStringWithLocalTimeZone(fromDate);
+            const to = formatToISOStringWithLocalTimeZone(toDate);
 
             return { from, to, aggregation };
         }
@@ -468,6 +474,17 @@ export class DemandQueuePerformanceStore {
         }
 
         return null;
+    }
+
+    /**
+     * Checks whether regular or escalated queue items has empty response
+     */
+    @computed
+    get isQueueItemsDataAvailable() {
+        const hasRegularDataEmpty = this.regularQueueItems.data !== null && !this.regularQueueItems.data.length;
+        const hasEscalatedDataEmpty = this.escalatedQueueItem.data !== null && !this.escalatedQueueItem.data.length;
+
+        return hasRegularDataEmpty && hasEscalatedDataEmpty;
     }
 
     /**

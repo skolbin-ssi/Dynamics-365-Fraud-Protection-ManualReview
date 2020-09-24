@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /* eslint-disable react/prop-types */
 
 import React from 'react';
@@ -5,6 +8,7 @@ import { Text } from '@fluentui/react/lib/Text';
 import { ActionButton } from '@fluentui/react/lib/Button';
 import { FontIcon } from '@fluentui/react/lib/Icon';
 import { Queue } from '../../../models';
+import { formatToLocaleDateString } from '../../../utils/date';
 import './console-header.scss';
 
 interface ConsoleHeaderProps {
@@ -38,7 +42,7 @@ export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({ queue, onClickCall
                     </Text>
                     <Text className={`${CN}__meta-title`}>Created:&nbsp;</Text>
                     <Text className={`${CN}__meta-value`}>
-                        { queueItem.created ? new Date(queueItem.created).toLocaleDateString() : 'N/A' }
+                        { formatToLocaleDateString(queueItem.created, 'N/A') }
                     </Text>
                 </div>
             </div>

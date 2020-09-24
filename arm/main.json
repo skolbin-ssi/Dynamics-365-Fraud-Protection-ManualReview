@@ -22,6 +22,12 @@
     "deploymentStorageAccount": {
       "type": "string"
     },
+    "appQueuesPackageUrl": {
+      "type": "string"
+    },
+    "appAnalyticsPackageUrl": {
+      "type": "string"
+    },
     "tenantId": {
       "type": "string"
     },
@@ -157,8 +163,66 @@
         "defaultValue": 0
     },
     "exceptionsThresholdAlert": {
-            "type": "int",
-            "defaultValue": 200
+        "type": "int",
+        "defaultValue": 200
+    },
+    "metricalertTraceWarnSeverityEvaluationFrequency": {
+        "type": "string",
+        "defaultValue": "PT1M",
+        "allowedValues": [
+        "PT1M",
+        "PT5M",
+        "PT15M",
+        "PT30M",
+        "PT1H"
+        ]
+    },
+    "metricalertTraceWarnSeverityWindowSize": {
+        "type": "string",
+        "defaultValue": "PT5M",
+        "allowedValues": [
+        "PT1M",
+        "PT5M",
+        "PT15M",
+        "PT30M",
+        "PT1H",
+        "PT6H",
+        "PT12H",
+        "P1D"
+        ]
+    },
+    "metricalertTraceWarnSeverityThreshold": {
+        "type": "int",
+        "defaultValue": 100
+    },
+    "metricalertTraceErrorSeverityEvaluationFrequency": {
+        "type": "string",
+        "defaultValue": "PT1M",
+        "allowedValues": [
+        "PT1M",
+        "PT5M",
+        "PT15M",
+        "PT30M",
+        "PT1H"
+        ]
+    },
+    "metricalertTraceErrorSeverityWindowSize": {
+        "type": "string",
+        "defaultValue": "PT5M",
+        "allowedValues": [
+        "PT1M",
+        "PT5M",
+        "PT15M",
+        "PT30M",
+        "PT1H",
+        "PT6H",
+        "PT12H",
+        "P1D"
+        ]
+    },
+    "metricalertTraceErrorSeverityThreshold": {
+        "type": "int",
+        "defaultValue": 10
     }
   },
   "variables": {
@@ -188,10 +252,8 @@
     "ehubSecondaryName": "[concat(variables('commonPrefix'), '-secondary-ehub')]",
     "storageAccountNameOffsets": "[replace(toLower(concat(variables('commonPrefix'), 'offsets')),'-','')]",
     "storageAccountNameSecondaryOffsets": "[replace(toLower(concat(variables('commonPrefix'), 'secoffsets')),'-','')]",
-    "appQueuesPackageUrl": "[replace(variables('templateBaseUri'),'main.json','queues/target.zip')]",
     "appQueuesName": "[concat(variables('commonPrefix'), '-queues')]",
     "appQueuesSecondaryName": "[concat(variables('commonPrefix'), '-queues-secondary')]",
-    "appAnalyticsPackageUrl": "[replace(variables('templateBaseUri'),'main.json','analytics/target.zip')]",
     "appAnalyticsName": "[concat(variables('commonPrefix'), '-analytics')]",
     "appAnalyticsSecondaryName": "[concat(variables('commonPrefix'), '-analytics-secondary')]",
     "appInsightName": "[concat(variables('commonPrefix'), '-app-insights')]",
@@ -482,7 +544,7 @@
             "value": "[variables('appQueuesName')]"
           },
           "packageUrl": {
-            "value": "[variables('appQueuesPackageUrl')]"
+            "value": "[parameters('appQueuesPackageUrl')]"
           },
           "location": {
             "value": "[parameters('primaryRegion')]"
@@ -578,7 +640,7 @@
             "value": "[variables('appQueuesSecondaryName')]"
           },
           "packageUrl": {
-            "value": "[variables('appQueuesPackageUrl')]"
+            "value": "[parameters('appQueuesPackageUrl')]"
           },
           "location": {
             "value": "[parameters('secondaryRegion')]"
@@ -674,7 +736,7 @@
             "value": "[variables('appAnalyticsName')]"
           },
           "packageUrl": {
-            "value": "[variables('appAnalyticsPackageUrl')]"
+            "value": "[parameters('appAnalyticsPackageUrl')]"
           },
           "location": {
             "value": "[parameters('primaryRegion')]"
@@ -770,7 +832,7 @@
             "value": "[variables('appAnalyticsSecondaryName')]"
           },
           "packageUrl": {
-            "value": "[variables('appAnalyticsPackageUrl')]"
+            "value": "[parameters('appAnalyticsPackageUrl')]"
           },
           "location": {
             "value": "[parameters('secondaryRegion')]"
@@ -1158,7 +1220,8 @@
       "name": "powershellPurgeCDN",
       "resourceGroup": "[resourceGroup().name]",
       "dependsOn": [
-        "Microsoft.Resources/deployments/cdnTemplate"
+        "Microsoft.Resources/deployments/cdnTemplate",
+        "Microsoft.Resources/deployments/powershellTemplateDeployFrontend"
       ],
       "properties": {
         "mode": "Incremental",
@@ -1318,6 +1381,24 @@
           },
           "exceptionsThresholdAlert": {
             "value": "[parameters('exceptionsThresholdAlert')]"
+          },
+          "metricalertTraceWarnSeverityEvaluationFrequency": {
+            "value": "[parameters('metricalertTraceWarnSeverityEvaluationFrequency')]"
+          },
+          "metricalertTraceWarnSeverityWindowSize": {
+            "value": "[parameters('metricalertTraceWarnSeverityWindowSize')]"
+          },
+          "metricalertTraceWarnSeverityThreshold": {
+            "value": "[parameters('metricalertTraceWarnSeverityThreshold')]"
+          },
+          "metricalertTraceErrorSeverityEvaluationFrequency": {
+            "value": "[parameters('metricalertTraceErrorSeverityEvaluationFrequency')]"
+          },
+          "metricalertTraceErrorSeverityWindowSize": {
+            "value": "[parameters('metricalertTraceErrorSeverityWindowSize')]"
+          },
+          "metricalertTraceErrorSeverityThreshold": {
+            "value": "[parameters('metricalertTraceErrorSeverityThreshold')]"
           }
         }
       }

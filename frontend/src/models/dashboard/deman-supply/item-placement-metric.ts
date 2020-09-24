@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ItemPlacementMetricDTO } from '../../../data-services/api-services/models/dashboard/demand-supply';
 
 export class ItemPlacementMetric implements ItemPlacementMetricDTO {

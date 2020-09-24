@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -240,14 +243,16 @@ public class AlertService {
     }
 
     private double getValueByMetric(final ItemLabelingMetricDTO queueTotal, final MetricType metricType) {
-        int approved = queueTotal.getApproved() + queueTotal.getWatched();
-        int approvedMatched = approved - queueTotal.getApproveOverturned();
-        int total = queueTotal.getApproved() + queueTotal.getWatched();
+        int goodActions = queueTotal.getGood() + queueTotal.getWatched();
+        int totalOverturned = queueTotal.getGoodOverturned() + queueTotal.getBadOverturned();
+        int total = queueTotal.getReviewed();
         switch (metricType) {
-            case APPROVE_ACCURACY:
-                return approved > 0 ? (double) approvedMatched * 100 / approved : 0;
-            case APPROVAL_RATE:
-                return total > 0 ? (double) approved * 100 / queueTotal.getReviewed() : 0;
+            case AVERAGE_OVERTURN_RATE:
+                return total > 0 ? (double) totalOverturned * 100 / total : 0;
+            case GOOD_DECISION_RATE:
+                return total > 0 ? (double) goodActions * 100 / total : 0;
+            case BAD_DECISION_RATE:
+                return total > 0 ? (double) queueTotal.getBad() * 100 / total : 0;
             default:
                 throw new NotImplementedException(String.format("Metric [%s] not implemented yet.", metricType));
         }

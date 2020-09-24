@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.config;
 
 
@@ -55,6 +58,9 @@ public class Constants {
     public static final String MAIL_TAG_VALUE = "\\[value]";
     public static final String MAIL_TAG_CALC_VALUE = "\\[calcvalue]";
     public static final String MAIL_TAG_PERIOD = "\\[period]";
+
+    public static final int INCORRECT_CONFIG_STATUS = 1;
+    public static final int FAIL_FAST_STATUS = 2;
 
 
 }

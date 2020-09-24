@@ -96,20 +96,20 @@
     }
 
     &__delete-btn {
-        background-color: $rejectFill;
-        border-color: $rejectColor;
-        color: $rejectColor;
+        background-color: $badFill;
+        border-color: $badColor;
+        color: $badColor;
 
         &:hover {
-            background-color: $rejectFillHover;
-            border-color: $rejectColor;
-            color: $rejectColor;
+            background-color: $badFillHover;
+            border-color: $badColor;
+            color: $badColor;
         }
 
         &:active {
-            background-color: $rejectFillActive;
-            border-color: $rejectColor;
-            color: $rejectColor;
+            background-color: $badFillActive;
+            border-color: $badColor;
+            color: $badColor;
         }
     }
 

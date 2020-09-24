@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import {
     action, autorun, computed, IReactionDisposer, observable, reaction
@@ -14,25 +17,32 @@ import {
 import { BasicEntityPerformance } from '../../models/dashboard';
 import { TYPES } from '../../types';
 import { DashboardScreenStore } from './dashboard-screen-store';
-import { excludeLocalTimeZoneDiff, getDatesBetween, isoStringToDateString } from '../../utils/date';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
 import { convertToCSVString, UnparseTypes } from '../../utility-services/convert-service';
 import { Report } from '../../models/misc';
+import {
+    getDatesBetween,
+    isoStringToDateString,
+    formatToISOStringWithLocalTimeZone,
+} from '../../utils/date';
 import { formatMetricToPercentageString } from '../../utils/text';
 import { CSVReportBuilder } from '../../utility-services';
 
 export interface UpdateQuerySearchReactionParams {
     /**
-     * ids - selected ids
+     * ids - selected(checked) items ids
      */
     ids: string[],
 
     /**
-     * rating - selected rating {PERFORMANCE_RATING}
+     * rating - selected rating
      */
-    rating: string,
+    rating: PERFORMANCE_RATING,
 
-    aggregation: string,
+    /**
+     * aggregation - chart aggregation period
+     */
+    aggregation: CHART_AGGREGATION_PERIOD,
 }
 
 @injectable()
@@ -95,8 +105,8 @@ export class BasePerformanceStore<T extends BasicEntityPerformance> {
             const aggregation = STATISTIC_AGGREGATION.get(this.aggregation)!;
 
             if (toDate && fromDate) {
-                const from = excludeLocalTimeZoneDiff(fromDate);
-                const to = excludeLocalTimeZoneDiff(toDate);
+                const from = formatToISOStringWithLocalTimeZone(fromDate);
+                const to = formatToISOStringWithLocalTimeZone(toDate);
 
                 const data = await callback({ from, to, aggregation });
 
@@ -356,7 +366,7 @@ export class BasePerformanceStore<T extends BasicEntityPerformance> {
             if (this.getPerformanceData?.length) {
                 const reportRawData: Array<any> = this.getPerformanceData.map(performanceDatum => ({
                     ...performanceDatum.entityPerformanceReport,
-                    'in-tune rate': formatMetricToPercentageString(performanceDatum.rejectedRatio)
+                    'bad decision rate': formatMetricToPercentageString(performanceDatum.badDecisionsRatio)
                 })).filter(report => report !== null);
 
                 return BasePerformanceStore.buildReport(name, reportRawData);

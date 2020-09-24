@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import cn from 'classnames';
 import React, { Component } from 'react';
 import { Price } from '../../../../components/price';

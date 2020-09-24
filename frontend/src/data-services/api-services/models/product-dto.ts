@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 interface _ProductDTO {
     ProductId: string;
     ProductName: string;

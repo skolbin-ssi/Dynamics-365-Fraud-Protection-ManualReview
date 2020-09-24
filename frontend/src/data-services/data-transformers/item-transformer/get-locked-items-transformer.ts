@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Item } from '../../../models';
 import { DataTransformer } from '../../data-transformer';
 import { BaseItemTransformer } from './base-item-transformer';

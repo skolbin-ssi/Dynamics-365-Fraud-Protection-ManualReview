@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import { action, observable } from 'mobx';
 import { PERMISSION, ROLE, ROLES_ACCESS_MAPPING } from '../constants';
@@ -41,6 +44,7 @@ export class CurrentUserStore {
     @action
     async loadCurrentUserInfo() {
         this.user = await this.userService.loadCurrentUser();
+        this.user.imageUrl = await this.userService.getUserPhoto(this.user.id);
         this.permissions = this.getUserPermission(this.user);
         this.isAuthenticated = true;
     }

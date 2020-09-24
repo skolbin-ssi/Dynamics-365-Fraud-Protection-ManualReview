@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React from 'react';
 import {
     ResponsivePie, PieDatum, PieSvgProps
@@ -80,13 +83,13 @@ export class PieChart extends React.Component<PieChartProps & PieSvgProps, never
                     fill={[
                         {
                             match: {
-                                id: 'Reject'
+                                id: 'Bad'
                             },
                             id: 'lines'
                         },
                         {
                             match: {
-                                id: 'Approve'
+                                id: 'Good'
                             },
                             id: 'squares'
                         },

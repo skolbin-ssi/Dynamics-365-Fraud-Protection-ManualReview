@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { action, computed, observable } from 'mobx';
 import { parse, Duration } from 'iso8601-duration';
 import { ITag } from '@fluentui/react/lib/Pickers';

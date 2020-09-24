@@ -20,10 +20,6 @@ repositories {
     jcenter()
 }
 
-ext {
-    set('azureVersion', "2.3.2")
-}
-
 bootJar {
     enabled = false
 }
@@ -33,7 +29,7 @@ jar {
 }
 
 dependencies {
-    compile project(path:':model', configuration: 'default')
+    compile project(path: ':model', configuration: 'default')
 
 //	  Common
     implementation 'org.springframework:spring-core'
@@ -44,11 +40,5 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.2'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.2'
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "com.microsoft.azure:azure-spring-boot-bom:${azureVersion}"
-    }
 }
 

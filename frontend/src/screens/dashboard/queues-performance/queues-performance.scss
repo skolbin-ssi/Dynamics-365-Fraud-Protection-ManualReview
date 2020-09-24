@@ -1,6 +1,13 @@
+@import "../../../styles/variables";
+
 .queues-performance {
   &__switch-header {
     margin-bottom: 10px;
+  }
+
+  &__switch-header,
+  &__data-table {
+    max-width: $maxTableSwitchWidth;
   }
 
   &__generate-reports-button {

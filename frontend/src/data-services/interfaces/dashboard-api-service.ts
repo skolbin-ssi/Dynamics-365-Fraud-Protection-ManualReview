@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ApiServiceResponse } from '../base-api-service';
 import { GetQueuesPerformanceResponse } from '../api-services/dashboard-api-service/queues/api-models';
 import {

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import cx from 'classnames';

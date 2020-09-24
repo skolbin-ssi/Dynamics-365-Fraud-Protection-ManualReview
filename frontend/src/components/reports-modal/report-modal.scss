@@ -1,0 +1,78 @@
+@import "../../styles/variables";
+
+.reports-modal {
+  width: 580px;
+  min-height: 300px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    height: 60px;
+
+    padding: 25px;
+    box-shadow: 0 1px 0 #EFEDEB;
+
+    &-title {
+      font-size: 20px;
+      color: $neutralDark;
+    }
+  }
+
+  &__content {
+    padding: 25px;
+  }
+
+  &__notification-message {
+    margin-bottom: 30px;
+
+    font-size: 14px;
+    color: $neutralDark;
+  }
+
+  &__selected-period {
+    margin-bottom: 45px;
+
+    &-title {
+      margin-bottom: 20px;
+
+      font-size: 16px;
+      font-weight: 600;
+      color: $neutralPrimary;
+    }
+  }
+
+  &__reports-table {
+    display: grid;
+  }
+
+  &__table-item {
+    display: grid;
+    height: 40px;
+    align-items: center;
+    grid-column-gap: 10px;
+    grid-template-columns: 30px 1fr 40px 150px;
+
+    padding: 0 5px;
+
+    box-shadow: 0 1px 0 #EFEDEB;
+
+    &:hover {
+      background: $neutralLighter;
+    }
+  }
+
+  &__download-link {
+    justify-self: end;
+
+    color: $themePrimary;
+    text-decoration: none;
+
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
+
+}

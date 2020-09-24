@@ -2999,7 +2999,7 @@
     "/" : {
       "get" : {
         "tags" : [ "health-controller" ],
-        "operationId" : "getHealth",
+        "operationId" : "getHealth_1",
         "responses" : {
           "204" : {
             "description" : "No Content"
@@ -3114,7 +3114,7 @@
       },
       "head" : {
         "tags" : [ "health-controller" ],
-        "operationId" : "getHealth_1",
+        "operationId" : "getHealth",
         "responses" : {
           "204" : {
             "description" : "No Content"
@@ -5000,7 +5000,7 @@
           },
           "metricType" : {
             "type" : "string",
-            "enum" : [ "APPROVE_ACCURACY", "APPROVAL_RATE" ]
+            "enum" : [ "AVERAGE_OVERTURN_RATE", "GOOD_DECISION_RATE", "BAD_DECISION_RATE" ]
           },
           "period" : {
             "type" : "string",
@@ -5070,7 +5070,7 @@
           },
           "metricType" : {
             "type" : "string",
-            "enum" : [ "APPROVE_ACCURACY", "APPROVAL_RATE" ]
+            "enum" : [ "AVERAGE_OVERTURN_RATE", "GOOD_DECISION_RATE", "BAD_DECISION_RATE" ]
           },
           "period" : {
             "type" : "string",
@@ -5131,7 +5131,7 @@
           },
           "metricType" : {
             "type" : "string",
-            "enum" : [ "APPROVE_ACCURACY", "APPROVAL_RATE" ]
+            "enum" : [ "AVERAGE_OVERTURN_RATE", "GOOD_DECISION_RATE", "BAD_DECISION_RATE" ]
           },
           "period" : {
             "type" : "string",
@@ -5167,7 +5167,7 @@
         "properties" : {
           "metricType" : {
             "type" : "string",
-            "enum" : [ "APPROVE_ACCURACY", "APPROVAL_RATE" ]
+            "enum" : [ "AVERAGE_OVERTURN_RATE", "GOOD_DECISION_RATE", "BAD_DECISION_RATE" ]
           },
           "thresholdOperators" : {
             "uniqueItems" : true,
@@ -5257,11 +5257,11 @@
             "type" : "integer",
             "format" : "int32"
           },
-          "approved" : {
+          "good" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "rejected" : {
+          "bad" : {
             "type" : "integer",
             "format" : "int32"
           },
@@ -5281,11 +5281,11 @@
             "type" : "integer",
             "format" : "int32"
           },
-          "approveOverturned" : {
+          "goodOverturned" : {
             "type" : "integer",
             "format" : "int32"
           },
-          "rejectOverturned" : {
+          "badOverturned" : {
             "type" : "integer",
             "format" : "int32"
           }
@@ -5493,7 +5493,7 @@
         "properties" : {
           "value" : {
             "type" : "string",
-            "enum" : [ "ACCEPT", "REJECT", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
+            "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
           },
           "authorId" : {
             "type" : "string"
@@ -5626,7 +5626,7 @@
           },
           "label" : {
             "type" : "string",
-            "enum" : [ "ACCEPT", "REJECT", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
+            "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
           },
           "merchantRuleDecision" : {
             "type" : "string"

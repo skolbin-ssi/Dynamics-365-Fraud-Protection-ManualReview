@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.model.persistence;
 
 import com.griddynamics.msd365fp.manualreview.model.Label;
@@ -32,6 +35,7 @@ public class ItemLabelActivityEntity implements ActivityEntity {
     private Label label;
     private String merchantRuleDecision;
     private Duration decisionApplyingDuration;
+    private Integer riskScore;
 
     @Builder.Default
     private long ttl = -1;

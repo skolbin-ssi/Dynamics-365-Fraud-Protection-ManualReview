@@ -141,6 +141,10 @@
     &--no-data {
       width: 34%;
     }
+
+    &--data-not-available {
+      width: 485px;
+    }
   }
 
   &__real-time-title {
@@ -152,6 +156,12 @@
     &--no-data {
       width: auto;
       font-weight: normal;
+    }
+
+    &--data-not-available {
+      width: auto;
+      font-weight: normal;
+      font-size: 16px;
     }
   }
 

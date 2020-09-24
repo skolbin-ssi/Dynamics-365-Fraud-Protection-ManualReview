@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ActionButton, DefaultButton } from '@fluentui/react/lib/Button';
 import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
 import { Spinner } from '@fluentui/react/lib/Spinner';

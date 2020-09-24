@@ -73,6 +73,12 @@
         },
         "exceptionsThresholdAlert": {
             "value": 100
+        },
+        "metricalertTraceWarnSeverityThreshold": {
+            "value": 100
+        },
+        "metricalertTraceErrorSeverityThreshold": {
+            "value": 10
         }
     }
 }

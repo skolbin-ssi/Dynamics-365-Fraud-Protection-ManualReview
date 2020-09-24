@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { action, computed, observable } from 'mobx';
 import { Datum } from '@nivo/line';
 
@@ -7,7 +10,7 @@ import { PeriodPerformanceMetrics } from '../../data-services/api-services/model
 import { BasicEntityPerformance } from './basic-entity-performance';
 import { calculatePercentageRatio } from '../../utils/math';
 import { formatMetricToPercentageString } from '../../utils/text';
-import { OVERTURNED_ACTIONS_CHART_KEYS, OVERTURNED_ACTIONS_REPORT_KEYS } from '../../constants';
+import { OVERTURNED_DECISIONS_CHART_KEYS, OVERTURNED_DECISIONS_REPORT_KEYS } from '../../constants';
 
 export abstract class EntityPerformance implements BasicEntityPerformance {
     /**
@@ -56,21 +59,21 @@ export abstract class EntityPerformance implements BasicEntityPerformance {
     abstract fromDto(entity: any): this;
 
     @computed
-    get approvedRatio() {
-        const { reviewed, approved } = this.total;
-        return EntityPerformance.getRatio(reviewed, approved);
+    get goodDecisionsRatio() {
+        const { good, reviewed } = this.total;
+        return calculatePercentageRatio(good, reviewed, 0);
     }
 
     @computed
-    get watchedRatio() {
-        const { reviewed, watched } = this.total;
-        return EntityPerformance.getRatio(reviewed, watched);
+    get watchDecisionsRatio() {
+        const { watched, reviewed } = this.total;
+        return calculatePercentageRatio(watched, reviewed, 0);
     }
 
     @computed
-    get rejectedRatio() {
-        const { reviewed, rejected } = this.total;
-        return EntityPerformance.getRatio(reviewed, rejected);
+    get badDecisionsRatio() {
+        const { bad, reviewed } = this.total;
+        return calculatePercentageRatio(bad, reviewed, 0);
     }
 
     @action
@@ -81,13 +84,13 @@ export abstract class EntityPerformance implements BasicEntityPerformance {
     @computed
     private get decisions() {
         return {
-            approvedApplied: this.approvedApplied,
-            approvedOverturned: this.approvedOverturned,
-            approvedAccuracy: this.approvedAccuracy,
-            rejectedApplied: this.rejectedApplied,
-            rejectedOverturned: this.rejectedOverturned,
-            rejectedAccuracy: this.rejectedAccuracy,
-            accuracyAverage: this.accuracyAverage,
+            goodApplied: this.goodApplied,
+            overturnedGood: this.goodOverturned,
+            goodOverturnRate: this.goodOverturnRate,
+            badApplied: this.badApplied,
+            overturnedBad: this.badOverturned,
+            badOverturnRate: this.badOverturnRate,
+            averageOverturnRate: this.averageOverturnRate,
         };
     }
 
@@ -96,20 +99,20 @@ export abstract class EntityPerformance implements BasicEntityPerformance {
     get accuracyReport() {
         return {
             name: this.name,
-            [OVERTURNED_ACTIONS_REPORT_KEYS[OVERTURNED_ACTIONS_CHART_KEYS.APPROVED_APPLIED]]:
-                this.decisions.approvedApplied,
-            [OVERTURNED_ACTIONS_REPORT_KEYS[OVERTURNED_ACTIONS_CHART_KEYS.APPROVED_OVERTURNED]]:
-                this.decisions.approvedOverturned,
-            [OVERTURNED_ACTIONS_REPORT_KEYS[OVERTURNED_ACTIONS_CHART_KEYS.APPROVED_ACCURACY]]:
-                formatMetricToPercentageString(this.decisions.approvedAccuracy),
-            [OVERTURNED_ACTIONS_REPORT_KEYS[OVERTURNED_ACTIONS_CHART_KEYS.APPROVED_APPLIED]]:
-            this.decisions.rejectedApplied,
-            [OVERTURNED_ACTIONS_REPORT_KEYS[OVERTURNED_ACTIONS_CHART_KEYS.REJECTED_OVERTURNED]]:
-            this.decisions.rejectedOverturned,
-            [OVERTURNED_ACTIONS_REPORT_KEYS[OVERTURNED_ACTIONS_CHART_KEYS.REJECTED_ACCURACY]]:
-                formatMetricToPercentageString(this.decisions.rejectedAccuracy),
-            [OVERTURNED_ACTIONS_REPORT_KEYS[OVERTURNED_ACTIONS_CHART_KEYS.ACCURACY_AVERAGE]]:
-                formatMetricToPercentageString(this.decisions.accuracyAverage),
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.GOOD_DECISIONS]]:
+                this.decisions.goodApplied,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.OVERTURNED_GOOD_DECISIONS]]:
+                this.decisions.overturnedGood,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.GOOD_DECISION_OVERTURN_RATE]]:
+                formatMetricToPercentageString(this.decisions.goodOverturnRate),
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.BAD_DECISIONS]]:
+            this.decisions.badApplied,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.OVERTURNED_BAD_DECISIONS]]:
+            this.decisions.overturnedBad,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.BAD_DECISION_OVERTURN_RATE]]:
+                formatMetricToPercentageString(this.decisions.badOverturnRate),
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.AVERAGE_OVERTURN_RATE]]:
+                formatMetricToPercentageString(this.decisions.averageOverturnRate),
         };
     }
 
@@ -139,9 +142,9 @@ export abstract class EntityPerformance implements BasicEntityPerformance {
             return {
                 name: this.name,
                 reviewed: this.total.reviewed,
-                approved: this.total.approved,
+                good: this.total.good,
                 watched: this.total.watched,
-                rejected: this.total.rejected
+                bad: this.total.bad
             };
         }
 
@@ -149,53 +152,40 @@ export abstract class EntityPerformance implements BasicEntityPerformance {
     }
 
     @computed
-    get approvedApplied() {
-        return this.total.approved + this.total.watched;
+    get goodApplied() {
+        return this.total.good + this.total.watched;
     }
 
     @computed
-    get approvedOverturned() {
-        return this.total.approveOverturned;
+    get goodOverturned() {
+        return this.total.goodOverturned;
     }
 
     @computed
-    get approvedAccuracy() {
-        const approve = this.approvedApplied - this.approvedOverturned;
-
-        return calculatePercentageRatio(approve, this.approvedApplied, 2);
+    get goodOverturnRate() {
+        return calculatePercentageRatio(this.goodOverturned, this.goodApplied, 2);
     }
 
     @computed
-    get rejectedApplied() {
-        return this.total.rejected;
+    get badApplied() {
+        return this.total.bad;
     }
 
     @computed
-    get rejectedOverturned() {
-        return this.total.rejectOverturned;
+    get badOverturned() {
+        return this.total.badOverturned;
     }
 
     @computed
-    get rejectedAccuracy() {
-        const reject = this.rejectedApplied - this.rejectedOverturned;
-
-        return calculatePercentageRatio(reject, this.rejectedApplied, 2);
+    get badOverturnRate() {
+        return calculatePercentageRatio(this.badOverturned, this.badApplied, 2);
     }
 
     @computed
-    get accuracyAverage() {
-        const numerator = (this.approvedApplied + this.rejectedApplied)
-            - (this.approvedOverturned + this.rejectedOverturned);
-        const denominator = this.approvedApplied + this.rejectedApplied;
+    get averageOverturnRate() {
+        const numerator = this.goodOverturned + this.badOverturned;
+        const denominator = this.goodApplied + this.badApplied;
 
         return calculatePercentageRatio(numerator, denominator, 2);
-    }
-
-    private static getRatio(numerator: number, denominator: number) {
-        const quotient = 100;
-        const ratio = (denominator * quotient) / numerator;
-        const result = Number.isFinite(ratio) ? ratio : 0;
-
-        return Math.floor(result);
     }
 }

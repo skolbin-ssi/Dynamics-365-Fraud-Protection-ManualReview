@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { injectable } from 'inversify';
 import { MrUserError } from '../models/exceptions';
 import { Logger } from '../utility-services';

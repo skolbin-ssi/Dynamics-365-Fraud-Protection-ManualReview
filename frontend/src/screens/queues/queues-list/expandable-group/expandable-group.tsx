@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { IconButton } from '@fluentui/react/lib/Button';
 import cn from 'classnames';
 import autobind from 'autobind-decorator';

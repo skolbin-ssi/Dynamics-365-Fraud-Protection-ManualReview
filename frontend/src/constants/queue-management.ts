@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 // TODO: Add DIRECT type
 export enum QUEUE_VIEW_TYPE {
     REGULAR = 'REGULAR',
@@ -112,8 +115,8 @@ export const SORTING_FIELD_DISPLAY = {
 };
 
 export enum LABEL {
-    ACCEPT = 'ACCEPT',
-    REJECT = 'REJECT',
+    GOOD = 'GOOD',
+    BAD = 'BAD',
     HOLD = 'HOLD',
     ESCALATE = 'ESCALATE',
     WATCH_NA = 'WATCH_NA',
@@ -121,8 +124,8 @@ export enum LABEL {
 }
 
 export const LABEL_NAMES = {
-    [LABEL.ACCEPT]: 'Approve',
-    [LABEL.REJECT]: 'Reject',
+    [LABEL.GOOD]: 'Good',
+    [LABEL.BAD]: 'Bad',
     [LABEL.HOLD]: 'Hold',
     [LABEL.ESCALATE]: 'Escalate',
     [LABEL.WATCH_NA]: 'Watch NA',
@@ -131,12 +134,12 @@ export const LABEL_NAMES = {
 
 export const QUEUE_CONFIGURATION_LABEL = [
     {
-        name: LABEL_NAMES[LABEL.ACCEPT],
-        labels: [LABEL.ACCEPT]
+        name: LABEL_NAMES[LABEL.GOOD],
+        labels: [LABEL.GOOD]
     },
     {
-        name: LABEL_NAMES[LABEL.REJECT],
-        labels: [LABEL.REJECT]
+        name: LABEL_NAMES[LABEL.BAD],
+        labels: [LABEL.BAD]
     },
     {
         name: LABEL_NAMES[LABEL.HOLD],

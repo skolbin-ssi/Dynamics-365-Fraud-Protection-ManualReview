@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { DICTIONARY_TYPE } from '../../constants';
 import { ApiServiceResponse } from '../base-api-service';
 

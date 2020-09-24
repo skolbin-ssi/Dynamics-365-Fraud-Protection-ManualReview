@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component, FormEvent, createRef } from 'react';
 import { observer } from 'mobx-react';
 import autobind from 'autobind-decorator';

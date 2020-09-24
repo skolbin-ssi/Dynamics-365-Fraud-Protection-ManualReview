@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 Param(
   [Parameter(Mandatory=$true)]
   [string] $config,
@@ -81,7 +84,10 @@ if (Get-AzADGroup -DisplayName $mapsGroupName -ErrorAction Ignore) {
 # remove deployment resource group
 if (Get-AzResourceGroup -Name $deploymentResourceGroup -ErrorAction Ignore) {
   Write-Host "Removing resource group"$deploymentResourceGroup
-  Remove-AzResourceGroup -Name $deploymentResourceGroup -Force
+  # Sometimes command failed with error, add one retry
+  if(!(Remove-AzResourceGroup -Name $deploymentResourceGroup -Force -ErrorAction Ignore)) {
+    Remove-AzResourceGroup -Name $deploymentResourceGroup -Force
+  }
 }
 
 [System.Console]::Beep()

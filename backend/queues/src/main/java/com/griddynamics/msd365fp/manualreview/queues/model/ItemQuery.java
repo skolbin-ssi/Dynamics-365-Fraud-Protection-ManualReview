@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.model;
 
 import com.google.common.base.Joiner;
@@ -5,7 +8,9 @@ import com.griddynamics.msd365fp.manualreview.cosmos.utilities.ExtendedCosmosCon
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
@@ -93,31 +98,33 @@ public class ItemQuery {
             return this;
         }
 
-        public ItemQueryConstructor itemFilter(ItemFilter itemFilter) {
-            boolean arrayInPath = itemFilter.getField().getPath().contains("[]");
-            String path;
-            String localAlias;
-            String array;
-            if (arrayInPath) {
-                // form "datainarray.field" from "data.in.array[].fiels"
-                // and "datainarray" from "data.in.array[]"
-                String fieldPath = itemFilter.getField().getPath();
-                array = fieldPath.substring(0, fieldPath.indexOf("[]"));
-                localAlias = getJoinClauseAliasName(array);
-                path = fieldPath.substring(fieldPath.indexOf("[]") + "[]".length());
+        public ItemQueryConstructor filterFieldIsDefined(ItemDataField field) {
+            FieldDecomposition decomposition = decomposeField(field);
+            String condition = String.format(
+                    "IS_DEFINED(%s%s)",
+                    decomposition.getLocalAlias(),
+                    decomposition.getPath());
+            if (decomposition.getArray() != null) {
+                List<String> parts = joinParts.computeIfAbsent(decomposition.getArray(), key -> new LinkedList<>());
+                if (!parts.isEmpty()) parts.add("AND");
+                parts.add(condition);
+                queryParts.add("true");
             } else {
-                path = "." + itemFilter.getField().getPath();
-                localAlias = alias;
-                array = "";
+                queryParts.add(condition);
             }
+            return this;
+        }
+
+        public ItemQueryConstructor itemFilter(ItemFilter itemFilter) {
+            FieldDecomposition decomposition = decomposeField(itemFilter.getField());
             String condition;
             Iterator<String> valuesIter;
             switch (itemFilter.getCondition()) {
                 case IN:
                     condition = String.format(
                             "%s%s IN ('%s')",
-                            localAlias,
-                            path,
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
                             Joiner.on("', '").join(itemFilter.getValues())
                     );
                     break;
@@ -125,8 +132,8 @@ public class ItemQuery {
                     valuesIter = itemFilter.getValues().iterator();
                     condition = String.format(
                             "udf.isMatchRegexp(%s%s, \"%s\")",
-                            localAlias,
-                            path,
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
                             valuesIter.next()
                     );
                     break;
@@ -134,8 +141,8 @@ public class ItemQuery {
                     valuesIter = itemFilter.getValues().iterator();
                     condition = String.format(
                             "(%1$s%2$s >= %3$s AND %1$s%2$s <= %4$s)",
-                            localAlias,
-                            path,
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
                             valuesIter.next(),
                             valuesIter.next()
                     );
@@ -144,8 +151,8 @@ public class ItemQuery {
                     valuesIter = itemFilter.getValues().iterator();
                     condition = String.format(
                             "(%1$s%2$s >= \"%3$s\" AND %1$s%2$s <= \"%4$s\")",
-                            localAlias,
-                            path,
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
                             valuesIter.next(),
                             valuesIter.next()
                     );
@@ -154,8 +161,8 @@ public class ItemQuery {
                     valuesIter = itemFilter.getValues().iterator();
                     condition = String.format(
                             "(%s%s BETWEEN %s AND %s)",
-                            localAlias,
-                            path,
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
                             valuesIter.next(),
                             valuesIter.next()
                     );
@@ -166,8 +173,8 @@ public class ItemQuery {
                                     itemFilter.getCondition())
                     );
             }
-            if (arrayInPath) {
-                List<String> parts = joinParts.computeIfAbsent(array, key -> new LinkedList<>());
+            if (decomposition.getArray() != null) {
+                List<String> parts = joinParts.computeIfAbsent(decomposition.getArray(), key -> new LinkedList<>());
                 if (!parts.isEmpty()) parts.add("AND");
                 parts.add(condition);
                 queryParts.add("true");
@@ -257,6 +264,20 @@ public class ItemQuery {
             return this;
         }
 
+
+        public ItemQueryConstructor enrichedAfter(OffsetDateTime time) {
+            if (time != null) {
+                queryParts.add(String.format(
+                        "%s.enriched>=%s",
+                        alias,
+                        time.toEpochSecond())
+                );
+            } else {
+                queryParts.add("true");
+            }
+            return this;
+        }
+
         //TODO: delete it
         public ItemQueryConstructor includeLocked(boolean includeLocked) {
             if (!includeLocked) {
@@ -325,20 +346,29 @@ public class ItemQuery {
 
         public String constructSelect() {
             return String.format(
-                    "SELECT %1$s FROM %1$s %3$s WHERE %2$s",
+                    "SELECT %1$s FROM %1$s %2$s WHERE %3$s",
                     alias,
-                    Joiner.on(" ").join(queryParts),
-                    getJoinClause()
-            );
+                    getJoinClause(),
+                    Joiner.on(" ").join(queryParts));
         }
 
         public String constructCount() {
             return String.format(
-                    "SELECT VALUE COUNT(1) FROM %1$s %3$s WHERE %2$s",
+                    "SELECT VALUE COUNT(1) FROM %1$s %2$s WHERE %3$s",
                     alias,
-                    Joiner.on(" ").join(queryParts),
-                    getJoinClause()
-            );
+                    getJoinClause(),
+                    Joiner.on(" ").join(queryParts));
+        }
+
+        public String constructSample(ItemDataField field) {
+            FieldDecomposition decomposition = decomposeField(field);
+            return String.format(
+                    "SELECT VALUE root FROM (SELECT DISTINCT %1$s%2$s as val FROM %3$s %4$s WHERE %5$s) AS root",
+                    decomposition.getLocalAlias(),
+                    decomposition.getPath(),
+                    alias,
+                    getJoinClause(),
+                    Joiner.on(" ").join(queryParts));
         }
 
         private String getJoinClause() {
@@ -351,10 +381,6 @@ public class ItemQuery {
                                     entry.getKey(),
                                     Joiner.on(" ").join(entry.getValue())))
                             .collect(Collectors.joining(" "));
-        }
-
-        private String getJoinClauseAliasName(String field) {
-            return field.replaceAll("\\.", "");
         }
 
         public ItemSelectQueryExecutor constructSelectExecutor(ExtendedCosmosContainer itemsContainer) {
@@ -393,6 +419,53 @@ public class ItemQuery {
                 return optionalCount.orElse(0);
             };
         }
+
+
+        public FilterSampleQueryExecutor constructSampleExecutor(ExtendedCosmosContainer itemsContainer, ItemDataField field) {
+            return () -> {
+                String query = constructSample(field);
+                try {
+                    return itemsContainer.runCrossPartitionQuery(query)
+                            .map(cip -> cip.getString("val"))
+                            .collect(Collectors.toSet());
+                } catch (Exception e) {
+                    log.error("Constructed query execution ended with error. Query: [{}]", query);
+                    throw e;
+                }
+            };
+        }
+
+        private FieldDecomposition decomposeField(ItemDataField field) {
+            boolean arrayInPath = field.getPath().contains("[]");
+            FieldDecomposition result = new FieldDecomposition();
+
+            if (arrayInPath) {
+                // form "datainarray.field" from "data.in.array[].fiels"
+                // and "datainarray" from "data.in.array[]"
+                String fieldPath = field.getPath();
+                result.setArray(fieldPath.substring(0, fieldPath.indexOf("[]")));
+                result.setLocalAlias(getJoinClauseAliasName(result.getArray()));
+                result.setPath(fieldPath.substring(fieldPath.indexOf("[]") + "[]".length()));
+            } else {
+                result.setPath("." + field.getPath());
+                result.setLocalAlias(alias);
+                result.setArray(null);
+            }
+            return result;
+        }
+
+        private String getJoinClauseAliasName(String field) {
+            return field.replaceAll("\\.", "");
+        }
+
+        @Getter
+        @Setter
+        private static class FieldDecomposition {
+            private String path;
+            private String localAlias;
+            private String array;
+        }
+
     }
 
 
@@ -404,5 +477,10 @@ public class ItemQuery {
     @FunctionalInterface
     public interface ItemCountQueryExecutor {
         Integer execute();
+    }
+
+    @FunctionalInterface
+    public interface FilterSampleQueryExecutor {
+        Set<String> execute();
     }
 }

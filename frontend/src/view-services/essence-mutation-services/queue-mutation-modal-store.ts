@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import { computed } from 'mobx';
 import { QUEUE_MANAGEMENT, QUEUE_MUTATION_TYPES } from '../../constants';
@@ -17,10 +20,23 @@ export class QueueMutationModalStore {
         }
     }
 
+    /**
+     * We should block block updating deadline settings according to user permissions
+     */
     @computed
-    get blockDisableProcessingDeadline() {
-        const { blockDisableProcessingDeadline, mutationType } = this.queueMutationStore;
-        return blockDisableProcessingDeadline || (mutationType === QUEUE_MUTATION_TYPES.UPDATE && !this.userStore.checkUserCan(QUEUE_MANAGEMENT.UPDATE_DEADLINE));
+    get blockUpdatingProcessingDeadline() {
+        const { mutationType } = this.queueMutationStore;
+        return mutationType === QUEUE_MUTATION_TYPES.UPDATE && !this.userStore.checkUserCan(QUEUE_MANAGEMENT.UPDATE_DEADLINE);
+    }
+
+    /**
+     * We should block unsetting processing deadline if it was initially set,
+     * as well as block updating deadline settings according to user permissions
+     */
+    @computed
+    get blockDisablingProcessingDeadline() {
+        const { blockDisablingProcessingDeadline } = this.queueMutationStore;
+        return blockDisablingProcessingDeadline || this.blockUpdatingProcessingDeadline;
     }
 
     @computed

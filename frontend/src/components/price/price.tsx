@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Text } from '@fluentui/react/lib/Text';
 import React, { Component } from 'react';
 

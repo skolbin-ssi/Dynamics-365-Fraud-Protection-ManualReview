@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { computed, observable } from 'mobx';
 import { DecisionDTO } from '../../data-services/api-services/models';
 

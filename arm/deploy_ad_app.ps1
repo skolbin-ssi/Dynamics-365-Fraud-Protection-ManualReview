@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 Param(
     [string] $AD_APP_NAME,
 
@@ -9,7 +12,7 @@ Param(
 $ErrorActionPreference = "Stop"
 
 # Register Azure AD Application
-Write-Host "= Register App"
+Write-Host "= Register App"$AD_APP_NAME
 $CLIENT_ID = (az ad app list --display-name "${AD_APP_NAME}" --query "[0].appId")
 if (!($CLIENT_ID))
 {
@@ -72,9 +75,11 @@ if (!($APP_SP_ID))
     # Set admin consent
     Write-Host "= Set admin consent"
     # This operation sometimes raise an exception, do some retries
-    for ($i = 0; $i -lt 3; $i++) {
+    for ($i = 0; $i -lt 5; $i++) {
+        Write-Host "Retry"$i
+        Start-Sleep -s 10
         az ad app permission admin-consent --id "${CLIENT_ID}"
-        if ($LastExitCode -ne 0) { Start-Sleep -s 2 } else { break }
+        if ($LastExitCode -eq 0) { break }
     }
 
     if ($LastExitCode -ne 0) {

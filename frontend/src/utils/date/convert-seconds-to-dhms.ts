@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Duration } from 'iso8601-duration';
 
 export function convertSecondsToDhms(timeInSeconds: number): Duration {

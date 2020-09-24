@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { AddressDTO } from './address-dto';
 import { DeviceContextDTO } from './device-context-dto';
 import { PaymentInstrumentDTO } from './payment-instrument-dto';

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject } from 'inversify';
 import axios, { CancelTokenSource } from 'axios';
 import { DICTIONARY_TYPE } from '../../../constants';

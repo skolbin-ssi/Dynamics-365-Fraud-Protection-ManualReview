@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.queues.model;
 
 import org.junit.jupiter.api.Test;
@@ -12,7 +15,7 @@ class ItemQueryTest {
     void ItemQueryCanDealWithArrayInFilter() {
         ItemFilter filter = new ItemFilterIn();
         filter.setCondition(ItemFilter.FilterCondition.IN);
-        filter.setField(ItemFilter.FilterField.PRODUCT_SKU);
+        filter.setField(ItemDataField.PRODUCT_SKU);
         filter.setValues(List.of("edu", "sales"));
         String select = ItemQuery.constructor("i")
                 .all(List.of(filter))
@@ -32,11 +35,11 @@ class ItemQueryTest {
     void ItemQueryCanDealWithArrayInManyFilters() {
         ItemFilter filter1 = new ItemFilterIn();
         filter1.setCondition(ItemFilter.FilterCondition.IN);
-        filter1.setField(ItemFilter.FilterField.PRODUCT_SKU);
+        filter1.setField(ItemDataField.PRODUCT_SKU);
         filter1.setValues(List.of("edu", "sales"));
         ItemFilter filter2 = new ItemFilterIn();
         filter2.setCondition(ItemFilter.FilterCondition.IN);
-        filter2.setField(ItemFilter.FilterField.PRODUCT_SKU);
+        filter2.setField(ItemDataField.PRODUCT_SKU);
         filter2.setValues(List.of("edu", "dreams"));
         String select = ItemQuery.constructor("i")
                 .all(List.of(filter1, filter2))
@@ -58,11 +61,11 @@ class ItemQueryTest {
     void ItemQueryCanDealWithArrayInCombinedFilters() {
         ItemFilter filter1 = new ItemFilterIn();
         filter1.setCondition(ItemFilter.FilterCondition.IN);
-        filter1.setField(ItemFilter.FilterField.PRODUCT_SKU);
+        filter1.setField(ItemDataField.PRODUCT_SKU);
         filter1.setValues(List.of("edu", "sales"));
         ItemFilter filter2 = new ItemFilterIn();
         filter2.setCondition(ItemFilter.FilterCondition.IN);
-        filter2.setField(ItemFilter.FilterField.SCORE);
+        filter2.setField(ItemDataField.SCORE);
         filter2.setValues(List.of("0", "1"));
         String select = ItemQuery.constructor("i")
                 .all(List.of(filter1, filter2))
@@ -81,7 +84,7 @@ class ItemQueryTest {
     void ItemQueryCanDealWithUsualInFilters() {
         ItemFilter filter = new ItemFilterIn();
         filter.setCondition(ItemFilter.FilterCondition.IN);
-        filter.setField(ItemFilter.FilterField.SCORE);
+        filter.setField(ItemDataField.SCORE);
         filter.setValues(List.of("0", "1"));
         String select = ItemQuery.constructor("i")
                 .all(List.of(filter))
@@ -96,11 +99,11 @@ class ItemQueryTest {
     void ItemQueryCanDealWithArrayInCombinedFiltersWhenCount() {
         ItemFilter filter1 = new ItemFilterIn();
         filter1.setCondition(ItemFilter.FilterCondition.IN);
-        filter1.setField(ItemFilter.FilterField.PRODUCT_SKU);
+        filter1.setField(ItemDataField.PRODUCT_SKU);
         filter1.setValues(List.of("edu", "sales"));
         ItemFilter filter2 = new ItemFilterIn();
         filter2.setCondition(ItemFilter.FilterCondition.IN);
-        filter2.setField(ItemFilter.FilterField.SCORE);
+        filter2.setField(ItemDataField.SCORE);
         filter2.setValues(List.of("0", "1"));
         String counting = ItemQuery.constructor("i")
                 .all(List.of(filter1, filter2))

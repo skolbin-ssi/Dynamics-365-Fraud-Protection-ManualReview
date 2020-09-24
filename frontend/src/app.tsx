@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React from 'react';
 import {
     Redirect, Route, Router, Switch
@@ -14,6 +17,7 @@ import {
     ERROR_SCREEN_STATES,
     MANUAL_REVIEW,
     QUEUE_MANAGEMENT,
+    USER_INFO_MANAGEMENT,
     ROUTES
 } from './constants';
 import {
@@ -23,7 +27,8 @@ import {
     Error,
     Login,
     Queues,
-    ReviewConsole
+    ReviewConsole,
+    PersonalPerformance
 } from './screens';
 import { QueueTiles } from './screens/queue-tiles/queue-tiles';
 
@@ -36,6 +41,12 @@ export const ROUTES_LIST = [
     {
         path: ROUTES.LOGIN,
         component: Login
+    },
+    {
+        path: ROUTES.PERSONAL_PERFORMANCE,
+        component: PersonalPerformance,
+        isPrivate: true,
+        accessPermission: USER_INFO_MANAGEMENT.ACCESS
     },
     { // order defined below should be kept
         path: [

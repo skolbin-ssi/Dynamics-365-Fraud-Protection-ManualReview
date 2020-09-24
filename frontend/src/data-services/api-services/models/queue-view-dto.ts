@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { LABEL, QUEUE_VIEW_TYPE } from '../../../constants';
 import { ItemFilterDTO } from './item-filter-dto';
 import { QueueSortingSettingsDTO } from './queue-sorting-settings-dto';

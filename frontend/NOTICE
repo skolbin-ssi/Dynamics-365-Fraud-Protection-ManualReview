@@ -1,0 +1,482 @@
+=========================================================================
+== This NOTICE file describes the dependencies, which used in          ==
+== the project.                                                        ==
+=========================================================================
+
+@babel/core
+Version: 7.8.4
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Babel compiler core.
+https://github.com/babel/babel/tree/master/packages/babel-core
+
+
+@fluentui/react
+Version: 7.110.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Reusable React components for building web experiences.
+https://github.com/microsoft/fluentui
+
+
+@nivo/bar
+Version: 0.62.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Responsive BarChart (nivo.rocks)
+
+
+
+@nivo/line
+Version: 0.62.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Responsive LineChart (nivo.rocks)
+
+
+
+@nivo/pie
+Version: 0.62.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Responsive PieChart (nivo.rocks)
+
+
+
+@svgr/webpack
+Version: 4.3.3
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+SVGR webpack loader.
+https://github.com/smooth-code/svgr/tree/master/packages/webpack
+
+
+@testing-library/dom
+Version: 7.2.2
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Simple and complete DOM testing utilities that encourage good testing practices.
+https://github.com/testing-library/dom-testing-library
+
+
+@testing-library/jest-dom
+Version: 4.2.4
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Custom jest matchers to test the state of the DOM
+https://github.com/testing-library/jest-dom
+
+
+@testing-library/user-event
+Version: 7.2.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Simulate user events for react-testing-library
+https://github.com/testing-library/user-event
+
+
+@types/axios
+Version: 0.14.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Stub TypeScript definitions entry for axios
+which provides its own types definitions
+
+@types/history
+Version: 4.7.5
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+TypeScript definitions for history
+https://github.com/DefinitelyTyped/DefinitelyTyped
+
+
+@types/jest
+Version: 24.9.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+TypeScript definitions for Jest
+https://github.com/DefinitelyTyped/DefinitelyTyped
+
+
+@types/js-cookie
+Version: 2.2.6
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+TypeScript definitions for js-cookie
+https://github.com/DefinitelyTyped/DefinitelyTyped
+
+
+@types/jwt-decode
+Version: 2.2.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+TypeScript definitions for jwt-decode
+https://github.com/DefinitelyTyped/DefinitelyTyped
+
+
+@types/lodash
+Version: 4.14.157
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+TypeScript definitions for Lo-Dash
+https://github.com/DefinitelyTyped/DefinitelyTyped
+
+
+@types/prop-types
+Version: 15.7.3
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+TypeScript definitions for prop-types
+https://github.com/DefinitelyTyped/DefinitelyTyped
+
+
+@types/randomcolor
+Version: 0.5.5
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+TypeScript definitions for randomColor
+https://github.com/DefinitelyTyped/DefinitelyTyped
+
+
+@uifabric/fluent-theme
+Version: 7.1.68
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Fluent theming for use with Fabric components.
+https://github.com/microsoft/fluentui
+
+
+@uifabric/icons
+Version: 7.3.33
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Fluent UI React icon set.
+https://github.com/microsoft/fluentui
+
+
+adal-angular
+Version: 1.0.17
+License: Apache License 2.0 (Apache-2.0) https://spdx.org/licenses/Apache-2.0.html
+Windows Azure Active Directory Client Library for js
+https://github.com/AzureAD/azure-activedirectory-library-for-js
+
+
+axios
+Version: 0.19.2
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Promise based HTTP client for the browser and node.js
+https://github.com/axios/axios
+
+
+autobind-decorator
+Version: 2.4.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Decorator for binding method to an object
+https://github.com/andreypopp/autobind-decorator
+
+
+azure-maps-control
+Version: 2.0.26
+License: Custom: https://azure.com/maps
+Map SDK for Azure Maps
+
+
+
+azure-maps-rest
+Version: 2.0.5
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+SDK for Azure Maps REST Services
+
+
+
+babel-eslint
+Version: 10.0.3
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Custom parser for ESLint
+https://github.com/babel/babel-eslint
+
+
+babel-jest
+Version: 24.9.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Jest plugin to use babel for transformation.
+https://github.com/facebook/jest
+
+
+babel-loader
+Version: 8.0.6
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+babel module loader for webpack
+https://github.com/babel/babel-loader
+
+
+babel-plugin-named-asset-import
+Version: 0.3.6
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Babel plugin for named asset imports in Create React App
+https://github.com/facebook/create-react-app
+
+
+camelcase
+Version: 5.3.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Convert a dash/dot/underscore/space separated string to camelCase or PascalCase: `foo-bar` → `fooBar`
+https://github.com/sindresorhus/camelcase
+
+
+case-sensitive-paths-webpack-plugin
+Version: 2.3.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Enforces module path case sensitivity in Webpack
+https://github.com/Urthen/case-sensitive-paths-webpack-plugin
+
+
+classnames
+Version: 2.2.6
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+A simple utility for conditionally joining classNames together
+https://github.com/JedWatson/classnames
+
+
+cross-env
+Version: 7.0.2
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Run scripts that set and use environment variables across platforms
+https://github.com/kentcdodds/cross-env
+
+
+css-loader
+Version: 3.4.2
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+css loader module for webpack
+https://github.com/webpack-contrib/css-loader
+
+
+dotenv-expand
+Version: 5.1.0
+License: BSD 2-Clause "Simplified" License (BSD-2-Clause) https://spdx.org/licenses/BSD-2-Clause.html
+Expand environment variables using dotenv
+
+
+
+dotenv
+Version: 8.2.0
+License: BSD 2-Clause "Simplified" License (BSD-2-Clause) https://spdx.org/licenses/BSD-2-Clause.html
+Loads environment variables from .env file
+https://github.com/motdotla/dotenv
+
+
+file-loader
+Version: 4.3.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+A file loader module for webpack
+https://github.com/webpack-contrib/file-loader
+
+
+fs-extra
+Version: 8.1.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+"fs-extra contains methods that aren't included in the vanilla Node.js fs package. Such as mkdir -p
+ cp -r
+
+history
+Version: 4.10.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Manage session history with JavaScript
+https://github.com/ReactTraining/history
+
+
+html-webpack-plugin
+Version: 4.0.0-beta.11
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Simplifies creation of HTML files to serve your webpack bundles
+https://github.com/jantimon/html-webpack-plugin
+
+
+identity-obj-proxy
+Version: 3.0.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+an identity object using ES6 proxies
+https://github.com/keyanzhang/identity-obj-proxy
+
+
+inversify-react
+Version: 0.4.3
+License: Apache License 2.0 (Apache-2.0) https://spdx.org/licenses/Apache-2.0.html
+Components and decorators to connect react with inversify.
+https://github.com/Kukkimonsuta/inversify-react
+
+
+inversify
+Version: 5.0.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+A powerful and lightweight inversion of control container for JavaScript and Node.js apps powered by TypeScript.
+https://github.com/inversify/InversifyJS
+
+
+iso8601-duration
+Version: 1.2.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Node/Js-module for parsing and making sense of ISO8601-durations
+https://github.com/tolu/ISO8601-duration
+
+
+jest-environment-jsdom-fourteen
+Version: 1.0.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+JSDOM environment for Jest with JSDOM 14
+https://github.com/ianschmitz/jest-environment-jsdom-fourteen
+
+
+jwt-decode
+Version: 2.2.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+"Decode JWT tokens
+ mostly useful for browser applications."
+
+lodash
+Version: 4.17.19
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Lodash modular utilities.
+https://github.com/lodash/lodash
+
+
+mini-css-extract-plugin
+Version: 0.9.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+extracts CSS into separate files
+https://github.com/webpack-contrib/mini-css-extract-plugin
+
+
+mobx
+Version: 5.15.4
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+"Simple
+ scalable state management."
+
+msal
+Version: 1.3.2
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Microsoft Authentication Library for js
+https://github.com/AzureAD/microsoft-authentication-library-for-js
+
+
+optimize-css-assets-webpack-plugin
+Version: 5.0.3
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+A Webpack plugin to optimize \ minimize CSS assets.
+https://github.com/NMFR/optimize-css-assets-webpack-plugin
+
+
+pnp-webpack-plugin
+Version: 1.6.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+plug'n'play resolver for Webpack
+https://github.com/arcanis/pnp-webpack-plugin
+
+
+postcss-flexbugs-fixes
+Version: 4.1.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+PostCSS plugin This project tries to fix all of flexbug's issues
+https://github.com/luisrudge/postcss-flexbugs-fixes
+
+
+postcss-loader
+Version: 3.0.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+PostCSS loader for webpack
+https://github.com/postcss/postcss-loader
+
+
+postcss-normalize
+Version: 8.0.1
+License: Creative Commons Zero v1.0 Universal (CC0-1.0) https://spdx.org/licenses/CC0-1.0.html
+Use the parts of normalize.css or sanitize.css you need from your browserslist
+https://github.com/csstools/postcss-normalize
+
+
+postcss-preset-env
+Version: 6.7.0
+License: Creative Commons Zero v1.0 Universal (CC0-1.0) https://spdx.org/licenses/CC0-1.0.html
+Convert modern CSS into something browsers understand
+https://github.com/csstools/postcss-preset-env
+
+
+postcss-safe-parser
+Version: 4.0.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Fault-tolerant CSS parser for PostCSS
+https://github.com/postcss/postcss-safe-parser
+
+
+prop-types
+Version: 15.7.2
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Runtime type checking for React props and similar objects.
+https://github.com/facebook/prop-types
+
+
+query-string
+Version: 6.13.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Parse and stringify URL query strings
+https://github.com/sindresorhus/query-string
+
+
+react-app-polyfill
+Version: 1.0.6
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Polyfills for various browsers including commonly used language features
+https://github.com/facebook/create-react-app
+
+
+react-router-dom
+Version: 5.1.2
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+DOM bindings for React Router
+https://github.com/ReactTraining/react-router
+
+
+reflect-metadata
+Version: 0.1.13
+License: Apache License 2.0 (Apache-2.0) https://spdx.org/licenses/Apache-2.0.html
+Polyfill for Metadata Reflection API
+https://github.com/rbuckton/reflect-metadata
+
+
+resolve-url-loader
+Version: 3.1.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Webpack loader that resolves relative paths in url() statements based on the original source file
+https://github.com/bholloway/resolve-url-loader
+
+
+resolve
+Version: 1.15.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+resolve like require.resolve() on behalf of files asynchronously and synchronously
+https://github.com/browserify/resolve
+
+
+sass-loader
+Version: 8.0.2
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Sass loader for webpack
+https://github.com/webpack-contrib/sass-loader
+
+
+semver
+Version: 6.3.0
+License: ISC License (ISC) https://spdx.org/licenses/ISC.html
+The semantic version parser used by npm.
+https://github.com/npm/node-semver
+
+
+style-loader
+Version: 0.23.1
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+style loader module for webpack
+https://github.com/webpack-contrib/style-loader
+
+
+terser-webpack-plugin
+Version: 4.1.0
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Terser plugin for webpack
+https://github.com/webpack-contrib/terser-webpack-plugin
+
+
+ts-pnp
+Version: 1.1.5
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+plug'n'play resolver for TypeScript
+https://github.com/arcanis/ts-pnp
+
+
+typeface-roboto
+Version: 0.0.75
+License: MIT License (MIT) https://spdx.org/licenses/MIT.html 
+Roboto typeface
+https://github.com/KyleAMathews/typefaces/tree/master/packages/roboto

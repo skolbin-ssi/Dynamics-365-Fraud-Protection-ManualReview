@@ -1,6 +1,4 @@
-spring:
-  cloud:
-    azure:
-      eventhub:
-        connection-string: ${spring-cloud-azure-eventhub-secondary-connection-string:${EVENT_HUB_CONNECTION_STRING}}
-        checkpoint-access-key: ${spring-cloud-azure-eventhub-checkpoint-secondary-access-key:${EVENT_HUB_OFFSET_STORAGE_KEY}}
+azure:
+  event-hub:
+    connection-string: ${spring-cloud-azure-eventhub-secondary-connection-string:${EVENT_HUB_CONNECTION_STRING}}
+    checkpoint-connection-string: DefaultEndpointsProtocol=https;AccountName=${EVENT_HUB_OFFSET_STORAGE_NAME};AccountKey=${spring-cloud-azure-eventhub-checkpoint-secondary-access-key:${EVENT_HUB_OFFSET_STORAGE_KEY}};EndpointSuffix=core.windows.net

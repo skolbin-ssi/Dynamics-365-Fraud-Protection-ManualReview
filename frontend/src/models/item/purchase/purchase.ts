@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { observable } from 'mobx';
 import { PurchaseDTO } from '../../../data-services/api-services/models';
 import { BaseModel } from '../../misc';

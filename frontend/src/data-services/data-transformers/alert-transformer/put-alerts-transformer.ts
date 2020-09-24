@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Alert } from '../../../models';
 import { PutAlertRequest } from '../../api-services/alerts-api-service/api-models/put-alert-request';
 import { PutAlertResponse } from '../../api-services/alerts-api-service/api-models/put-alert-response';

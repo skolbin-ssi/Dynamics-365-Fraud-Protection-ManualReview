@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 package com.griddynamics.msd365fp.manualreview.analytics.model.dto;
 
 import lombok.AllArgsConstructor;
@@ -14,9 +17,9 @@ public class ItemLabelingMetricDTO {
     @Builder.Default
     private int reviewed = 0;
     @Builder.Default
-    private int approved = 0;
+    private int good = 0;
     @Builder.Default
-    private int rejected = 0;
+    private int bad = 0;
     @Builder.Default
     private int watched = 0;
     @Builder.Default
@@ -26,7 +29,7 @@ public class ItemLabelingMetricDTO {
     @Builder.Default
     private int other = 0;
     @Builder.Default
-    private int approveOverturned = 0;
+    private int goodOverturned = 0;
     @Builder.Default
-    private int rejectOverturned = 0;
+    private int badOverturned = 0;
 }

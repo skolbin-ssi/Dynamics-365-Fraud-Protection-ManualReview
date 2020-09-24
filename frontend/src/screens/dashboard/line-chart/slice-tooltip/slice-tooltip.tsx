@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /* eslint-disable react/prop-types */
 import React from 'react';
 import cx from 'classnames';
@@ -37,6 +40,7 @@ export const SliceTooltip: React.FC<SliceTooltipProps & NivoSliceTooltipProps> =
     const totalCount = slice.points
         .map(datum => Number(datum.data.y))
         .reduce((prev, next) => prev + next);
+    const reversedPoints = [...slice.points].reverse();
 
     function renderUserAvatar(value: ExtendedPoint) {
         const { user } = value.data;
@@ -87,8 +91,7 @@ export const SliceTooltip: React.FC<SliceTooltipProps & NivoSliceTooltipProps> =
                 )}
             </div>
             {
-                slice.points
-                    .sort((prevPoint, nextPoint) => (nextPoint.data.y as number) - (prevPoint.data.y as number))
+                reversedPoints
                     .map(value => (
                         <div
                             key={value.serieId}

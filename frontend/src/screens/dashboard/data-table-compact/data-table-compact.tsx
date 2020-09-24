@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import autoBind from 'autobind-decorator';
 import { observer } from 'mobx-react';
@@ -37,14 +40,13 @@ export class DataTableCompact<T extends BasicEntityPerformance> extends Componen
             // eslint-disable-next-line react/destructuring-assignment
             name: this.props.isAnalystTable ? 'Analyst' : 'Queue',
             minWidth: 50,
-            maxWidth: 250,
             onRender: this.renderFirstColumn,
         },
         {
             key: 'reviewed',
             name: 'Reviewed',
-            minWidth: 50,
-            maxWidth: 120,
+            minWidth: 100,
+            maxWidth: 100,
             className: `${CN}__right-aligned-cell ${CN}__sorting-arrow`,
             onRender: ({ total }: T) => (
                 <div className={`${CN}__content-row`}>
@@ -55,19 +57,19 @@ export class DataTableCompact<T extends BasicEntityPerformance> extends Componen
             ),
         },
         {
-            key: 'approved',
-            name: 'Approved',
-            minWidth: 50,
-            maxWidth: 120,
+            key: 'good',
+            name: 'Good',
+            minWidth: 100,
+            maxWidth: 100,
             className: `${CN}__right-aligned-cell`,
             onRender: (queue: T) => (
                 <div className={`${CN}__content-row`}>
                     <Text variant="medium" className={`${CN}__score-cell`}>
-                        {queue.total.approved}
+                        {queue.total.good}
                     </Text>
-                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--approved`)}>
+                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--good`)}>
                         <span>
-                            {queue.approvedRatio}
+                            {queue.goodDecisionsRatio}
                             %
                         </span>
                     </div>
@@ -76,9 +78,9 @@ export class DataTableCompact<T extends BasicEntityPerformance> extends Componen
         },
         {
             key: 'watched',
-            name: 'Watched',
-            minWidth: 50,
-            maxWidth: 120,
+            name: 'Watch',
+            minWidth: 100,
+            maxWidth: 100,
             className: `${CN}__right-aligned-cell`,
             onRender: (queue: T) => (
                 <div className={`${CN}__content-row`}>
@@ -87,7 +89,7 @@ export class DataTableCompact<T extends BasicEntityPerformance> extends Componen
                     </Text>
                     <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--watched`)}>
                         <span>
-                            {queue.watchedRatio}
+                            {queue.watchDecisionsRatio}
                             %
                         </span>
                     </div>
@@ -95,19 +97,19 @@ export class DataTableCompact<T extends BasicEntityPerformance> extends Componen
             ),
         },
         {
-            key: 'rejected',
-            name: 'Rejected',
-            minWidth: 50,
-            maxWidth: 120,
+            key: 'bad',
+            name: 'Bad',
+            minWidth: 100,
+            maxWidth: 100,
             className: `${CN}__right-aligned-cell`,
             onRender: (queue: T) => (
                 <div className={`${CN}__content-row`}>
                     <Text variant="medium" className={`${CN}__score-cell`}>
-                        {queue.total.rejected}
+                        {queue.total.bad}
                     </Text>
-                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--rejected`)}>
+                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--bad`)}>
                         <span>
-                            {queue.rejectedRatio}
+                            {queue.badDecisionsRatio}
                             %
                         </span>
                     </div>
@@ -190,7 +192,6 @@ export class DataTableCompact<T extends BasicEntityPerformance> extends Componen
             <div className={cx(CN, className)}>
                 <ShimmeredDetailsList
                     enableShimmer={isLoading}
-                    layoutMode={DetailsListLayoutMode.justified}
                     className={CN}
                     selectionMode={SelectionMode.none}
                     columns={this.columns}

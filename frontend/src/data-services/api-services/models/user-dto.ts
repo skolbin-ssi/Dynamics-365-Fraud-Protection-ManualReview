@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { ROLE } from '../../../constants';
 
 export interface UserDTO {

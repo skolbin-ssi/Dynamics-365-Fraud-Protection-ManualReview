@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { BaseTransformer } from '../base-transformer';
 import { CollectedQueueInfoDto } from '../../api-services/models/collected-info/collecte-queue-info';
 import { Queue, User } from '../../../models';

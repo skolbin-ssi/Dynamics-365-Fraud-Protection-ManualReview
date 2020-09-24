@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Container } from 'inversify';
 import { ConfigurationApiServiceImpl } from '../data-services/api-services/configuration/configuration-api-service-impl';
 import { TYPES } from '../types';

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { inject, injectable } from 'inversify';
 import lGet from 'lodash/get';
 import { action, computed, observable } from 'mobx';
@@ -162,7 +165,7 @@ export class ReviewConsoleScreenStore {
         this.isInAddNoteMode = false;
         this.isNoteSubmitting = true;
         const currentItemId = this.reviewItem?.id;
-        const currentQueueId = this.queue?.queueId;
+        const currentQueueId = this.queue?.viewId;
         if (!currentItemId || !currentQueueId) {
             return;
         }
@@ -215,7 +218,7 @@ export class ReviewConsoleScreenStore {
 
         if (this.reviewItem && this.queue) {
             const currentItemId = this.reviewItem.id;
-            const currentQueueId = this.queue.queueId;
+            const currentQueueId = this.queue.viewId;
 
             await this.itemService.patchItemTags(this.reviewItem.id, this.reviewItemTags);
             await this.getItem(currentItemId, currentQueueId, true);

@@ -1,4 +1,8 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import queryString, { ParsedQuery } from 'query-string';
+import { CHART_AGGREGATION_PERIOD, PERFORMANCE_RATING } from '../constants';
 
 /**
  * Maps keys from specified type to booleans types
@@ -19,6 +23,18 @@ interface ReadSearchQueryFields extends ParsedQuery {
     overturnedAggregation?: string;
     from?: string;
     to?: string;
+}
+
+/**
+ * Represents URL search query params on the dashboard pages and on the personal-performance page
+ */
+export interface PerformanceParsedQueryUrl extends ParsedQuery {
+    ids: string[],
+    rating: PERFORMANCE_RATING,
+    aggregation: CHART_AGGREGATION_PERIOD,
+    overturnedIds: string[],
+    overturnedRating: PERFORMANCE_RATING,
+    overturnedAggregation: CHART_AGGREGATION_PERIOD
 }
 
 /**

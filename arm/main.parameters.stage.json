@@ -61,7 +61,11 @@
         },
         "alertReceivers": {
             "value": [
-                "ms_gd_engineering@griddynamics.com"
+                "asokolov@griddynamics.com",
+                "asavelev@griddynamics.com",
+                "alavielle@griddynamics.com",
+                "imytropan@griddynamics.com",
+                "istetsiuk@griddynamics.com"
             ]
         },
         "NoIncomingEventsDfphubEvaluationFrequency": {

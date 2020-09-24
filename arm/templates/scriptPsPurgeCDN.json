@@ -38,10 +38,6 @@
         },
         "properties": {
             "forceUpdateTag": "[parameters('utcValue')]",
-            "storageAccountSettings": {
-                "storageAccountName": "[parameters('storageAccountName')]",
-                "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-06-01').keys[0].value]"
-            },
             "azPowerShellVersion": "3.0",
             "scriptContent": "
                 param([string] $rgName,[string] $cdnEndpointName, [string] $cdnProfileName)

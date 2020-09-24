@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { LABEL } from '../../constants';
 import { ApiServiceResponse } from '../base-api-service';
 import { GetItemResponse, GetLockedItemsResponse } from '../api-services/item-api-service/api-models';

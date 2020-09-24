@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { PerformanceMetrics } from './performance-metrics';
 
 import { PeriodPerformanceMetrics } from '../../data-services/api-services/models/dashboard';
@@ -38,19 +41,19 @@ export interface BasicEntityPerformance {
     isChecked: boolean,
 
     /**
-     * Ration between reviewed numbers to approved
+     * Ratio of good decisions to all reviewed items
      */
-    approvedRatio: number,
+    goodDecisionsRatio: number,
 
     /**
-     * Ration between reviewed numbers to watched
+     * Ratio of watch decisions to all reviewed items
      */
-    watchedRatio: number,
+    watchDecisionsRatio: number,
 
     /**
-     * Ration between reviewed numbers to rejected
+     * Ratio of bad decisions to all reviewed items
      */
-    rejectedRatio: number
+    badDecisionsRatio: number
 
     /**
      * setIsChecked - indicates either this performance metric has been selected or not
@@ -58,19 +61,19 @@ export interface BasicEntityPerformance {
      */
     setIsChecked: (isChecked: boolean) => void;
 
-    approvedApplied: number
+    goodApplied: number
 
-    approvedOverturned: number
+    goodOverturned: number
 
-    approvedAccuracy: number
+    goodOverturnRate: number
 
-    rejectedApplied: number
+    badApplied: number
 
-    rejectedOverturned: number
+    badOverturned: number
 
-    rejectedAccuracy: number
+    badOverturnRate: number
 
-    accuracyAverage: number
+    averageOverturnRate: number
 
     accuracyReport: {}
 

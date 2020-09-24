@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { Modal } from '@fluentui/react/lib/Modal';
 import { Persona, PersonaSize } from '@fluentui/react/lib/Persona';
 import autobind from 'autobind-decorator';

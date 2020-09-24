@@ -2,6 +2,8 @@ mr:
   task-reset-timeout-multiplier: 4.0
   task-warning-timeout-multiplier: 2.0
   tasks:
+    fail-fast-healthcheck-task:
+      delay: PT10M
     resolution-send-task:
       delay: PT1M
       timeout: PT5M
@@ -37,6 +39,10 @@ azure:
   dfp-auth:
     token-cache-size: 500
     token-cache-retention: PT10M
+  event-hub:
+    checkpoint-interval: PT3M
+    consumer-error-threshold: 5
+    producerer-error-threshold: 5
 
 swagger:
   # the https://cors-anywhere.herokuapp.com/ prefix is only for dev environments

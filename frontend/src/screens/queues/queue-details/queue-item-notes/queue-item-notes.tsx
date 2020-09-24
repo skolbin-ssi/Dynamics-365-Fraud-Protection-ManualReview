@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import React, { Component } from 'react';
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
@@ -10,7 +13,7 @@ import { Persona, PersonaSize } from '@fluentui/react/lib/Persona';
 
 import { Note } from '../../../../models';
 import { QueuesScreenStore } from '../../../../view-services';
-import { encodeStringForCSS } from '../../../../utils';
+import { encodeStringForCSS, formatForNotes } from '../../../../utils';
 import { TYPES } from '../../../../types';
 
 import './queue-item-notes.scss';
@@ -79,9 +82,7 @@ export class QueueItemNote extends Component<QueueItemNoteProps, never> {
                         {
                             notes.map((note: Note, i) => {
                                 const { note: content, created, user } = note;
-                                const formattedDate = created
-                                    ? `${new Date(created).toLocaleDateString()} at ${new Date(created).toLocaleTimeString()}`
-                                    : '';
+                                const formattedDate = formatForNotes(created, '');
                                 const name = user ? user.name : 'Fraud Analyst';
                                 return (
                                     // TODO: don't use index as key (so far we don't have unique params in dummy data)

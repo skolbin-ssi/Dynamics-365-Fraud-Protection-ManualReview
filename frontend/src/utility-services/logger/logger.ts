@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export interface LogEntity {
     readonly data?: object;
     readonly message: string;

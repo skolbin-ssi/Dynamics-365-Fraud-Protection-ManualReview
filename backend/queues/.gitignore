@@ -37,4 +37,4 @@ out/
 ##############################
 ## App Specific
 ##############################
-!src/main/resources/applicationinsights-agent*.jar
+!src/main/resources/applicationinsights-agent/applicationinsights-agent*.jar

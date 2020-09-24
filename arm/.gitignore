@@ -1,1 +1,3 @@
 build
+!main.parameters.tst.json
+main.parameters.*.json

@@ -241,6 +241,11 @@ if (CheckOSWindows)
     Connect-AzureAD -TenantId $currentAzureContext.Tenant.Id -AccountId $currentAzureContext.Account.Id
 }
 
+# Register providers
+Write-Host "=== Register Azure resource providers"
+Register-AzResourceProvider `
+    -ProviderNamespace Microsoft.ContainerInstance
+
 Write-Host "=== Cleanup artifacts temporary directory"
 if (Test-Path "${baseDir}/build" -PathType container) {
     Remove-Item "${baseDir}/build" -Recurse
@@ -323,7 +328,7 @@ if (CheckOSWindows)
     Write-Host "=== Assing DFP roles to application"
     foreach ($dfpRoleName in $dfpRoles[$envType]) {
         GrantDfpPermissionWin -clientAppName $prefix -dfpRoleName $dfpRoleName
-    } 
+    }
 }
 
 
@@ -412,8 +417,6 @@ Write-Host "=== Assign role to managed identity"
 if (!(Get-AzRoleAssignment -ObjectId $spId.PrincipalId -ResourceGroupName $deploymentResourceGroup -ErrorAction Ignore))
 { 
     for ($i=0; $i -lt 10; $i++) {
-        # Sometimes role assignment fails if try to assign role immediately after creation
-        # to fix this add some retries 
         Start-Sleep -Seconds 5
         if (New-AzRoleAssignment -ObjectId $spId.PrincipalId -RoleDefinitionName "Contributor" -ResourceGroupName $deploymentResourceGroup -ErrorAction Ignore) {
             Write-Host "Managed Identity"$spId.Name"granted Contributor role at resource group"$deploymentResourceGroup
@@ -443,6 +446,8 @@ $deployment = New-AzResourceGroupDeployment `
     -appAnalyticsPackageUrl ("https://${deploymentStorageAccount}.blob.core.windows.net/deploy/analytics/target-${version}.zip" + $token) `
     -keyVaultName $keyVaultName
 
+Write-Host "=== Set admin consent for Azure AD applicaton"
+./deploy_ad_app_admin_consent.ps1 -AD_APP_NAME "$prefix"
 
 Write-Host "Deployment Output"
 Write-Host $deployment.OutputsString

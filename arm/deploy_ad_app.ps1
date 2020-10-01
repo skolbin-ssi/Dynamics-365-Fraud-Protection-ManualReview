@@ -71,20 +71,6 @@ if (!($APP_SP_ID))
     if ($LastExitCode -ne 0) {
         throw "Last command failed, check logs"
     }
-
-    # Set admin consent
-    Write-Host "= Set admin consent"
-    # This operation sometimes raise an exception, do some retries
-    for ($i = 0; $i -lt 5; $i++) {
-        Write-Host "Retry"$i
-        Start-Sleep -s 10
-        az ad app permission admin-consent --id "${CLIENT_ID}"
-        if ($LastExitCode -eq 0) { break }
-    }
-
-    if ($LastExitCode -ne 0) {
-        throw "Last command failed, check logs"
-    }
 }
 else {
     Write-Host "= SP is already exist"

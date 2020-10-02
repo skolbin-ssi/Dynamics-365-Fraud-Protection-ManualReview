@@ -2,8 +2,9 @@
 1. Install Dynamics 365 Fraud Protection to your tenant in accordance with the [documentation](https://docs.microsoft.com/en-us/dynamics365/fraud-protection/provision-azure-tenant#provision-your-existing-azure-tenant)
 2. Create a mail account for alerts. The preferable provider is the [https://outlook.live.com/](https://outlook.live.com/)
 3. Create active subscription in Azure for solution resources. Remember Azure subscription id and tenant id for deployment steps.
+4. You must have assigned to you the 'Global Administrator' role in Azure Active Directory and the 'Owner' in Subscriptions.
 
-4. Install tools on deployment host:
+5. Install tools on deployment host:
    * Powershell version 7.0.3 [Instruction for Mac and Linux](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-macos?view=powershell-7), 5.1.0 (on Windows, should be pre-installed)
    * Powershell module 'Az' version 4.5.0 [Install instructions](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps?view=azps-4.5.0)
    * Powershell module 'Az.ManagedServiceIdentity'
@@ -37,7 +38,7 @@ Based on example file 'main.parameters.tst.json', create new file.
 
 Change 'prefix' parameter, should be uniq for environment. It defines the general prefix of all
 resources, created during deployment. Some of them, like storage account name, should be
-uniq by nature.
+uniq by nature. The 'prefix' parameter MUST be shorter than 14 characters.
 
 SubscriptionId and TenantId are two important parameters and should be verified they both have
 correct ids.
@@ -52,8 +53,8 @@ This parameter modifies following configuration settings
    For Dev environment 'localhost' urls will be added to provide a way to debug locally
 3. The appropriate spring profile will be configured for backend Java Web App
 
-## Alerts configuration
-In order to configure alerts for the solution, add the following parameter with
+## Technical alert configuration
+In order to configure health/availability alerts for the solution, add the following parameter with
 list of email addresses to properties file:
 ```
 "alertReceivers": {
@@ -65,10 +66,27 @@ list of email addresses to properties file:
 ```
 Alerts will be sent to this list of recepients.
 
-When this parameter is absent in the configuration file, alerts will be disabled.
+When this parameter is absent in the configuration file, technical alerts will be disabled.
 
-**Verify application options:**
+**WARNING!** Technical alerts are not related to business metric alerts inside application. Technical
+alerts are intended for troubleshooting and support. It can contain information from logs. 
 
+## Custom domain configuration
+In order to provide custom domain as entry point to the solution, following steps should be 
+accomplished:
+1. Add "customDomain" parameter to environment configuration file with domain name as value
+2. Configure CNAME record `<custom domain name> IN CNAME <$prefix.azurefd.net.>` in custom
+   domain dns zone
+3. If you have a Certificate Authority Authorization (CAA) record with your DNS provider, 
+   it must include DigiCert as a valid CA. 
+
+For mode details see [Front Doors documentation](https://docs.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain-https#validate-the-domain)
+Digicert [explanation](https://docs.digicert.com/manage-certificates/dns-caa-resource-record-check/)
+
+Previous steps should be performed before run deployment, as Azure Front Doors will validate custom domain
+dns zone before applying configuration.
+
+# Verify application options
 Depending on what you defined in deployment properties as the envType, the different property files will be used:
 * For `Dev` check all durations, URLs, and roles in:
     * [queue service property file](../backend/queues/src/main/resources/application-int.yml)
@@ -86,22 +104,7 @@ any value in env-specific property files will override values defined here):
     * [commion analytics service property file](../backend/analytics/src/main/resources/application.yml)
 
 Configuration files are available in the future in AppService.
-WARNING! Redeployment will override any manual changes in configuration files.
-
-## Custom domain configuration
-In order to provide custom domain as entry point to the solution, following steps should be 
-accomplished:
-1. Add "customDomain" parameter to environment configuration file with domain name as value
-2. Configure CNAME record `<custom domain name> IN CNAME <$prefix.azurefd.net.>` in custom
-   domain dns zone
-3. If you have a Certificate Authority Authorization (CAA) record with your DNS provider, 
-   it must include DigiCert as a valid CA. 
-
-For mode details see [Front Doors documentation](https://docs.microsoft.com/en-us/azure/frontdoor/front-door-custom-domain-https#validate-the-domain)
-Digicert [explanation](https://docs.digicert.com/manage-certificates/dns-caa-resource-record-check/)
-
-Previous steps should be performed before run deployment, as Azure Front Doors will validate custom domain
-dns zone before applying configuration.
+**WARNING!** Redeployment will override any manual changes in configuration files made at AppService.
 
 # Deploy application
 ## Initial deployment

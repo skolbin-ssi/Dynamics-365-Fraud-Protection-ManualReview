@@ -175,9 +175,6 @@
         line-height: 16px;
       }
 
-      /**
-       * @see https://www.w3schools.com/howto/howto_css_bullet_color.asp
-       */
       li::before {
         content: "\2022";  /* Add content: \2022 is the CSS Code/unicode for a bullet */
         color: $neutralTertiaryAlt; /* Change the color */

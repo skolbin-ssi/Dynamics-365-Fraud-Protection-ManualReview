@@ -34,7 +34,7 @@ export class DashboardServiceImpl extends BaseDomainService implements Dashboard
     }
 
     async getQueuesPerformance(params: DashboardRequestApiParams) {
-        const dataTransformer = new GetQueuePerformanceTransformer();
+        const dataTransformer = new GetQueuePerformanceTransformer(this.cacheStoreService);
         let response;
 
         try {

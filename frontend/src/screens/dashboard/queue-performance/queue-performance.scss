@@ -48,4 +48,12 @@
       margin-right: 32px;
     }
   }
+
+  &__pie-chart-no-data-placeholder {
+    position: relative;
+    width: 35%;
+    margin: auto;
+    height: 350px;
+    background: #f3f2f1;
+  }
 }

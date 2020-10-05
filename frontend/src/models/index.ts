@@ -12,3 +12,4 @@ export * from './misc';
 export * from './setting';
 export * from './external-link';
 export * from './alert';
+export * from './notification';

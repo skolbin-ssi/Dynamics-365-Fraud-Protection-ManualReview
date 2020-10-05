@@ -10,6 +10,10 @@
     grid-column-gap: 12px;
   }
 
+  &__analyst-overview-section {
+    margin-bottom: 30px;
+  }
+
   &__analyst-overview-section-content {
     display: flex;
   }
@@ -65,5 +69,24 @@
 
   &__progress-percent-arrow {
     margin-right: 4px;
+  }
+
+  &__empty-cell {
+    border: 1px solid $neutralLight;
+  }
+
+  &__no-data-placeholder {
+    position: relative;
+    width: 62%;
+    height: 232px;
+    background: $neutralLighter;
+  }
+
+  &__pie-chart-no-data-placeholder {
+    position: relative;
+    width: 35%;
+    margin: auto;
+    height: 350px;
+    background: #f3f2f1;
   }
 }

@@ -87,8 +87,12 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
     async handleCreateEditQueueClick() {
         const { queueMutationStore } = this.queueCreationModalStore;
         const result = await queueMutationStore.performMutation();
+
         if (result === 'success') {
             setTimeout(() => this.handleClose(), 500);
+        }
+        if (result === 'failure') {
+            this.handleClose();
         }
     }
 
@@ -96,8 +100,12 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
     async handleDeleteQueueClick() {
         const { queueMutationStore } = this.queueCreationModalStore;
         const result = await queueMutationStore.performDeletion();
+
         if (result === 'success') {
             setTimeout(() => this.handleClose(), 500);
+        }
+        if (result === 'failure') {
+            this.handleClose();
         }
     }
 

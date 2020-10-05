@@ -14,11 +14,6 @@ export interface QueuePerformanceDTO {
     id: string,
 
     /**
-     * name - queue name
-     */
-    name: string,
-
-    /**
      * data - aggregated performance metrics by dates
      */
     data: PeriodPerformanceMetrics;

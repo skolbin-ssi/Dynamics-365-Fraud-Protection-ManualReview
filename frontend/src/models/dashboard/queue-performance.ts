@@ -16,7 +16,6 @@ import { QueuePerformanceDTO } from '../../data-services/api-services/models/das
 export class QueuePerformance extends EntityPerformance {
     fromDto(queue: QueuePerformanceDTO) {
         this.id = queue.id;
-        this.name = (queue as QueuePerformanceDTO).name;
         this.data = queue.data;
         this.total = (queue.total as PerformanceMetrics);
         generateColor(queue.id)
@@ -43,5 +42,9 @@ export class QueuePerformance extends EntityPerformance {
         }
 
         return 0;
+    }
+
+    setQueueName(name: string) {
+        this.name = name;
     }
 }

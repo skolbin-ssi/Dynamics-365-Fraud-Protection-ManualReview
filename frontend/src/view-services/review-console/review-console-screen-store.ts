@@ -3,8 +3,14 @@
 
 import { inject, injectable } from 'inversify';
 import lGet from 'lodash/get';
-import { action, computed, observable } from 'mobx';
-import { LABEL, SETTING_TYPE } from '../../constants';
+import {
+    action, computed, observable, runInAction
+} from 'mobx';
+import {
+    LABEL,
+    NOTIFICATION_TYPE,
+    SETTING_TYPE,
+} from '../../constants';
 import { ItemService, QueueService, SettingsService } from '../../data-services';
 import { ApiServiceError } from '../../data-services/base-api-service';
 import {
@@ -16,6 +22,7 @@ import {
 import { MrUserError } from '../../models/exceptions';
 import { TYPES } from '../../types';
 import { LockedItemsStore } from '../locked-items-store';
+import { AppStore } from '../app-store';
 
 @injectable()
 export class ReviewConsoleScreenStore {
@@ -33,6 +40,8 @@ export class ReviewConsoleScreenStore {
     @observable loadingQueueData: boolean = false;
 
     @observable loadingQueueDataError: Error | null = null;
+
+    @observable labelingItemError: ApiServiceError | MrUserError | null = null;
 
     @observable isInAddNoteMode: boolean = false;
 
@@ -53,14 +62,16 @@ export class ReviewConsoleScreenStore {
     @computed get blockActionButtons(): boolean {
         return (!!this.queue && !this.queue.size)
             || !!this.loadingQueueDataError
-            || !!this.loadingReviewItemError;
+            || !!this.loadingReviewItemError
+            || !!this.labelingItemError;
     }
 
     constructor(
         @inject(TYPES.ITEM_SERVICE) private itemService: ItemService,
         @inject(TYPES.QUEUE_SERVICE) private queueService: QueueService,
         @inject(TYPES.LOCKED_ITEMS_STORE) private lockedItemsStore: LockedItemsStore,
-        @inject(TYPES.SETTINGS_SERVICE) private settingsService: SettingsService
+        @inject(TYPES.SETTINGS_SERVICE) private settingsService: SettingsService,
+        @inject(TYPES.APP_STORE) private appStore: AppStore
     ) {
         this.loadSettings();
     }
@@ -69,6 +80,7 @@ export class ReviewConsoleScreenStore {
     async getReviewItem(queueId: string, itemId?: string) {
         this.loadingReviewItem = true;
         this.loadingReviewItemError = null;
+        this.labelingItemError = null;
 
         try {
             if (itemId) {
@@ -88,6 +100,7 @@ export class ReviewConsoleScreenStore {
     @action
     async getItem(itemId: string, queueId?: string, consealed?: boolean) {
         this.loadingReviewItemError = null;
+        this.labelingItemError = null;
         if (!consealed) {
             this.loadingReviewItem = true;
         }
@@ -115,7 +128,21 @@ export class ReviewConsoleScreenStore {
     @action
     async labelOrder(label: LABEL) {
         if (this.reviewItem && this.queue) {
-            await this.itemService.labelItem(this.reviewItem.id, label);
+            try {
+                await this.itemService.labelItem(this.reviewItem.id, label);
+            } catch (e) {
+                this.labelingItemError = e;
+                this.appStore.showToast({
+                    type: NOTIFICATION_TYPE.LABEL_ADDED_ERROR,
+                });
+
+                return;
+            }
+
+            this.appStore.showToast({
+                type: NOTIFICATION_TYPE.LABEL_ADDED_SUCCESS,
+                label
+            });
             this.reviewItem = null;
             this.getQueueData(this.queue.viewId);
         }
@@ -126,11 +153,19 @@ export class ReviewConsoleScreenStore {
         this.loadingQueueData = true;
         try {
             this.queue = await this.queueService.getQueue(queueId);
-            this.loadingReviewItem = false;
+            runInAction(() => {
+                this.loadingQueueData = false;
+            });
         } catch (e) {
-            this.loadingReviewItem = false;
-            this.loadingReviewItemError = e;
-            throw e;
+            runInAction(() => {
+                this.loadingQueueData = false;
+                this.loadingQueueDataError = e;
+                throw e;
+            });
+        } finally {
+            runInAction(() => {
+                this.loadingQueueData = false;
+            });
         }
     }
 

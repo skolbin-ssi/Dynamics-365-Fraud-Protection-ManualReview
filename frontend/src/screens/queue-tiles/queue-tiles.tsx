@@ -47,9 +47,9 @@ export class QueueTiles extends Component<QueueTilesComponentProps, never> {
     @resolve(TYPES.APP_STORE)
     private appStore!: AppStore;
 
-    componentDidMount() {
-        this.queuesScreenStore.queueStore.loadQueues();
-        this.queuesScreenStore.queueStore.loadQueues(QUEUE_VIEW_TYPE.ESCALATION);
+    async componentDidMount() {
+        await this.queuesScreenStore.queueStore.loadQueues();
+        await this.queuesScreenStore.queueStore.loadQueues(QUEUE_VIEW_TYPE.ESCALATION);
     }
 
     @autobind

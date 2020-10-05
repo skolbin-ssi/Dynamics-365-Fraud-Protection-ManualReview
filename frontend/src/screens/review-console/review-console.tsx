@@ -228,7 +228,10 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     @autoBind
     async handleLabeling(label: LABEL) {
         await this.reviewConsoleScreenStore.labelOrder(label);
-        this.processNextItem();
+
+        if (!this.reviewConsoleScreenStore.labelingItemError) {
+            this.processNextItem();
+        }
     }
 
     @autoBind
@@ -241,22 +244,21 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         }
     }
 
+    static renderReviewConsolePanelSpinner() {
+        return (
+            <div className={`${CN}__spinner-wrap`}>
+                <Spinner label="Loading..." />
+            </div>
+        );
+    }
+
     @autoBind
-    renderReviewActionsPanel() {
+    renderReviewActionsPanel(blockActionButtons: boolean) {
         const {
             queue,
             reviewItem,
-            blockActionButtons,
             loadingReviewItem
         } = this.reviewConsoleScreenStore;
-
-        function renderSpinner() {
-            return (
-                <div className={`${CN}__spinner-wrap`}>
-                    <Spinner label="Loading..." />
-                </div>
-            );
-        }
 
         return (
             <>
@@ -268,7 +270,7 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
                     onFinishReviewProcessCallback={this.handleFinishReviewProcess}
                     onLabeled={this.handleLabeling}
                 />
-                {loadingReviewItem && renderSpinner()}
+                {loadingReviewItem && ReviewConsole.renderReviewConsolePanelSpinner()}
             </>
         );
     }
@@ -349,8 +351,6 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         return (
             <StartReviewPanel
                 onStartReviewCallback={this.startReviewProcess}
-                // Items held by the current  user should be available for review
-                // See MDMR-475 for more details
                 isItemReviewLocked={queue.sortingLocked && !this.isItemHeldByCurrentUser(reviewItem)}
                 notes={reviewItem?.notes || []}
                 isReviewAllowed={isReviewAllowed}
@@ -360,6 +360,12 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     }
 
     renderReviewConsolePanel() {
+        const {
+            blockActionButtons,
+            loadingQueueData,
+            loadingReviewItem
+        } = this.reviewConsoleScreenStore;
+
         return (
             <div className={cx(`${CN}__review-console-panel`)}>
                 <div className={`${CN}__review-console-heading`}>
@@ -371,11 +377,13 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
                     <Route
                         exact
                         path={ROUTES.ITEM_DETAILS}
-                        render={this.renderStartReviewPanel}
+                        render={() => (loadingQueueData || loadingReviewItem
+                            ? ReviewConsole.renderReviewConsolePanelSpinner()
+                            : this.renderStartReviewPanel())}
                     />
                     <Route
                         path={[ROUTES.ITEM_DETAILS_REVIEW_CONSOLE, ROUTES.REVIEW_CONSOLE]}
-                        render={this.renderReviewActionsPanel}
+                        render={() => this.renderReviewActionsPanel(blockActionButtons)}
                     />
                 </Switch>
             </div>
@@ -383,7 +391,6 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     }
 
     renderGetItemError(error: ApiServiceError | MrUserError) {
-        // for some reason, objects, that are supposed to be of type "MrUserError", are of type "Error"
         const errorMessage: string = (error as any).displayMessage || (error as ApiServiceError).response!.data.details;
         // TODO: find a better way to determine the error type
         if (errorMessage.includes('All of the items in this queue are locked')) {

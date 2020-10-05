@@ -4,6 +4,9 @@
 import { User } from '../../../models/user';
 import { Queue } from '../../../models';
 
+/**
+ * API service for retrieving historical data
+ */
 export interface CollectedInfoService {
 
     /**

@@ -2,7 +2,9 @@
 // Licensed under the MIT license.
 
 import { inject, injectable } from 'inversify';
-import { action, computed, observable } from 'mobx';
+import {
+    action, computed, observable, runInAction
+} from 'mobx';
 import { QueueService } from '../../data-services';
 import { Item, Queue } from '../../models';
 import { TYPES } from '../../types';
@@ -69,17 +71,20 @@ export class QueueStore {
                 .queueService
                 .getQueues({ viewType });
 
-            if (viewType !== QUEUE_VIEW_TYPE.ESCALATION) {
-                this.queues = queues;
-            } else {
-                this.escalatedQueues = queues;
-            }
+            runInAction(() => {
+                if (viewType !== QUEUE_VIEW_TYPE.ESCALATION) {
+                    this.queues = queues;
+                } else {
+                    this.escalatedQueues = queues;
+                }
 
-            this.loadingQueues = false;
-            return viewType === QUEUE_VIEW_TYPE.ESCALATION ? this.escalatedQueues : this.queues;
+                this.loadingQueues = false;
+            });
         } catch (e) {
-            this.loadingQueues = false;
-            throw e;
+            runInAction(() => {
+                this.loadingQueues = false;
+                throw e;
+            });
         }
     }
 

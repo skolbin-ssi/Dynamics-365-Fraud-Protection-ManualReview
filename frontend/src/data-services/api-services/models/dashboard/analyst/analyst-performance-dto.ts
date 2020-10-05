@@ -10,11 +10,6 @@ export interface AnalystPerformanceDTO {
      * id - analyst id
      */
     id: string,
-    //
-    // /**
-    //  * displayName - name of the analyst
-    //  */
-    // displayName: string;
 
     /**
      * data - aggregated performance metrics by dates

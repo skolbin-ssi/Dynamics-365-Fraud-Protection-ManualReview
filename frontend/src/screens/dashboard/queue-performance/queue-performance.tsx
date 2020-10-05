@@ -37,6 +37,7 @@ import { TYPES } from '../../../types';
 import './queue-performance.scss';
 import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
 import { BarChart } from '../bar-chart';
+import { WarningChartMessage } from '../warning-chart-message';
 
 const CN = 'queue-performance';
 
@@ -241,17 +242,48 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
         this.reportsModalStore.showReportsModal([...queuePerformanceReports, ...overturnedPerformanceReports]);
     }
 
+    renderDecisionPieChart() {
+        const { isTotalPerformanceLoading, pieChartData } = this.queuePerformanceStore;
+
+        const isAllPieDatumsEqualsZero = pieChartData.every(datum => !datum.value);
+        const isDataNotAvailable = isAllPieDatumsEqualsZero && !isTotalPerformanceLoading;
+
+        if (isDataNotAvailable) {
+            return (
+                <div className={`${CN}__pie-chart-no-data-placeholder`}>
+                    <WarningChartMessage
+                        className={`${CN}__warning-message`}
+                        message="Total decisions metrics are not available"
+                    />
+                </div>
+            );
+        }
+
+        const filteredNotZeroPieData = pieChartData.filter(datum => datum.value !== 0);
+
+        return (
+            <div className={`${CN}__decision-pie-chart`}>
+                <BlurLoader
+                    isLoading={isTotalPerformanceLoading}
+                    spinnerProps={{
+                        label: 'Please, wait! Loading chart data ...'
+                    }}
+                >
+                    <PieChart data={filteredNotZeroPieData} className={`${CN}__pie-chart`} />
+                </BlurLoader>
+            </div>
+        );
+    }
+
     render() {
         const {
             isDataLoading,
             rating,
             getPerformanceData,
-            pieChartData,
             hasSelectedItems,
             hasStorePerformanceData,
             lineChartData,
             aggregation,
-            isTotalPerformanceLoading,
             getQueueName
         } = this.queuePerformanceStore;
 
@@ -314,16 +346,7 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
                                 data={getPerformanceData}
                             />
                         </div>
-                        <div className={`${CN}__decision-pie-chart`}>
-                            <BlurLoader
-                                isLoading={isTotalPerformanceLoading}
-                                spinnerProps={{
-                                    label: 'Please, wait! Loading chart data ...'
-                                }}
-                            >
-                                <PieChart data={pieChartData} className={`${CN}__pie-chart`} />
-                            </BlurLoader>
-                        </div>
+                        {this.renderDecisionPieChart()}
                     </section>
                 </section>
                 <section className={`${CN}__overturned-analytics-section`}>

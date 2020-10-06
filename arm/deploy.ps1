@@ -320,18 +320,8 @@ catch {
 }
 Write-Host "Dynamics 365 Fraud Protection service principal id:"$dfpAppServicePrincipal.Id
 
-# Assign Azure App permissions for DFP
-# Works only on Windows due to AzureAD module
-# on Mac grant_dfp_permissions.ps1 shuld be execured (see Readme for more details)
-if (CheckOSWindows)
-{
-    Write-Host "=== Assing DFP roles to application"
-    foreach ($dfpRoleName in $dfpRoles[$envType]) {
-        GrantDfpPermissionWin -clientAppName $prefix -dfpRoleName $dfpRoleName
-    }
-}
 
-
+# Create Azure maps group
 Write-Host "=== Create Azure Maps Group"
 if (!($mapsGroup = Get-AzADGroup -DisplayName $mapsGroupName)) 
 {
@@ -448,6 +438,17 @@ $deployment = New-AzResourceGroupDeployment `
 
 Write-Host "=== Set admin consent for Azure AD applicaton"
 ./deploy_ad_app_admin_consent.ps1 -AD_APP_NAME "$prefix"
+
+# Assign Azure App permissions for DFP
+# Works only on Windows due to AzureAD module
+# on Mac grant_dfp_permissions.ps1 should be executed manually (see Readme for more details)
+if (CheckOSWindows)
+{
+    Write-Host "=== Assing DFP roles to application"
+    foreach ($dfpRoleName in $dfpRoles[$envType]) {
+        GrantDfpPermissionWin -clientAppName $prefix -dfpRoleName $dfpRoleName
+    } 
+}
 
 Write-Host "Deployment Output"
 Write-Host $deployment.OutputsString

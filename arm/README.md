@@ -172,29 +172,28 @@ create two new subscriptions using obtained connection strings.
 3. On the DFP rule configuration page `https://dfp.microsoft-int.com/<TenantId>/env/ga/purchase/rules` for
 Purchase Protection create a new rule with `Trace()` clause which will send purchases to Manual Review.
 
+### Grant DFP API permissions
+This step should be omitted when installation is done from Windows machine.
+The deployment script uses 'AzureAD' powershell module and can't be performed automatically when deployment run on 
+Mac OS (or Linux) machine. It should be performed manually after deploy.ps1 finish, and can be performed 
+in Azure Cloud Shell or on Windows machine with installed module.
+
+1. In order to grant permissions replace in file `grant_dfp_permissions.ps1` folowing 
+variables:
+    ```
+    $c_app_name = "<set your prefix from configuration file>"
+    $c_app_role_names = @(<set roles list for environment>)
+    ```
+2. Then apply powershell code. The easiest way is to copy-paste code in Cloud Shell.
+3. Once you executed the script, restart all App Services in `<$prefix>-rg` resource group.
+
+For Dev/Test environment roles with "Sandbox" prefix should be applied ("Sandbox_Risk_API","Sandbox_ManualReview_API"), for Production - without "Sandbox" prefix ("Risk_API","ManualReview_API").
+
 ### New users with deployment permissions
 Following permissions should be configured for the new user, who should perform deployments when initial
 deployment is already done:
 1. Add `Owner` permission on Azure Maps Account, created for deployment
 2. Add policy for new user on Azure Key Vault, created for deployment, with management permissions on secrets
-
-
-## Notes about run deployment on Mac OS 
-**Grant DFP Api permissions**
-This step uses 'AzureAD' powershell module and can't be performed automatically when deployment run on 
-Mac OS (or Linux) machine. It should be performed manually after deploy.ps1 finish, and can be performed 
-in Azure Cloud Shell or on Windows machine with installed module.
-
-In order to grant permissions replace in file `grant_dfp_permissions.ps1` folowing 
-variables:
-```
-$c_app_name = "<set your prefix from configuration file>"
-$c_app_role_names = @(<set roles list for environment>)
-```
-
-Then apply powershell code. The easiest way is to copy-paste code in Cloud Shell.
-
-For Dev/Test environment roles with "Sandbox" prefix should be applied ("Sandbox_Risk_API","Sandbox_ManualReview_API"), for Production - without "Sandbox" prefix ("Risk_API","ManualReview_API").
 
 # Notes about deployment configurations
 ## UDF functions for Cosmos DB

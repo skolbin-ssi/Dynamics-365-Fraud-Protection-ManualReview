@@ -38,7 +38,7 @@ import './demand-supply.scss';
 const CN = 'demand-supply-dashboard';
 
 const MAX_SUPERVISORS_TO_SHOW = 3;
-const MAX_REVIEWERS_TO_SHOW = 3;
+const MAX_REVIEWERS_TO_SHOW = 2;
 
 interface DemandSupplyProps extends RouteComponentProps {}
 
@@ -58,7 +58,7 @@ export class DemandSupply extends Component<DemandSupplyProps, never> {
             key: 'queueName',
             name: 'Queue',
             minWidth: 50,
-            maxWidth: 600,
+            maxWidth: 450,
             onRender: ({ queueName, queueId }) => (
                 <div className={`${CN}__queue-name-cell`}>
                     <button type="button" className={`${CN}__go-to-queue-db-btn`} onClick={() => this.goToQueueDashboard(queueId)}>
@@ -143,7 +143,7 @@ export class DemandSupply extends Component<DemandSupplyProps, never> {
             key: 'analysts',
             name: 'Analysts',
             minWidth: 200,
-            maxWidth: 300,
+            maxWidth: 215,
             headerClassName: `${CN}__analysts-header-cell`,
             className: `${CN}__analysts-col`,
             onRender: ({ queue }: DemandSupplyDashboardTableItemData) => {
@@ -258,7 +258,7 @@ export class DemandSupply extends Component<DemandSupplyProps, never> {
         return (
             <ShimmeredDetailsList
                 enableShimmer={!demandSupplyDashboardTableData}
-                layoutMode={DetailsListLayoutMode.justified}
+                layoutMode={DetailsListLayoutMode.fixedColumns}
                 className={`${CN}__table`}
                 selectionMode={SelectionMode.none}
                 columns={this.columns}

@@ -11,3 +11,4 @@ export * from './dictionary';
 export * from './settings';
 export * from './window-sizes';
 export * from './alerts';
+export * from './notifications';

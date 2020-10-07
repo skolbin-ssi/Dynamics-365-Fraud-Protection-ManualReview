@@ -6,15 +6,18 @@ import { observer } from 'mobx-react';
 import autoBind from 'autobind-decorator';
 import cx from 'classnames';
 
+import { Shimmer, ShimmerElementType } from '@fluentui/react/lib/Shimmer';
+
 import { BlurLoader } from '../../blur-loader';
 import { PieChart } from '../../pie-chart';
 import { CurrentProgress } from '../../../../models/dashboard/progress-performance-metric';
 import ArrowUpGreen from '../../../../assets/icon/arrows/arrow-up-top-right-green.svg';
 import ArrowUpRed from '../../../../assets/icon/arrows/arrow-up-top-right-red.svg';
 
-import { AnalystPerformanceStore } from '../../../../view-services/dashboard/analyst-performance-store';
+import { AnalystPerformanceStore } from '../../../../view-services/dashboard';
 
 import './performance-overview.scss';
+import { WarningChartMessage } from '../../warning-chart-message';
 
 const CN = 'performance-overview';
 
@@ -82,7 +85,54 @@ export class PerformanceOverview extends Component<PerformanceOverviewComponentP
         return null;
     }
 
-    render() {
+    static renderShimmerList() {
+        const SHIMMERS_COUNT = 12;
+
+        return new Array(SHIMMERS_COUNT)
+            .fill(undefined)
+            .map(() => (<Shimmer shimmerElements={[{ type: ShimmerElementType.line, height: 64 }]} />));
+    }
+
+    renderAnalystProgressTable() {
+        const {
+            analystPerformanceStore: {
+                processingTimeMetric,
+                progressPerformanceMetric,
+                isProcessingTimeMetricLoading,
+                isProgressPerformanceMetricLoading,
+            }
+        } = this.props;
+
+        const isDataLoading = isProcessingTimeMetricLoading || isProgressPerformanceMetricLoading;
+        const isDataNotAvailable = !processingTimeMetric && !progressPerformanceMetric;
+
+        if (isDataLoading) {
+            return (
+                <div className={`${CN}__analyst-progress-table`}>
+                    {PerformanceOverview.renderShimmerList()}
+                </div>
+            );
+        }
+
+        if (isDataNotAvailable) {
+            return (
+                <div className={`${CN}__no-data-placeholder`}>
+                    <WarningChartMessage
+                        className={`${CN}__warning-message`}
+                        message="Performance overview data is not available"
+                    />
+                </div>
+            );
+        }
+
+        return (
+            <div className={`${CN}__analyst-progress-table`}>
+                {this.renderProgressTableCells()}
+            </div>
+        );
+    }
+
+    renderDecisionPieChart() {
         const {
             analystPerformanceStore: {
                 isTotalPerformanceLoading,
@@ -90,23 +140,43 @@ export class PerformanceOverview extends Component<PerformanceOverviewComponentP
             }
         } = this.props;
 
+        const isAllPieDatumsEqualsZero = pieChartData.every(datum => !datum.value);
+        const isDataNotAvailable = isAllPieDatumsEqualsZero && !isTotalPerformanceLoading;
+
+        if (isDataNotAvailable) {
+            return (
+                <div className={`${CN}__pie-chart-no-data-placeholder`}>
+                    <WarningChartMessage
+                        className={`${CN}__warning-message`}
+                        message="Total decisions metrics are not available"
+                    />
+                </div>
+            );
+        }
+
+        const filteredNotZeroPieData = pieChartData.filter(datum => datum.value !== 0);
+
+        return (
+            <div className={`${CN}__decision-pie-chart`}>
+                <BlurLoader
+                    isLoading={isTotalPerformanceLoading}
+                    spinnerProps={{
+                        label: 'Please, wait! Loading chart data ...'
+                    }}
+                >
+                    <PieChart data={filteredNotZeroPieData} className={`${CN}__pie-chart`} />
+                </BlurLoader>
+            </div>
+        );
+    }
+
+    render() {
         return (
             <section className={`${CN}__analyst-overview-section`}>
                 <div className={`${CN}__analyst-overview-section-title`}>Analyst overview</div>
                 <div className={`${CN}__analyst-overview-section-content`}>
-                    <div className={`${CN}__analyst-progress-table`}>
-                        {this.renderProgressTableCells()}
-                    </div>
-                    <div className={`${CN}__decision-pie-chart`}>
-                        <BlurLoader
-                            isLoading={isTotalPerformanceLoading}
-                            spinnerProps={{
-                                label: 'Please, wait! Loading chart data ...'
-                            }}
-                        >
-                            <PieChart data={pieChartData} className={`${CN}__pie-chart`} />
-                        </BlurLoader>
-                    </div>
+                    {this.renderAnalystProgressTable()}
+                    {this.renderDecisionPieChart()}
                 </div>
             </section>
         );

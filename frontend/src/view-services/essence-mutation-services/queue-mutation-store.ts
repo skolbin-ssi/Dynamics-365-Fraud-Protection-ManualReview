@@ -4,16 +4,18 @@
 import { inject, injectable } from 'inversify';
 import { action, computed, observable } from 'mobx';
 import {
-    LABEL,
-    SORTING_FIELD,
-    SORTING_ORDER,
-    MAXIMUM_QUEUE_PROCESSING_DAYS,
     FILTER_NAMES,
+    LABEL,
+    MAXIMUM_QUEUE_PROCESSING_DAYS,
+    NOTIFICATION_TYPE,
+    QUEUE_CONFIGURATION_LABEL,
     QUEUE_ITEMS_FIELD,
     QUEUE_MUTATION_TYPES,
-    QUEUE_CONFIGURATION_LABEL
+    SORTING_FIELD,
+    SORTING_ORDER,
 } from '../../constants';
 import {
+    AppStore,
     LockedItemsStore,
     QueuesScreenStore,
     QueueStore,
@@ -267,6 +269,7 @@ export class QueueMutationStore {
         @inject(TYPES.QUEUE_SERVICE) private queueService: QueueService,
         @inject(TYPES.QUEUE_STORE) private queueStore: QueueStore,
         @inject(TYPES.USER_SERVICE) private userService: UserService,
+        @inject(TYPES.APP_STORE) private appStore: AppStore,
         @inject(TYPES.QUEUES_SCREEN_STORE) private queueScreenStore: QueuesScreenStore,
         @inject(TYPES.LOCKED_ITEMS_STORE) private lockedItemsStore: LockedItemsStore
     ) {}
@@ -628,12 +631,24 @@ export class QueueMutationStore {
         } else if (this.mutationType === QUEUE_MUTATION_TYPES.DELETE && this.queueId) {
             result = await this.deleteQueueAndUpdateQueueList(this.queueId);
         }
+
         if (result instanceof Error) {
             this.error = result;
             this.mutationStatus = 'failure';
+            this.appStore.showToast({
+                type: NOTIFICATION_TYPE.QUEUE_MUTATION_ERROR,
+                mutation: this.mutationType!,
+                queueName: name,
+            });
             return 'failure';
         }
+
         this.mutationStatus = 'success';
+        this.appStore.showToast({
+            type: NOTIFICATION_TYPE.QUEUE_MUTATION_SUCCESS,
+            mutation: this.mutationType!,
+            queueName: name,
+        });
         return 'success';
     }
 

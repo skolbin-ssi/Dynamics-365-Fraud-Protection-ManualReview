@@ -52,6 +52,9 @@ $gapSize: 32px;
     &:focus {
       outline: none;
     }
+    &:disabled {
+      cursor: not-allowed;
+    }
 
     & > span {
       font-weight: 600 !important;
@@ -241,6 +244,10 @@ $gapSize: 32px;
     &:focus {
       outline: none;
     }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
   }
 
   &__add-tag-note-btn:hover &__btn-tagnote-icon {
@@ -335,6 +342,9 @@ $gapSize: 32px;
 
     &:active {
       background: $neutralLighter;
+    }
+    &:disabled {
+      cursor: not-allowed;
     }
   }
 

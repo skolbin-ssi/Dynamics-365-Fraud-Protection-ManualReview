@@ -18,6 +18,7 @@ import { TYPES } from '../../types';
 import { AppStore, CurrentUserStore, QueuesScreenStore } from '../../view-services';
 import { Header } from './header';
 import { LeftNavigation } from './left-navigation';
+import { ToastNotification } from './toast-notification';
 import {
     emailTextStyles,
     myAccountPanelStyles,
@@ -164,6 +165,7 @@ export class PageLayout extends Component<PageLayoutProps, never> {
                 </div>
                 { this.renderMyAccountPanel() }
                 { this.renderCreateQueueModal() }
+                <ToastNotification />
             </div>
         );
     }

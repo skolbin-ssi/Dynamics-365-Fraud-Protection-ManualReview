@@ -3,7 +3,9 @@
 
 /* eslint-disable react/prop-types */
 
-import React from 'react';
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
+
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { PrimaryButton } from '@fluentui/react/lib/Button';
 
@@ -26,16 +28,9 @@ interface StartReviewPanelProps {
 
 const CN = 'start-review-panel';
 
-export const StartReviewPanel: React.FC<StartReviewPanelProps> = (
-    {
-        onStartReviewCallback,
-        isItemReviewLocked,
-        notes,
-        isReviewAllowed,
-        reasonToPreventReview
-    }
-) => {
-    function renderMessageBar(node: JSX.Element | string) {
+@observer
+export class StartReviewPanel extends Component<StartReviewPanelProps, never> {
+    static renderMessageBar(node: JSX.Element | string) {
         return (
             <MessageBar
                 className={`${CN}__warning-message`}
@@ -47,10 +42,14 @@ export const StartReviewPanel: React.FC<StartReviewPanelProps> = (
         );
     }
 
-    function renderReviewBlock() {
+    renderReviewBlock() {
+        const {
+            onStartReviewCallback,
+            isItemReviewLocked,
+        } = this.props;
         // eslint-disable-next-line no-constant-condition
         if (isItemReviewLocked) {
-            return renderMessageBar(
+            return StartReviewPanel.renderMessageBar(
                 <>
                     It is not allowed to review transactions in random order because the queue is locked.
                     However, you can&nbsp;
@@ -80,13 +79,23 @@ export const StartReviewPanel: React.FC<StartReviewPanelProps> = (
         );
     }
 
-    return (
-        <div className={CN}>
-            {isReviewAllowed ? renderReviewBlock() : renderMessageBar(reasonToPreventReview!)}
-            <ReviewNotes
-                className={`${CN}__user-notes`}
-                notes={notes}
-            />
-        </div>
-    );
-};
+    render() {
+        const {
+            notes,
+            isReviewAllowed,
+            reasonToPreventReview
+        } = this.props;
+
+        return (
+            <div className={CN}>
+                {isReviewAllowed
+                    ? this.renderReviewBlock()
+                    : StartReviewPanel.renderMessageBar(reasonToPreventReview!)}
+                <ReviewNotes
+                    className={`${CN}__user-notes`}
+                    notes={notes}
+                />
+            </div>
+        );
+    }
+}

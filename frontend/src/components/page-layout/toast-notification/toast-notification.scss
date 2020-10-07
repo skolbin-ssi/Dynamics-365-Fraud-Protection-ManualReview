@@ -1,0 +1,52 @@
+@import "../../../styles/variables";
+
+.toast-notification {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 310px;
+  z-index: 100;
+  padding: 10px 5px 10px 2px;
+  background: white;
+  border-radius: 2px;
+  box-shadow: 0 1.6px 3.6px rgba(0, 0, 0, 0.13), 0 0.3px 0.9px rgba(0, 0, 0, 0.1);
+  border-left: solid 4px;
+
+  &--good, &--success {
+    border-left-color: $goodLabelBackground;
+  }
+  &--bad, &--error {
+    border-left-color: $badLabelBackground;
+  }
+  &--watch {
+    border-left-color: $neutralLight;
+  }
+  &--escalate, &--hold {
+    border-left-color: $vividMediumColor;
+  }
+
+  &-title {
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  &-title, &-icon {
+    &--good, &--success {
+      color: $goodColor;
+    }
+    &--bad, &--error {
+      color: $badColor;
+    }
+    &--watch {
+      color: $neutralSecondary;
+    }
+    &--escalate, &--hold {
+      color: $vividMostColor;
+    }
+  }
+
+  &-content {
+    font-size: $warningFontSize;
+  }
+}

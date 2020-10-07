@@ -3,7 +3,11 @@
 
 import { injectable } from 'inversify';
 import { action, computed, observable } from 'mobx';
-import { CreateQueueModalTabs, QUEUE_MUTATION_TYPES } from '../constants';
+import {
+    CreateQueueModalTabs,
+    QUEUE_MUTATION_TYPES,
+} from '../constants';
+import { Notification } from '../models';
 
 @injectable()
 export class AppStore {
@@ -13,9 +17,21 @@ export class AppStore {
 
     @observable openedQueueMutationModalInitialTab: CreateQueueModalTabs = 'general';
 
+    @observable toastNotification: Notification | null = null;
+
     @action
     toggleNavigationExpanded(isNavigationExpanded?: boolean) {
         this.isNavigationExpanded = isNavigationExpanded || !this.isNavigationExpanded;
+    }
+
+    @action
+    showToast(notification: Notification): void {
+        this.toastNotification = notification;
+    }
+
+    @action
+    dismissToast() {
+        this.toastNotification = null;
     }
 
     @action

@@ -20,4 +20,8 @@ export class CacheStoreService {
     getHistoricalQueuesZise() {
         return this.historicalQueues.size;
     }
+
+    getHistoricalQueue(id: string): Queue | null {
+        return this.historicalQueues.get(id) || null;
+    }
 }

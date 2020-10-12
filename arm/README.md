@@ -163,7 +163,7 @@ please, note that:
 shouldn't point to fields in arrays or composite non-textual fields;
 
 ### DFP integration
-Installation doesn't include DFP configuration for purchase sending. In order to do it:
+Installation doesn't include DFP configuration for purchase events sending event trace data to Event hub. In order to do it:
 1. Get the connection string for dfp-hub policy `dfpSend`. 
 For that open resource group for your installation and open Event Hubs Namespace resource both for primary
 region and for secondary region. Then open the `dfp-hub` event hub and go to `Share access policies` blade. 

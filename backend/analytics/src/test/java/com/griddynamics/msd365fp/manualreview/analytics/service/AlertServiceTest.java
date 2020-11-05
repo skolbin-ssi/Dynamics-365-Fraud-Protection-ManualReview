@@ -15,7 +15,7 @@ import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.Alert;
 import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.ConfigurableAppSetting;
 import com.griddynamics.msd365fp.manualreview.analytics.repository.AlertRepository;
 import com.griddynamics.msd365fp.manualreview.analytics.repository.ConfigurableAppSettingRepository;
-import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.ItemLabelingMetricService;
+import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.PublicItemLabelingMetricService;
 import com.griddynamics.msd365fp.manualreview.azuregraph.client.AnalystClient;
 import com.griddynamics.msd365fp.manualreview.model.Analyst;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
@@ -59,7 +59,7 @@ class AlertServiceTest {
     private AlertService alertService;
 
     @Mock
-    private ItemLabelingMetricService metricService;
+    private PublicItemLabelingMetricService metricService;
     @Mock
     private AnalystClient analystClient;
     @Mock

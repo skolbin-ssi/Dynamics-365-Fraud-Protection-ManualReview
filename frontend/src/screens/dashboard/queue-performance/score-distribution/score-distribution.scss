@@ -1,0 +1,100 @@
+@import "../../../../styles/variables";
+
+.queue-score-distribution {
+  width: 100%;
+  padding: 0 20px 0 60px;
+
+  &__chart-container {
+    width: 100%;
+    height: 200px;
+    position: relative;
+
+    .warning-message__wrapper {
+      bottom: 66px;
+    }
+
+  }
+
+  &__header {
+    margin-bottom: 40px;
+  }
+
+  &__header-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: $neutralPrimary;
+  }
+
+  &__chart-legend {
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+
+    &-label {
+      font-size: 12px;
+      font-weight: 600;
+      filter: brightness(0.9);
+    }
+
+    &-good,
+    &-watched {
+      margin-right: 25px;
+    }
+
+    &-good,
+    &-bad,
+    &-watched {
+      display: flex;
+      align-items: center;
+    }
+
+    &-indicator {
+      width: 10px;
+      height: 10px;
+      margin-right: 5px;
+      border-radius: 50%;
+    }
+  }
+
+
+  &__tooltip {
+    width: 100%;
+    font-size: 12px;
+  }
+
+  &__tooltip-content {
+    width: 100%;
+  }
+
+  &__tooltip-header {
+    margin-bottom: 10px;
+  }
+
+  &__tooltip-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  &__tooltip-row:last-child {
+    margin-bottom: 0;
+  }
+
+  &__tooltip-value {
+    margin-left: auto;
+    justify-self: flex-end;
+  }
+
+  &__color-indicator {
+    width: 10px;
+    height: 10px;
+    margin-right: 12px;
+  }
+
+  &__warning-message {
+    .ms-MessageBar-innerText {
+      font-size: 12px;
+    }
+  }
+}

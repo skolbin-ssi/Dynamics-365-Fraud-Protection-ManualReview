@@ -1,7 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { IBasePicker, ITag, TagPicker } from '@fluentui/react/lib/Pickers';
+import {
+    IBasePicker, ITag, TagPicker, ValidationState
+} from '@fluentui/react/lib/Pickers';
 import React, { Component, createRef } from 'react';
 import cx from 'classnames';
 import autobind from 'autobind-decorator';
@@ -94,7 +96,7 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
                 disabled={blockActionButtons}
             >
                 <FontIcon
-                    className={`${CN}__control-btn-icon`}
+                    className={`${CN}__btn-label-icon`}
                     iconName="RedEye"
                 />
                 <Text>Watch</Text>
@@ -154,7 +156,7 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
                 disabled={blockActionButtons}
             >
                 <FontIcon
-                    className={`${CN}__control-btn-icon`}
+                    className={`${CN}__btn-label-icon`}
                     iconName="FollowUser"
                 />
                 <Text>Escalate</Text>
@@ -178,7 +180,7 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
                 disabled={blockActionButtons}
             >
                 <FontIcon
-                    className={`${CN}__control-btn-icon`}
+                    className={`${CN}__btn-label-icon`}
                     iconName="HourGlass"
                 />
                 <Text>Hold</Text>
@@ -187,7 +189,7 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
     }
 
     @autobind
-    renderAddBtn(callback: () => void, label: string) {
+    renderAddBtn(callback: () => void, label: string, iconName?: string) {
         const { blockActionButtons } = this.props;
 
         return (
@@ -198,7 +200,7 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
                 disabled={blockActionButtons}
             >
                 <div className={`${CN}__btn-tagnote-icon`}>
-                    <FontIcon iconName="Message" className="link-icon" />
+                    <FontIcon iconName={iconName || 'Message'} className="link-icon" />
                 </div>
                 <Text>{label}</Text>
             </button>
@@ -229,7 +231,7 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
         const getTextFromTag = (tag: ITag) => tag.name;
 
         const getSuggestions = async (term: string, selectedItems?: ITag[]) => {
-            const textSuggestions = await this.reviewConsoleScreenStore.getTagSuggestions(term);
+            const textSuggestions = await this.reviewConsoleScreenStore.getTagSuggestions(term.trim());
             const filteredTextSuggestions = textSuggestions.filter((suggestion: string) => !selectedItems?.find(selected => selected.name === suggestion));
             return filteredTextSuggestions.map(getTagFromText);
         };
@@ -238,15 +240,28 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
 
         const onChange = (items?: ITag[]) => {
             if (items) {
-                const newValues = items.map(item => item.name);
+                const newValues: string[] = [];
+                items.forEach(item => {
+                    const newValue = item.name.trim();
+                    if (newValue) {
+                        newValues.push(newValue);
+                    }
+                });
                 this.reviewConsoleScreenStore.setReviewItemTags(newValues);
                 this.reviewConsoleScreenStore.submitNewTags();
             }
         };
 
         const onInputChange = (newValue: string) => {
-            this.reviewConsoleScreenStore.setNewTagValue(newValue);
+            this.reviewConsoleScreenStore.setNewTagValue(newValue.trim());
             return newValue;
+        };
+
+        const onBlur = () => this.reviewConsoleScreenStore.discardNewTags();
+
+        const onValidateInput = (input: string): ValidationState => {
+            if (input.trim()) return ValidationState.valid;
+            return ValidationState.invalid;
         };
 
         const selectedItems = reviewItemTags.map(getTagFromText);
@@ -263,16 +278,16 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
             <div className={`${CN}__no-tag-found`}>
                 {
                     tags.includes(tagToAdd)
-                        ? <Text className={`${CN}__no-tag-found-text`}>{`Custom Tag "${tagToAdd}" is already in the list`}</Text>
+                        ? <Text className={`${CN}__no-tag-found-text`}>{`Custom tag "${tagToAdd}" is already in the list`}</Text>
                         : (
                             <>
-                                <Text className={`${CN}__no-tag-found-text`}>No Tags found</Text>
+                                <Text className={`${CN}__no-tag-found-text`}>No tags found</Text>
                                 <ActionButton
                                     className={`${CN}__add-custom-tag-btn`}
                                     iconProps={{ iconName: 'AddTo' }}
                                     onClick={() => addCustomTag(tagToAdd)}
                                 >
-                                    { `Add custom Tag "${tagToAdd}"` }
+                                    { `Add a custom tag "${tagToAdd}"` }
                                 </ActionButton>
                             </>
                         )
@@ -289,21 +304,23 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
                     onEmptyResolveSuggestions={getAllSuggestions}
                     getTextFromItem={getTextFromTag}
                     pickerSuggestionsProps={{
-                        suggestionsHeaderText: 'Suggested Tags',
+                        suggestionsHeaderText: 'Suggested tags',
                         onRenderNoResultFound: renderNoSuggestionsFound
                     }}
                     selectedItems={selectedItems}
                     onInputChange={onInputChange}
                     onChange={onChange}
+                    onBlur={onBlur}
                     createGenericItem={getTagFromText}
-                    onValidateInput={() => 0}
+                    onValidateInput={onValidateInput}
                     resolveDelay={250}
                     disabled={isTagSubmitting}
+                    inputProps={{ autoFocus: isInAddTagMode }}
                 />
             );
         }
 
-        return this.renderAddBtn(this.handleAddTagClick, 'Add a custom tag');
+        return this.renderAddBtn(this.handleAddTagClick, 'Add a custom tag', 'Tag');
     }
 
     @autobind
@@ -401,9 +418,7 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
                                 onClick={this.handleLabelClick}
                                 disabled={blockActionButtons}
                             >
-                                <div className={`${CN}__btn-label-icon`}>
-                                    <FontIcon iconName="CheckMark" className="link-icon" />
-                                </div>
+                                <FontIcon iconName="CompletedSolid" className={`${CN}__btn-label-icon`} />
                                 <Text>{LABEL_NAMES[LABEL.GOOD]}</Text>
                             </button>
                         )
@@ -417,9 +432,7 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
                                 onClick={this.handleLabelClick}
                                 disabled={blockActionButtons}
                             >
-                                <div className={`${CN}__btn-label-icon`}>
-                                    <FontIcon iconName="ChromeMinimize" className="link-icon" />
-                                </div>
+                                <FontIcon iconName="Blocked2Solid" className={`${CN}__btn-label-icon`} />
                                 <Text>{LABEL_NAMES[LABEL.BAD]}</Text>
                             </button>
                         )
@@ -439,7 +452,7 @@ export class ReviewActionsPanel extends Component<ReviewActionsPanelProps, Revie
                     onClick={onFinishReviewProcessCallback}
                     disabled={blockActionButtons}
                 >
-                    <FontIcon iconName="CircleStopSolid" className={`${CN}__finish-review-btn-icon`} />
+                    <FontIcon iconName="UnlockSolid" className={`${CN}__finish-review-btn-icon`} />
                     <Text>Unlock order</Text>
                 </button>
             </div>

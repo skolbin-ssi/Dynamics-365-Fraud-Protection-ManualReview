@@ -54,6 +54,13 @@ This parameter modifies following configuration settings
 3. The appropriate spring profile will be configured for backend Java Web App
 
 ## Technical alert configuration
+
+Technical alerts are not related to business metric alerts inside application. Technical
+alerts are intended for troubleshooting and support. 
+
+**Warning!** Technical alerts can contain information from logs.
+
+### Alerts notificatioin email
 In order to configure health/availability alerts for the solution, add the following parameter with
 list of email addresses to properties file:
 ```
@@ -68,8 +75,27 @@ Alerts will be sent to this list of recepients.
 
 When this parameter is absent in the configuration file, technical alerts will be disabled.
 
-**WARNING!** Technical alerts are not related to business metric alerts inside application. Technical
-alerts are intended for troubleshooting and support. It can contain information from logs. 
+### Technical alerts parameters
+It is possible to tune alerts parameters, such as threshold, frequence, windowSize.
+The configuration should always be done by adding or changing corresponding values in properties
+file.
+
+The full list of available configuration parameters and allowed values can be found in
+*parameters* section of *main.json* template file.
+
+As an example, the following parameters could be provided to change defaults for 
+*NoIncomingEventsDfphub* alert:
+```
+"NoIncomingEventsDfphubEvaluationFrequency": {
+   "value": "PT1H"
+},
+"NoIncomingEventsDfphubThreshold": {
+   "value": 0
+},
+"NoIncomingEventsDfphubWindowSize": {
+   "value": "P1D"
+}
+```
 
 ## Custom domain configuration
 In order to provide custom domain as entry point to the solution, following steps should be 

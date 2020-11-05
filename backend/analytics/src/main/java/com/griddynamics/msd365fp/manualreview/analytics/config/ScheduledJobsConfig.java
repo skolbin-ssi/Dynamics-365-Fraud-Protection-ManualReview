@@ -18,7 +18,8 @@ public class ScheduledJobsConfig {
     public static final String RESOLUTION_RETRY_TASK_NAME = "resolution-send-task";
     public static final String COLLECT_ANALYST_INFO_TASK_NAME = "collect-analyst-info-task";
     public static final String SEND_ALERTS_TASK_NAME = "send-alerts-task";
-    public static final String FAIL_FAST_TASK_NAME = "fail-fast-healthcheck-task";
+    public static final String PRIM_HEALTH_ANALYSIS_TASK_NAME = "prim-health-analysis-task";
+    public static final String SEC_HEALTH_ANALYSIS_TASK_NAME = "sec-health-analysis-task";
 
     public static final long TASK_RUNNER_RATE_MS = 30000L;
 

@@ -30,7 +30,7 @@ import { QueueStore } from '../queues';
 import { Queue, Report } from '../../models';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
 import { OverviewItem, QueuesOverview } from '../../models/queues';
-import { CacheStoreService, CSVReportBuilder } from '../../utility-services';
+import { CSVReportBuilder } from '../../utility-services';
 
 export interface DemandSupplyDashboardTableItemData {
     queueName: string;
@@ -107,12 +107,9 @@ export class DashboardDemandSupplyScreenStore {
         @inject(TYPES.DASHBOARD_SCREEN_STORE) private dashboardScreenStore: DashboardScreenStore,
         @inject(TYPES.QUEUE_SERVICE) private queueService: QueueService,
         @inject(TYPES.QUEUE_STORE) private queueStore: QueueStore,
-        @inject(TYPES.USER_SERVICE) private userService: UserService,
-        @inject(TYPES.CACHE_STORE_SERVICE) private cacheStorageService: CacheStoreService
+        @inject(TYPES.USER_SERVICE) private userService: UserService
     ) {
-        if (!this.queueStore.queues) {
-            this.queueStore.loadQueues();
-        }
+        this.queueStore.loadRegularAndHistoricalQueues();
     }
 
     loadData(): IReactionDisposer {
@@ -289,16 +286,17 @@ export class DashboardDemandSupplyScreenStore {
                 return this.itemPlacementMetrics.map(item => {
                     const remaining = this.getRemaining(item.id);
                     const { nearToSlaCount, nearToTimeoutCount } = this.getQueueOverviewMetrics(item.id);
+                    const queue = this.getSpecificQueue(item.id);
 
                     return {
                         queueId: item.id,
-                        queueName: item.name,
+                        queueName: queue?.name || item.id,
                         remaining,
                         newOrders: item.total.received,
                         reviewed: item.total.reviewed,
                         nearToSlaCount,
                         nearToTimeoutCount,
-                        queue: this.getSpecificQueue(item.id)
+                        queue
                     };
                 }).sort((a, b) => this.sortTableDataItemsByRemainingCount(a, b));
             }
@@ -432,16 +430,6 @@ export class DashboardDemandSupplyScreenStore {
     }
 
     private getSpecificQueue(queueId: string) {
-        if (this.queues) {
-            let queue = this.queues.find(q => q.queueId === queueId);
-
-            if (!queue) {
-                queue = this.cacheStorageService.getHistoricalQueues(queueId);
-            }
-
-            return queue;
-        }
-
-        return undefined;
+        return this.queues?.find(q => q.queueId === queueId) || this.queueStore.getQueueById(queueId);
     }
 }

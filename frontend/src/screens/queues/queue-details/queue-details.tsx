@@ -68,7 +68,7 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
         },
         {
             key: 'id',
-            name: 'Order Id',
+            name: 'Order ID',
             fieldName: 'id',
             minWidth: 70,
             isCollapsible: true,
@@ -298,7 +298,7 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
             <div className={`${CN}__center-aligned`}>
                 <ErrorContent
                     illustrationSvg={NoOrdersIllustrationSvg}
-                    message="No orders in the Queue. Please wait for a while"
+                    message="No orders in the queue. Please wait for a while."
                 />
             </div>
         );

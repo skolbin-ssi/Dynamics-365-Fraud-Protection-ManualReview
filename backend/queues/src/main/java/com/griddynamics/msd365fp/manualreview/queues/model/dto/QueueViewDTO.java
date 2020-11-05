@@ -14,12 +14,12 @@ import com.griddynamics.msd365fp.manualreview.queues.validation.FieldConditionCo
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.Collections;
 import java.util.Set;
 
 import static com.griddynamics.msd365fp.manualreview.queues.model.Constants.SWAGGER_DURATION_EXAMPLE;
@@ -56,7 +56,7 @@ public class QueueViewDTO {
     private Set<String> supervisors;
     @NotNull
     private QueueSortSettings sorting;
-    private Set<@FieldConditionCombination ItemFilter> filters;
+    private Set<@FieldConditionCombination @Valid ItemFilter> filters;
     @Schema(type = "string", format = SWAGGER_DURATION_FORMAT, example = SWAGGER_DURATION_EXAMPLE)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Duration processingDeadline;

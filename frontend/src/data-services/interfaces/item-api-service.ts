@@ -11,28 +11,32 @@ export interface ItemApiService {
      * Add a tag to the specified item
      * @param id - item id
      * @param tags
+     * @param queueId
      */
-    patchItemTag(id: string, tags: string[]): Promise<ApiServiceResponse<never>>;
+    patchItemTag(id: string, tags: string[], queueId?: string): Promise<ApiServiceResponse<never>>;
 
     /**
      * Unlock the specified item
      * @param id - item id
+     * @param queueId
      */
-    deleteItemLock(id: string): Promise<ApiServiceResponse<DeleteItemLockResponse>>;
+    deleteItemLock(id: string, queueId?: string): Promise<ApiServiceResponse<DeleteItemLockResponse>>;
 
     /**
      * Apply label to the item
      * @param id
      * @param label
+     * @param queueId
      */
-    patchItemLabel(id: string, label: LABEL): Promise<ApiServiceResponse<never>>;
+    patchItemLabel(id: string, label: LABEL, queueId?: string): Promise<ApiServiceResponse<never>>;
 
     /**
      * Apply note to the item
      * @param id
      * @param note
+     * @param queueId
      */
-    putItemNote(id: string, note: string): Promise<ApiServiceResponse<never>>;
+    putItemNote(id: string, note: string, queueId?: string): Promise<ApiServiceResponse<never>>;
 
     /**
      * Get item details by id

@@ -1,0 +1,26 @@
+@import "../../../styles/variables";
+
+.decision-pie-chart {
+  $chartHeight: 350px;
+
+  &__chart-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  &__pie-chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: $chartHeight;
+  }
+
+  &__empty-placeholder {
+    position: relative;
+    width: 75%;
+    margin: auto;
+    height: $chartHeight;
+    background: #f3f2f1;
+  }
+}

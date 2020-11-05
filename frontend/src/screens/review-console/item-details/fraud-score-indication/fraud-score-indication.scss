@@ -62,11 +62,11 @@
   }
 
   &-title {
-    color: $neutralTertiary;
+    color: $neutralSecondary;
   }
 
   &-score-factors {
-    color: $neutralSecondary;
+    color: $neutralPrimary;
     font-weight: 600;
   }
 
@@ -133,7 +133,7 @@
     }
 
     &-value {
-      background: $neutralLight;
+      background: $neutralQuaternaryAlt;
       position: absolute;
       top: 0;
       // transform: rotate(-180deg);

@@ -5,7 +5,6 @@ package com.griddynamics.msd365fp.manualreview.analytics.service.dashboard;
 
 import com.griddynamics.msd365fp.manualreview.analytics.model.SizeHistoryBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.dto.SizeHistoryDTO;
-import com.griddynamics.msd365fp.manualreview.analytics.repository.QueueSizeCalculationActivityRepository;
 import com.griddynamics.msd365fp.manualreview.analytics.util.DataGenerationUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
@@ -19,9 +18,9 @@ import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.
 
 @Service
 @RequiredArgsConstructor
-public class QueueSizeHistoryService {
+public class PublicQueueSizeHistoryService {
 
-    private final QueueSizeCalculationActivityRepository sizeCalculationActivitiesRepository;
+    private final PublicQueueSizeHistoryClient publicQueueSizeHistoryClient;
 
     /**
      * Returns sizes of specified queues calculated for
@@ -45,7 +44,7 @@ public class QueueSizeHistoryService {
             final Set<String> queueIds) {
         Map<String, SizeHistoryDTO> queues = new TreeMap<>();
         List<SizeHistoryBucket> dbResult =
-                sizeCalculationActivitiesRepository.getSizeHistory(from, to, aggregation, queueIds);
+                publicQueueSizeHistoryClient.getQueueSizeHistory(from, to, aggregation, queueIds);
 
         // map essential metrics
         dbResult.forEach(bucket -> {

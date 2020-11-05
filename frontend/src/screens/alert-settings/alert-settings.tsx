@@ -54,7 +54,7 @@ export class AlertSettings extends Component<RouteComponentProps, never> {
             <div className={CN}>
                 <div className={`${CN}__action-bar`}>
                     <CommandBarButton
-                        text="Add new Alert"
+                        text="Add new alert"
                         iconProps={{ iconName: 'Add' }}
                         className={`${CN}__action-bar-btn`}
                         onClick={this.onNavToCreate}

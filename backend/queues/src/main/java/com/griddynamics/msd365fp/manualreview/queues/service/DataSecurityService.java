@@ -111,6 +111,7 @@ public class DataSecurityService {
         List<String> roles = Objects.requireNonNull(UserPrincipalUtility.extractUserRoles(authentication));
 
         return (queueView == null || itemBelongsToQueue(item, queueView)) &&
+                (item.isActive() || roles.contains(ADMIN_MANAGER_ROLE)) &&
                 (userHasAccessToItemAsLockOwner(item, actor) ||
                         roles.contains(ADMIN_MANAGER_ROLE) ||
                         roles.contains(SENIOR_ANALYST_ROLE) ||

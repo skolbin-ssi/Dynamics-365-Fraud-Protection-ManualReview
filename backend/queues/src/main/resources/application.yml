@@ -1,11 +1,19 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 server:
   port: 8080
 
 mr:
+  instance-type: prim
+  instance-id: ${WEBSITE_INSTANCE_ID}
   task-reset-timeout-multiplier: 4.0
   task-warning-timeout-multiplier: 2.0
   tasks:
-    fail-fast-healthcheck-task:
+    prim-health-analysis-task:
+      enabled: true
+      delay: PT10M
+    sec-health-analysis-task:
       enabled: false
       delay: PT10M
     residual-queue-reconciliation-task:
@@ -50,6 +58,8 @@ mr:
     timeout-seconds: PT5M
   dictionary:
     ttl: P14D
+  search-query:
+    ttl: P30D
 
 logging:
   level:
@@ -59,10 +69,6 @@ logging:
           spring:
             autoconfigure:
               aad: ERROR
-      azure:
-        messaging:
-          eventhubs:
-            PartitionBasedLoadBalancer: WARN
 
 azure:
   cosmosdb:
@@ -106,8 +112,11 @@ azure:
     checkpoint-storage-account: ${EVENT_HUB_OFFSET_STORAGE_NAME}
     checkpoint-connection-string: DefaultEndpointsProtocol=https;AccountName=${EVENT_HUB_OFFSET_STORAGE_NAME};AccountKey=${spring-cloud-azure-eventhub-checkpoint-access-key:${EVENT_HUB_OFFSET_STORAGE_KEY}};EndpointSuffix=core.windows.net
     checkpoint-interval: PT1M
-    consumer-error-threshold: 5
-    producerer-error-threshold: 5
+    sending-timeout: PT10M
+    sending-retries: 3
+    health-check-ttl: PT24H
+    health-check-batch-size: 5
+    health-check-allowed-delay: PT60M
     consumers:
       dfp-hub:
         destination: dfp-hub

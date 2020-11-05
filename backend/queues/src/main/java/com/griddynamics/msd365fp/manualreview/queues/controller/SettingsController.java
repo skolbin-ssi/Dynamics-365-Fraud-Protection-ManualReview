@@ -4,6 +4,8 @@
 package com.griddynamics.msd365fp.manualreview.queues.controller;
 
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemFilterField;
+import com.griddynamics.msd365fp.manualreview.queues.model.dto.ItemFilterFieldDTO;
 import com.griddynamics.msd365fp.manualreview.queues.model.dto.SettingsConfigurationDTO;
 import com.griddynamics.msd365fp.manualreview.queues.model.dto.SettingsDTO;
 import com.griddynamics.msd365fp.manualreview.queues.service.SettingsService;
@@ -13,12 +15,16 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.*;
 
@@ -32,6 +38,7 @@ import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.*;
 public class SettingsController {
 
     private final SettingsService settingsService;
+    private final ModelMapper modelMapper;
 
     @Operation(summary = "Get all settings by specified type")
     @GetMapping(value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -67,5 +74,19 @@ public class SettingsController {
             @Parameter(description = "Id of settings")
             @PathVariable String id) throws NotFoundException {
         return settingsService.deleteSettings(id);
+    }
+
+    @Operation(summary = "Get all available fields")
+    @GetMapping(value = "/static/filter-fields", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
+    public Set<ItemFilterFieldDTO> getAvailableFields() {
+        return Arrays.stream(ItemFilterField.values())
+                .map(field -> {
+                    ItemFilterFieldDTO dto = modelMapper.map(field, ItemFilterFieldDTO.class);
+                    dto.setId(field);
+                    return dto;
+                })
+                .collect(Collectors.toSet());
+
     }
 }

@@ -15,6 +15,7 @@ import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Queue;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepository;
 import com.griddynamics.msd365fp.manualreview.queues.repository.QueueRepository;
+import com.griddynamics.msd365fp.manualreview.queues.repository.SearchQueryRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -57,6 +58,8 @@ public class ItemServiceTest {
     @Mock
     private QueueRepository queueRepository;
     @Mock
+    private SearchQueryRepository searchQueryRepository;
+    @Mock
     private DFPExplorerService dfpExplorerService;
 
     @Captor
@@ -73,7 +76,9 @@ public class ItemServiceTest {
     @BeforeEach
     public void setUp() {
         ModelMapper dfpModelMapper = new DFPModelMapperConfig().dfpModelMapper();
-        itemService = new ItemService(streamService, itemRepository, queueRepository, dfpExplorerService);
+        ModelMapper modelMapper = new ModelMapper();
+        itemService = new ItemService(streamService, itemRepository, queueRepository, searchQueryRepository,
+                dfpExplorerService, modelMapper);
         itemService.setDfpModelMapper(dfpModelMapper);
         itemService.setThisService(itemService);
         itemService.setUnlockTimeout(Duration.parse(UNLOCK_TIMEOUT));

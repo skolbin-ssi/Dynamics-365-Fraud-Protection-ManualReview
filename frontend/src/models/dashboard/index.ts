@@ -7,3 +7,4 @@ export * from './performance-metrics';
 export * from './entity-performance';
 export * from './basic-entity-performance';
 export * from './processing-time-metric';
+export * from './queue-risk-score-overview';

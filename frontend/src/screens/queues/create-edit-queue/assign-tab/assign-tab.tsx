@@ -225,8 +225,8 @@ export class AssignTab extends Component<AssignTabProps, AssignTabOwnState> {
                                             onEmptyResolveSuggestions={this.resolveEmptyAnalystSuggestions}
                                             onChange={this.handleReviewerSelected}
                                             pickerSuggestionsProps={{
-                                                suggestionsHeaderText: 'Suggested Analysts',
-                                                noResultsFoundText: 'No Analysts found',
+                                                suggestionsHeaderText: 'Suggested analysts',
+                                                noResultsFoundText: 'No analysts found',
                                                 className: `${CN}__assignment-suggestion`
                                             }}
                                             inputProps={{

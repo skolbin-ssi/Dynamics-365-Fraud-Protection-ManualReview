@@ -536,6 +536,143 @@
         }
       }
     },
+    "/api/items/{id}" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "Get item details by ID",
+        "operationId" : "getItem",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "queueId",
+          "in" : "query",
+          "description" : "id of the queue which is used for item access",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ItemDTO"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
     "/api/items/{id}/lock" : {
       "delete" : {
         "tags" : [ "items" ],
@@ -545,6 +682,14 @@
           "name" : "id",
           "in" : "path",
           "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "queueId",
+          "in" : "query",
+          "description" : "id of the queue which is used for item access",
+          "required" : false,
           "schema" : {
             "type" : "string"
           }
@@ -677,6 +822,14 @@
           "schema" : {
             "type" : "string"
           }
+        }, {
+          "name" : "queueId",
+          "in" : "query",
+          "description" : "id of the queue which is used for item access",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
         } ],
         "requestBody" : {
           "content" : {
@@ -797,143 +950,6 @@
         } ]
       }
     },
-    "/api/items/{id}" : {
-      "get" : {
-        "tags" : [ "items" ],
-        "summary" : "Get item details by ID",
-        "operationId" : "getItem",
-        "parameters" : [ {
-          "name" : "id",
-          "in" : "path",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          }
-        }, {
-          "name" : "queueId",
-          "in" : "query",
-          "description" : "id of the queue which is used for item access",
-          "required" : false,
-          "schema" : {
-            "type" : "string"
-          }
-        } ],
-        "responses" : {
-          "204" : {
-            "description" : "No Content"
-          },
-          "404" : {
-            "description" : "Not Found",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "422" : {
-            "description" : "Unprocessable Entity",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "409" : {
-            "description" : "Conflict",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "429" : {
-            "description" : "Too Many Requests",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ItemDTO"
-                }
-              }
-            }
-          }
-        },
-        "security" : [ {
-          "mr_user_auth" : [ ]
-        } ]
-      }
-    },
     "/api/items/locked" : {
       "get" : {
         "tags" : [ "items" ],
@@ -1011,8 +1027,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1025,8 +1041,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1067,6 +1083,14 @@
           "name" : "id",
           "in" : "path",
           "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "queueId",
+          "in" : "query",
+          "description" : "id of the queue which is used for item access",
+          "required" : false,
           "schema" : {
             "type" : "string"
           }
@@ -1153,8 +1177,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1167,8 +1191,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1199,6 +1223,14 @@
           "name" : "id",
           "in" : "path",
           "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "queueId",
+          "in" : "query",
+          "description" : "id of the queue which is used for item access",
+          "required" : false,
           "schema" : {
             "type" : "string"
           }
@@ -1285,8 +1317,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1299,8 +1331,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1322,6 +1354,453 @@
         } ]
       }
     },
+    "/api/items/search-query" : {
+      "post" : {
+        "tags" : [ "items" ],
+        "summary" : "Save search query to the database",
+        "operationId" : "saveSearchQuery",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ItemSearchQueryDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/search-query/{id}" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "Get search query by id",
+        "operationId" : "getSearchQuery",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ItemSearchQueryDTO"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/search-query/{id}/results" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "Execute saved search query and return search results",
+        "operationId" : "applySearchQuery",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "size of a page",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 20
+          }
+        }, {
+          "name" : "continuation",
+          "in" : "query",
+          "description" : "continuation token from previous request",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "sortingField",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "IMPORT_DATE",
+            "enum" : [ "ID", "IMPORT_DATE", "ACTIVE", "QUEUE_IDS", "LABEL_VALUE", "TAGS", "LOCK_OWNER_ID", "HOLD_OWNER_ID", "LABEL_AUTHOR_ID", "LABEL_QUEUE_ID", "SCORE", "TOTAL_AMOUNT", "PRODUCT_SKU", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "USER_COUNTRY", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "AGGREGATED_EMAIL_DOMAIN", "AGGREGATED_EMAIL_CONFIRMED", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PAYMENT_GATEWAY", "BANK_RESPONSE_CODE", "AUTH_RESULT_CODE", "APPROVE_RESULT_CODE", "DECLINE_RESULT_CODE", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT" ]
+          }
+        }, {
+          "name" : "sortingOrder",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string",
+            "default" : "DESC",
+            "enum" : [ "ASC", "DESC" ]
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "required" : [ "empty", "size" ],
+                  "type" : "array",
+                  "properties" : {
+                    "continuationToken" : {
+                      "type" : "string"
+                    },
+                    "size" : {
+                      "type" : "integer",
+                      "format" : "int32"
+                    },
+                    "empty" : {
+                      "type" : "boolean"
+                    },
+                    "values" : {
+                      "type" : "array",
+                      "items" : {
+                        "$ref" : "#/components/schemas/ItemDTO"
+                      }
+                    }
+                  },
+                  "items" : {
+                    "$ref" : "#/components/schemas/ItemDTO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
     "/api/overview/risk-score" : {
       "get" : {
         "tags" : [ "overview" ],
@@ -1330,7 +1809,7 @@
         "parameters" : [ {
           "name" : "bucketSize",
           "in" : "query",
-          "description" : "size of the risk score buckets, e.g. ",
+          "description" : "size of the risk score buckets",
           "required" : true,
           "schema" : {
             "type" : "integer",
@@ -1417,8 +1896,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1431,8 +1910,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1546,8 +2025,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1560,8 +2039,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1673,8 +2152,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1687,8 +2166,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1813,8 +2292,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1827,8 +2306,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1952,8 +2431,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1966,8 +2445,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2084,8 +2563,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2098,8 +2577,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2216,8 +2695,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2230,8 +2709,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2366,8 +2845,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2380,8 +2859,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2517,8 +2996,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2531,8 +3010,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2653,8 +3132,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2667,8 +3146,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2795,8 +3274,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2809,8 +3288,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2965,8 +3444,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2979,8 +3458,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3117,8 +3596,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3131,8 +3610,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3251,8 +3730,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3265,8 +3744,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3374,8 +3853,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3388,8 +3867,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3512,6 +3991,20 @@
               }
             }
           },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
           "500" : {
             "description" : "Internal Server Error",
             "content" : {
@@ -3522,6 +4015,92 @@
                   }, {
                     "type" : "object"
                   } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/settings/static/filter-fields" : {
+      "get" : {
+        "tags" : [ "settings" ],
+        "summary" : "Get all available fields",
+        "operationId" : "getAvailableFields",
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
                 }
               }
             }
@@ -3540,8 +4119,33 @@
               }
             }
           },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
           "200" : {
-            "description" : "OK"
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "uniqueItems" : true,
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ItemFilterFieldDTO"
+                  }
+                }
+              }
+            }
           }
         },
         "security" : [ {
@@ -3626,8 +4230,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3640,8 +4244,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3750,8 +4354,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3764,8 +4368,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3873,8 +4477,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3887,8 +4491,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4029,6 +4633,20 @@
               }
             }
           },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
           "500" : {
             "description" : "Internal Server Error",
             "content" : {
@@ -4043,8 +4661,266 @@
               }
             }
           },
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/testing/items" : {
+      "post" : {
+        "tags" : [ "testing" ],
+        "summary" : "Create a new item directly in the database",
+        "operationId" : "createItem",
+        "parameters" : [ {
+          "name" : "amount",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 1
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Item"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
           "400" : {
             "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Item"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      },
+      "delete" : {
+        "tags" : [ "testing" ],
+        "summary" : "Hard delete for all items by IDs",
+        "operationId" : "deleteAllById",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object",
+                  "additionalProperties" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4151,8 +5027,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4165,8 +5041,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4199,7 +5075,7 @@
           "required" : true,
           "schema" : {
             "type" : "string",
-            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE" ]
+            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE", "AGGREGATED_EMAIL_CONFIRMED", "AGGREGATED_EMAIL_DOMAIN", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "PAYMENT_GATEWAY", "BANK_RESPONSE_CODE", "AUTH_RESULT_CODE", "APPROVE_RESULT_CODE", "DECLINE_RESULT_CODE", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI" ]
           }
         } ],
         "responses" : {
@@ -4274,8 +5150,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4288,8 +5164,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4417,20 +5293,6 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
           "400" : {
             "description" : "Bad Request",
             "content" : {
@@ -4445,266 +5307,8 @@
               }
             }
           },
-          "200" : {
-            "description" : "OK"
-          }
-        },
-        "security" : [ {
-          "mr_user_auth" : [ ]
-        } ]
-      }
-    },
-    "/api/testing/items" : {
-      "post" : {
-        "tags" : [ "testing" ],
-        "summary" : "Create a new item directly in the database",
-        "operationId" : "createItem",
-        "parameters" : [ {
-          "name" : "amount",
-          "in" : "query",
-          "required" : false,
-          "schema" : {
-            "type" : "integer",
-            "format" : "int32",
-            "default" : 1
-          }
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/Item"
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "204" : {
-            "description" : "No Content"
-          },
-          "404" : {
-            "description" : "Not Found",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "422" : {
-            "description" : "Unprocessable Entity",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "409" : {
-            "description" : "Conflict",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "429" : {
-            "description" : "Too Many Requests",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
           "500" : {
             "description" : "Internal Server Error",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "type" : "array",
-                  "items" : {
-                    "$ref" : "#/components/schemas/Item"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security" : [ {
-          "mr_user_auth" : [ ]
-        } ]
-      },
-      "delete" : {
-        "tags" : [ "testing" ],
-        "summary" : "Hard delete for all items by IDs",
-        "operationId" : "deleteAllById",
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "type" : "array",
-                "items" : {
-                  "type" : "object",
-                  "additionalProperties" : {
-                    "type" : "string"
-                  }
-                }
-              }
-            }
-          },
-          "required" : true
-        },
-        "responses" : {
-          "204" : {
-            "description" : "No Content"
-          },
-          "404" : {
-            "description" : "Not Found",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "422" : {
-            "description" : "Unprocessable Entity",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "409" : {
-            "description" : "Conflict",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "429" : {
-            "description" : "Too Many Requests",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4813,8 +5417,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4827,8 +5431,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4940,8 +5544,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4954,8 +5558,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -5074,8 +5678,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -5088,8 +5692,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -5207,8 +5811,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -5221,8 +5825,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -5364,6 +5968,203 @@
           }
         }
       },
+      "CalculatedFields" : {
+        "type" : "object",
+        "properties" : {
+          "matchingOfCountriesForShippingAndIP" : {
+            "type" : "boolean"
+          },
+          "matchingOfCountriesForBillingAndShipping" : {
+            "type" : "boolean"
+          },
+          "matchingOfCountriesForBillingAndIP" : {
+            "type" : "boolean"
+          },
+          "billingCountries" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "billingZipCodes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "billingAddresses" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "accountAgeInDays" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "activityAgeInDays" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "firstTransactionDateTime" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "aggregatedEmailConfirmed" : {
+            "type" : "boolean"
+          },
+          "aggregatedEmailDomain" : {
+            "type" : "string"
+          },
+          "authResultCodes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "approveResultCodes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "declineResultCodes" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "lastHourTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastDayTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastWeekTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastHourTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastDayTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastWeekTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastHourRejectedTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastDayRejectedTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastWeekRejectedTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastHourRejectedTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastDayRejectedTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastWeekRejectedTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastHourFailedTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastDayFailedTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastWeekFailedTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastHourFailedTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastDayFailedTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastWeekFailedTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastHourSuccessfulTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastDaySuccessfulTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastWeekSuccessfulTransactionCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastHourSuccessfulTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastDaySuccessfulTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastWeekSuccessfulTransactionAmount" : {
+            "type" : "number"
+          },
+          "lastHourUniquePaymentInstrumentCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastDayUniquePaymentInstrumentCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastWeekUniquePaymentInstrumentCount" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastHourTransactionCountWithCurrentPaymentInstrument" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastDayTransactionCountWithCurrentPaymentInstrument" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastWeekTransactionCountWithCurrentPaymentInstrument" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastHourTransactionAmountWithCurrentPaymentInstrument" : {
+            "type" : "number"
+          },
+          "lastDayTransactionAmountWithCurrentPaymentInstrument" : {
+            "type" : "number"
+          },
+          "lastWeekTransactionAmountWithCurrentPaymentInstrument" : {
+            "type" : "number"
+          },
+          "lastHourUniqueIPCountries" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastDayUniqueIPCountries" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "lastWeekUniqueIPCountries" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
       "Decision" : {
         "type" : "object",
         "properties" : {
@@ -5463,6 +6264,9 @@
           "active" : {
             "type" : "boolean"
           },
+          "label" : {
+            "$ref" : "#/components/schemas/ItemLabel"
+          },
           "notes" : {
             "uniqueItems" : true,
             "type" : "array",
@@ -5471,6 +6275,13 @@
             }
           },
           "tags" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "queueIds" : {
             "uniqueItems" : true,
             "type" : "array",
             "items" : {
@@ -5531,6 +6342,28 @@
           },
           "queueViewId" : {
             "type" : "string"
+          }
+        }
+      },
+      "ItemLabel" : {
+        "type" : "object",
+        "properties" : {
+          "value" : {
+            "type" : "string",
+            "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
+          },
+          "authorId" : {
+            "type" : "string"
+          },
+          "queueId" : {
+            "type" : "string"
+          },
+          "queueViewId" : {
+            "type" : "string"
+          },
+          "labeled" : {
+            "type" : "string",
+            "format" : "date-time"
           }
         }
       },
@@ -5664,6 +6497,9 @@
             "items" : {
               "$ref" : "#/components/schemas/PreviousPurchase"
             }
+          },
+          "CalculatedFields" : {
+            "$ref" : "#/components/schemas/CalculatedFields"
           }
         }
       },
@@ -5794,6 +6630,30 @@
           },
           "PolicyApplied" : {
             "type" : "string"
+          },
+          "LastMerchantStatus" : {
+            "type" : "string"
+          },
+          "DeviceContext" : {
+            "$ref" : "#/components/schemas/DeviceContext"
+          },
+          "AddressList" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Address"
+            }
+          },
+          "PaymentInstrumentList" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PaymentInstrument"
+            }
+          },
+          "BankEventsList" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/BankEvent"
+            }
           }
         }
       },
@@ -6019,6 +6879,97 @@
           }
         }
       },
+      "ItemFilter" : {
+        "required" : [ "condition", "field" ],
+        "type" : "object",
+        "properties" : {
+          "field" : {
+            "type" : "string",
+            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE", "AGGREGATED_EMAIL_CONFIRMED", "AGGREGATED_EMAIL_DOMAIN", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "PAYMENT_GATEWAY", "BANK_RESPONSE_CODE", "AUTH_RESULT_CODE", "APPROVE_RESULT_CODE", "DECLINE_RESULT_CODE", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI" ]
+          },
+          "condition" : {
+            "type" : "string",
+            "enum" : [ "IN", "CONTAINS", "REGEXP", "IS_TRUE", "BETWEEN", "BETWEEN_ALPH", "BETWEEN_DATE", "EQUAL", "EQUAL_ALPH", "GREATER", "GREATER_ALPH", "GREATER_DATE", "LESS", "LESS_ALPH", "LESS_DATE", "GREATER_OR_EQUAL", "GREATER_OR_EQUAL_ALPH", "GREATER_OR_EQUAL_DATE", "LESS_OR_EQUAL", "LESS_OR_EQUAL_ALPH", "LESS_OR_EQUAL_DATE" ]
+          },
+          "values" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        },
+        "discriminator" : {
+          "propertyName" : "condition"
+        }
+      },
+      "ItemSearchQueryDTO" : {
+        "type" : "object",
+        "properties" : {
+          "ids" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "active" : {
+            "type" : "boolean"
+          },
+          "queueIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "residual" : {
+            "type" : "boolean"
+          },
+          "itemFilters" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ItemFilter"
+            }
+          },
+          "lockOwnerIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "holdOwnerIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "labels" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
+            }
+          },
+          "tags" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "labelAuthorIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
       "RiskScoreBucketDTO" : {
         "required" : [ "count" ],
         "type" : "object",
@@ -6039,29 +6990,6 @@
               "$ref" : "#/components/schemas/RiskScoreBucketDTO"
             }
           }
-        }
-      },
-      "ItemFilter" : {
-        "required" : [ "condition", "field" ],
-        "type" : "object",
-        "properties" : {
-          "field" : {
-            "type" : "string",
-            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE" ]
-          },
-          "condition" : {
-            "type" : "string",
-            "enum" : [ "IN", "BETWEEN", "BETWEEN_ALPH", "BETWEEN_DATE", "REGEXP" ]
-          },
-          "values" : {
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          }
-        },
-        "discriminator" : {
-          "propertyName" : "condition"
         }
       },
       "QueueSortSettings" : {
@@ -6170,6 +7098,54 @@
           },
           "viewId" : {
             "type" : "string"
+          }
+        }
+      },
+      "QueueCreationDTO" : {
+        "required" : [ "allowedLabels", "filters", "name", "sorting", "supervisors" ],
+        "type" : "object",
+        "properties" : {
+          "name" : {
+            "type" : "string"
+          },
+          "allowedLabels" : {
+            "maxItems" : 6,
+            "minItems" : 2,
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
+            }
+          },
+          "reviewers" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "supervisors" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "sorting" : {
+            "$ref" : "#/components/schemas/QueueSortSettings"
+          },
+          "filters" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ItemFilter"
+            }
+          },
+          "processingDeadline" : {
+            "type" : "string",
+            "format" : "PnDTnHnMn.nS",
+            "example" : "P2DT12H"
           }
         }
       },
@@ -6323,28 +7299,6 @@
           }
         }
       },
-      "ItemLabel" : {
-        "type" : "object",
-        "properties" : {
-          "value" : {
-            "type" : "string",
-            "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
-          },
-          "authorId" : {
-            "type" : "string"
-          },
-          "queueId" : {
-            "type" : "string"
-          },
-          "queueViewId" : {
-            "type" : "string"
-          },
-          "labeled" : {
-            "type" : "string",
-            "format" : "date-time"
-          }
-        }
-      },
       "PurchaseStatus" : {
         "type" : "object",
         "properties" : {
@@ -6359,54 +7313,6 @@
           },
           "Reason" : {
             "type" : "string"
-          }
-        }
-      },
-      "QueueCreationDTO" : {
-        "required" : [ "allowedLabels", "filters", "name", "sorting", "supervisors" ],
-        "type" : "object",
-        "properties" : {
-          "name" : {
-            "type" : "string"
-          },
-          "allowedLabels" : {
-            "maxItems" : 6,
-            "minItems" : 2,
-            "uniqueItems" : true,
-            "type" : "array",
-            "items" : {
-              "type" : "string",
-              "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
-            }
-          },
-          "reviewers" : {
-            "uniqueItems" : true,
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          },
-          "supervisors" : {
-            "uniqueItems" : true,
-            "type" : "array",
-            "items" : {
-              "type" : "string"
-            }
-          },
-          "sorting" : {
-            "$ref" : "#/components/schemas/QueueSortSettings"
-          },
-          "filters" : {
-            "uniqueItems" : true,
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/ItemFilter"
-            }
-          },
-          "processingDeadline" : {
-            "type" : "string",
-            "format" : "PnDTnHnMn.nS",
-            "example" : "P2DT12H"
           }
         }
       },
@@ -6440,6 +7346,39 @@
             "additionalProperties" : {
               "type" : "object"
             }
+          }
+        }
+      },
+      "ItemFilterFieldDTO" : {
+        "required" : [ "acceptableConditions" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE", "AGGREGATED_EMAIL_CONFIRMED", "AGGREGATED_EMAIL_DOMAIN", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "PAYMENT_GATEWAY", "BANK_RESPONSE_CODE", "AUTH_RESULT_CODE", "APPROVE_RESULT_CODE", "DECLINE_RESULT_CODE", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI" ]
+          },
+          "category" : {
+            "type" : "string"
+          },
+          "displayName" : {
+            "type" : "string"
+          },
+          "acceptableConditions" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "IN", "CONTAINS", "REGEXP", "IS_TRUE", "BETWEEN", "BETWEEN_ALPH", "BETWEEN_DATE", "EQUAL", "EQUAL_ALPH", "GREATER", "GREATER_ALPH", "GREATER_DATE", "LESS", "LESS_ALPH", "LESS_DATE", "GREATER_OR_EQUAL", "GREATER_OR_EQUAL_ALPH", "GREATER_OR_EQUAL_DATE", "LESS_OR_EQUAL", "LESS_OR_EQUAL_ALPH", "LESS_OR_EQUAL_DATE" ]
+            }
+          },
+          "lowerBound" : {
+            "type" : "string"
+          },
+          "upperBound" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
           }
         }
       },

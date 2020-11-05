@@ -58,7 +58,11 @@ export class LockedItemsStore {
 
     @action
     async unassignItem(itemId: string, queueId: string | null) {
-        await this.itemService.finishReview(itemId);
+        if (queueId) {
+            await this.itemService.finishReview(itemId, queueId);
+        } else {
+            await this.itemService.finishReview(itemId);
+        }
 
         // refresh queue if it is the one selected on the screen
         if (queueId && this.queueStore.selectedQueueId === queueId) {

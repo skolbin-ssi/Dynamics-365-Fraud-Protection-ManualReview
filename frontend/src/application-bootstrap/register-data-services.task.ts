@@ -2,11 +2,24 @@
 // Licensed under the MIT license.
 
 import { Container } from 'inversify';
+
+import { TYPES } from '../types';
+import { Logger } from '../utility-services';
 import {
-    QueueApiService, ItemApiService, UserApiService,
-    ItemService, QueueService, UserService,
-    DashboardService, DictionaryApiService,
-    SettingsApiService, SettingsService, AlertsApiService, CollectedInfoApiService, CollectedInfoService
+    QueueApiService,
+    ItemApiService,
+    UserApiService,
+    ItemService,
+    QueueService,
+    UserService,
+    DashboardService,
+    DictionaryApiService,
+    SettingsApiService,
+    SettingsService,
+    AlertsApiService,
+    CollectedInfoApiService,
+    CollectedInfoService,
+    OverviewApiService
 } from '../data-services';
 import { AlertsApiServiceImpl } from '../data-services/api-services/alerts-api-service/alerts-api-service-impl';
 import { DictionaryApiServiceImpl } from '../data-services/api-services/dictionary-api-service/dictionary-api-service-impl';
@@ -20,13 +33,14 @@ import { ItemServiceImpl } from '../data-services/domain-services/item-service-i
 import { SettingsServiceImpl } from '../data-services/domain-services/settings-service-impl';
 import { UserServiceImpl } from '../data-services/domain-services/user-service-impl';
 import { AlertsService } from '../data-services/interfaces/alerts-service';
-import { TYPES } from '../types';
-import { Logger } from '../utility-services';
 import { DashboardApiService } from '../data-services/interfaces/dashboard-api-service';
 import { DashboardApiServiceImpl } from '../data-services/api-services/dashboard-api-service/dashboard-api-service-impl';
 import { DashboardServiceImpl } from '../data-services/domain-services/dashboard-service-impl';
 import { CollectedInfoApiServiceImpl } from '../data-services/api-services/collected-info-api-service/collected-info-api-service-impl';
 import { CollectedInfoServiceImpl } from '../data-services/domain-services/collected-info-service-impl';
+import { OverviewApiServiceImpl } from '../data-services/api-services/overview-api-service/overview-api-service-impl';
+import { OverviewServiceImpl } from '../data-services/domain-services/overview-service-impl';
+import { OverviewService } from '../data-services/interfaces/domain-interfaces/overview-service';
 
 export const registerDataServicesTask = {
     execute: async (logger: Logger, container: Container) => {
@@ -68,6 +82,10 @@ export const registerDataServicesTask = {
             .to(CollectedInfoApiServiceImpl)
             .inSingletonScope();
 
+        container
+            .bind<OverviewApiService>(TYPES.OVERVIEW_API_SERVICE)
+            .to(OverviewApiServiceImpl);
+
         /**
          * Registering Data Services
          */
@@ -104,6 +122,10 @@ export const registerDataServicesTask = {
         container
             .bind<CollectedInfoService>(TYPES.COLLECTED_INFO_SERVICE)
             .to(CollectedInfoServiceImpl)
+            .inSingletonScope();
+        container
+            .bind<OverviewService>(TYPES.OVERVIEW_SERVICE)
+            .to(OverviewServiceImpl)
             .inSingletonScope();
 
         /**

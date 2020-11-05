@@ -4,6 +4,7 @@
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
+import com.griddynamics.msd365fp.manualreview.dfpauth.util.UserPrincipalUtility;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.model.exception.EmptySourceException;
@@ -12,7 +13,6 @@ import com.griddynamics.msd365fp.manualreview.queues.model.QueueView;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewType;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepository;
-import com.griddynamics.msd365fp.manualreview.dfpauth.util.UserPrincipalUtility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -26,7 +26,10 @@ import org.springframework.security.access.prepost.PreFilter;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.*;
@@ -105,13 +108,14 @@ public class PublicItemClient {
 
 
     @PostAuthorize("@dataSecurityService.checkPermissionForItemReading(authentication, returnObject, #queueView)")
-    public Item getActiveItem(
+    public Item getItem(
             @NonNull String id,
-            @Nullable QueueView queueView) throws NotFoundException {
+            @Nullable QueueView queueView,
+            @Nullable Boolean active) throws NotFoundException {
         return itemRepository
                 .findItemById(
                         id,
-                        true,
+                        active,
                         queueView == null ? null : queueView.getViewType(),
                         queueView == null ? null : queueView.getQueueId(),
                         queueView == null ? null : queueView.isResidual())

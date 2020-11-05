@@ -7,6 +7,13 @@ export const customConstants = {
     expandedLeftNavigationWidth: 230
 };
 
+export const GENERAL_COLORS = {
+    goodColorLight: '#87BD87',
+    badColorLight: '#E36772',
+    badDark: '#D83B01',
+    goodDark: '#107C10',
+};
+
 /**
  * COLORS - represents the map to scss colors
  */
@@ -17,14 +24,26 @@ export const COLORS = {
     badColor: '#D83B01',
 
     pieChart: {
-        badColor: '#FF989E',
-        goodColor: '#BCEEB7',
-        watchColor: '#E1DFDD'
+        badColor: GENERAL_COLORS.badColorLight,
+        goodColor: '#107C10',
+        watchColor: '#8A8886'
+    },
+    riskScoreDistributionPieChart: {
+        green: '#1B5E20',
+        lightGreen: '#107C10',
+        lime: '#50AF43',
+        yellow: '#F5BB41',
+        orange: '#F19837',
+        orangeHot: '#EE6F2D',
+        pink: '#FC7572',
+        pinkHot: '#EC433F',
+        red: '#CD0000',
+        redDark: '#A31515'
     },
     barChart: {
-        good: '#87BD87',
+        good: GENERAL_COLORS.goodColorLight,
         overturnedGood: '#DFF6DD',
-        bad: '#E36772',
+        bad: GENERAL_COLORS.badColorLight,
         overturnedBad: '#FAC3C8'
     },
     demandSupplyCharts: {
@@ -32,5 +51,12 @@ export const COLORS = {
         reviewed: '#2B88D8',
         received: '#FF9314',
         released: '#605E5C'
+    },
+    queueRiskScoreDistributionChart: {
+        watched: '#FFCB19',
+        good: GENERAL_COLORS.goodDark,
+        bad: GENERAL_COLORS.badDark,
+        goodLight: GENERAL_COLORS.goodColorLight,
+        badLight: GENERAL_COLORS.badColorLight,
     }
 };

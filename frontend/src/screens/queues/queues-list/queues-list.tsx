@@ -201,7 +201,7 @@ export class QueuesList extends Component<QueuesListProps, never> {
                             className={`${CN}__add-new-item-btn`}
                             onClick={onCreateQueueClick}
                         >
-                            Create a new Queue
+                            Create a new queue
                         </ActionButton>
                     </div>
                 )}

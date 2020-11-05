@@ -8,8 +8,6 @@ import cx from 'classnames';
 
 import { Shimmer, ShimmerElementType } from '@fluentui/react/lib/Shimmer';
 
-import { BlurLoader } from '../../blur-loader';
-import { PieChart } from '../../pie-chart';
 import { CurrentProgress } from '../../../../models/dashboard/progress-performance-metric';
 import ArrowUpGreen from '../../../../assets/icon/arrows/arrow-up-top-right-green.svg';
 import ArrowUpRed from '../../../../assets/icon/arrows/arrow-up-top-right-red.svg';
@@ -18,6 +16,7 @@ import { AnalystPerformanceStore } from '../../../../view-services/dashboard';
 
 import './performance-overview.scss';
 import { WarningChartMessage } from '../../warning-chart-message';
+import { DecisionPieChart } from '../../decision-pie-chart';
 
 const CN = 'performance-overview';
 
@@ -132,7 +131,7 @@ export class PerformanceOverview extends Component<PerformanceOverviewComponentP
         );
     }
 
-    renderDecisionPieChart() {
+    render() {
         const {
             analystPerformanceStore: {
                 isTotalPerformanceLoading,
@@ -140,43 +139,16 @@ export class PerformanceOverview extends Component<PerformanceOverviewComponentP
             }
         } = this.props;
 
-        const isAllPieDatumsEqualsZero = pieChartData.every(datum => !datum.value);
-        const isDataNotAvailable = isAllPieDatumsEqualsZero && !isTotalPerformanceLoading;
-
-        if (isDataNotAvailable) {
-            return (
-                <div className={`${CN}__pie-chart-no-data-placeholder`}>
-                    <WarningChartMessage
-                        className={`${CN}__warning-message`}
-                        message="Total decisions metrics are not available"
-                    />
-                </div>
-            );
-        }
-
-        const filteredNotZeroPieData = pieChartData.filter(datum => datum.value !== 0);
-
-        return (
-            <div className={`${CN}__decision-pie-chart`}>
-                <BlurLoader
-                    isLoading={isTotalPerformanceLoading}
-                    spinnerProps={{
-                        label: 'Please, wait! Loading chart data ...'
-                    }}
-                >
-                    <PieChart data={filteredNotZeroPieData} className={`${CN}__pie-chart`} />
-                </BlurLoader>
-            </div>
-        );
-    }
-
-    render() {
         return (
             <section className={`${CN}__analyst-overview-section`}>
                 <div className={`${CN}__analyst-overview-section-title`}>Analyst overview</div>
                 <div className={`${CN}__analyst-overview-section-content`}>
                     {this.renderAnalystProgressTable()}
-                    {this.renderDecisionPieChart()}
+                    <DecisionPieChart
+                        className={`${CN}__decision-pie-chart`}
+                        isDataLoading={isTotalPerformanceLoading}
+                        data={pieChartData}
+                    />
                 </div>
             </section>
         );

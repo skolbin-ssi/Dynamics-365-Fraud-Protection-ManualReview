@@ -9,10 +9,20 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum DictionaryType {
     TAG(null),
-    PRODUCT_SKU(ItemDataField.PRODUCT_SKU),
-    USER_COUNTRY(ItemDataField.USER_COUNTRY);
+    PRODUCT_SKU(ItemFilterField.PRODUCT_SKU),
+    USER_COUNTRY(ItemFilterField.USER_COUNTRY),
+    AUTHENTICATION_PROVIDER(ItemFilterField.AUTHENTICATION_PROVIDER),
+    AGGREGATED_EMAIL_DOMAIN(ItemFilterField.AGGREGATED_EMAIL_DOMAIN),
+    PRODUCT_CATEGORY(ItemFilterField.PRODUCT_CATEGORY),
+    PRODUCT_TYPE(ItemFilterField.PRODUCT_TYPE),
+    PI_BIN(ItemFilterField.PI_BIN),
+    PI_COUNTRY(ItemFilterField.PI_COUNTRY),
+    PI_ZIP(ItemFilterField.PI_ZIP),
+    PAYMENT_GATEWAY(ItemFilterField.PAYMENT_GATEWAY),
+    DEVICE_CONTEXT_USER_AGENT(ItemFilterField.DEVICE_CONTEXT_USER_AGENT),
+    IP_COUNTRY(ItemFilterField.IP_COUNTRY);
 
     @Getter
-    private final ItemDataField field;
+    private final ItemFilterField field;
 
 }

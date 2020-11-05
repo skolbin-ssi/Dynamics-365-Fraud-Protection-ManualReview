@@ -15,6 +15,7 @@ import {
     GetQueueSizeHistoryArrayResponse,
     GetQueueSizeHistoryResponse
 } from '../api-services/dashboard-api-service/queue-size-history/api-models';
+import { GetQueueRiskScoreOverviewResponse } from '../api-services/dashboard-api-service/risk-score-overview/api-models';
 
 export interface DashboardRequestApiParams {
     /**
@@ -35,16 +36,41 @@ export interface DashboardRequestApiParams {
     aggregation: DURATION_PERIOD,
 
     /**
-     * queueId - queue id, if provided gets statistic by specified queue
+     * queue - queue id(s), if provided gets statistic by specified queue
      * (keep empty to query all)
      */
     queue?: string | string[],
 
     /**
-     * analystId - analyst id, if provided gets gets statistic by specified analyst
+     * analyst - analyst id(s), if provided gets gets statistic by specified analyst
      * (keep empty to query all)
      */
     analyst?: string | string[]
+}
+
+export interface QueueRiskScoreOverviewApiParams {
+    /**
+     * from - start of the date range, excluding a time zone
+     * (format e. g.: 2020-06-10T00:00:00+00:00)
+     */
+    from: string
+
+    /**
+     * to - end of the date range, excluding a time zone
+     * (format e. g.: 2020-06-10T00:00:00+00:00
+     */
+    to: string;
+
+    /**
+     * bucketSize - size of the risk score buckets,
+     * distributes queue items by a risk score
+     *
+     * e.g.: bucketSize = 100 then the items will be distributed by the risk score
+     * as for example: 0, 5, 10,... ets, till the maximum risk score
+     * defined by the queue itself risk score filter
+     */
+    bucketSize: number;
+    queue?: string | string[]
 }
 
 export interface DashboardApiService {
@@ -78,4 +104,10 @@ export interface DashboardApiService {
     getAnalystsPerformanceMetrics(params: DashboardRequestApiParams): Promise<ApiServiceResponse<GetAnalystsPerformanceResponse>>
 
     getTotalPerformanceMetrics(params: DashboardRequestApiParams): Promise<ApiServiceResponse<GetTotalPerformanceMetricsResponse>>
+
+    /**
+     * Returns items split by risk score and label
+     * @param params - API endpoint params
+     */
+    getQueueRiskScoreOverview(params: QueueRiskScoreOverviewApiParams): Promise<ApiServiceResponse<GetQueueRiskScoreOverviewResponse>>
 }

@@ -1,21 +1,33 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 mr:
+  instance-type: prim
   task-reset-timeout-multiplier: 4.0
   task-warning-timeout-multiplier: 2.0
   tasks:
-    fail-fast-healthcheck-task:
+    prim-health-analysis-task:
+      enabled: true
+      delay: PT10M
+    sec-health-analysis-task:
+      enabled: false
       delay: PT10M
     resolution-send-task:
+      enabled: true
       delay: PT1M
       timeout: PT5M
       max-retries: 10
       initial-retry-delay: PT10M
       max-retry-delay: P1D
     collect-analyst-info-task:
+      enabled: true
       delay: PT10M
     send-alerts-task:
+      enabled: true
       delay: PT1M
       timeout: PT5M
     alert-template-reconciliation-task:
+      enabled: true
       delay: PT10M
 azure:
   cosmosdb:
@@ -41,8 +53,11 @@ azure:
     token-cache-retention: PT10M
   event-hub:
     checkpoint-interval: PT3M
-    consumer-error-threshold: 5
-    producerer-error-threshold: 5
+    sending-timeout: PT10M
+    sending-retries: 3
+    health-check-ttl: PT24H
+    health-check-batch-size: 5
+    health-check-allowed-delay: PT60M
 
 swagger:
   # the https://cors-anywhere.herokuapp.com/ prefix is only for dev environments

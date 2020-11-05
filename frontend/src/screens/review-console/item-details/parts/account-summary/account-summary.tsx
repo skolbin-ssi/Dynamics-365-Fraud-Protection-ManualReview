@@ -142,7 +142,7 @@ export class AccountSummary extends Component<AccountSummaryProps, AccountSummar
         const { user } = purchase;
 
         const renderingConfig: KeyValueItem[] = [
-            { key: 'Profile Type', value: user.profileType },
+            { key: 'Profile type', value: user.profileType },
             { key: 'User ID', value: user.userId },
             { key: 'Country', value: user.country },
             { key: 'Zip', value: user.zipCode },

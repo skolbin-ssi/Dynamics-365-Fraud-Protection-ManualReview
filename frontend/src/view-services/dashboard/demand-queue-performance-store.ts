@@ -39,6 +39,8 @@ import { LockedItemsStore } from '../locked-items-store';
 import { CurrentUserStore } from '../current-user-store';
 import { AutoRefreshStorageItemManger } from '../misc/auto-refresh-storage-item-manager';
 import { CSVReportBuilder, LocalStorageService } from '../../utility-services';
+import { FraudScoreDistributionStore } from './demand-fraud-score-distribution-store';
+import { OverviewService } from '../../data-services/interfaces/domain-interfaces/overview-service';
 
 export interface QueueItem {
     viewId: string;
@@ -174,6 +176,9 @@ export class DemandQueuePerformanceStore {
     @observable
     escalatedQueueItem = new QueueItemImpl(QUEUE_VIEW_TYPE.ESCALATION);
 
+    @observable
+    riskScoreDistributionStore = new FraudScoreDistributionStore(this.overviewService);
+
     /**
      * AutoRefreshStorageItemManger - manager for dealing with localStorage
      */
@@ -225,6 +230,7 @@ export class DemandQueuePerformanceStore {
     constructor(
         @inject(TYPES.DASHBOARD_SERVICE) private dashboardService: DashboardService,
         @inject(TYPES.QUEUE_SERVICE) private queueService: QueueService,
+        @inject(TYPES.OVERVIEW_SERVICE) private overviewService: OverviewService,
         @inject(TYPES.CURRENT_USER_STORE) private currentUserStore: CurrentUserStore,
         @inject(TYPES.LOCKED_ITEMS_STORE) private readonly lockedItemsStore: LockedItemsStore,
         @inject(TYPES.COLLECTED_INFO_SERVICE) private readonly collectedInfoService: CollectedInfoService,
@@ -256,7 +262,7 @@ export class DemandQueuePerformanceStore {
 
     @computed
     get lastQueueItemsUpdated() {
-        const queueId = this.getQueueId();
+        const queueId = this.getQueueId;
 
         if (!queueId) { return null; }
         const lastUpdateTimestamp = this.lastRefreshQueueItemsMap.get(queueId);
@@ -424,7 +430,8 @@ export class DemandQueuePerformanceStore {
         return null;
     }
 
-    getQueueId() {
+    @computed
+    get getQueueId() {
         return this.queueId;
     }
 
@@ -481,10 +488,18 @@ export class DemandQueuePerformanceStore {
      */
     @computed
     get isQueueItemsDataAvailable() {
-        const hasRegularDataEmpty = this.regularQueueItems.data !== null && !this.regularQueueItems.data.length;
-        const hasEscalatedDataEmpty = this.escalatedQueueItem.data !== null && !this.escalatedQueueItem.data.length;
+        const hasRegularData = !!this.regularQueueItems?.data?.length;
+        const hasEscalatedData = !!this.escalatedQueueItem?.data?.length;
 
-        return hasRegularDataEmpty && hasEscalatedDataEmpty;
+        if (hasRegularData && !hasEscalatedData) {
+            return false;
+        }
+
+        if (hasEscalatedData && !hasRegularData) {
+            return false;
+        }
+
+        return !hasRegularData && !hasEscalatedData;
     }
 
     /**

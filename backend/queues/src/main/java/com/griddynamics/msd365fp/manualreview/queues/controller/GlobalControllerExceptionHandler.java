@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,8 +27,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.servlet.ServletException;
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * The main error mapper.
@@ -89,7 +86,7 @@ public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHan
             mediaType = MediaType.APPLICATION_JSON_VALUE,
             schema = @Schema(implementation = ErrorDTO.class)))
     @ResponseStatus(value = HttpStatus.CONFLICT)
-    @ExceptionHandler({IncorrectConditionException.class, IncorrectConditionException.class})
+    @ExceptionHandler(IncorrectConditionException.class)
     @NonNull
     public ResponseEntity<Object> handleConflict(final Exception exception) {
         return generateClientError("Conditions aren't met", exception, HttpStatus.CONFLICT);

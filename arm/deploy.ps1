@@ -320,7 +320,6 @@ catch {
 }
 Write-Host "Dynamics 365 Fraud Protection service principal id:"$dfpAppServicePrincipal.Id
 
-
 # Create Azure maps group
 Write-Host "=== Create Azure Maps Group"
 if (!($mapsGroup = Get-AzADGroup -DisplayName $mapsGroupName)) 
@@ -447,7 +446,7 @@ if (CheckOSWindows)
     Write-Host "=== Assing DFP roles to application"
     foreach ($dfpRoleName in $dfpRoles[$envType]) {
         GrantDfpPermissionWin -clientAppName $prefix -dfpRoleName $dfpRoleName
-    } 
+    }
 }
 
 Write-Host "Deployment Output"

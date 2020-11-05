@@ -5,6 +5,7 @@ package com.griddynamics.msd365fp.manualreview.queues.model;
 
 import com.google.common.base.Joiner;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.ExtendedCosmosContainer;
+import com.griddynamics.msd365fp.manualreview.model.Label;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import lombok.Builder;
@@ -45,8 +46,8 @@ public class ItemQuery {
             return this;
         }
 
-        public ItemQueryConstructor all(Collection<ItemFilter> itemFilters) {
-            if (itemFilters.isEmpty()) {
+        public ItemQueryConstructor all(@Nullable Collection<ItemFilter> itemFilters) {
+            if (CollectionUtils.isEmpty(itemFilters)) {
                 queryParts.add("true");
                 return this;
             }
@@ -98,8 +99,8 @@ public class ItemQuery {
             return this;
         }
 
-        public ItemQueryConstructor filterFieldIsDefined(ItemDataField field) {
-            FieldDecomposition decomposition = decomposeField(field);
+        public ItemQueryConstructor filterFieldIsDefined(ItemFilterField filter) {
+            FieldDecomposition decomposition = decomposeField(filter.getItemDataField());
             String condition = String.format(
                     "IS_DEFINED(%s%s)",
                     decomposition.getLocalAlias(),
@@ -116,9 +117,8 @@ public class ItemQuery {
         }
 
         public ItemQueryConstructor itemFilter(ItemFilter itemFilter) {
-            FieldDecomposition decomposition = decomposeField(itemFilter.getField());
+            FieldDecomposition decomposition = decomposeField(itemFilter.getField().getItemDataField());
             String condition;
-            Iterator<String> valuesIter;
             switch (itemFilter.getCondition()) {
                 case IN:
                     condition = String.format(
@@ -128,50 +128,95 @@ public class ItemQuery {
                             Joiner.on("', '").join(itemFilter.getValues())
                     );
                     break;
+                case CONTAINS:
+                    condition = String.format(
+                            "CONTAINS(%s%s, '%s')",
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
+                            itemFilter.getValues().get(0)
+                    );
+                    break;
+                case IS_TRUE:
+                    condition = String.format(
+                            "(IS_DEFINED(%1$s%2$s) AND NOT IS_NULL(%1$s%2$s) AND %1$s%2$s)", //TODO: check
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath()
+                    );
+                    break;
                 case REGEXP:
-                    valuesIter = itemFilter.getValues().iterator();
                     condition = String.format(
                             "udf.isMatchRegexp(%s%s, \"%s\")",
                             decomposition.getLocalAlias(),
                             decomposition.getPath(),
-                            valuesIter.next()
+                            itemFilter.getValues().get(0)
                     );
                     break;
                 case BETWEEN:
-                    valuesIter = itemFilter.getValues().iterator();
-                    condition = String.format(
-                            "(%1$s%2$s >= %3$s AND %1$s%2$s <= %4$s)",
-                            decomposition.getLocalAlias(),
-                            decomposition.getPath(),
-                            valuesIter.next(),
-                            valuesIter.next()
-                    );
-                    break;
-                case BETWEEN_ALPH:
-                    valuesIter = itemFilter.getValues().iterator();
-                    condition = String.format(
-                            "(%1$s%2$s >= \"%3$s\" AND %1$s%2$s <= \"%4$s\")",
-                            decomposition.getLocalAlias(),
-                            decomposition.getPath(),
-                            valuesIter.next(),
-                            valuesIter.next()
-                    );
-                    break;
-                case BETWEEN_DATE:
-                    valuesIter = itemFilter.getValues().iterator();
                     condition = String.format(
                             "(%s%s BETWEEN %s AND %s)",
                             decomposition.getLocalAlias(),
                             decomposition.getPath(),
-                            valuesIter.next(),
-                            valuesIter.next()
+                            itemFilter.getValues().get(0),
+                            itemFilter.getValues().get(1)
                     );
                     break;
-                default:
-                    throw new RuntimeException(
-                            String.format("Could not build query due to unexpected FilterCondition: %s",
-                                    itemFilter.getCondition())
+                case BETWEEN_ALPH:
+                    condition = String.format(
+                            "(%s%s BETWEEN '%s' AND '%s')",
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
+                            itemFilter.getValues().get(0),
+                            itemFilter.getValues().get(1)
                     );
+                    break;
+                case BETWEEN_DATE:
+                    condition = String.format(
+                            "(%s%s BETWEEN %s AND %s)",
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
+                            OffsetDateTime.parse(itemFilter.getValues().get(0)).toEpochSecond(),
+                            OffsetDateTime.parse(itemFilter.getValues().get(1)).toEpochSecond()
+                    );
+                    break;
+                case EQUAL:
+                case GREATER:
+                case LESS:
+                case GREATER_OR_EQUAL:
+                case LESS_OR_EQUAL:
+                    condition = String.format(
+                            "(%s%s %s %s)",
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
+                            getSignByComparisonCondition(itemFilter.getCondition()),
+                            itemFilter.getValues().get(0));
+                    break;
+                case EQUAL_ALPH:
+                case GREATER_ALPH:
+                case LESS_ALPH:
+                case GREATER_OR_EQUAL_ALPH:
+                case LESS_OR_EQUAL_ALPH:
+                    condition = String.format(
+                            "(%s%s %s '%s')",
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
+                            getSignByComparisonCondition(itemFilter.getCondition()),
+                            itemFilter.getValues().get(0));
+                    break;
+                case GREATER_DATE:
+                case LESS_DATE:
+                case GREATER_OR_EQUAL_DATE:
+                case LESS_OR_EQUAL_DATE:
+                    condition = String.format(
+                            "(%s%s %s %s)",
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
+                            getSignByComparisonCondition(itemFilter.getCondition()),
+                            OffsetDateTime.parse(itemFilter.getValues().get(0)).toEpochSecond());
+                    break;
+                default:
+                    throw new IncorrectFilterException(
+                            String.format("Could not build query due to unexpected FilterCondition: %s",
+                                    itemFilter.getCondition()));
             }
             if (decomposition.getArray() != null) {
                 List<String> parts = joinParts.computeIfAbsent(decomposition.getArray(), key -> new LinkedList<>());
@@ -184,6 +229,32 @@ public class ItemQuery {
             return this;
         }
 
+        private String getSignByComparisonCondition(final ItemDataFieldCondition condition) {
+            switch (condition) {
+                case EQUAL:
+                case EQUAL_ALPH:
+                    return "=";
+                case GREATER:
+                case GREATER_ALPH:
+                case GREATER_DATE:
+                    return ">";
+                case LESS:
+                case LESS_ALPH:
+                case LESS_DATE:
+                    return "<";
+                case GREATER_OR_EQUAL:
+                case GREATER_OR_EQUAL_ALPH:
+                case GREATER_OR_EQUAL_DATE:
+                    return ">=";
+                case LESS_OR_EQUAL:
+                case LESS_OR_EQUAL_ALPH:
+                case LESS_OR_EQUAL_DATE:
+                    return "<=";
+                default:
+                    throw new IllegalArgumentException();
+            }
+        }
+
         public ItemQueryConstructor order(Sort.Order order) {
             queryParts.add(String.format(
                     "ORDER BY %s.%s %s",
@@ -194,7 +265,12 @@ public class ItemQuery {
             return this;
         }
 
-        public ItemQueryConstructor active(boolean active) {
+        public ItemQueryConstructor active(@Nullable Boolean active) {
+            if (active == null) {
+                queryParts.add("true");
+                return this;
+            }
+
             queryParts.add(String.format(
                     "%s.active=%s",
                     alias,
@@ -278,7 +354,6 @@ public class ItemQuery {
             return this;
         }
 
-        //TODO: delete it
         public ItemQueryConstructor includeLocked(boolean includeLocked) {
             if (!includeLocked) {
                 queryParts.add(String.format(
@@ -435,11 +510,101 @@ public class ItemQuery {
             };
         }
 
+        public ItemQueryConstructor inField(ItemDataField itemDataField, @Nullable Collection<String> collection) {
+            if (CollectionUtils.isEmpty(collection)) {
+                queryParts.add("true");
+                return this;
+            }
+
+            if (itemDataField.isArrayField()) {
+                throw new IllegalArgumentException(
+                        String.format(
+                                "inField() method work only with non-array fields. But field [%s] is an array one.",
+                                itemDataField));
+            }
+
+            queryParts.add(String.format(
+                    "%s.%s IN ('%s')",
+                    alias,
+                    itemDataField.getPath(),
+                    String.join("','", collection))
+            );
+            return this;
+        }
+
+        public ItemQueryConstructor label(@Nullable Collection<Label> labels) {
+            if (CollectionUtils.isEmpty(labels)) {
+                queryParts.add("true");
+                return this;
+            }
+
+            return inField(ItemDataField.LABEL_VALUE, labels.stream()
+                    .map(Enum::name)
+                    .collect(Collectors.toSet()));
+        }
+
+        public ItemQueryConstructor collectionInCollectionField(ItemDataField field, @Nullable Collection<String> collection) {
+            if (CollectionUtils.isEmpty(collection)) {
+                return this;
+            }
+
+            FieldDecomposition decomposition = decomposeField(field);
+
+            String condition = String.format(
+                    "%s%s IN ('%s')",
+                    decomposition.getLocalAlias(),
+                    decomposition.getPath(),
+                    String.join("','", collection));
+
+            List<String> parts = joinParts.computeIfAbsent(decomposition.getArray(), key -> new LinkedList<>());
+            if (!parts.isEmpty()) {
+                parts.add("AND");
+            }
+            parts.add(condition);
+
+            return this;
+        }
+
+        public ItemQueryConstructor queueIds(@Nullable Collection<String> collection,
+                                             boolean residual) {
+            if (CollectionUtils.isEmpty(collection)) {
+                queryParts.add("true");
+                return this;
+            }
+
+            String labelQueueQuery = String.format(
+                    "%s.%s IN ('%s')",
+                    alias,
+                    ItemDataField.LABEL_QUEUE_ID.getPath(),
+                    String.join("','", collection));
+
+            String queuesQuery = collection.stream()
+                    .map(queueId ->
+                            String.format(
+                                    "ARRAY_CONTAINS(%s.%s, '%s')",
+                                    alias,
+                                    decomposeField(ItemDataField.QUEUE_IDS).getArray(),
+                                    queueId))
+                    .collect(Collectors.joining(" OR "));
+
+            String residualQueueQuery = "false";
+            if (residual) {
+                residualQueueQuery = String.format("ARRAY_LENGTH(%1$s.%2$s) = 0 AND IS_NULL(%1$s.%3$s)",
+                        alias,
+                        decomposeField(ItemDataField.QUEUE_IDS).getArray(),
+                        ItemDataField.LABEL_QUEUE_ID.getPath());
+            }
+
+            queryParts.add("("
+                    + String.join(" OR ", labelQueueQuery, queuesQuery, residualQueueQuery)
+                    + ")");
+            return this;
+        }
+
         private FieldDecomposition decomposeField(ItemDataField field) {
-            boolean arrayInPath = field.getPath().contains("[]");
             FieldDecomposition result = new FieldDecomposition();
 
-            if (arrayInPath) {
+            if (field.isArrayField()) {
                 // form "datainarray.field" from "data.in.array[].fiels"
                 // and "datainarray" from "data.in.array[]"
                 String fieldPath = field.getPath();
@@ -464,6 +629,12 @@ public class ItemQuery {
             private String path;
             private String localAlias;
             private String array;
+        }
+
+        public static class IncorrectFilterException extends RuntimeException {
+            public IncorrectFilterException(final String message) {
+                super(message);
+            }
         }
 
     }

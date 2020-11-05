@@ -22,7 +22,7 @@
     border-left-color: $neutralLight;
   }
   &--escalate, &--hold {
-    border-left-color: $vividMediumColor;
+    border-left-color: $escalateBorderColor;
   }
 
   &-title {
@@ -42,7 +42,7 @@
       color: $neutralSecondary;
     }
     &--escalate, &--hold {
-      color: $vividMostColor;
+      color: $escalateColor;
     }
   }
 

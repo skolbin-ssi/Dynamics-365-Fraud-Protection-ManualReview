@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -34,6 +36,7 @@ public class DictionaryService {
         return dicts.stream()
                 .map(DictionaryEntity::getValue)
                 .filter(dict -> dict.contains(searchValue))
+                .distinct()
                 .sorted((dict1, dict2) -> {
                     if (dict1.startsWith(searchValue) && dict2.startsWith(searchValue)) {
                         return dict1.compareTo(dict2);
@@ -79,8 +82,9 @@ public class DictionaryService {
         valuesFromData.stream()
                 .filter(value -> dictEntities.get(value) == null || dictEntities.get(value).getConfirmed() == null)
                 .forEach(value -> {
-                    DictionaryEntity toSave = dictEntities.getOrDefault(value, DictionaryEntity.builder()
-                            .id(String.format("%s:%s", type, value))
+                    DictionaryEntity toSave = null;
+                    toSave = dictEntities.getOrDefault(value, DictionaryEntity.builder()
+                            .id(String.format("%s:%s", type, URLEncoder.encode(value, StandardCharsets.UTF_8).replace('%','.')))
                             .type(type)
                             .value(value)
                             .build());

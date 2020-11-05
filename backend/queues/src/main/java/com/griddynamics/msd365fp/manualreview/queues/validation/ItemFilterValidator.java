@@ -20,9 +20,9 @@ public class ItemFilterValidator implements ConstraintValidator<FieldConditionCo
         }
         context.buildConstraintViolationWithTemplate(
                 String.format("Combination of conditions and field is not valid. Valid combinations for field %s are: %s",
-                        value.getField(), value.getField().getAcceptedConditions()))
+                        value.getField(), value.getField().getAcceptableConditions()))
                 .addConstraintViolation();
         context.disableDefaultConstraintViolation();
-        return value.getField().getAcceptedConditions().contains(value.getCondition());
+        return value.getField().getAcceptableConditions().contains(value.getCondition());
     }
 }

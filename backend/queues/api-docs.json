@@ -2327,7 +2327,7 @@
         "summary" : "Update a queue by ID",
         "operationId" : "updateQueue",
         "parameters" : [ {
-          "name" : "id",
+          "name" : "queueId",
           "in" : "path",
           "required" : true,
           "schema" : {
@@ -2480,7 +2480,9 @@
           "in" : "path",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "default" : "REGULAR",
+            "enum" : [ "DIRECT", "REGULAR", "ESCALATION" ]
           }
         } ],
         "responses" : {
@@ -2588,7 +2590,10 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ItemDTO"
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/QueueViewDTO"
+                  }
                 }
               }
             }
@@ -3426,8 +3431,8 @@
               }
             }
           },
-          "200" : {
-            "description" : "OK",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3438,6 +3443,9 @@
                 }
               }
             }
+          },
+          "200" : {
+            "description" : "OK"
           }
         },
         "security" : [ {
@@ -7603,6 +7611,97 @@
           },
           "tokenType" : {
             "type" : "string"
+          }
+        }
+      },
+      "ItemFilter" : {
+        "required" : [ "condition", "field" ],
+        "type" : "object",
+        "properties" : {
+          "field" : {
+            "type" : "string",
+            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE", "AGGREGATED_EMAIL_CONFIRMED", "AGGREGATED_EMAIL_DOMAIN", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "PAYMENT_GATEWAY", "BANK_RESPONSE_CODE", "AUTH_RESULT_CODE", "APPROVE_RESULT_CODE", "DECLINE_RESULT_CODE", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI" ]
+          },
+          "condition" : {
+            "type" : "string",
+            "enum" : [ "IN", "CONTAINS", "REGEXP", "IS_TRUE", "BETWEEN", "BETWEEN_ALPH", "BETWEEN_DATE", "EQUAL", "EQUAL_ALPH", "GREATER", "GREATER_ALPH", "GREATER_DATE", "LESS", "LESS_ALPH", "LESS_DATE", "GREATER_OR_EQUAL", "GREATER_OR_EQUAL_ALPH", "GREATER_OR_EQUAL_DATE", "LESS_OR_EQUAL", "LESS_OR_EQUAL_ALPH", "LESS_OR_EQUAL_DATE" ]
+          },
+          "values" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        },
+        "discriminator" : {
+          "propertyName" : "condition"
+        }
+      },
+      "ItemSearchQueryDTO" : {
+        "type" : "object",
+        "properties" : {
+          "ids" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "active" : {
+            "type" : "boolean"
+          },
+          "queueIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "residual" : {
+            "type" : "boolean"
+          },
+          "itemFilters" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ItemFilter"
+            }
+          },
+          "lockOwnerIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "holdOwnerIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "labels" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
+            }
+          },
+          "tags" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "labelAuthorIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
           }
         }
       },

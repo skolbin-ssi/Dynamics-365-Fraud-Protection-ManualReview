@@ -17,6 +17,8 @@ import lombok.ToString;
 
 import java.time.OffsetDateTime;
 
+import java.util.List;
+
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)

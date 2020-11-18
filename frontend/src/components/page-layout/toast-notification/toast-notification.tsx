@@ -77,7 +77,6 @@ export class ToastNotification extends Component<{}, never> {
                 this.setToastTimeout();
                 return TOASTS_FOR_ITEM_LABELS.get(notification.label)!;
             }
-
             case NOTIFICATION_TYPE.QUEUE_MUTATION_SUCCESS: {
                 this.setToastTimeout();
                 return {

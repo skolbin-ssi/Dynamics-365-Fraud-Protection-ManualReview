@@ -139,6 +139,10 @@ export const registerDataServicesTask = {
             .bind<CollectedInfoService>(TYPES.COLLECTED_INFO_SERVICE)
             .to(CollectedInfoServiceImpl)
             .inSingletonScope();
+        container
+            .bind<OverviewService>(TYPES.OVERVIEW_SERVICE)
+            .to(OverviewServiceImpl)
+            .inSingletonScope();
 
         container
             .bind<OverviewService>(TYPES.OVERVIEW_SERVICE)

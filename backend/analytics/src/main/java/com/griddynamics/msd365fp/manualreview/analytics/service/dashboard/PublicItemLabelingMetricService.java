@@ -4,15 +4,10 @@
 package com.griddynamics.msd365fp.manualreview.analytics.service.dashboard;
 
 import com.griddynamics.msd365fp.manualreview.analytics.model.ItemLabelingBucket;
+import com.griddynamics.msd365fp.manualreview.analytics.model.LabelBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.LabelingTimeBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.LockTimeBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.dto.*;
-import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.CollectedAnalystInfoEntity;
-import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.CollectedQueueInfoEntity;
-import com.griddynamics.msd365fp.manualreview.analytics.repository.CollectedAnalystInfoRepository;
-import com.griddynamics.msd365fp.manualreview.analytics.repository.CollectedQueueInfoRepository;
-import com.griddynamics.msd365fp.manualreview.analytics.repository.ItemLabelActivityRepository;
-import com.griddynamics.msd365fp.manualreview.analytics.repository.ItemLockActivityRepository;
 import com.griddynamics.msd365fp.manualreview.analytics.util.DataGenerationUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
@@ -21,16 +16,14 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor
-public class ItemLabelingMetricService {
-    private final ItemLabelActivityRepository labelActivityRepository;
-    private final ItemLockActivityRepository lockActivitiesRepository;
-    private final CollectedAnalystInfoRepository analystInfoRepository;
-    private final CollectedQueueInfoRepository queueInfoRepository;
+public class PublicItemLabelingMetricService {
+    private final PublicItemLabelingHistoryClient labelingClient;
+    private final PublicItemLockingHistoryClient lockingClient;
 
     public ItemLabelingTimeMetricDTO getItemLabelingTimeTotalMetrics(
             @NonNull final OffsetDateTime from,
@@ -39,14 +32,14 @@ public class ItemLabelingMetricService {
             final Set<String> queueIds) {
         ItemLabelingTimeMetricDTO totalResult = new ItemLabelingTimeMetricDTO();
 
-        List<LockTimeBucket> dbLockTimeResults = lockActivitiesRepository.getSpentTime(
+        List<LockTimeBucket> dbLockTimeResults = lockingClient.getSpentTimeSummary(
                 from,
                 to,
                 analystIds,
                 queueIds);
         dbLockTimeResults.forEach(bucket -> mapLockingTimeMetrics(totalResult, bucket));
 
-        List<LabelingTimeBucket> dbLabelTimeResults = labelActivityRepository.getSpentTime(
+        List<LabelingTimeBucket> dbLabelTimeResults = labelingClient.getItemLabelingTimeSummary(
                 from,
                 to,
                 analystIds,
@@ -63,7 +56,7 @@ public class ItemLabelingMetricService {
             final Set<String> queueIds) {
         ItemLabelingMetricDTO totalResult = new ItemLabelingMetricDTO();
 
-        List<ItemLabelingBucket> dbResult = labelActivityRepository.getTotalPerformance(
+        List<ItemLabelingBucket> dbResult = labelingClient.getItemLabelingSummary(
                 from,
                 to,
                 analystIds,
@@ -90,7 +83,7 @@ public class ItemLabelingMetricService {
                 .comparing((ItemLabelingMetricsByQueueDTO qp) -> qp.getTotal().getReviewed()).reversed()
                 .thenComparing(ItemLabelingMetricsByQueueDTO::getId));
 
-        List<ItemLabelingBucket> dbResult = labelActivityRepository.getQueuePerformance(
+        List<ItemLabelingBucket> dbResult = labelingClient.getItemLabelingHistoryGroupedByQueues(
                 from,
                 to,
                 aggregation,
@@ -99,11 +92,8 @@ public class ItemLabelingMetricService {
         aggergateDBResultsToLabelingMetricMaps(from, to, aggregation, result, totalResult, dbResult);
 
         if (!result.isEmpty()) {
-            Map<String, String> queueNames = StreamSupport.stream(queueInfoRepository.findAllById(result.keySet()).spliterator(), false)
-                    .collect(Collectors.toMap(CollectedQueueInfoEntity::getId, CollectedQueueInfoEntity::getName));
             result.forEach((id, data) -> dto.add(ItemLabelingMetricsByQueueDTO.builder()
                     .id(id)
-                    .name(queueNames.getOrDefault(id, id))
                     .data(data)
                     .total(totalResult.get(id))
                     .build()));
@@ -125,7 +115,7 @@ public class ItemLabelingMetricService {
                 .comparing((ItemLabelingMetricsByAnalystDTO ap) -> ap.getTotal().getReviewed()).reversed()
                 .thenComparing(ItemLabelingMetricsByAnalystDTO::getId));
 
-        List<ItemLabelingBucket> dbResult = labelActivityRepository.getAnalystPerformance(
+        List<ItemLabelingBucket> dbResult = labelingClient.getItemLabelingHistoryGroupedByAnalysts(
                 from,
                 to,
                 aggregation,
@@ -134,11 +124,8 @@ public class ItemLabelingMetricService {
         aggergateDBResultsToLabelingMetricMaps(from, to, aggregation, result, totalResult, dbResult);
 
         if (!result.isEmpty()) {
-            Map<String, String> analystNames = StreamSupport.stream(analystInfoRepository.findAllById(result.keySet()).spliterator(), false)
-                    .collect(Collectors.toMap(CollectedAnalystInfoEntity::getId, en -> en.getDisplayName() == null ? en.getId() : en.getDisplayName()));
             result.forEach((id, data) -> dto.add(ItemLabelingMetricsByAnalystDTO.builder()
                     .id(id)
-                    .displayName(analystNames.getOrDefault(id, id))
                     .data(data)
                     .total(totalResult.get(id))
                     .build()));
@@ -202,6 +189,27 @@ public class ItemLabelingMetricService {
 
     }
 
+    public RiskScoreOverviewDTO getRiskScoreOverview(
+            @NonNull final OffsetDateTime from,
+            @NonNull final OffsetDateTime to,
+            int bucketSize,
+            Set<String> analystIds,
+            Set<String> queueIds) {
+        return new RiskScoreOverviewDTO(labelingClient.getRiskScoreDistribution(from, to, bucketSize, analystIds, queueIds)
+                .collect(
+                        Collectors.groupingBy(
+                                LabelBucket::getLowerBound,
+                                Collector.of(
+                                        RiskScoreOverviewDTO.RiskScoreBucketDTO::new,
+                                        (r, t) -> mapRiskScoreDistribution(t, r),
+                                        (r, b) -> {
+                                            r.setGood(r.getGood() + b.getGood());
+                                            r.setBad(r.getBad() + b.getBad());
+                                            return r;
+                                        })
+                        )
+                ));
+    }
 
     private void mapLockingTimeMetrics(final ItemLabelingTimeMetricDTO totalResult, final LockTimeBucket bucket) {
         if (bucket.getActionType().isWasted()) {
@@ -319,4 +327,21 @@ public class ItemLabelingMetricService {
         }
     }
 
+    private void mapRiskScoreDistribution(LabelBucket labelBucket,
+                                          RiskScoreOverviewDTO.RiskScoreBucketDTO riskScoreBucketDTO) {
+        switch (labelBucket.getLabel()) {
+            case GOOD:
+                riskScoreBucketDTO.setGood(riskScoreBucketDTO.getGood() + labelBucket.getCount());
+                break;
+            case WATCH_INCONCLUSIVE:
+            case WATCH_NA:
+                riskScoreBucketDTO.setWatched(riskScoreBucketDTO.getWatched() + labelBucket.getCount());
+                break;
+            case BAD:
+                riskScoreBucketDTO.setBad(riskScoreBucketDTO.getBad() + labelBucket.getCount());
+                break;
+            default:
+                throw new IllegalArgumentException(String.format("Unexpected label [%s]", labelBucket.getLabel()));
+        }
+    }
 }

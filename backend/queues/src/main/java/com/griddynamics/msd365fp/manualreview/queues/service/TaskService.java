@@ -56,13 +56,9 @@ public class TaskService {
     private Duration partialCheckObservedPeriod;
 
     private Map<String, TaskExecution<Object, Exception>> taskExecutions;
-    private Map<String, TaskCondition<Exception>> taskConditions;
 
     @PostConstruct
     private void initializeTasks() {
-        this.taskConditions = Map.of(
-                FAIL_FAST_TASK_NAME, this::failFastCondition);
-
         this.taskExecutions = Map.of(
                 QUEUE_ASSIGNMENT_TASK_NAME, task ->
                         queueService.reconcileQueueAssignments(),
@@ -81,7 +77,8 @@ public class TaskService {
                                 task.getPreviousRun(),
                                 applicationProperties.getTasks().get(task.getId()).getDelay()),
                 ITEM_ASSIGNMENT_TASK_NAME, this::itemStateFetch,
-                FAIL_FAST_TASK_NAME, this::failFast
+                PRIM_HEALTH_ANALYSIS_TASK_NAME, this::healthAnalysis,
+                SEC_HEALTH_ANALYSIS_TASK_NAME, this::healthAnalysis
         );
 
         Optional<Map.Entry<String, ApplicationProperties.TaskProperties>> incorrectTimingTask = applicationProperties.getTasks().entrySet().stream()
@@ -162,7 +159,7 @@ public class TaskService {
 
                     // Create task if absent
                     if (task == null) {
-                        createStoredTask(taskName);
+                        createStoredTask(taskName, taskPropertiesEntry.getValue());
                     }
 
                     // Restore task if it's stuck
@@ -184,7 +181,7 @@ public class TaskService {
             timeAfterPreviousRun = Duration.between(
                     task.getPreviousRun(), OffsetDateTime.now());
         } else {
-            timeAfterPreviousRun = Duration.ZERO;
+            timeAfterPreviousRun = Duration.between(OffsetDateTime.MIN, OffsetDateTime.now());
         }
         Duration timeout = Objects.requireNonNullElse(taskProperties.getTimeout(), taskProperties.getDelay());
         Duration acceptableDelayBeforeWarning = Duration.ofSeconds(
@@ -208,12 +205,13 @@ public class TaskService {
         }
     }
 
-    private void createStoredTask(final String taskName) {
+    private void createStoredTask(final String taskName, final ApplicationProperties.TaskProperties properties) {
         try {
             log.info("Trying to create task [{}]", taskName);
             taskRepository.save(Task.builder()
                     .id(taskName)
                     ._etag(taskName)
+                    .previousRun(OffsetDateTime.now().minus(properties.getDelay()))
                     .status(READY)
                     .build());
             log.info("Task [{}] has been initialized successfully.", taskName);
@@ -255,26 +253,18 @@ public class TaskService {
         ApplicationProperties.TaskProperties taskProperties =
                 applicationProperties.getTasks().get(task.getId());
         TaskExecution<Object, Exception> taskExecution = taskExecutions.get(task.getId());
-        TaskCondition<Exception> taskCondition = taskConditions.get(task.getId());
 
         // check possibility to execute
         if (!READY.equals(task.getStatus())) {
             return false;
         }
-        if (taskCondition != null) {
-            try {
-                if (!taskCondition.check(task)) {
-                    return false;
-                }
-            } catch (Exception e) {
-                log.warn("Condition checking for [{}] task ended with an exception", task.getId(), e);
-                return false;
-            }
-        }
 
         // acquire a lock
+        OffsetDateTime startTime = OffsetDateTime.now();
         task.setStatus(RUNNING);
-        task.setPreviousRun(OffsetDateTime.now());
+        if (task.getPreviousRun() == null){
+            task.setPreviousRun(startTime);
+        }
         Task runningTask;
         try {
             runningTask = taskRepository.save(task);
@@ -304,6 +294,7 @@ public class TaskService {
                         TimeUnit.MILLISECONDS)
                 .whenComplete((result, exception) -> {
                     runningTask.setStatus(READY);
+                    runningTask.setPreviousRun(startTime);
                     if (exception != null) {
                         log.warn("Task [{}] finished its execution with an exception.",
                                 runningTask.getId(), exception);
@@ -321,21 +312,18 @@ public class TaskService {
     }
 
 
-    private boolean failFastCondition(Task task) {
+    private boolean healthAnalysis(Task task) {
         boolean resourcesAreHealthy;
         try {
             resourcesAreHealthy = streamService.checkStreamingHealth();
         } catch (Exception e) {
-            log.error("Exception during fail fast reconciliation.", e);
+            log.error("Exception during health-check.", e);
             resourcesAreHealthy = false;
         }
-        return !resourcesAreHealthy;
-    }
-
-    private boolean failFast(Task task) {
-        log.error("Fatal error has been discovered. Initiate fail-fast recovery.");
-        System.exit(FAIL_FAST_STATUS);
-        return true;
+        if (!resourcesAreHealthy) {
+            log.warn("One of health checks has failed.");
+        }
+        return resourcesAreHealthy;
     }
 
 
@@ -366,10 +354,5 @@ public class TaskService {
     @FunctionalInterface
     public interface TaskExecution<T, E extends Exception> {
         T apply(Task task) throws E;
-    }
-
-    @FunctionalInterface
-    public interface TaskCondition<E extends Exception> {
-        boolean check(Task task) throws E;
     }
 }

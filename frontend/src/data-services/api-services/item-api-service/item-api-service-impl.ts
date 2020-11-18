@@ -7,7 +7,7 @@ import { TYPES } from '../../../types';
 import { AuthenticationService, Configuration } from '../../../utility-services';
 import { BaseApiService } from '../../base-api-service';
 import { DeleteItemLockResponse } from './api-models/delete-item-lock-response';
-import { ItemApiService } from '../../interfaces/item-api-service';
+import { ItemApiService } from '../../interfaces';
 import { GetItemResponse, GetLockedItemsResponse } from './api-models';
 
 @injectable()
@@ -33,33 +33,36 @@ export class ItemApiServiceImpl extends BaseApiService implements ItemApiService
         );
     }
 
-    patchItemTag(id: string, tags: string[]) {
+    patchItemTag(id: string, tags: string[], queueId?: string) {
         return this.patch<never>(`/${id}/tags`, { tags }, {
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            params: { queueId }
         });
     }
 
-    deleteItemLock(id: string) {
-        return this.delete<DeleteItemLockResponse>(`/${id}/lock`);
+    deleteItemLock(id: string, queueId?: string) {
+        return this.delete<DeleteItemLockResponse>(`/${id}/lock`, { params: { queueId } });
     }
 
-    patchItemLabel(id: string, label: LABEL) {
+    patchItemLabel(id: string, label: LABEL, queueId?: string) {
         return this.patch<never>(`/${id}/label`, {
             label
         }, {
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            params: { queueId }
         });
     }
 
-    putItemNote(id: string, note: string) {
+    putItemNote(id: string, note: string, queueId?: string) {
         return this.put<never>(`/${id}/note`, { note }, {
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            params: { queueId }
         });
     }
 

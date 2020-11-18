@@ -4,6 +4,7 @@
 package com.griddynamics.msd365fp.manualreview.analytics.repository;
 
 import com.griddynamics.msd365fp.manualreview.analytics.model.ItemLabelingBucket;
+import com.griddynamics.msd365fp.manualreview.analytics.model.LabelBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.LabelingTimeBucket;
 import org.springframework.lang.NonNull;
 
@@ -11,6 +12,7 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public interface ItemLabelActivityRepositoryCustomMethods {
 
@@ -96,4 +98,11 @@ public interface ItemLabelActivityRepositoryCustomMethods {
             @NonNull final OffsetDateTime endDateTime,
             final Set<String> analystIds,
             final Set<String> queueIds);
+
+    Stream<LabelBucket> getRiskScoreDistribution(
+            @NonNull final OffsetDateTime startDateTime,
+            @NonNull final OffsetDateTime endDateTime,
+            int bucketSize,
+            Set<String> analystIds,
+            Set<String> queueIds);
 }

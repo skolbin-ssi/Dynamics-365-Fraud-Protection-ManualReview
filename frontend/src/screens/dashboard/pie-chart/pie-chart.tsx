@@ -12,27 +12,80 @@ import { COLORS } from '../../../styles/variables';
 
 interface PieChartProps {
     className?: string;
+    innerText?: string;
+    enableLegends?: boolean;
 }
 
 const CN = 'pie-chart';
 
 export class PieChart extends React.Component<PieChartProps & PieSvgProps, never> {
+    private static getDefs() {
+        return [
+            {
+                id: 'squares',
+                type: 'patternSquares',
+                background: 'inherit',
+                color: 'rgba(255, 255, 255, 0.3)',
+                size: 5,
+                padding: 2,
+                stagger: true
+            },
+            {
+                id: 'lines',
+                type: 'patternLines',
+                background: 'inherit',
+                color: 'rgba(255, 255, 255, 0.3)',
+                rotation: -45,
+                lineWidth: 1,
+                spacing: 6
+            }
+        ];
+    }
+
     getRenderLabel(datum: PieDatum) {
         return `${datum.id} (${datum.percentage}%)`;
     }
 
     renderPieChartInnerText() {
+        const { innerText } = this.props;
+
         return (
             <div className={`${CN}__text-wrap`}>
                 <div className={`${CN}__text`}>
-                    All decisions for the period
+                    {innerText}
                 </div>
             </div>
         );
     }
 
+    renderLegends() {
+        const { data } = this.props;
+
+        return (
+            <div className={`${CN}__legends`}>
+                {
+                    data.map(datum => (
+                        <div className={`${CN}__legend`}>
+                            <div
+                                className={`${CN}__legend-indicator`}
+                                style={{
+                                    background: datum.color
+                                }}
+                            />
+                            <div className={`${CN}__legend-label`}>
+                                {datum.label}
+                                {' '}
+                                {`(${datum.percentage}%)`}
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        );
+    }
+
     render() {
-        const { data, className } = this.props;
+        const { data, className, enableLegends } = this.props;
 
         return (
             <div className={cx(CN, className)}>
@@ -45,6 +98,7 @@ export class PieChart extends React.Component<PieChartProps & PieSvgProps, never
                             }
                         }
                     }}
+                    radialLabelsSkipAngle={15}
                     radialLabelsLinkOffset={0}
                     radialLabelsLinkDiagonalLength={15}
                     radialLabelsLinkHorizontalLength={14}
@@ -52,34 +106,14 @@ export class PieChart extends React.Component<PieChartProps & PieSvgProps, never
                     startAngle={-180}
                     colors={(d: any) => d.color} // maps colors from datum to appropriate on the chart pieces
                     innerRadius={0.7}
-                    radialLabel={datum => this.getRenderLabel(datum)}
                     radialLabelsTextColor={{ from: 'color', modifiers: [['darker', 1]] }}
+                    isInteractive={false}
                     data={data}
                     padAngle={1}
                     enableSlicesLabels={false}
                     margin={{
-                        top: 40, bottom: 40, left: 20, right: 20
+                        top: 25, bottom: 25, left: 35, right: 35
                     }}
-                    defs={[
-                        {
-                            id: 'squares',
-                            type: 'patternSquares',
-                            background: 'inherit',
-                            color: 'rgba(255, 255, 255, 0.3)',
-                            size: 5,
-                            padding: 2,
-                            stagger: true
-                        },
-                        {
-                            id: 'lines',
-                            type: 'patternLines',
-                            background: 'inherit',
-                            color: 'rgba(255, 255, 255, 0.3)',
-                            rotation: -45,
-                            lineWidth: 1,
-                            spacing: 6
-                        }
-                    ]}
                     fill={[
                         {
                             match: {
@@ -94,8 +128,11 @@ export class PieChart extends React.Component<PieChartProps & PieSvgProps, never
                             id: 'squares'
                         },
                     ]}
+                    /* eslint-disable-next-line react/jsx-props-no-spreading */
+                    {...this.props}
                 />
-                {data.length && this.renderPieChartInnerText()}
+                {!!data.length && this.renderPieChartInnerText()}
+                {!!data.length && enableLegends && this.renderLegends()}
             </div>
         );
     }

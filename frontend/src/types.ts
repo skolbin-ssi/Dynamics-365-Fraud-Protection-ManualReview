@@ -13,6 +13,7 @@ export const TYPES = {
     SETTINGS_API_SERVICE: Symbol('settingsApiService'),
     ALERTS_API_SERVICE: Symbol('alertsApiService'),
     COLLECTED_INFO_API_SERVICE: Symbol('collectedInfoApiService'),
+    OVERVIEW_API_SERVICE: Symbol('overviewApiService'),
 
     /**
      * Data Services
@@ -24,6 +25,7 @@ export const TYPES = {
     SETTINGS_SERVICE: Symbol('settingsService'),
     ALERTS_SERVICE: Symbol('alertsService'),
     COLLECTED_INFO_SERVICE: Symbol('collectedInfoService'),
+    OVERVIEW_SERVICE: Symbol('overviewApiService'),
 
     /**
      * View Services (aka stores)
@@ -66,5 +68,4 @@ export const TYPES = {
     AZURE_MAPS_SEARCH: Symbol('AzureMapsSearch'),
     WINDOW_SIZE_STORE: Symbol('WindowSizeStore'),
     LOCAL_STORAGE_SERVICE: Symbol('LocalStorageService'),
-    CACHE_STORE_SERVICE: Symbol('CacheStoreService')
 };

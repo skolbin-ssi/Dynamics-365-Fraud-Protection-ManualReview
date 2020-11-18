@@ -79,7 +79,7 @@
     }
 
     &__grayed-out-value {
-        color: $neutralTertiaryAlt;
+        color: $neutralTertiary;
     }
 
     &__value-with-opacity {
@@ -88,7 +88,7 @@
         cursor: default;
 
         &.translucent {
-            color: $neutralLight;
+            color: $neutralQuaternaryAlt;
         }
     }
 

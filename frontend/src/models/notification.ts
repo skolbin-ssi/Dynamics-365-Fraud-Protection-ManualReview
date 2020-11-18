@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { MessageBarType } from '@fluentui/react/lib/MessageBar';
 import {
     LABEL,
@@ -24,6 +27,12 @@ export type Notification =
     }
     | {
         type: NOTIFICATION_TYPE.LABEL_ADDED_ERROR,
+    }
+    | {
+        type: NOTIFICATION_TYPE.NOTE_ADDED_ERROR,
+    }
+    | {
+        type: NOTIFICATION_TYPE.TAGS_UPDATED_ERROR,
     }
     | {
         type: NOTIFICATION_TYPE.QUEUE_MUTATION_SUCCESS,

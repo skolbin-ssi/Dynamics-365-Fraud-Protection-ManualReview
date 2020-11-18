@@ -180,7 +180,7 @@ class PublicItemServiceTest {
     }
 
     /**
-     * {@link PublicItemService#unlockItem(String)} should create an event with {@link LockActionType#MANUAL_RELEASE}.
+     * {@link PublicItemService#unlockItem(String, String)} should create an event with {@link LockActionType#MANUAL_RELEASE}.
      */
     @Test
     void unlockItemManuallySendsEvent() throws Exception {
@@ -199,10 +199,10 @@ class PublicItemServiceTest {
                         .queueId(TEST_QUEUE_ID)
                         .build())
                 .build();
-        when(publicItemClient.getActiveItem(eq(TEST_ITEM_ID), isNull()))
+        when(publicItemClient.getItem(eq(TEST_ITEM_ID), isNull(), eq(true)))
                 .thenReturn(item);
 
-        itemService.unlockItem(TEST_ITEM_ID);
+        itemService.unlockItem(TEST_ITEM_ID, null);
 
         verify(streamService, times(1))
                 .sendItemLockEvent(itemCaptor.capture(), itemLockCaptor.capture(), lockActionTypeCaptor.capture());
@@ -218,7 +218,7 @@ class PublicItemServiceTest {
     }
 
     /**
-     * {@link PublicItemService#labelItem(String, LabelDTO)} should create an event with
+     * {@link PublicItemService#labelItem(String, String, LabelDTO)} should create an event with
      * {@link LockActionType#LABEL_APPLIED_RELEASE}.
      */
     @Test
@@ -255,10 +255,10 @@ class PublicItemServiceTest {
 
         when(publicQueueClient.getActiveQueueView(eq(TEST_QUEUE_VIEW_ID)))
                 .thenReturn(queueView);
-        when(publicItemClient.getActiveItem(eq(TEST_ITEM_ID), isNull()))
+        when(publicItemClient.getItem(eq(TEST_ITEM_ID), isNull(), true))
                 .thenReturn(item);
 
-        itemService.labelItem(TEST_ITEM_ID, labelDto);
+        itemService.labelItem(TEST_ITEM_ID, null, labelDto);
 
         verify(streamService, times(1))
                 .sendItemLockEvent(itemCaptor.capture(), itemLockCaptor.capture(), lockActionTypeCaptor.capture());
@@ -276,7 +276,7 @@ class PublicItemServiceTest {
     }
 
     /**
-     * {@link PublicItemService#labelItem(String, LabelDTO)} should create an event via
+     * {@link PublicItemService#labelItem(String, String, LabelDTO)} should create an event via
      * {@link StreamService#sendItemAssignmentEvent(Item, Set)} method.
      */
     @Test
@@ -313,7 +313,7 @@ class PublicItemServiceTest {
 
         when(publicQueueClient.getActiveQueueView(eq(TEST_QUEUE_VIEW_ID)))
                 .thenReturn(queueView);
-        when(publicItemClient.getActiveItem(eq(TEST_ITEM_ID), isNull()))
+        when(publicItemClient.getItem(eq(TEST_ITEM_ID), isNull(), true))
                 .thenReturn(item);
         when(userPrincipal.getClaim(eq(AUTH_TOKEN_PRINCIPAL_ID_CLAIM)))
                 .thenReturn(TEST_REVIEWER_ID);
@@ -321,7 +321,7 @@ class PublicItemServiceTest {
                 .thenReturn(TEST_REVIEWER_ID + "-assignment");
         SecurityContextHolder.getContext().setAuthentication(new TestingAuthenticationToken(userPrincipal, null));
 
-        itemService.labelItem(TEST_ITEM_ID, labelDto);
+        itemService.labelItem(TEST_ITEM_ID, null, labelDto);
 
         ItemLock expectedLock = ItemLock.builder()
                 .locked(ITEM_LOCK_DATE_TIME)
@@ -341,7 +341,7 @@ class PublicItemServiceTest {
     }
 
     /**
-     * {@link PublicItemService#labelItem(String, LabelDTO)} should create an event via
+     * {@link PublicItemService#labelItem(String, String, LabelDTO)} should create an event via
      * {@link StreamService#sendItemAssignmentEvent(Item, Set)} method.
      */
     //TODO: enable after escalation flow rework
@@ -383,10 +383,10 @@ class PublicItemServiceTest {
                 .thenReturn(queueView);
         when(publicQueueClient.getActiveQueueView(eq(TEST_ESC_QUEUE_VIEW_ID)))
                 .thenReturn(escalationQueueView);
-        when(publicItemClient.getActiveItem(eq(TEST_ITEM_ID), isNull()))
+        when(publicItemClient.getItem(eq(TEST_ITEM_ID), isNull(), true))
                 .thenReturn(item);
 
-        itemService.labelItem(TEST_ITEM_ID, labelDto);
+        itemService.labelItem(TEST_ITEM_ID, null, labelDto);
 
         ItemLock expectedLock = ItemLock.builder()
                 .locked(ITEM_LOCK_DATE_TIME)

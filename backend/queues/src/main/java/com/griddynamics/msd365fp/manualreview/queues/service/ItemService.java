@@ -14,10 +14,16 @@ import com.griddynamics.msd365fp.manualreview.model.dfp.raw.UserNodeData;
 import com.griddynamics.msd365fp.manualreview.model.event.dfp.PurchaseEventBatch;
 import com.griddynamics.msd365fp.manualreview.model.event.type.LockActionType;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
+import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemDataField;
+import com.griddynamics.msd365fp.manualreview.queues.model.dto.ItemDTO;
+import com.griddynamics.msd365fp.manualreview.queues.model.dto.ItemSearchQueryDTO;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Queue;
+import com.griddynamics.msd365fp.manualreview.queues.model.persistence.SearchQuery;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepository;
 import com.griddynamics.msd365fp.manualreview.queues.repository.QueueRepository;
+import com.griddynamics.msd365fp.manualreview.queues.repository.SearchQueryRepository;
 import com.microsoft.azure.spring.data.cosmosdb.exception.CosmosDBAccessException;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +55,9 @@ public class ItemService {
     private final StreamService streamService;
     private final ItemRepository itemRepository;
     private final QueueRepository queueRepository;
+    private final SearchQueryRepository searchQueryRepository ;
     private final DFPExplorerService dfpExplorerService;
+    private final ModelMapper modelMapper;
 
     @Setter(onMethod = @__({@Autowired}))
     private ItemService thisService;
@@ -351,6 +359,42 @@ public class ItemService {
 
     public int countActiveItems() {
         return itemRepository.countActiveItems();
+    }
+
+    public PageableCollection<ItemDTO> searchForItems(
+            final String searchQueryId,
+            final int pageSize,
+            @Nullable final String continuationToken,
+            final ItemDataField sortingField,
+            final Sort.Direction sortingDirection
+    ) throws BusyException, NotFoundException {
+        SearchQuery searchQuery = searchQueryRepository.findById(searchQueryId)
+                .orElseThrow(() -> new NotFoundException(String.format("Search Query not found for id [%s]", searchQueryId)));
+
+        PageableCollection<Item> queriedItems = PageProcessingUtility.getNotEmptyPage(
+                continuationToken,
+                continuation -> itemRepository.searchForItems(
+                        searchQuery.getIds(),
+                        searchQuery.getQueueIds(),
+                        searchQuery.isResidual(),
+                        searchQuery.getActive(),
+                        searchQuery.getItemFilters(),
+                        searchQuery.getLockOwnerIds(),
+                        searchQuery.getHoldOwnerIds(),
+                        searchQuery.getLabels(),
+                        searchQuery.getLabelAuthorIds(),
+                        sortingField,
+                        sortingDirection,
+                        searchQuery.getTags(),
+                        pageSize,
+                        continuation)
+        );
+        return new PageableCollection<>(
+                queriedItems.getValues()
+                        .stream()
+                        .map(item -> modelMapper.map(item, ItemDTO.class))
+                        .collect(Collectors.toList()),
+                queriedItems.getContinuationToken());
     }
 
     private void enrichItem(String itemId) {

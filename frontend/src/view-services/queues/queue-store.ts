@@ -5,7 +5,7 @@ import { inject, injectable } from 'inversify';
 import {
     action, computed, observable, runInAction
 } from 'mobx';
-import { QueueService } from '../../data-services';
+import { CollectedInfoService, QueueService } from '../../data-services';
 import { Item, Queue } from '../../models';
 import { TYPES } from '../../types';
 import { getCurrentTimeDiff, getProcessingDeadlineValues } from '../../utils';
@@ -27,6 +27,16 @@ export class QueueStore {
      * Indication that queues are loading
      */
     @observable loadingQueues = false;
+
+    /**
+     * Indication Promise that regular queues are loading
+     */
+    @observable loadingRegularQueuesPromise: Promise<void> | null = null;
+
+    /**
+     * Indication that historical queues are loading
+     */
+    @observable loadingHistoricalQueuesPromise: Promise<void> | null = null;
 
     /**
      * Selected queue item id
@@ -58,8 +68,13 @@ export class QueueStore {
      */
     @observable refreshingQueueIds: string[] = [];
 
+    private regularQueuesMap = new Map<string, Queue>();
+
+    private historicalQueuesMap = new Map<string, Queue>();
+
     constructor(
-        @inject(TYPES.QUEUE_SERVICE) private queueService: QueueService
+        @inject(TYPES.QUEUE_SERVICE) private queueService: QueueService,
+        @inject(TYPES.COLLECTED_INFO_SERVICE) private collectedInfoService: CollectedInfoService
     ) {}
 
     @action
@@ -74,6 +89,9 @@ export class QueueStore {
             runInAction(() => {
                 if (viewType !== QUEUE_VIEW_TYPE.ESCALATION) {
                     this.queues = queues;
+
+                    this.regularQueuesMap = new Map<string, Queue>(queues
+                        .map(queue => [queue.queueId, queue]));
                 } else {
                     this.escalatedQueues = queues;
                 }
@@ -85,6 +103,33 @@ export class QueueStore {
                 this.loadingQueues = false;
                 throw e;
             });
+        }
+    }
+
+    @action
+    async loadHistoricalQueues() {
+        const historicalQueues: Queue[] | null = await this.collectedInfoService.getQueuesCollectedInfo();
+
+        this.historicalQueuesMap = new Map<string, Queue>((historicalQueues || [])
+            .map(queue => [queue.queueId, queue]));
+    }
+
+    @action
+    async loadRegularAndHistoricalQueues() {
+        if (!this.regularQueuesMap.size) {
+            this.loadingRegularQueuesPromise = this.loadingRegularQueuesPromise || this.loadQueues();
+
+            await this.loadingRegularQueuesPromise;
+
+            this.loadingRegularQueuesPromise = null;
+        }
+
+        if (!this.historicalQueuesMap.size) {
+            this.loadingHistoricalQueuesPromise = this.loadingHistoricalQueuesPromise || this.loadHistoricalQueues();
+
+            await this.loadingHistoricalQueuesPromise;
+
+            this.loadingHistoricalQueuesPromise = null;
         }
     }
 
@@ -227,6 +272,14 @@ export class QueueStore {
         return null;
     }
 
+    @computed
+    get allQueues() {
+        return [
+            ...(this.queues || []),
+            ...(this.escalatedQueues || [])
+        ];
+    }
+
     getTimeLeft(importDateTime: Date) {
         const { days: currentDiffDays } = getCurrentTimeDiff(importDateTime);
 
@@ -238,11 +291,7 @@ export class QueueStore {
         return null;
     }
 
-    @computed
-    get allQueues() {
-        return [
-            ...(this.queues || []),
-            ...(this.escalatedQueues || [])
-        ];
+    getQueueById(queueId: string) {
+        return this.regularQueuesMap?.get(queueId) || this.historicalQueuesMap?.get(queueId);
     }
 }

@@ -17,8 +17,6 @@ import java.util.Map;
 @AllArgsConstructor
 public class ItemPlacementMetricsByQueueDTO {
     private String id;
-    @Deprecated
-    private String name; //TODO: delete
     private Map<OffsetDateTime, ItemPlacementMetricDTO> data;
     private ItemPlacementMetricDTO total;
 }

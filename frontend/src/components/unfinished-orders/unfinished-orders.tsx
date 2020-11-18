@@ -107,7 +107,7 @@ export class UnfinishedOrders extends Component<UnfinishedOrdersProps, Unfinishe
                 )}
                 { (lockedOnQueueViewId && itemId) && (
                     <DefaultButton
-                        iconProps={{ iconName: 'CircleStopSolid' }}
+                        iconProps={{ iconName: 'UnlockSolid' }}
                         text="Unlock"
                         onClick={() => this.unassignItem(itemId, lockedOnQueueViewId)}
                     />

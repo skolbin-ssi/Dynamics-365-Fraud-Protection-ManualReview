@@ -79,7 +79,7 @@ public class GlobalControllerExceptionHandler extends ResponseEntityExceptionHan
             mediaType = MediaType.APPLICATION_JSON_VALUE,
             schema = @Schema(implementation = ErrorDTO.class)))
     @ResponseStatus(value = HttpStatus.CONFLICT)
-    @ExceptionHandler({IncorrectConditionException.class, IncorrectConditionException.class})
+    @ExceptionHandler(IncorrectConditionException.class)
     @NonNull
     public ResponseEntity<Object> handleConflict(final Exception exception) {
         return generateClientError("Conditions aren't met", exception, HttpStatus.CONFLICT);

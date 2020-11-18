@@ -4,9 +4,9 @@
 package com.griddynamics.msd365fp.manualreview.analytics.controller;
 
 import com.griddynamics.msd365fp.manualreview.analytics.model.dto.*;
-import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.ItemLabelingMetricService;
-import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.ItemPlacementMetricService;
-import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.QueueSizeHistoryService;
+import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.PublicItemLabelingMetricService;
+import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.PublicItemPlacementMetricService;
+import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.PublicQueueSizeHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,13 +40,13 @@ import static com.griddynamics.msd365fp.manualreview.analytics.model.Constants.S
 @Secured({ADMIN_MANAGER_ROLE})
 public class DashboardController {
 
-    private final ItemLabelingMetricService performanceService;
-    private final ItemPlacementMetricService itemPlacementMetricService;
-    private final QueueSizeHistoryService queueSizeHistoryService;
+    private final PublicItemLabelingMetricService publicItemLabelingMetricService;
+    private final PublicItemPlacementMetricService publicItemPlacementMetricService;
+    private final PublicQueueSizeHistoryService publicQueueSizeHistoryService;
 
     @Operation(summary = "Get performance metrics for list of queues")
     @GetMapping(value = "/labeling/queues", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
     public Set<ItemLabelingMetricsByQueueDTO> getItemLabelingMetricsByQueue(
             @Parameter(description = FROM_PARAM_DESCRIPTION, example = FROM_PARAM_EXAMPLE)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -67,12 +67,12 @@ public class DashboardController {
             @RequestParam(value = "queue", required = false)
                     Set<String> queueIds
     ) {
-        return performanceService.getItemLabelingMetricsByQueue(from, to, aggregation, analystIds, queueIds);
+        return publicItemLabelingMetricService.getItemLabelingMetricsByQueue(from, to, aggregation, analystIds, queueIds);
     }
 
     @Operation(summary = "Get total performance metrics for the specified queue")
     @GetMapping(value = "/labeling/total", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
     public ItemLabelingMetricDTO getItemLabelingTotalMetrics(
             @Parameter(description = FROM_PARAM_DESCRIPTION, example = FROM_PARAM_EXAMPLE)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -88,7 +88,7 @@ public class DashboardController {
             @Parameter(description = QUEUES_PARAM_DESCRIPTION)
             @RequestParam(value = "queue", required = false)
                     Set<String> queueIds) {
-        return performanceService.getItemLabelingTotalMetrics(from, to, analystIds, queueIds);
+        return publicItemLabelingMetricService.getItemLabelingTotalMetrics(from, to, analystIds, queueIds);
     }
 
     @Operation(summary = "Get performance metrics for list of analysts")
@@ -113,12 +113,12 @@ public class DashboardController {
             @Parameter(description = QUEUES_PARAM_DESCRIPTION)
             @RequestParam(value = "queue", required = false)
                     Set<String> queueIds) {
-        return performanceService.getItemLabelingMetricsByAnalyst(from, to, aggregation, analystIds, queueIds);
+        return publicItemLabelingMetricService.getItemLabelingMetricsByAnalyst(from, to, aggregation, analystIds, queueIds);
     }
 
     @Operation(summary = "Get progress of total performance metrics")
     @GetMapping(value = "/labeling/progress", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
     public ItemLabelingProgressMetricsDTO getItemLabelingProgressMetrics(
             @Parameter(description = FROM_PARAM_DESCRIPTION, example = FROM_PARAM_EXAMPLE)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -134,12 +134,12 @@ public class DashboardController {
             @Parameter(description = QUEUES_PARAM_DESCRIPTION)
             @RequestParam(value = "queue", required = false)
                     Set<String> queueIds) {
-        return performanceService.getItemLabelingProgressMetrics(from, to, analystIds, queueIds);
+        return publicItemLabelingMetricService.getItemLabelingProgressMetrics(from, to, analystIds, queueIds);
     }
 
     @Operation(summary = "Get the processing time performance metrics")
     @GetMapping(value = "/labeling-time/total", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
     public ItemLabelingTimeMetricDTO getLabelingTimeTotalMetrics(
             @Parameter(description = FROM_PARAM_DESCRIPTION, example = FROM_PARAM_EXAMPLE)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -155,12 +155,12 @@ public class DashboardController {
             @Parameter(description = QUEUES_PARAM_DESCRIPTION)
             @RequestParam(value = "queue", required = false)
                     Set<String> queueIds) {
-        return performanceService.getItemLabelingTimeTotalMetrics(from, to, analystIds, queueIds);
+        return publicItemLabelingMetricService.getItemLabelingTimeTotalMetrics(from, to, analystIds, queueIds);
     }
 
     @Operation(summary = "Get the processing time performance metrics")
     @GetMapping(value = "/labeling-time/progress", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
     public ItemLabelingTimeProgressMetricsDTO getItemLabelingTimeProgressMetrics(
             @Parameter(description = FROM_PARAM_DESCRIPTION, example = FROM_PARAM_EXAMPLE)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -176,7 +176,7 @@ public class DashboardController {
             @Parameter(description = QUEUES_PARAM_DESCRIPTION)
             @RequestParam(value = "queue", required = false)
                     Set<String> queueIds) {
-        return performanceService.getItemLabelingTimeProgressMetrics(from, to, analystIds, queueIds);
+        return publicItemLabelingMetricService.getItemLabelingTimeProgressMetrics(from, to, analystIds, queueIds);
     }
 
 
@@ -199,7 +199,7 @@ public class DashboardController {
             @Parameter(description = QUEUES_PARAM_DESCRIPTION)
             @RequestParam(value = "queue", required = false)
                     Set<String> queueIds) {
-        return itemPlacementMetricService.getItemPlacementMetricsByQueues(from, to, aggregation, queueIds);
+        return publicItemPlacementMetricService.getItemPlacementMetricsByQueues(from, to, aggregation, queueIds);
     }
 
     @Operation(summary = "Get demand/supply metrics for all queues")
@@ -218,7 +218,7 @@ public class DashboardController {
             @Schema(type = "string", format = SWAGGER_DURATION_FORMAT, example = SWAGGER_DURATION_EXAMPLE)
             @RequestParam
                     Duration aggregation) {
-        return itemPlacementMetricService.getOverallItemPlacementMetrics(from, to, aggregation);
+        return publicItemPlacementMetricService.getOverallItemPlacementMetrics(from, to, aggregation);
     }
 
     @Operation(summary = "Get size history metrics for list of queues")
@@ -240,7 +240,7 @@ public class DashboardController {
             @Parameter(description = QUEUES_PARAM_DESCRIPTION)
             @RequestParam(value = "queue", required = false)
                     Set<String> queueIds) {
-        return queueSizeHistoryService.getQueueSizeHistoryByQueues(from, to, aggregation, queueIds);
+        return publicQueueSizeHistoryService.getQueueSizeHistoryByQueues(from, to, aggregation, queueIds);
     }
 
     @Operation(summary = "Get size history metrics for all queues")
@@ -259,7 +259,31 @@ public class DashboardController {
             @Schema(type = "string", format = SWAGGER_DURATION_FORMAT, example = SWAGGER_DURATION_EXAMPLE)
             @RequestParam
                     Duration aggregation) {
-        return queueSizeHistoryService.getOverallQueueSizeHistory(from, to, aggregation);
+        return publicQueueSizeHistoryService.getOverallQueueSizeHistory(from, to, aggregation);
     }
 
+    @Operation(summary = "Get items split by risk score and label")
+    @GetMapping(value = "/labeling/distribution/risk-score", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE})
+    public RiskScoreOverviewDTO getRiskScoreOverview(
+            @Parameter(description = FROM_PARAM_DESCRIPTION, example = FROM_PARAM_EXAMPLE)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            @RequestParam
+                    OffsetDateTime from,
+            @Parameter(description = TO_PARAM_DESCRIPTION, example = TO_PARAM_EXAMPLE)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            @RequestParam
+                    OffsetDateTime to,
+            @Parameter(description = "size of the risk score buckets")
+            @RequestParam
+                    int bucketSize,
+            @Parameter(description = "ids of the analysts which are used for the item filtering")
+            @RequestParam(value = "analyst", required = false)
+                    Set<String> analystIds,
+            @Parameter(description = "ids of the queues which are used for the item filtering")
+            @RequestParam(value = "queue", required = false)
+                    Set<String> queueIds
+    ) {
+        return publicItemLabelingMetricService.getRiskScoreOverview(from, to, bucketSize, analystIds, queueIds);
+    }
 }

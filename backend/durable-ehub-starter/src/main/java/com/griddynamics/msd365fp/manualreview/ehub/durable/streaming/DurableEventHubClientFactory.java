@@ -6,11 +6,11 @@ package com.griddynamics.msd365fp.manualreview.ehub.durable.streaming;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.config.properties.EventHubProperties;
+import com.griddynamics.msd365fp.manualreview.ehub.durable.model.HealthCheckProcessor;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
@@ -26,16 +26,17 @@ public class DurableEventHubClientFactory {
             final String hubName,
             final Class<T> klass,
             final Consumer<T> eventProcessor,
-            final Consumer<Throwable> errorProcessor) {
-        return DurableEventHubProcessorClient.<T>builder()
-                .properties(properties)
-                .hubName(hubName)
-                .mapper(mapper)
-                .klass(klass)
-                .eventProcessor(eventProcessor)
-                .errorProcessor(errorProcessor)
-                .meterRegistry(meterRegistry)
-                .build();
+            final Consumer<Throwable> errorProcessor,
+            final HealthCheckProcessor healthcheckProcessor) {
+        return new DurableEventHubProcessorClient<>(
+                properties,
+                hubName,
+                mapper,
+                klass,
+                eventProcessor,
+                errorProcessor,
+                healthcheckProcessor,
+                meterRegistry);
     }
 
     public DurableEventHubProducerClient buildProducerClient(

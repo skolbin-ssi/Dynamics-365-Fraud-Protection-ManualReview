@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collector;
 
 import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.*;
 
@@ -51,7 +52,7 @@ public class AlertController {
      */
     @Operation(summary = "Get all alerts for particular user")
     @GetMapping(path = "/my", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE})
     public List<AlertDTO> getAllByCurrentUser() {
         return alertService.getAllByCurrentUser();
     }
@@ -65,7 +66,7 @@ public class AlertController {
      */
     @Operation(summary = "Get alert for particular user")
     @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE})
     public AlertDTO getById(@PathVariable String id) throws NotFoundException {
         return alertService.getById(id);
     }
@@ -78,7 +79,7 @@ public class AlertController {
      */
     @Operation(summary = "Create alert for particular user")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE})
     public AlertDTO create(@Valid @RequestBody AlertCreationDTO alertDTO) throws NotFoundException {
         return alertService.create(alertDTO);
     }
@@ -93,7 +94,7 @@ public class AlertController {
      */
     @Operation(summary = "Update alert for particular user")
     @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE})
     public AlertDTO update(@PathVariable String id,
                            @Valid @RequestBody AlertUpdateDTO alertDTO) throws NotFoundException {
         return alertService.update(id, alertDTO);
@@ -106,7 +107,7 @@ public class AlertController {
      */
     @Operation(summary = "Delete alert for particular user")
     @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE})
     public AlertDTO delete(@PathVariable String id) throws NotFoundException {
         return alertService.delete(id);
     }
@@ -118,7 +119,7 @@ public class AlertController {
      */
     @Operation(summary = "Get metrics available for current user")
     @GetMapping(path = "/metrics", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE})
     public Set<AlertMetricDTO> getMetrics() {
         return alertService.getMetricsForCurrentUser();
     }

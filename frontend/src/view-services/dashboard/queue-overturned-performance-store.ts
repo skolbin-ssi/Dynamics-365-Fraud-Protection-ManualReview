@@ -12,12 +12,14 @@ import { QueuePerformance } from '../../models/dashboard';
 import { DashboardService, UserService } from '../../data-services/interfaces';
 import { DURATION_PERIOD } from '../../constants';
 import { Report } from '../../models/misc';
+import { QueueStore } from '../queues';
 
 export class QueueOverturnedPerformanceStore extends BaseOverturnedPerformanceStore<QueuePerformance> {
     constructor(
         @inject(TYPES.DASHBOARD_SERVICE) protected dashboardService: DashboardService,
         @inject(TYPES.DASHBOARD_ANALYST_PERFORMANCE_STORE) protected analystPerformanceStore: AnalystPerformanceStore,
-        @inject(TYPES.USER_SERVICE) private userService: UserService
+        @inject(TYPES.USER_SERVICE) private userService: UserService,
+        @inject(TYPES.QUEUE_STORE) private queueStore: QueueStore
     ) {
         super();
     }
@@ -40,11 +42,18 @@ export class QueueOverturnedPerformanceStore extends BaseOverturnedPerformanceSt
         this.isDataLoading = true;
 
         try {
+            await this.queueStore.loadRegularAndHistoricalQueues();
+
             const performanceData = await this
                 .dashboardService
                 .getQueuesPerformance({
                     from, to, aggregation, analyst
                 });
+
+            (performanceData || []).forEach(queuePerformance => {
+                const queue = this.queueStore.getQueueById(queuePerformance.id);
+                queuePerformance.setQueueName(queue?.name || queuePerformance.id);
+            });
 
             this.isDataLoading = false;
             return performanceData;

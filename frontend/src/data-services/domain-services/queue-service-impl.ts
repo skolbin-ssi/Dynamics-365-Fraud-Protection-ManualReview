@@ -18,14 +18,17 @@ import { Logger, UserBuilder } from '../../utility-services';
 import { PatchQueueRequest, PostQueueRequest } from '../api-services/queue-api-service/api-models';
 import { BaseDomainService } from '../base-domain-service';
 import {
-    GetQueueItemsTransformer,
-    GetQueuesOverviewTransformer,
-    GetQueuesTransformer,
     GetQueueTransformer,
-    PostQueueTransformer
+    PostQueueTransformer,
+    GetQueuesTransformer,
+    GetQueueItemsTransformer,
+    GetQueuesOverviewTransformer
 } from '../data-transformers';
 import {
-    DictionaryApiService, QueueApiService, QueueItemsOverviewRequestParams, QueueService
+    QueueService,
+    QueueApiService,
+    DictionaryApiService,
+    QueueItemsOverviewRequestParams
 } from '../interfaces';
 import { QueuesOverview } from '../../models/queues';
 

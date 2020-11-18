@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 @Slf4j
@@ -35,8 +34,6 @@ public class DurableEventHubProducerClient {
     private final Counter errorCounter;
 
     private EventHubProducerAsyncClient internalClient;
-    private final int errorThreshold;
-    private final AtomicInteger errorsFound = new AtomicInteger(0);
 
     @Builder
     public DurableEventHubProducerClient(final EventHubProperties properties,
@@ -46,7 +43,6 @@ public class DurableEventHubProducerClient {
         this.properties = properties;
         this.hubName = hubName;
         this.mapper = mapper;
-        this.errorThreshold = properties.getProducerErrorThreshold();
         this.processingCounter = meterRegistry.counter(
                 "event-hub.sent",
                 Tags.of(HUB_TAG, hubName));
@@ -64,10 +60,6 @@ public class DurableEventHubProducerClient {
                 .buildAsyncProducerClient();
     }
 
-    public boolean requireRestart() {
-        return errorsFound.get() > errorThreshold;
-    }
-
     public boolean send(final Event event) {
         if (internalClient == null) {
             return false;
@@ -76,17 +68,22 @@ public class DurableEventHubProducerClient {
         try {
             data = new EventData(mapper.writeValueAsString(event));
         } catch (JsonProcessingException e) {
+            log.error("An error has occurred in hub [{}] during event [{}] serialization: {}",
+                    hubName,
+                    event.getId(),
+                    event);
             return false;
         }
         internalClient.send(Set.of(data))
+                .timeout(properties.getSendingTimeout())
+                .retry(properties.getSendingRetries())
                 .doOnSuccess(res -> processingCounter.increment())
                 .doOnError(e -> {
-                    log.error("An error has occured in hub [{}] during event [{}] sending: {}",
+                    log.error("An error has occurred in hub [{}] during event [{}] sending: {}",
                             hubName,
                             event.getId(),
                             data.getBodyAsString());
                     errorCounter.increment();
-                    errorsFound.incrementAndGet();
                 })
                 .subscribeOn(Schedulers.elastic())
                 .subscribe();

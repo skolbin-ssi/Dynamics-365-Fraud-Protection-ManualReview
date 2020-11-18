@@ -30,9 +30,11 @@ public class ItemDTO {
 
     @NotNull
     private boolean active;
+    private ItemLabel label;
 
     private SortedSet<ItemNote> notes;
     private Set<String> tags;
+    private Set<String> queueIds;
 
     private MainPurchase purchase;
     private Decision decision;

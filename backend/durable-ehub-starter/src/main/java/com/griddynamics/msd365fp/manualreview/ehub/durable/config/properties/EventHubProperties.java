@@ -22,8 +22,8 @@ public class EventHubProperties {
     private final String checkpointStorageAccount;
     private final String checkpointConnectionString;
     private final Duration checkpointInterval;
-    private final int consumerErrorThreshold;
-    private final int producerErrorThreshold;
+    private final Duration sendingTimeout;
+    private final long sendingRetries;
     private final Map<String, ProducerProperties> producers;
     private final Map<String, ConsumerProperties> consumers;
 

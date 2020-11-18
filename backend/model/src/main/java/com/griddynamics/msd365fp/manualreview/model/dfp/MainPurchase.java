@@ -29,4 +29,5 @@ public class MainPurchase extends Purchase {
     private Map<String, String> customData;
     private Map<String, Map<String, Object>> additionalInfo;
     private List<PreviousPurchase> previousPurchaseList;
+    private CalculatedFields calculatedFields;
 }

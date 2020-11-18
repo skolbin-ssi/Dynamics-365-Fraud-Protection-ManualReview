@@ -7,10 +7,6 @@ import com.griddynamics.msd365fp.manualreview.analytics.model.ItemLabelingBucket
 import com.griddynamics.msd365fp.manualreview.analytics.model.ItemPlacementBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.dto.ItemPlacementMetricDTO;
 import com.griddynamics.msd365fp.manualreview.analytics.model.dto.ItemPlacementMetricsByQueueDTO;
-import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.CollectedQueueInfoEntity;
-import com.griddynamics.msd365fp.manualreview.analytics.repository.CollectedQueueInfoRepository;
-import com.griddynamics.msd365fp.manualreview.analytics.repository.ItemLabelActivityRepository;
-import com.griddynamics.msd365fp.manualreview.analytics.repository.ItemPlacementActivityRepository;
 import com.griddynamics.msd365fp.manualreview.analytics.util.DataGenerationUtility;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
@@ -19,17 +15,14 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.OVERALL_PLACEMENT_ID;
 
 @Service
 @RequiredArgsConstructor
-public class ItemPlacementMetricService {
-    private final ItemPlacementActivityRepository placementActivitiesRepository;
-    private final ItemLabelActivityRepository labelActivityRepository;
-    private final CollectedQueueInfoRepository queueInfoRepository;
+public class PublicItemPlacementMetricService {
+    private final PublicItemPlacementHistoryClient placementClient;
+    private final PublicItemLabelingHistoryClient labelingClient;
 
 
     public Collection<ItemPlacementMetricsByQueueDTO> getItemPlacementMetricsByQueues(
@@ -64,18 +57,18 @@ public class ItemPlacementMetricService {
             final Set<String> queueIds) {
         Map<String, ItemPlacementMetricsByQueueDTO> queueData = new HashMap<>();
 
-        List<ItemPlacementBucket> dbResult = placementActivitiesRepository.getPlacementMetrics(
+        List<ItemPlacementBucket> dbResult = placementClient.getItemPlacementHistory(
                 from,
                 to,
                 aggregation,
                 queueIds);
 
-        List<ItemLabelingBucket> dbLabelingResult = labelActivityRepository.getQueuePerformance(
+        List<ItemLabelingBucket> dbLabelingResult = labelingClient.getItemLabelingHistoryGroupedByQueues(
                 from,
                 to,
                 aggregation,
-                queueIds,
-                null);
+                null,
+                queueIds);
 
         // map essential metrics
         dbResult.forEach(bucket -> {
@@ -108,13 +101,6 @@ public class ItemPlacementMetricService {
             qds.getData().forEach((date, ds) -> aggregatePlacementMetrics(totalInfo, ds));
             qds.setTotal(totalInfo);
         });
-
-        // enrich data
-        if (!queueData.isEmpty()) {
-            Map<String, String> queueNames = StreamSupport.stream(queueInfoRepository.findAllById(queueData.keySet()).spliterator(), false)
-                    .collect(Collectors.toMap(CollectedQueueInfoEntity::getId, CollectedQueueInfoEntity::getName));
-            queueData.forEach((id, qds) -> qds.setName(queueNames.getOrDefault(id, id)));
-        }
 
         // collect response
         return queueData;

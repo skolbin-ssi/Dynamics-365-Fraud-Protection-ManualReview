@@ -39,7 +39,7 @@ public class OverviewController {
     @GetMapping(value = "/risk-score", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE})
     public RiskScoreOverviewDTO getRiskScoreOverview(
-            @Parameter(description = "size of the risk score buckets, e.g. ")
+            @Parameter(description = "size of the risk score buckets")
             @RequestParam int bucketSize,
             @Parameter(description = "id of the queue which is used for the item filtering")
             @RequestParam(required = false) String queueId

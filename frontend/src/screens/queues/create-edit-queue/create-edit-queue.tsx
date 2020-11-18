@@ -280,8 +280,8 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
                     >
                         {
                             isCreateModal
-                                ? 'Create a new Queue'
-                                : `${activeTab === 'delete' ? 'Delete' : 'Edit'} Queue`
+                                ? 'Create a new queue'
+                                : `${activeTab === 'delete' ? 'Delete' : 'Edit'} queue`
                         }
                     </Text>
                     <IconButton

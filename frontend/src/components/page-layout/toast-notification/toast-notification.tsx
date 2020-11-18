@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { MessageBar } from '@fluentui/react/lib/MessageBar';
 import autobind from 'autobind-decorator';
 import { resolve } from 'inversify-react';
@@ -24,7 +27,7 @@ export class ToastNotification extends Component<{}, never> {
     static composeSuccessMessageForQueueAction(mutation: QUEUE_MUTATION_TYPES, name: string) {
         return (
             <>
-                The Queue with the name &quot;
+                The queue with the name &quot;
                 <b>{name}</b>
                 &quot; has been successfully
                 {' '}
@@ -41,7 +44,7 @@ export class ToastNotification extends Component<{}, never> {
                 {' '}
                 {mutation}
                 {' '}
-                the Queue with the name &quot;
+                the queue with the name &quot;
                 <b>{name}</b>
                 &quot;. Please, try again or write to IT.
             </>
@@ -80,7 +83,18 @@ export class ToastNotification extends Component<{}, never> {
                     message: 'The label was not applied. Probably, the current item has been unlocked.'
                 };
             }
-
+            case NOTIFICATION_TYPE.TAGS_UPDATED_ERROR: {
+                return {
+                    ...GENERAL_TOAST_SETTINGS.get(TOAST_TYPE.ERROR)!,
+                    message: 'The item tags were not updated. Probably, the current item has been unlocked.'
+                };
+            }
+            case NOTIFICATION_TYPE.NOTE_ADDED_ERROR: {
+                return {
+                    ...GENERAL_TOAST_SETTINGS.get(TOAST_TYPE.ERROR)!,
+                    message: 'The note was not added. Probably, the current item has been unlocked.'
+                };
+            }
             case NOTIFICATION_TYPE.QUEUE_MUTATION_SUCCESS: {
                 this.setToastTimeout();
                 return {

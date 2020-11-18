@@ -8,6 +8,7 @@ import com.griddynamics.msd365fp.manualreview.ehub.durable.config.properties.Eve
 import com.griddynamics.msd365fp.manualreview.ehub.durable.model.DurableEventHubProcessorClientRegistry;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.model.DurableEventHubProducerClientRegistry;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.model.EventHubProcessorExecutorRegistry;
+import com.griddynamics.msd365fp.manualreview.ehub.durable.model.HealthCheckProcessor;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.streaming.DurableEventHubClientFactory;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.streaming.DurableEventHubProcessorClient;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.streaming.DurableEventHubProducerClient;
@@ -37,6 +38,7 @@ public class DurableEventHubAutoConfiguration {
     @ConditionalOnBean({EventHubProcessorExecutorRegistry.class})
     public DurableEventHubProcessorClientRegistry eventHubProcessorClientRegistry(
             final DurableEventHubClientFactory factory,
+            final HealthCheckProcessor healthCheckProcessor,
             final EventHubProcessorExecutorRegistry executorRegistry) {
         DurableEventHubProcessorClientRegistry processorRegistry = new DurableEventHubProcessorClientRegistry();
 
@@ -46,7 +48,8 @@ public class DurableEventHubAutoConfiguration {
                         key,
                         executor.getKlass(),
                         executor.getConsumer(),
-                        error -> logEventHubErrorMessage(error.getMessage(), key))));
+                        error -> logEventHubErrorMessage(error, key),
+                        healthCheckProcessor)));
 
         processorRegistry.values().forEach(DurableEventHubProcessorClient::start);
         return processorRegistry;
@@ -68,8 +71,8 @@ public class DurableEventHubAutoConfiguration {
     }
 
 
-    private static void logEventHubErrorMessage(String errorMessage, String hub) {
-        log.warn("EventHub channel [{}] got an error message: [{}]", hub, errorMessage);
+    private static void logEventHubErrorMessage(Throwable error, String hub) {
+        log.warn("EventHub channel [{}] got an error message", hub, error);
     }
 
 }

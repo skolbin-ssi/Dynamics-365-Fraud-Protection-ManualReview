@@ -41,7 +41,7 @@ export class ReviewConsoleScreenStore {
 
     @observable loadingQueueDataError: Error | null = null;
 
-    @observable labelingItemError: ApiServiceError | MrUserError | null = null;
+    @observable itemUpdatingError: ApiServiceError | MrUserError | null = null;
 
     @observable isInAddNoteMode: boolean = false;
 
@@ -63,7 +63,8 @@ export class ReviewConsoleScreenStore {
         return (!!this.queue && !this.queue.size)
             || !!this.loadingQueueDataError
             || !!this.loadingReviewItemError
-            || !!this.labelingItemError;
+            || !!this.itemUpdatingError
+            || this.loadingReviewItem;
     }
 
     constructor(
@@ -80,7 +81,7 @@ export class ReviewConsoleScreenStore {
     async getReviewItem(queueId: string, itemId?: string) {
         this.loadingReviewItem = true;
         this.loadingReviewItemError = null;
-        this.labelingItemError = null;
+        this.itemUpdatingError = null;
 
         try {
             if (itemId) {
@@ -100,7 +101,7 @@ export class ReviewConsoleScreenStore {
     @action
     async getItem(itemId: string, queueId?: string, consealed?: boolean) {
         this.loadingReviewItemError = null;
-        this.labelingItemError = null;
+        this.itemUpdatingError = null;
         if (!consealed) {
             this.loadingReviewItem = true;
         }
@@ -108,6 +109,24 @@ export class ReviewConsoleScreenStore {
         try {
             this.reviewItem = await this.itemService.getItem(itemId, queueId);
             this.reviewItemTags = this.reviewItem?.tags || [];
+            this.loadingReviewItem = false;
+        } catch (e) {
+            this.loadingReviewItem = false;
+            this.reviewItemTags = [];
+            this.loadingReviewItemError = e;
+        }
+    }
+
+    @action
+    async updateItemTagsAndNotes(itemId: string, queueId?: string) {
+        this.loadingReviewItemError = null;
+        this.itemUpdatingError = null;
+
+        try {
+            const updatedItem = await this.itemService.getItem(itemId, queueId);
+            this.reviewItemTags = updatedItem?.tags || [];
+            this.reviewItem!.tags = updatedItem?.tags || [];
+            this.reviewItem!.notes = updatedItem?.notes || [];
             this.loadingReviewItem = false;
         } catch (e) {
             this.loadingReviewItem = false;
@@ -128,15 +147,18 @@ export class ReviewConsoleScreenStore {
     @action
     async labelOrder(label: LABEL) {
         if (this.reviewItem && this.queue) {
+            this.loadingReviewItem = true;
             try {
-                await this.itemService.labelItem(this.reviewItem.id, label);
+                await this.itemService.labelItem(this.reviewItem.id, label, this.queue.viewId);
             } catch (e) {
-                this.labelingItemError = e;
+                this.itemUpdatingError = e;
                 this.appStore.showToast({
                     type: NOTIFICATION_TYPE.LABEL_ADDED_ERROR,
                 });
 
                 return;
+            } finally {
+                this.loadingReviewItem = false;
             }
 
             this.appStore.showToast({
@@ -171,7 +193,8 @@ export class ReviewConsoleScreenStore {
 
     @action
     async finishReviewProcess(itemId: string) {
-        await this.itemService.finishReview(itemId);
+        const currentQueueViewId = this.queue?.viewId;
+        await this.itemService.finishReview(itemId, currentQueueViewId);
     }
 
     @action
@@ -196,24 +219,27 @@ export class ReviewConsoleScreenStore {
     }
 
     @action
-    submitNewNote() {
+    async submitNewNote() {
         this.isInAddNoteMode = false;
         this.isNoteSubmitting = true;
         const currentItemId = this.reviewItem?.id;
-        const currentQueueId = this.queue?.viewId;
-        if (!currentItemId || !currentQueueId) {
+        const currentQueueViewId = this.queue?.viewId;
+        if (!currentItemId || !currentQueueViewId) {
             return;
         }
 
-        this.itemService
-            .putItemNote(currentItemId, this.noteToAdd)
-            .then(() => {
-                this.getItem(currentItemId, currentQueueId, true);
-            })
-            .finally(() => {
-                this.isNoteSubmitting = false;
-                this.noteToAdd = '';
+        try {
+            await this.itemService.putItemNote(currentItemId, this.noteToAdd, currentQueueViewId);
+            await this.updateItemTagsAndNotes(currentItemId, currentQueueViewId);
+        } catch (e) {
+            this.itemUpdatingError = e;
+            this.appStore.showToast({
+                type: NOTIFICATION_TYPE.NOTE_ADDED_ERROR,
             });
+        } finally {
+            this.isNoteSubmitting = false;
+            this.noteToAdd = '';
+        }
     }
 
     /**
@@ -249,17 +275,25 @@ export class ReviewConsoleScreenStore {
 
     @action
     async submitNewTags() {
-        this.isTagSubmitting = true;
-
         if (this.reviewItem && this.queue) {
+            this.isTagSubmitting = true;
             const currentItemId = this.reviewItem.id;
-            const currentQueueId = this.queue.viewId;
+            const currentQueueViewId = this.queue.viewId;
+            try {
+                await this.itemService.patchItemTags(this.reviewItem.id, this.reviewItemTags, currentQueueViewId);
+                await this.updateItemTagsAndNotes(currentItemId, currentQueueViewId);
+            } catch (e) {
+                this.itemUpdatingError = e;
+                this.appStore.showToast({
+                    type: NOTIFICATION_TYPE.TAGS_UPDATED_ERROR,
+                });
 
-            await this.itemService.patchItemTags(this.reviewItem.id, this.reviewItemTags);
-            await this.getItem(currentItemId, currentQueueId, true);
-            this.isTagSubmitting = false;
-            this.isInAddTagMode = false;
-            this.tagToAdd = '';
+                return;
+            } finally {
+                this.isTagSubmitting = false;
+                this.isInAddTagMode = false;
+                this.tagToAdd = '';
+            }
         }
     }
 

@@ -5,7 +5,7 @@ package com.griddynamics.msd365fp.manualreview.analytics.controller;
 
 import com.griddynamics.msd365fp.manualreview.analytics.model.dto.CollectedAnalystInfoDTO;
 import com.griddynamics.msd365fp.manualreview.analytics.model.dto.CollectedQueueInfoDTO;
-import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.CollectedInfoService;
+import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.PublicCollectedInfoService;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +30,7 @@ import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.
 @SecurityRequirement(name = SECURITY_SCHEMA_IMPLICIT)
 @Secured({ADMIN_MANAGER_ROLE})
 public class CollectedInfoController {
-    private final CollectedInfoService collectedInfoService;
+    private final PublicCollectedInfoService publicCollectedInfoService;
 
     @Operation(summary = "Get list of collected analysts")
     @GetMapping(value = "/analysts", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -39,7 +39,7 @@ public class CollectedInfoController {
             @Parameter(description = ANALYSTS_PARAM_DESCRIPTION)
             @RequestParam(value = "analyst", required = false)
                     Set<String> analystIds) {
-        return collectedInfoService.getCollectedAnalystInfo(analystIds);
+        return publicCollectedInfoService.getCollectedAnalystInfo(analystIds);
     }
 
     @Operation(summary = "Get collected analyst info by id")
@@ -47,25 +47,25 @@ public class CollectedInfoController {
     @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE})
     public CollectedAnalystInfoDTO getCollectedAnalystInfo(
             @PathVariable(value = "id") String analystId) throws NotFoundException {
-        return collectedInfoService.getCollectedAnalystInfo(analystId);
+        return publicCollectedInfoService.getCollectedAnalystInfo(analystId);
     }
 
     @Operation(summary = "Get list of collected queues")
     @GetMapping(value = "/queues", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
     public List<CollectedQueueInfoDTO> getAllCollectedQueues(
             @Parameter(description = QUEUES_PARAM_DESCRIPTION)
             @RequestParam(value = "queue", required = false)
                     Set<String> queueIds) {
-        return collectedInfoService.getCollectedQueueInfo(queueIds);
+        return publicCollectedInfoService.getCollectedQueueInfo(queueIds);
     }
 
     @Operation(summary = "Get collected queue info by id")
     @GetMapping(value = "/queues/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE})
+    @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
     public CollectedQueueInfoDTO getCollectedQueueInfo(
             @PathVariable(value = "id") String queueId) throws NotFoundException {
-        return collectedInfoService.getCollectedQueueInfo(queueId);
+        return publicCollectedInfoService.getCollectedQueueInfo(queueId);
     }
 
 }

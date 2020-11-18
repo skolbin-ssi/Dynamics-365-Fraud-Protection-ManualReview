@@ -14,5 +14,5 @@ export * from './settings-api-service';
 export * from './settings-service';
 export * from './alerts-api-service';
 
-export * from './api-interfaces/collected-info-api-service';
+export * from './api-interfaces';
 export * from './domain-interfaces/collected-info-service';

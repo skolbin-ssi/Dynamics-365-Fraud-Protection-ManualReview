@@ -9,3 +9,4 @@ export * from './patch-queue';
 export * from './get-queue-items';
 export * from './lock-queue-item';
 export * from './get-queues-overview';
+export * from './get-risk-score-overview-response';

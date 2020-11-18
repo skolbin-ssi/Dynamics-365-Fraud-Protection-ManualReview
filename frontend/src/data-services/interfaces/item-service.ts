@@ -17,8 +17,9 @@ export interface ItemService {
      * label item
      * @param itemId
      * @param label
+     * @param queueId
      */
-    labelItem(itemId: string, label: LABEL): Promise<ApiServiceResponse<never>>;
+    labelItem(itemId: string, label: LABEL, queueId?: string): Promise<ApiServiceResponse<never>>;
 
     /**
      * Get item details
@@ -36,8 +37,10 @@ export interface ItemService {
 
     /**
      * Unlock the specified item
+     * @param itemId
+     * @param queueId
      */
-    finishReview(itemId: string): Promise<Item | null>;
+    finishReview(itemId: string, queueId?: string): Promise<Item | null>;
 
     /**
      *  Returns item, lock the specified item from the specified queue
@@ -50,15 +53,17 @@ export interface ItemService {
      * Adds a new note for an item
      * @param itemId
      * @param note
+     * @param queueId
      */
-    putItemNote(itemId: string, note: string): Promise<ApiServiceResponse<never>>;
+    putItemNote(itemId: string, note: string, queueId?: string): Promise<ApiServiceResponse<never>>;
 
     /**
      * Adds a tag for an item
      * @param itemId
      * @param tags
+     * @param queueId
      */
-    patchItemTags(itemId: string, tags: string[]): Promise<ApiServiceResponse<never>>;
+    patchItemTags(itemId: string, tags: string[], queueId?: string): Promise<ApiServiceResponse<never>>;
 
     /**
      * Items locked on user

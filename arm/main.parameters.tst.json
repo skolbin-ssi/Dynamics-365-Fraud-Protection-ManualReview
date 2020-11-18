@@ -20,11 +20,11 @@
         "secondaryRegion": {
             "value": "eastus"
         },
-        "throuhgputAnalyticsDb": {
-            "value": 5000
+        "autoscaleMaxThroughputAnalyticsDB": {
+            "value": 4000
         },
-        "throuhgputQueuesDb": {
-            "value": 1500
+        "autoscaleMaxThroughputQueuesDB": {
+            "value": 4000
         },
         "ehubMaximumThroughputUnits": {
             "value": 8
@@ -74,13 +74,13 @@
             "value": "P1D"
         },
         "exceptionsThresholdAlert": {
-            "value": 100
+            "value": 250
         },
         "metricalertTraceWarnSeverityThreshold": {
-            "value": 100
+            "value": 5
         },
         "metricalertTraceErrorSeverityThreshold": {
-            "value": 10
+            "value": 1
         }
     }
 }

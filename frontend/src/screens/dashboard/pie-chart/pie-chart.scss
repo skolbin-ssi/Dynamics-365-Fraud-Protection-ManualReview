@@ -18,7 +18,31 @@
 
   &__text {
     width: 115px;
+    font-weight: 600;
     text-align: center;
     color: $neutralPrimary;
+  }
+
+  &__legends {
+    display: flex;
+    align-items: center;
+    padding-top: 15px;
+  }
+
+  &__legend {
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+
+    &-indicator {
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
+      border-radius: 50%;
+    }
+
+    &-label {
+      font-size: 12px;
+    }
   }
 }

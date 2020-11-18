@@ -8,17 +8,12 @@ import scala.concurrent.duration._
 
 class SeniorAnalystSimulation extends Simulation {
 
-  val baseUrl = System.getenv("BASE_URL")
-  val authToken = System.getenv("AUTH_TOKEN")
-
-  val virtualUserFeeder = csv("senioranalyst_virtualusers.csv").eager.queue
-
   val httpProtocol = http
-    .baseUrl(baseUrl)
+    .baseUrl(AuthorisationInfo.baseUrl)
     .header("sec-fetch-site", "same-origin")
     .header("sec-fetch-mode", "cors")
     .header("sec-fetch-dest", "empty")
-    .header("origin", baseUrl)
+    .header("origin", AuthorisationInfo.baseUrl)
     .authorizationHeader("Bearer ${authToken}")
     .acceptLanguageHeader("en-US,en;q=0.9,ru;q=0.8")
     .acceptEncodingHeader("gzip, deflate, br")
@@ -27,8 +22,8 @@ class SeniorAnalystSimulation extends Simulation {
     .silentResources
 
   val scn = scenario("Senior analyst dashboard exploration")
-    .exec(_.set("authToken", authToken))
-    .feed(virtualUserFeeder)
+    .exec(_.set("authToken", AuthorisationInfo.authToken))
+    .feed(AuthorisationInfo.virtualUserFeeder)
     .exec(DashboardExploration.action)
     .exitHereIfFailed
 

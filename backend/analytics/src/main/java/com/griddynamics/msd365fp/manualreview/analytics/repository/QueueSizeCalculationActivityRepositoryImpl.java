@@ -37,7 +37,7 @@ public class QueueSizeCalculationActivityRepositoryImpl implements QueueSizeCalc
                                     "SELECT " +
                                     "max(c.calculated) as last, c.queueId, bucket " +
                                     "FROM c " +
-                                    "JOIN (SELECT VALUE udf.getTimestampBucket(%1$s,%3$s,c.calculated)) bucket " +
+                                    "JOIN (SELECT VALUE FLOOR((c.calculated-%1$s)/%3$s)) bucket " +
                                     "where " +
                                     "(c.calculated BETWEEN %1$s AND %2$s) " +
                                     "%4$s " +

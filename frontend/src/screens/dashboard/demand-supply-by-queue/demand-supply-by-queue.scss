@@ -133,13 +133,12 @@
   }
 
   &__realtime-data-header {
-    width: 70%;
     display: flex;
     align-items: center;
     margin-bottom: 30px;
 
     &--no-data {
-      width: 34%;
+      width: 48%;
     }
 
     &--data-not-available {
@@ -213,18 +212,6 @@
 
   .queues-list-expandable-group__content--expanded {
     max-height: 100%;
-  }
-
-  &__real-time-data {
-    display: flex;
-  }
-
-  &__queue-items-tables {
-    width: 70%;
-  }
-
-  &__score-distribution-chart-container {
-    width: 30%;
   }
 
   &__action_btns {
@@ -312,8 +299,6 @@
 
 
   &__shimmer-sub {
-    width: 70%;
-
     .ms-Shimmer-container:first-child {
       margin-bottom: 40px;
     }
@@ -387,5 +372,17 @@
 
   &__switch-item {
     margin-left: 20px;
+  }
+
+  &__wrapper {
+    display: flex;
+  }
+
+  &__real-time-data {
+    width: 70%;
+  }
+
+  &__score-distribution-chart-container {
+    width: 30%;
   }
 }

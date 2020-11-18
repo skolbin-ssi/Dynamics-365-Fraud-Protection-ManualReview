@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { DashboardRequestApiParams } from './dashboard-api-service';
+import { DashboardRequestApiParams, QueueRiskScoreOverviewApiParams } from './dashboard-api-service';
 
 import { QueueSizeHistory, ItemPlacementMetrics } from '../../models/dashboard/deman-supply';
 import { ProgressPerformanceMetric } from '../../models/dashboard/progress-performance-metric';
@@ -9,7 +9,8 @@ import {
     AnalystPerformance,
     PerformanceMetrics,
     ProcessingTimeMetric,
-    QueuePerformance
+    QueuePerformance,
+    QueueRiskScoreOverview,
 } from '../../models';
 
 export interface DashboardService {
@@ -27,7 +28,7 @@ export interface DashboardService {
 
     /**
      * Returns performance metrics for all queues
-     * @param params - api params
+     * @param params - Api params
      */
     getQueuesPerformance(params: DashboardRequestApiParams): Promise<QueuePerformance[] | null>
 
@@ -39,7 +40,7 @@ export interface DashboardService {
 
     /**
      * Returns total performance metrics for the specified queue or analyst
-     * @param params -  API endpoint params
+     * @param params - API endpoint params
      */
     getTotalPerformanceMetrics(params: DashboardRequestApiParams): Promise<PerformanceMetrics | null>
 
@@ -54,4 +55,10 @@ export interface DashboardService {
      * @param params
      */
     getProgressPerformanceMetric(params: DashboardRequestApiParams): Promise<ProgressPerformanceMetric | null>
+
+    /**
+     * Returns items split by risk score and label
+     * @param params - API endpoint params
+     */
+    getQueueRiskScoreOverview(params: QueueRiskScoreOverviewApiParams): Promise<QueueRiskScoreOverview | null>;
 }

@@ -229,7 +229,7 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     async handleLabeling(label: LABEL) {
         await this.reviewConsoleScreenStore.labelOrder(label);
 
-        if (!this.reviewConsoleScreenStore.labelingItemError) {
+        if (!this.reviewConsoleScreenStore.itemUpdatingError) {
             this.processNextItem();
         }
     }
@@ -415,7 +415,7 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
                         className={`${CN}__all-done-modal-action-btn`}
                         onClick={this.handleGoToQueuesClick}
                         primary
-                        text="Go to the Queues"
+                        text="Go to the queues"
                     />
                 </Stack>
             </ReviewModal>
@@ -433,7 +433,7 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
                         className={`${CN}__all-done-modal-action-btn`}
                         onClick={this.handleGoToQueuesClick}
                         primary
-                        text="Go to the Queues"
+                        text="Go to the queues"
                     />
                 </div>
             </ReviewModal>

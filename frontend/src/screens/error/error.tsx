@@ -103,7 +103,7 @@ export class Error extends Component<ErrorComponentProps, never> {
                             as="h1"
                             variant="mediumPlus"
                         >
-                            DFP Manual Review
+                            Dynamics 365 Fraud Protection Manual Review
                         </Text>
                     </Stack.Item>
                 </Stack>

@@ -1,16 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { createBrowserHistory, History } from 'history';
+import { History, createBrowserHistory } from 'history';
 import { Container } from 'inversify';
+
 import { TYPES } from '../types';
 import {
     AuthenticationService,
+    AzureMapsService,
+    FiltersBuilder,
+    LocalStorageService,
     Logger,
     UserBuilder,
-    AzureMapsService,
-    LocalStorageService,
-    FiltersBuilder,
 } from '../utility-services';
 import { WindowSizeStore } from '../view-services/misc/window-size-store';
 

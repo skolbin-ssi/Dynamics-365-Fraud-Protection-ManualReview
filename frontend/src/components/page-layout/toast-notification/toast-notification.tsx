@@ -1,15 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { MessageBar } from '@fluentui/react/lib/MessageBar';
+import './toast-notification.scss';
+
 import autobind from 'autobind-decorator';
+import cn from 'classnames';
 import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
-import cn from 'classnames';
 
-import { TYPES } from '../../../types';
-import { AppStore } from '../../../view-services';
+import { MessageBar } from '@fluentui/react/lib/MessageBar';
+
 import {
     DEFAULT_SUCCESS_TOAST_TIMEOUT,
     NOTIFICATION_TYPE,
@@ -17,8 +18,9 @@ import {
     TOAST_TYPE,
 } from '../../../constants';
 import { Notification, Toast } from '../../../models';
+import { TYPES } from '../../../types';
+import { AppStore } from '../../../view-services';
 import { GENERAL_TOAST_SETTINGS, TOASTS_FOR_ITEM_LABELS } from './toasts-details';
-import './toast-notification.scss';
 
 const CN = 'toast-notification';
 

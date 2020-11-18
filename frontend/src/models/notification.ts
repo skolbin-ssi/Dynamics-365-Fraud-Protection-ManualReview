@@ -2,10 +2,11 @@
 // Licensed under the MIT license.
 
 import { MessageBarType } from '@fluentui/react/lib/MessageBar';
+
 import {
     LABEL,
-    QUEUE_MUTATION_TYPES,
     NOTIFICATION_TYPE,
+    QUEUE_MUTATION_TYPES,
     TOAST_TYPE,
 } from '../constants';
 

@@ -1,23 +1,26 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
+import './left-navigation.scss';
+
 import autoBind from 'autobind-decorator';
 import cn from 'classnames';
-import { Stack } from '@fluentui/react/lib/Stack';
+import React, { Component } from 'react';
+
 import { IconButton } from '@fluentui/react/lib/Button';
+import { Stack } from '@fluentui/react/lib/Stack';
+
 import {
     ALERTS_MANAGEMENT,
     DASHBOARD_MANAGEMENT,
     PERMISSION,
     QUEUE_MANAGEMENT,
     ROUTES,
-    USER_INFO_MANAGEMENT,
     SEARCH_MANAGEMENT,
+    USER_INFO_MANAGEMENT,
 } from '../../../constants';
 import { CurrentUserStore } from '../../../view-services';
 import { LeftNavLink, LeftNavLinkProps } from './left-nav-link';
-import './left-navigation.scss';
 
 export interface LeftNavigationProps {
     isExpanded: boolean;

@@ -1,16 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './queue-details.scss';
+
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
+
 import { Text } from '@fluentui/react/lib/Text';
+
+import { ItemsDetailsList } from '../../../components/items-details-list';
 import { Queue } from '../../../models';
 import { QueuesScreenStore } from '../../../view-services';
 import { QueueStore } from '../../../view-services/queues';
-import { ItemsDetailsList } from '../../../components/items-details-list';
 import { QueueHeader } from './queue-header';
-
-import './queue-details.scss';
 
 export interface QueueDetailsProps {
     className: string;

@@ -5,12 +5,15 @@ package com.griddynamics.msd365fp.manualreview.model.dfp.raw;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.griddynamics.msd365fp.manualreview.model.jackson.FlexibleDateFormatDeserializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,11 +27,15 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class PurchaseNodeData extends NodeData {
+    public static final String NODE_NAME = "Purchase";
+
     private String purchaseId;
     private String assessmentType;
     private String originalOrderId;
-    private String merchantLocalDate;
-    private String customerLocalDate;
+    @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
+    private OffsetDateTime merchantLocalDate;
+    @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
+    private OffsetDateTime customerLocalDate;
     private Double totalAmount;
     private Double totalAmountInUSD;
     private Double salesTax;

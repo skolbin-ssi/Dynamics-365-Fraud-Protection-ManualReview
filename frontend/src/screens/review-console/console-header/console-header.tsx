@@ -12,19 +12,20 @@ import { formatToLocaleDateString } from '../../../utils/date';
 import './console-header.scss';
 
 interface ConsoleHeaderProps {
-    queue: Queue | null
-    onClickCallback(): void
+    queue: Queue | null;
+    onClickCallback(): void;
+    inactiveItem?: boolean;
 }
 
 const CN = 'console-header';
 
-export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({ queue, onClickCallback }) => {
+export const ConsoleHeader: React.FC<ConsoleHeaderProps> = ({ queue, onClickCallback, inactiveItem }) => {
     function renderQueueData(queueItem: Queue) {
         return (
             <div className={`${CN}__queue-data`}>
                 <div className={`${CN}__queue-name`}>
                     <div className={`${CN}__queue-name-queue`}>
-                        <Text variant="small">Queue: </Text>
+                        <Text variant="small">{inactiveItem ? 'Labeled from queue: ' : 'Queue: '}</Text>
                     </div>
                     <div className={`${CN}__queue-name-name`}>
                         <Text variant="small">{queueItem.name}</Text>

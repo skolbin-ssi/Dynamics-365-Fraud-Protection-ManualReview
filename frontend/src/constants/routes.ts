@@ -27,6 +27,12 @@ export const ROUTES = {
     ITEM_DETAILS: '/queues/:queueId/item/:itemId',
     ITEM_DETAILS_REVIEW_CONSOLE: '/queues/:queueId/item/:itemId/console',
 
+    SEARCH_NEW: '/search/new',
+    SEARCH_BY_ID: '/search/:searchId',
+    SEARCH_INACTIVE_ITEM_DETAILS: '/search/item/:itemId',
+    SEARCH_ITEM_DETAILS: '/search/queues/:queueId/item/:itemId',
+    SEARCH_ITEM_DETAILS_REVIEW_CONSOLE: '/search/queues/:queueId/item/:itemId/console',
+
     ERROR: '/error/:type',
 
     build: {
@@ -35,6 +41,10 @@ export const ROUTES = {
         reviewConsole: (queueId: string) => `/queues/${queueId}/console`,
         itemDetailsReviewConsole: (queueId: string, itemId: string) => `/queues/${queueId}/item/${itemId}/console`,
         queues: (queueId: string = '') => `/queues/${queueId}`,
+        search: (searchId: string) => `/search/${searchId}`,
+        searchInactiveItemDetails: (itemId: string) => `/search/item/${itemId}`,
+        searchItemDetails: (queueId: string, itemId: string) => `/search/queues/${queueId}/item/${itemId}`,
+        searchItemDetailsReviewConsole: (queueId: string, itemId: string) => `search/queues/${queueId}/item/${itemId}/console`,
         dashboard: {
             queues: (queueId: string) => `${ROUTES.DASHBOARD_QUEUES_PERFORMANCE}/${queueId}`,
             queue: (queueId: string) => `${ROUTES.DASHBOARD_QUEUES_PERFORMANCE}/${queueId}`,

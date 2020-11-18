@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -31,6 +32,7 @@ public class DFPExplorerService {
     @Value("${azure.dfp.graph-explorer-url}")
     private String dfpExplorerUrl;
 
+    @Cacheable(value = "traversal-purchase", unless = "#result.isEmpty()")
     public ExplorerEntity explorePurchase(final String id) {
         ExplorerEntityRequest request = ExplorerEntityRequest.builder()
                 .attribute("PurchaseId")
@@ -40,6 +42,7 @@ public class DFPExplorerService {
         return explore(request);
     }
 
+    @Cacheable(value = "traversal-pi", unless = "#result.isEmpty()")
     public ExplorerEntity explorePaymentInstrument(final String id) {
         ExplorerEntityRequest request = ExplorerEntityRequest.builder()
                 .attribute("PaymentInstrumentId")
@@ -49,6 +52,7 @@ public class DFPExplorerService {
         return explore(request);
     }
 
+    @Cacheable(value = "traversal-user", unless = "#result.isEmpty()")
     public ExplorerEntity exploreUser(final String id) {
         ExplorerEntityRequest request = ExplorerEntityRequest.builder()
                 .attribute("UserId")
@@ -59,12 +63,17 @@ public class DFPExplorerService {
     }
 
     private ExplorerEntity explore(final ExplorerEntityRequest request) {
-        return dfpClient
+        log.info("Start exploration of [{}] [{}]", request.getAttribute(), request.getValue());
+        ExplorerEntity result = dfpClient
                 .post()
                 .uri(dfpExplorerUrl)
                 .body(Mono.just(request), ExplorerEntityRequest.class)
                 .retrieve()
                 .bodyToMono(ExplorerEntity.class)
                 .block();
+        log.info("Exploration of [{}] [{}] has finished successfully", request.getAttribute(), request.getValue());
+        result.setRequestAttributeName(request.getAttribute());
+        result.setRequestAttributeValue(request.getValue());
+        return result;
     }
 }

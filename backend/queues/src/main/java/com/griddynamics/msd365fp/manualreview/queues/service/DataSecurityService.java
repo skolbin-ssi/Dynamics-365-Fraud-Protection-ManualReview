@@ -159,7 +159,7 @@ public class DataSecurityService {
             @NonNull final Queue queue,
             @NonNull final String actor) {
         return SetUtils.union(
-                Objects.requireNonNullElse(queue.getReviewers(), Collections.emptySet()),
+                Objects.requireNonNullElse(queue.getSupervisors(), Collections.emptySet()),
                 Objects.requireNonNullElse(queue.getReviewers(), Collections.emptySet()))
                 .contains(actor);
     }

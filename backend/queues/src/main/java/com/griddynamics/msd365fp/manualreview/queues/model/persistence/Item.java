@@ -33,6 +33,9 @@ public class Item implements Serializable {
     private String id;
     private OffsetDateTime imported;
     private OffsetDateTime enriched;
+    private int enrichmentAttempts;
+    private boolean enrichmentFailed;
+    private String enrichmentFailReason;
     @JsonProperty(value = "_ts")
     private OffsetDateTime updated;
 

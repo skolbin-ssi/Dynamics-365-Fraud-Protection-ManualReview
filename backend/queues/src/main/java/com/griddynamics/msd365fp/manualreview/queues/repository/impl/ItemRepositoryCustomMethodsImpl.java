@@ -154,12 +154,18 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
 
     @Override
     public PageableCollection<String> findUnenrichedItemIds(
-            final OffsetDateTime updatedUpperBoundary,
+            final OffsetDateTime importedUpperBoundary,
             final int size,
             final String continuationToken) {
         ExtendedCosmosContainer.Page res = itemsContainer.runCrossPartitionPageableQuery(
-                String.format("SELECT i.id FROM i WHERE IS_NULL(i.enriched) AND i._ts <= %s",
-                        updatedUpperBoundary.toEpochSecond()),
+                String.format("SELECT i.id FROM i WHERE IS_NULL(i.enriched) " +
+                                "AND (" +
+                                "   NOT IS_DEFINED(i.enrichmentFailed) " +
+                                "   OR IS_NULL(i.enrichmentFailed) " +
+                                "   OR NOT i.enrichmentFailed " +
+                                ") AND i.imported <= %s " +
+                                "ORDER BY i._ts",
+                        importedUpperBoundary.toEpochSecond()),
                 size,
                 continuationToken);
         List<String> queriedItems = res.getContent()
@@ -235,7 +241,6 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
                 .and().notEscalation()
                 .and().updatedAfter(enrichedSince)
                 .and().includeLocked(includeLocked)
-                .order(order)
                 .constructSelectExecutor(itemsContainer)
                 .execute(size, continuationToken);
     }

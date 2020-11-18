@@ -55,7 +55,7 @@ public interface ItemRepositoryCustomMethods {
             final String continuationToken);
 
     PageableCollection<String> findUnenrichedItemIds(
-            final OffsetDateTime updatedUpperBoundary,
+            final OffsetDateTime importedUpperBoundary,
             final int size,
             final String continuationToken);
 

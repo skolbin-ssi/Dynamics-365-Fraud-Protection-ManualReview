@@ -4,7 +4,13 @@
 package com.griddynamics.msd365fp.manualreview.model.dfp;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.griddynamics.msd365fp.manualreview.model.DisposabilityCheckServiceResponse;
+import com.griddynamics.msd365fp.manualreview.model.jackson.EpochSecondsDateTimeSerializer;
+import com.griddynamics.msd365fp.manualreview.model.jackson.FlexibleDateFormatDeserializer;
+import com.griddynamics.msd365fp.manualreview.model.jackson.ISOStringDateTimeSerializer;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -13,75 +19,56 @@ import java.util.List;
 
 
 @Data
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CalculatedFields implements Serializable {
+
+    // Geo data
     private Boolean matchingOfCountriesForShippingAndIP;
     private Boolean matchingOfCountriesForBillingAndShipping;
     private Boolean matchingOfCountriesForBillingAndIP;
-
     private List<String> billingCountries;
     private List<String> billingZipCodes;
     private List<String> billingAddresses;
+    private BigDecimal distanceToPreviousTransactionIP;
 
-    private Integer accountAgeInDays;
-    private Integer activityAgeInDays;
+    // Account statistic
+    private Long accountAgeInDays;
+    private Long activityAgeInDays;
+    @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
+    @JsonSerialize(using = ISOStringDateTimeSerializer.class)
     private OffsetDateTime firstTransactionDateTime;
-
     private Boolean aggregatedEmailConfirmed;
     private String aggregatedEmailDomain;
+    private Boolean disposableEmailDomain;
+    private List<DisposabilityCheckServiceResponse> disposabilityChecks;
 
-    private List<String> authResultCodes;
-    private List<String> approveResultCodes;
-    private List<String> declineResultCodes;
+    // Bank data
+    private List<String> authBankEventResultCodes;
+    private List<String> approveBankEventResultCodes;
+    private List<String> declineBankEventResultCodes;
 
-    private Integer lastHourTransactionCount;
-    private Integer lastDayTransactionCount;
-    private Integer lastWeekTransactionCount;
+    // Previous transactions statistic
+    private Velocity<Long> transactionCount;
+    private Velocity<BigDecimal> transactionAmount;
+    private Velocity<Long> rejectedTransactionCount;
+    private Velocity<BigDecimal> rejectedTransactionAmount;
+    private Velocity<Long> failedTransactionCount;
+    private Velocity<BigDecimal> failedTransactionAmount;
+    private Velocity<Long> successfulTransactionCount;
+    private Velocity<BigDecimal> successfulTransactionAmount;
+    private Velocity<Long> currentPaymentInstrumentTransactionCount;
+    private Velocity<BigDecimal> currentPaymentInstrumentTransactionAmount;
+    private Velocity<Long> uniquePaymentInstrumentCount;
+    private Velocity<Long> uniqueIPCountries;
 
-    private BigDecimal lastHourTransactionAmount;
-    private BigDecimal lastDayTransactionAmount;
-    private BigDecimal lastWeekTransactionAmount;
-
-    private Integer lastHourRejectedTransactionCount;
-    private Integer lastDayRejectedTransactionCount;
-    private Integer lastWeekRejectedTransactionCount;
-
-    private BigDecimal lastHourRejectedTransactionAmount;
-    private BigDecimal lastDayRejectedTransactionAmount;
-    private BigDecimal lastWeekRejectedTransactionAmount;
-
-    private Integer lastHourFailedTransactionCount;
-    private Integer lastDayFailedTransactionCount;
-    private Integer lastWeekFailedTransactionCount;
-
-    private BigDecimal lastHourFailedTransactionAmount;
-    private BigDecimal lastDayFailedTransactionAmount;
-    private BigDecimal lastWeekFailedTransactionAmount;
-
-    private Integer lastHourSuccessfulTransactionCount;
-    private Integer lastDaySuccessfulTransactionCount;
-    private Integer lastWeekSuccessfulTransactionCount;
-
-    private BigDecimal lastHourSuccessfulTransactionAmount;
-    private BigDecimal lastDaySuccessfulTransactionAmount;
-    private BigDecimal lastWeekSuccessfulTransactionAmount;
-
-    private Integer lastHourUniquePaymentInstrumentCount;
-    private Integer lastDayUniquePaymentInstrumentCount;
-    private Integer lastWeekUniquePaymentInstrumentCount;
-
-    private Integer lastHourTransactionCountWithCurrentPaymentInstrument;
-    private Integer lastDayTransactionCountWithCurrentPaymentInstrument;
-    private Integer lastWeekTransactionCountWithCurrentPaymentInstrument;
-
-    private BigDecimal lastHourTransactionAmountWithCurrentPaymentInstrument;
-    private BigDecimal lastDayTransactionAmountWithCurrentPaymentInstrument;
-    private BigDecimal lastWeekTransactionAmountWithCurrentPaymentInstrument;
-
-    private Integer lastHourUniqueIPCountries;
-    private Integer lastDayUniqueIPCountries;
-    private Integer lastWeekUniqueIPCountries;
+    /**
+     * Getter for advanced serialization.
+     * Json object will contain both representation of DateTime field -
+     * timestamp (for SQL queries) and string representation.
+     */
+    @SuppressWarnings("unused")
+    @JsonSerialize(using = EpochSecondsDateTimeSerializer.class)
+    public OffsetDateTime getFirstTransactionDateTimeEpochSeconds() {
+        return firstTransactionDateTime;
+    }
 }

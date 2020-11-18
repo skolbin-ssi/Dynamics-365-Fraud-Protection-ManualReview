@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -38,8 +39,8 @@ public class ItemQuery {
 
         private String alias;
         private final List<String> queryParts = new ArrayList<>();
-
         private final Map<String, List<String>> joinParts = new TreeMap<>();
+        private String orderPart = "";
 
         ItemQueryConstructor alias(String alias) {
             this.alias = alias;
@@ -138,9 +139,10 @@ public class ItemQuery {
                     break;
                 case IS_TRUE:
                     condition = String.format(
-                            "(IS_DEFINED(%1$s%2$s) AND NOT IS_NULL(%1$s%2$s) AND %1$s%2$s)", //TODO: check
+                            "%3$s (IS_DEFINED(%1$s%2$s) AND NOT IS_NULL(%1$s%2$s) AND %1$s%2$s)", //TODO: check
                             decomposition.getLocalAlias(),
-                            decomposition.getPath()
+                            decomposition.getPath(),
+                            Boolean.parseBoolean(itemFilter.getValues().get(0)) ? "" : "NOT"
                     );
                     break;
                 case REGEXP:
@@ -160,9 +162,27 @@ public class ItemQuery {
                             itemFilter.getValues().get(1)
                     );
                     break;
+                case NOT_BETWEEN:
+                    condition = String.format(
+                            "(%s%s NOT BETWEEN %s AND %s)",
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
+                            itemFilter.getValues().get(0),
+                            itemFilter.getValues().get(1)
+                    );
+                    break;
                 case BETWEEN_ALPH:
                     condition = String.format(
                             "(%s%s BETWEEN '%s' AND '%s')",
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
+                            itemFilter.getValues().get(0),
+                            itemFilter.getValues().get(1)
+                    );
+                    break;
+                case NOT_BETWEEN_ALPH:
+                    condition = String.format(
+                            "(%s%s NOT BETWEEN '%s' AND '%s')",
                             decomposition.getLocalAlias(),
                             decomposition.getPath(),
                             itemFilter.getValues().get(0),
@@ -178,7 +198,17 @@ public class ItemQuery {
                             OffsetDateTime.parse(itemFilter.getValues().get(1)).toEpochSecond()
                     );
                     break;
+                case NOT_BETWEEN_DATE:
+                    condition = String.format(
+                            "(%s%s NOT BETWEEN %s AND %s)",
+                            decomposition.getLocalAlias(),
+                            decomposition.getPath(),
+                            OffsetDateTime.parse(itemFilter.getValues().get(0)).toEpochSecond(),
+                            OffsetDateTime.parse(itemFilter.getValues().get(1)).toEpochSecond()
+                    );
+                    break;
                 case EQUAL:
+                case NOT_EQUAL:
                 case GREATER:
                 case LESS:
                 case GREATER_OR_EQUAL:
@@ -191,6 +221,7 @@ public class ItemQuery {
                             itemFilter.getValues().get(0));
                     break;
                 case EQUAL_ALPH:
+                case NOT_EQUAL_ALPH:
                 case GREATER_ALPH:
                 case LESS_ALPH:
                 case GREATER_OR_EQUAL_ALPH:
@@ -234,6 +265,9 @@ public class ItemQuery {
                 case EQUAL:
                 case EQUAL_ALPH:
                     return "=";
+                case NOT_EQUAL:
+                case NOT_EQUAL_ALPH:
+                    return "!=";
                 case GREATER:
                 case GREATER_ALPH:
                 case GREATER_DATE:
@@ -256,12 +290,7 @@ public class ItemQuery {
         }
 
         public ItemQueryConstructor order(Sort.Order order) {
-            queryParts.add(String.format(
-                    "ORDER BY %s.%s %s",
-                    alias,
-                    order.getProperty(),
-                    order.getDirection())
-            );
+            orderPart = order.getProperty() + " " + order.getDirection();
             return this;
         }
 
@@ -420,11 +449,22 @@ public class ItemQuery {
         }
 
         public String constructSelect() {
-            return String.format(
-                    "SELECT %1$s FROM %1$s %2$s WHERE %3$s",
-                    alias,
-                    getJoinClause(),
-                    Joiner.on(" ").join(queryParts));
+            String joinClause = getJoinClause();
+
+            if (StringUtils.isEmpty(joinClause)) {
+                return String.format(
+                        "SELECT %1$s FROM %1$s WHERE %2$s %3$s",
+                        alias,
+                        Joiner.on(" ").join(queryParts),
+                        getOrderByClause(""));
+            } else {
+                return String.format(
+                        "SELECT VALUE root FROM (SELECT DISTINCT %1$s FROM %1$s %2$s WHERE %3$s) AS root %4$s",
+                        alias,
+                        joinClause,
+                        Joiner.on(" ").join(queryParts),
+                        getOrderByClause("root"));
+            }
         }
 
         public String constructCount() {
@@ -450,12 +490,21 @@ public class ItemQuery {
             return CollectionUtils.isEmpty(joinParts) ? "" :
                     joinParts.entrySet().stream()
                             .map(entry -> String.format(
-                                    "JOIN (SELECT VALUE %1$s FROM %1$s IN %2$s.%3$s WHERE %4$s) %1$s",
+                                    "JOIN (SELECT DISTINCT VALUE %1$s FROM %1$s IN %2$s.%3$s WHERE %4$s) %1$s",
                                     getJoinClauseAliasName(entry.getKey()),
                                     alias,
                                     entry.getKey(),
                                     Joiner.on(" ").join(entry.getValue())))
                             .collect(Collectors.joining(" "));
+        }
+
+        private String getOrderByClause(String rootAlias) {
+            return StringUtils.isEmpty(orderPart) ? "" :
+                    String.format(
+                            "ORDER BY %s%s.%s",
+                            StringUtils.isEmpty(rootAlias) ? "" : rootAlias + ".",
+                            alias,
+                            orderPart);
         }
 
         public ItemSelectQueryExecutor constructSelectExecutor(ExtendedCosmosContainer itemsContainer) {

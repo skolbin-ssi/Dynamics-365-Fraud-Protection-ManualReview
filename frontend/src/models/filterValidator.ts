@@ -17,14 +17,14 @@ export abstract class FilterValidator {
 
     constraints: any = null;
 
-    filterField: QUEUE_ITEMS_FIELD | null = null;
+    filterField: QUEUE_ITEMS_FIELD | null | string = null;
 
     @observable
     filterValues: string[] = [];
 
     abstract isPassed: boolean;
 
-    constructor(type: FILTER_VALIDATOR_TYPES, field: QUEUE_ITEMS_FIELD, values: string[]) {
+    constructor(type: FILTER_VALIDATOR_TYPES, field: QUEUE_ITEMS_FIELD | string, values: string[]) {
         this.type = type;
         this.filterField = field;
         this.filterValues = values;
@@ -88,7 +88,7 @@ class AtLeastOneValueValidator extends FilterValidator {
 }
 
 class FilterValidatorFactory {
-    create(type: FILTER_VALIDATOR_TYPES, field: QUEUE_ITEMS_FIELD, values: string[]): FilterValidator {
+    create(type: FILTER_VALIDATOR_TYPES, field: QUEUE_ITEMS_FIELD | string, values: string[]): FilterValidator {
         switch (type) {
             case FILTER_VALIDATOR_TYPES.MIN_CONSTRAINT:
                 return new MinConstraintValidator(type, field, values);

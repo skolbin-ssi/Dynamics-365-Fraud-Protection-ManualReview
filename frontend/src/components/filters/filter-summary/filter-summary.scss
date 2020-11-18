@@ -1,0 +1,29 @@
+@import "../../../styles/variables";
+
+.filter-summary {
+  margin-bottom: 20px;
+  border-bottom: 1px solid $neutralLight;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    &-title {
+     font-size: 18px;
+     font-weight: 600;
+    }
+  }
+
+  &__filter-tiles {
+    @include filterTileGridContainer();
+
+    margin-bottom: 14px;
+  }
+
+  &__context-menu {
+    height: 40px;
+    color: $themeDark;
+    margin-bottom: 20px;
+  }
+}

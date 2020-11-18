@@ -1,0 +1,26 @@
+@import "../../../../styles/variables";
+
+.range-date-condition {
+  &__fields {
+    display: flex;
+    align-items: center;
+  }
+
+  &__delimiter {
+    margin: 0 5px;
+  }
+
+  &__validation-errors {
+    margin-top: 5px;
+    color: $formInvalidColor;
+  }
+
+  &__validator-error {
+    display: block;
+  }
+
+  &__hidden-error {
+    display: none;
+  }
+
+}

@@ -20,6 +20,7 @@ interface StartReviewPanelProps {
      */
     isItemReviewLocked: boolean
     notes: Note[];
+    isActiveItem?: boolean;
     isReviewAllowed: boolean;
     reasonToPreventReview?: JSX.Element | string;
 
@@ -46,8 +47,11 @@ export class StartReviewPanel extends Component<StartReviewPanelProps, never> {
         const {
             onStartReviewCallback,
             isItemReviewLocked,
+            isActiveItem
         } = this.props;
-        // eslint-disable-next-line no-constant-condition
+
+        if (!isActiveItem) return null;
+
         if (isItemReviewLocked) {
             return StartReviewPanel.renderMessageBar(
                 <>

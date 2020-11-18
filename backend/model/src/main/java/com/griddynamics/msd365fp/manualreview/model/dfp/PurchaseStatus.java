@@ -3,22 +3,52 @@
 
 package com.griddynamics.msd365fp.manualreview.model.dfp;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.griddynamics.msd365fp.manualreview.model.jackson.EpochSecondsDateTimeSerializer;
+import com.griddynamics.msd365fp.manualreview.model.jackson.FlexibleDateFormatDeserializer;
+import com.griddynamics.msd365fp.manualreview.model.jackson.ISOStringDateTimeSerializer;
+import lombok.Data;
 
 import java.io.Serializable;
+import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class PurchaseStatus implements Serializable {
     private String purchaseId;
     private String statusType;
-    private String statusDate;
+    @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
+    @JsonSerialize(using = ISOStringDateTimeSerializer.class)
+    private OffsetDateTime statusDate;
     private String reason;
+
+    private Map<String, String> additionalParams = new HashMap<>();
+
+    @JsonAnySetter
+    public void setAdditionalParam(String name, String value) {
+        additionalParams.put(name, value);
+    }
+    public void setAdditionalParams(Map<String, String> map) {
+        additionalParams.putAll(map);
+    }
+
+    /**
+     * Getter for advanced serialization.
+     * Json object will contain both representation of DateTime field -
+     * timestamp (for SQL queries) and string representation.
+     */
+    @SuppressWarnings("unused")
+    @JsonSerialize(using = EpochSecondsDateTimeSerializer.class)
+    public OffsetDateTime getStatusDateEpochSeconds() {
+        return statusDate;
+    }
+
 }

@@ -9,3 +9,4 @@ export * from './login';
 export * from './error';
 export * from './review-console';
 export * from './personal-performance';
+export * from './search';

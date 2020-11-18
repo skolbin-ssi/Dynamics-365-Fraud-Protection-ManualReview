@@ -1,0 +1,24 @@
+@import "../../../../styles/variables";
+
+.text-in-condition {
+  &__validation-errors {
+    margin-top: 5px;
+    color: $formInvalidColor;
+  }
+
+  &__validator-error {
+    display: block;
+  }
+
+  &__no-sku-found {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-items: center;
+    width: 100%;
+  }
+
+  &__no-sku-found-text {
+    padding: 10px;
+  }
+}

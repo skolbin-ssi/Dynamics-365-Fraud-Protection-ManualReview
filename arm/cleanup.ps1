@@ -19,7 +19,7 @@ $tenantId = $json.parameters.tenantId.value
 $deploymentResourceGroup  = $prefix + "-rg"
 $logWorkspace             = $prefix + "-log-analytics-ws"
 $logWorkspaceSecondary    = $prefix + "-secondary-log-analytics-ws"
-$mapsGroupName            = $prefix + "-map-access"
+$mapAppName               = $prefix + "-map"
 
 
 # Login to Azure and set context
@@ -57,28 +57,22 @@ foreach ($la in @($logWorkspace, $logWorkspaceSecondary)) {
     --force true -y
 }
 
-# remove AD service principal
-if (Get-AzADServicePrincipal -DisplayName $prefix -ErrorAction Ignore) {
-  Write-Host "Removing Azure AD service principal $prefix"
-  Remove-AzADServicePrincipal `
-    -DisplayName $prefix `
-    -Force
-}
+foreach ($app in @($prefix, $mapAppName)) {
+    # remove AD service principal
+    if (Get-AzADServicePrincipal -DisplayName $app -ErrorAction Ignore) {
+      Write-Host "Removing Azure AD service principal $app"
+      Remove-AzADServicePrincipal `
+        -DisplayName $app `
+        -Force
+    }
 
-# remove AD application
-if (Get-AzADApplication -DisplayName $prefix -ErrorAction Ignore) {
-  Write-Host "Removing Azure AD application $prefix"
-  Remove-AzADApplication `
-    -DisplayName $prefix `
-    -Force
-}
-
-# remove AD maps group
-if (Get-AzADGroup -DisplayName $mapsGroupName -ErrorAction Ignore) {
-  Write-Host "Removing Azure AD group $mapsGroupName"
-  Remove-AzADGroup `
-    -DisplayName $mapsGroupName `
-    -Force
+    # remove AD application
+    if (Get-AzADApplication -DisplayName $app -ErrorAction Ignore) {
+      Write-Host "Removing Azure AD application $app"
+      Remove-AzADApplication `
+        -DisplayName $app `
+        -Force
+    }
 }
 
 # remove deployment resource group

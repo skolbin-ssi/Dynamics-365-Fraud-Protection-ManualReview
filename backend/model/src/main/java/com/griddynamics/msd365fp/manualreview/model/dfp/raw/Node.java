@@ -18,15 +18,20 @@ public class Node {
     private String nodeIdAttribute;
     private String id;
     private String name;
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "name", visible = true)
+    @JsonTypeInfo(
+            use = JsonTypeInfo.Id.NAME,
+            include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
+            property = "name",
+            visible = true,
+            defaultImpl = DefaultNodeData.class)
     @JsonSubTypes({
-            @JsonSubTypes.Type(value = AddressNodeData.class, name = "Address"),
-            @JsonSubTypes.Type(value = BankEventNodeData.class, name = "BankEvent"),
-            @JsonSubTypes.Type(value = DeviceContextNodeData.class, name = "DeviceContext"),
-            @JsonSubTypes.Type(value = PaymentInstrumentNodeData.class, name = "PaymentInstrument"),
-            @JsonSubTypes.Type(value = ProductNodeData.class, name = "Product"),
-            @JsonSubTypes.Type(value = UserNodeData.class, name = "User"),
-            @JsonSubTypes.Type(value = PurchaseNodeData.class, name = "Purchase")
+            @JsonSubTypes.Type(value = AddressNodeData.class, name = AddressNodeData.NODE_NAME),
+            @JsonSubTypes.Type(value = BankEventNodeData.class, name = BankEventNodeData.NODE_NAME),
+            @JsonSubTypes.Type(value = DeviceContextNodeData.class, name = DeviceContextNodeData.NODE_NAME),
+            @JsonSubTypes.Type(value = PaymentInstrumentNodeData.class, name = PaymentInstrumentNodeData.NODE_NAME),
+            @JsonSubTypes.Type(value = ProductNodeData.class, name = ProductNodeData.NODE_NAME),
+            @JsonSubTypes.Type(value = UserNodeData.class, name = UserNodeData.NODE_NAME),
+            @JsonSubTypes.Type(value = PurchaseNodeData.class, name = PurchaseNodeData.NODE_NAME)
     })
     private NodeData data;
 }

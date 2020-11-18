@@ -3,13 +3,12 @@
 
 package com.griddynamics.msd365fp.manualreview.model.dfp.raw;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.lang.NonNull;
+import lombok.NoArgsConstructor;
 import org.springframework.util.CollectionUtils;
 
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * The info returned by the {@code azure.dfp.graph-explorer-url} DFP endpoint.
@@ -19,18 +18,22 @@ import java.util.Objects;
  * @see Edge
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ExplorerEntity {
+    public static final ExplorerEntity EMPTY = new ExplorerEntity(
+            null,
+            null,
+            List.of(),
+            List.of());
+
+    private String requestAttributeName;
+    private String requestAttributeValue;
+
     private List<Node> nodes = null;
     private List<Edge> edges = null;
 
-    public void extend(@NonNull ExplorerEntity entity) {
-        if (!CollectionUtils.isEmpty(entity.getNodes())) {
-            this.nodes = Objects.requireNonNullElseGet(this.nodes, LinkedList::new);
-            this.nodes.addAll(entity.getNodes());
-        }
-        if (!CollectionUtils.isEmpty(entity.getEdges())) {
-            this.edges = Objects.requireNonNullElseGet(this.edges, LinkedList::new);
-            this.edges.addAll(entity.getEdges());
-        }
+    public boolean isEmpty() {
+        return CollectionUtils.isEmpty(nodes) && CollectionUtils.isEmpty(edges);
     }
 }

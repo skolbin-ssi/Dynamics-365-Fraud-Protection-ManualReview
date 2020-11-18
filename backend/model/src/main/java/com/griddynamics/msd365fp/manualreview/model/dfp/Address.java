@@ -3,21 +3,20 @@
 
 package com.griddynamics.msd365fp.manualreview.model.dfp;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import lombok.Data;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class Address implements Serializable {
-
     private String addressId;
     private String type;
     private String firstName;
@@ -31,5 +30,14 @@ public class Address implements Serializable {
     private String district;
     private String zipCode;
     private String country;
-    private String countryRegion;
+
+    private Map<String, String> additionalParams = new HashMap<>();
+
+    @JsonAnySetter
+    public void setAdditionalParam(String name, String value) {
+        additionalParams.put(name, value);
+    }
+    public void setAdditionalParams(Map<String, String> map) {
+        additionalParams.putAll(map);
+    }
 }

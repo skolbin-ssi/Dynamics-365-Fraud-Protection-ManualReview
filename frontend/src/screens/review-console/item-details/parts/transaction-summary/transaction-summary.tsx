@@ -116,7 +116,7 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
         },
         {
             key: 'riskScore',
-            name: 'Risk score',
+            name: 'Fraud score',
             fieldName: '',
             minWidth: 80,
             maxWidth: 80,

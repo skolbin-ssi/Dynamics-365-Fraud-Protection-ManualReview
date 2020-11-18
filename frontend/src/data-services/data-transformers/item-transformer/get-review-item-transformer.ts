@@ -7,7 +7,7 @@ import {
     Item,
     Purchase
 } from '../../../models';
-import { AzureMapsSearch, LocationAsArray, UserBuilder } from '../../../utility-services';
+import { AzureMapsService, LocationAsArray, UserBuilder } from '../../../utility-services';
 import { LockQueueItemResponse } from '../../api-services/queue-api-service/api-models';
 import { DataTransformer } from '../../data-transformer';
 import { UserService } from '../../interfaces';
@@ -17,7 +17,7 @@ export class GetReviewItemTransformer extends BaseItemTransformer implements Dat
     constructor(
         private readonly userService: UserService,
         private readonly userBuilder: UserBuilder,
-        private readonly azureMapsSearch: AzureMapsSearch
+        private readonly azureMapsService: AzureMapsService
     ) {
         super();
     }
@@ -53,7 +53,7 @@ export class GetReviewItemTransformer extends BaseItemTransformer implements Dat
         const promises: Promise<LocationAsArray>[] = [];
 
         purchase.addressList.forEach(address => {
-            promises.push(this.azureMapsSearch.getLocationByAddress(address));
+            promises.push(this.azureMapsService.getLocationByAddress(address));
         });
 
         return Promise
@@ -64,18 +64,18 @@ export class GetReviewItemTransformer extends BaseItemTransformer implements Dat
     }
 
     private async populateDistances(item: Item) {
-        const { getDistance } = this.azureMapsSearch;
+        const { getDistance } = this.azureMapsService;
         const { geoAddressList, deviceContext } = item.purchase;
         const [shippingAddress] = geoAddressList.filter(gA => gA.address.type === ADDRESS_TYPE.SHIPPING);
         const promises: ReturnType<typeof getDistance>[] = [];
 
         geoAddressList.forEach(gA => {
             if (gA.address.type !== ADDRESS_TYPE.SHIPPING) {
-                promises.push(this.azureMapsSearch.getDistance(shippingAddress, gA));
+                promises.push(this.azureMapsService.getDistance(shippingAddress, gA));
             }
         });
 
-        promises.push(this.azureMapsSearch.getDistance(shippingAddress, deviceContext.address));
+        promises.push(this.azureMapsService.getDistance(shippingAddress, deviceContext.address));
 
         return Promise
             .all(promises)

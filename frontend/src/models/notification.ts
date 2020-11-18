@@ -26,15 +26,6 @@ export type Notification =
         label: LABEL,
     }
     | {
-        type: NOTIFICATION_TYPE.LABEL_ADDED_ERROR,
-    }
-    | {
-        type: NOTIFICATION_TYPE.NOTE_ADDED_ERROR,
-    }
-    | {
-        type: NOTIFICATION_TYPE.TAGS_UPDATED_ERROR,
-    }
-    | {
         type: NOTIFICATION_TYPE.QUEUE_MUTATION_SUCCESS,
         mutation: QUEUE_MUTATION_TYPES;
         queueName: string;
@@ -43,6 +34,10 @@ export type Notification =
         type: NOTIFICATION_TYPE.QUEUE_MUTATION_ERROR,
         mutation: QUEUE_MUTATION_TYPES;
         queueName: string;
+    }
+    | {
+        type: NOTIFICATION_TYPE.GENERIC_ERROR,
+        message: string;
     }
     | {
         type: NOTIFICATION_TYPE.CUSTOM,

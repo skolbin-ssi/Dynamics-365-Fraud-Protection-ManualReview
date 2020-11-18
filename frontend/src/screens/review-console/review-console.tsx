@@ -85,8 +85,8 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         const { params, path } = match;
         const { queueId, itemId } = params;
 
-        if (itemId) {
-            this.reviewConsoleScreenStore.getItem(itemId, queueId!);
+        if (itemId && queueId) {
+            this.reviewConsoleScreenStore.getItem(itemId, queueId);
         }
 
         if (queueId && path === ROUTES.REVIEW_CONSOLE) {
@@ -99,6 +99,16 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         if (queueId) {
             this.reviewConsoleScreenStore.getQueueData(queueId);
         }
+
+        if (itemId && path === ROUTES.SEARCH_INACTIVE_ITEM_DETAILS) {
+            await this.reviewConsoleScreenStore.getItem(itemId);
+            await this.reviewConsoleScreenStore.getQueueData(this.reviewConsoleScreenStore.reviewItem?.label?.queueId);
+        }
+
+        this.reviewConsoleScreenStore.setIsItemDetailsOpenedFromSearch([
+            ROUTES.SEARCH_ITEM_DETAILS,
+            ROUTES.SEARCH_INACTIVE_ITEM_DETAILS,
+            ROUTES.SEARCH_ITEM_DETAILS_REVIEW_CONSOLE].includes(path));
 
         if (!this.lockedItemsStore.lockedItems) {
             this.lockedItemsStore.getLockedItems();
@@ -116,13 +126,15 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     }
 
     @autoBind
-    handleBackToQueuesClick() {
-        const { queue } = this.reviewConsoleScreenStore;
+    handleBackButtonClick() {
+        const { queue, isItemDetailsOpenedFromSearch } = this.reviewConsoleScreenStore;
 
         this.reviewConsoleScreenStore.clearQueueData();
 
-        if (queue) {
+        if (queue && !isItemDetailsOpenedFromSearch) {
             this.goBackToQueueList(queue.viewId);
+        } else {
+            this.history.goBack();
         }
     }
 
@@ -352,6 +364,7 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
             <StartReviewPanel
                 onStartReviewCallback={this.startReviewProcess}
                 isItemReviewLocked={queue.sortingLocked && !this.isItemHeldByCurrentUser(reviewItem)}
+                isActiveItem={reviewItem?.active}
                 notes={reviewItem?.notes || []}
                 isReviewAllowed={isReviewAllowed}
                 reasonToPreventReview={reasonToPreventReview}
@@ -376,13 +389,21 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
                 <Switch>
                     <Route
                         exact
-                        path={ROUTES.ITEM_DETAILS}
+                        path={[
+                            ROUTES.ITEM_DETAILS,
+                            ROUTES.SEARCH_ITEM_DETAILS,
+                            ROUTES.SEARCH_INACTIVE_ITEM_DETAILS,
+                        ]}
                         render={() => (loadingQueueData || loadingReviewItem
                             ? ReviewConsole.renderReviewConsolePanelSpinner()
                             : this.renderStartReviewPanel())}
                     />
                     <Route
-                        path={[ROUTES.ITEM_DETAILS_REVIEW_CONSOLE, ROUTES.REVIEW_CONSOLE]}
+                        path={[
+                            ROUTES.REVIEW_CONSOLE,
+                            ROUTES.ITEM_DETAILS_REVIEW_CONSOLE,
+                            ROUTES.SEARCH_ITEM_DETAILS_REVIEW_CONSOLE
+                        ]}
                         render={() => this.renderReviewActionsPanel(blockActionButtons)}
                     />
                 </Switch>
@@ -481,9 +502,13 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
 
         return (
             <div className={CN}>
-                <ConsoleHeader queue={queue} onClickCallback={this.handleBackToQueuesClick} />
+                <ConsoleHeader
+                    queue={queue}
+                    onClickCallback={this.handleBackButtonClick}
+                    inactiveItem={reviewItem?.active === false}
+                />
                 <ItemDetails
-                    handleBackToQueuesClickCallback={this.handleBackToQueuesClick}
+                    handleBackToQueuesClickCallback={this.handleBackButtonClick}
                     reviewItem={reviewItem}
                     loadingReviewItem={loadingReviewItem}
                     externalLinksMap={externalLinksMap}

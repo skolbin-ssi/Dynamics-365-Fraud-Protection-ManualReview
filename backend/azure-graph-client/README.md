@@ -33,7 +33,7 @@ spring:
             scope: https://graph.microsoft.com/.default
         provider:
           azure-graph-api:
-            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+            token-uri: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/v2.0/token
 
 ``` 
 

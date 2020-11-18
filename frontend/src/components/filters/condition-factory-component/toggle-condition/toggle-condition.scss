@@ -1,0 +1,11 @@
+@import "../../../../styles/variables";
+
+.toggle-condition {
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+  &__toggle {
+    margin: 0;
+  }
+}

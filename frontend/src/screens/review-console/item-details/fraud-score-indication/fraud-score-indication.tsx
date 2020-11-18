@@ -82,7 +82,7 @@ export class FraudScoreIndication extends Component<FraudScoreIndicationProps, F
                             {riskScore}
                         </Text>
                     </div>
-                    <Text className={`${CN}-title`} variant="medium">Risk score</Text>
+                    <Text className={`${CN}-title`} variant="medium">Fraud score</Text>
                     <Text className={`${CN}-score-factors`} variant="medium">
                         {factorsAmount}
                         &nbsp;Score factors

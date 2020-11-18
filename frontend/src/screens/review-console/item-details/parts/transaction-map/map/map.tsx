@@ -15,7 +15,7 @@ import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { GeoAddress, Item } from '../../../../../../models/item';
 import { TYPES } from '../../../../../../types';
-import { AuthenticationService } from '../../../../../../utility-services';
+import { AzureMapsService } from '../../../../../../utility-services';
 import { Configuration } from '../../../../../../utility-services/configuration';
 import './map.scss';
 
@@ -41,8 +41,8 @@ export class Map extends Component<MapComponentProps, MapComponentState> {
     @resolve(TYPES.CONFIGURATION)
     private config!: Configuration;
 
-    @resolve(TYPES.AUTHENTICATION)
-    private authService!: AuthenticationService;
+    @resolve(TYPES.AZURE_MAPS_SERVICE)
+    private azureMapsService!: AzureMapsService;
 
     private map?: AzureMap;
 
@@ -102,11 +102,8 @@ export class Map extends Component<MapComponentProps, MapComponentState> {
                 authType: AuthenticationType.anonymous,
                 clientId,
                 getToken: (success, error) => {
-                    this.authService
-                        .getAtlasAccessToken()
-                        .then(accessToken => {
-                            success(accessToken);
-                        })
+                    this.azureMapsService.getMapsToken()
+                        .then(token => success(token))
                         .catch(() => {
                             error('Access token is expired or user is not authorized');
                         });

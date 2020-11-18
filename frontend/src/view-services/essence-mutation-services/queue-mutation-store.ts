@@ -4,12 +4,10 @@
 import { inject, injectable } from 'inversify';
 import { action, computed, observable } from 'mobx';
 import {
-    FILTER_NAMES,
     LABEL,
     MAXIMUM_QUEUE_PROCESSING_DAYS,
     NOTIFICATION_TYPE,
     QUEUE_CONFIGURATION_LABEL,
-    QUEUE_ITEMS_FIELD,
     QUEUE_MUTATION_TYPES,
     SORTING_FIELD,
     SORTING_ORDER,
@@ -26,14 +24,15 @@ import {
     Queue,
     QueueToUpdate,
     User,
-    Filter,
     QueueAssignee,
 } from '../../models';
+
 import { TYPES } from '../../types';
 import {
     getProcessingDeadlineValues,
     getQueueProcessingDeadline
 } from '../../utils';
+import { FilterField } from '../../models/filter/filter-field';
 
 type MutationStatus = null | 'ongoing' | 'success' | 'failure';
 type OverlayType = null | MutationStatus | 'loadingData';
@@ -49,7 +48,7 @@ interface CreateEditQueueModalFields {
     processingDeadlineHours: number;
     reviewers: string[];
     supervisors: string[];
-    filters: Filter[];
+    filters: FilterField[];
 }
 
 export interface LabelObject {
@@ -215,9 +214,13 @@ export class QueueMutationStore {
             filters,
             supervisors
         } = this.fields;
+
+        const areFiltersConditionsValid = filters
+            .every(filter => filter.areUsedConditionsValid);
+
         const isNameValid = !!name;
         const isDeadlineValid = !enableProcessingDeadline || (!!processingDeadlineDays || !!processingDeadlineHours);
-        const areFiltersValid = this.isResidual || (!!filters.length && filters.every(filter => filter.validators.every(validator => validator.isPassed)));
+        const areFiltersValid = this.isResidual || (!!filters.length && areFiltersConditionsValid);
         const hasSomeSupervisors = Array.isArray(supervisors) && supervisors.length > 0;
         return isNameValid && isDeadlineValid && areFiltersValid && hasSomeSupervisors;
     }
@@ -250,21 +253,6 @@ export class QueueMutationStore {
         return users.filter(({ id }) => !reviewers.includes(id) && !supervisors.includes(id));
     }
 
-    /**
-     * Types of filters to display in "Add condition" dropdown
-     */
-    @computed
-    get availableFilterTypes(): { field: string, name: string, isUsed: boolean }[] {
-        return Array.from(FILTER_NAMES).map(([field, name]) => {
-            const isUsed = !!this.fields.filters.find(filter => filter.field === field);
-            return {
-                field,
-                name,
-                isUsed
-            };
-        });
-    }
-
     constructor(
         @inject(TYPES.QUEUE_SERVICE) private queueService: QueueService,
         @inject(TYPES.QUEUE_STORE) private queueStore: QueueStore,
@@ -272,7 +260,8 @@ export class QueueMutationStore {
         @inject(TYPES.APP_STORE) private appStore: AppStore,
         @inject(TYPES.QUEUES_SCREEN_STORE) private queueScreenStore: QueuesScreenStore,
         @inject(TYPES.LOCKED_ITEMS_STORE) private lockedItemsStore: LockedItemsStore
-    ) {}
+    ) {
+    }
 
     @action
     getUsersIfNecessary() {
@@ -444,93 +433,8 @@ export class QueueMutationStore {
     }
 
     @action
-    async addFilter(field: QUEUE_ITEMS_FIELD) {
-        const filter = new Filter(field);
-        this.fields.filters.push(filter);
-    }
-
-    @action
-    async removeFilter(field: QUEUE_ITEMS_FIELD) {
-        this.fields.filters = this.fields.filters.filter(filter => filter.field !== field);
-    }
-
-    @action
-    async setNumericRangeFilterValue(args: {
-        field: QUEUE_ITEMS_FIELD,
-        value: string,
-        type: 'min' | 'max',
-        allowDecimal?: boolean,
-        allowNegative?: boolean
-    }) {
-        const {
-            field,
-            value,
-            type,
-            allowDecimal,
-            allowNegative
-        } = args;
-        if ((value !== '' && Number.isNaN(+value)) || (!allowDecimal && value.includes('.')) || (!allowNegative && value.startsWith('-'))) {
-            return;
-        }
-        const soughtFilter = this.fields.filters.find(filter => filter.field === field);
-        const index = type === 'min' ? 0 : 1;
-        if (soughtFilter) {
-            soughtFilter.values[index] = value.toString();
-        }
-    }
-
-    @action
-    addMultiValuesFilterValue(args: {
-        field: QUEUE_ITEMS_FIELD,
-        value: string
-    }) {
-        const { field, value } = args;
-        const soughtFilter = this.fields.filters.find(filter => filter.field === field);
-        if (soughtFilter) {
-            soughtFilter.values.push(value);
-        }
-    }
-
-    @action
-    removeMultiValuesFilterValue(args: {
-        field: QUEUE_ITEMS_FIELD,
-        value: string
-    }) {
-        const { field, value } = args;
-        const soughtFilter = this.fields.filters.find(filter => filter.field === field);
-        if (soughtFilter) {
-            soughtFilter.values = soughtFilter.values.filter(filterValue => filterValue !== value);
-        }
-    }
-
-    @action
-    setMultiValuesFilterValues(args: {
-        field: QUEUE_ITEMS_FIELD,
-        values: string[]
-    }) {
-        const { field, values } = args;
-        const soughtFilter = this.fields.filters.find(filter => filter.field === field);
-        if (soughtFilter) {
-            // We can't just replace an array, as it's observed
-            soughtFilter.values.length = 0;
-            values.forEach(value => soughtFilter.values.push(value));
-        }
-    }
-
-    getSKUSuggestions(term: string) {
-        return this.queueService.searchSKU(term);
-    }
-
-    createCustomSKU(sku: string) {
-        return this.queueService.addSKU(sku);
-    }
-
-    setSKUInput(newValue: string) {
-        this.SKUInput = newValue;
-    }
-
-    getCountrySuggestions(term: string = '') {
-        return this.queueService.searchCountry(term);
+    addFilters(filters: FilterField[]) {
+        this.fields.filters = [...filters];
     }
 
     @action
@@ -603,7 +507,10 @@ export class QueueMutationStore {
             filters
         } = this.fields;
 
-        const filterDTOs = filters.map(filter => filter.toDTO());
+        const filterDTOs = filters
+            .filter(filter => filter.isFilterUsed)
+            .map(filter => filter.filterConditionsToDTOs)
+            .flat();
 
         const queueBase = {
             name,

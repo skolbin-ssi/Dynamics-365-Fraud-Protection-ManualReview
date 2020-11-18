@@ -96,7 +96,7 @@ public class TaskService {
         allTasks.forEach(task -> {
             if (!READY.equals(task.getStatus())) {
                 task.setStatus(READY);
-                task.setFailedStatusMessage("Restored manually");
+                task.setLastFailedRunMessage("Restored manually");
                 taskRepository.save(task);
             }
         });
@@ -174,13 +174,13 @@ public class TaskService {
                 (long) (timeout.toSeconds() * applicationProperties.getTaskResetTimeoutMultiplier()));
         if (timeAfterPreviousRun.compareTo(acceptableDelayBeforeWarning) > 0) {
             log.warn("Task [{}] is idle for too long. Last execution was [{}] minutes ago with status message: [{}]",
-                    task.getId(), timeAfterPreviousRun.toMinutes(), task.getFailedStatusMessage());
+                    task.getId(), timeAfterPreviousRun.toMinutes(), task.getLastFailedRunMessage());
         }
         if (!READY.equals(task.getStatus()) && timeAfterPreviousRun.compareTo(acceptableDelayBeforeReset) > 0) {
             try {
                 log.info("Start [{}] task restore", task.getId());
                 task.setStatus(READY);
-                task.setFailedStatusMessage("Restored after long downtime");
+                task.setLastFailedRunMessage("Restored after long downtime");
                 taskRepository.save(task);
                 log.info("Task [{}] has been restored", task.getId());
             } catch (CosmosDBAccessException e) {
@@ -225,7 +225,7 @@ public class TaskService {
      * have to be saved to the database with updated {@link Task#getStatus()}.
      * </p>
      * In case task execution failed with an exception,
-     * {@link Task#getFailedStatusMessage()} is set to
+     * {@link Task#getLastFailedRunMessage()} is set to
      * {@link Exception#getMessage()} and new state saved into the database.
      *
      * @param task which should represent a lock object
@@ -246,6 +246,7 @@ public class TaskService {
         // acquire a lock
         OffsetDateTime startTime = OffsetDateTime.now();
         task.setStatus(RUNNING);
+        task.setInstanceId(applicationProperties.getInstanceId());
         if (task.getPreviousRun() == null){
             task.setPreviousRun(startTime);
         }
@@ -279,10 +280,12 @@ public class TaskService {
                 .whenComplete((result, exception) -> {
                     runningTask.setStatus(READY);
                     runningTask.setPreviousRun(startTime);
+                    runningTask.setPreviousRunSuccessfull(true);
                     if (exception != null) {
                         log.warn("Task [{}] finished its execution with an exception.",
                                 runningTask.getId(), exception);
-                        runningTask.setFailedStatusMessage(exception.getMessage());
+                        runningTask.setLastFailedRunMessage(exception.getMessage());
+                        runningTask.setPreviousRunSuccessfull(false);
                         taskRepository.save(runningTask);
                     } else if (result.isEmpty()) {
                         log.info("Task [{}] finished its execution with empty result.", runningTask.getId());

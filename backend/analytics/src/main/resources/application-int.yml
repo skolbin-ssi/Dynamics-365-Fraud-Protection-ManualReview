@@ -33,7 +33,7 @@ azure:
   cosmosdb:
     default-ttl: P1827D
   dfp:
-    purchase-status-event-url: https://${TENANT_SHORT_NAME}-${TENANT_ID}.api.dfp.dynamics-int.com/v1.0/merchantservices/events/PurchaseStatus
+    purchase-status-event-url: https://${CLIENT_TENANT_SHORT_NAME}-${CLIENT_TENANT_ID}.api.dfp.dynamics-int.com/v1.0/merchantservices/events/PurchaseStatus
   graph-api:
     role-assignments-url: https://graph.microsoft.com/v1.0/servicePrincipals/${DFP_SP_ID}/appRoleAssignedTo
     user-role-assignments-url-template: https://graph.microsoft.com/v1.0/users/#user_id#/appRoleAssignments?$filter=resourceId eq ${DFP_SP_ID}
@@ -41,6 +41,8 @@ azure:
     user-url-template: https://graph.microsoft.com/v1.0/users/#user_id#
     app-service-principal-url: https://graph.microsoft.com/v1.0/servicePrincipals/${DFP_SP_ID}
     user-photo-url-template: https://graph.microsoft.com/beta/users/#user_id#/photo/$value
+    timeout: PT5S
+    retries: 2
     role-mapping:
       ManualReviewFraudManager: ADMIN_MANAGER
       ManualReviewSeniorAnalyst: SENIOR_ANALYST
@@ -61,7 +63,7 @@ azure:
 
 swagger:
   # the https://cors-anywhere.herokuapp.com/ prefix is only for dev environments
-  token-url: https://cors-anywhere.herokuapp.com/https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+  token-url: https://cors-anywhere.herokuapp.com/https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/v2.0/token
 
 spring:
   security:
@@ -74,9 +76,9 @@ spring:
             scope: https://api.dfp.microsoft-int.com/.default
         provider:
           azure-graph-api:
-            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+            token-uri: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/v2.0/token
           azure-dfp-api:
-            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+            token-uri: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/v2.0/token
 
 resilience4j.retry:
   instances:

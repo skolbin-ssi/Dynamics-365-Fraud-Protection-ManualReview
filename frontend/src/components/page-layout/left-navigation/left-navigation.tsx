@@ -13,6 +13,7 @@ import {
     QUEUE_MANAGEMENT,
     ROUTES,
     USER_INFO_MANAGEMENT,
+    SEARCH_MANAGEMENT,
 } from '../../../constants';
 import { CurrentUserStore } from '../../../view-services';
 import { LeftNavLink, LeftNavLinkProps } from './left-nav-link';
@@ -52,11 +53,17 @@ export class LeftNavigation extends Component<LeftNavigationProps, never> {
             permission: QUEUE_MANAGEMENT.ACCESS
         },
         {
+            name: 'Search',
+            link: ROUTES.SEARCH_NEW,
+            icon: 'Search',
+            permission: SEARCH_MANAGEMENT.ACCESS
+        },
+        {
             name: 'Alerts',
             link: ROUTES.ALERT_SETTINGS,
             icon: 'AlertSettings',
             permission: ALERTS_MANAGEMENT.ACCESS
-        }
+        },
     ];
 
     toggleIsExpanded() {

@@ -13,7 +13,9 @@ export const TYPES = {
     SETTINGS_API_SERVICE: Symbol('settingsApiService'),
     ALERTS_API_SERVICE: Symbol('alertsApiService'),
     COLLECTED_INFO_API_SERVICE: Symbol('collectedInfoApiService'),
+    MAPS_TOKEN_API_SERVICE: Symbol('mapsTokenApiService'),
     OVERVIEW_API_SERVICE: Symbol('overviewApiService'),
+    SEARCH_API_SERVICE: Symbol('searchApiService'),
 
     /**
      * Data Services
@@ -26,6 +28,7 @@ export const TYPES = {
     ALERTS_SERVICE: Symbol('alertsService'),
     COLLECTED_INFO_SERVICE: Symbol('collectedInfoService'),
     OVERVIEW_SERVICE: Symbol('overviewApiService'),
+    SEARCH_SERVICE: Symbol('searchService'),
 
     /**
      * View Services (aka stores)
@@ -42,6 +45,8 @@ export const TYPES = {
     REVIEW_PERMISSION_STORE: Symbol('reviewPermissionStore'),
     ALERTS_STORE: Symbol('alertsStore'),
     ALERTS_MUTATION_STORE: Symbol('alertMutationStore'),
+    SEARCH_SCREEN_STORE: Symbol('searchScreenStore'),
+    FILTERS_STORE: Symbol('filtersStore'),
 
     // Dashboard stores
     DASHBOARD_DEMAND_SUPPLY_SCREEN_STORE: Symbol('dashboardDemandSupplyScreenStore'),
@@ -65,7 +70,8 @@ export const TYPES = {
     AUTHENTICATION: Symbol('Authentication'),
     USER_BUILDER: Symbol('userBuilder'),
     HISTORY: Symbol('History'),
-    AZURE_MAPS_SEARCH: Symbol('AzureMapsSearch'),
+    AZURE_MAPS_SERVICE: Symbol('AzureMapsService'),
     WINDOW_SIZE_STORE: Symbol('WindowSizeStore'),
     LOCAL_STORAGE_SERVICE: Symbol('LocalStorageService'),
+    FILTERS_BUILDER: Symbol('FiltersBuilder')
 };

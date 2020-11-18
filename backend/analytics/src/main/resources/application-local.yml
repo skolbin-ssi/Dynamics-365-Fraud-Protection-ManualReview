@@ -27,4 +27,4 @@ azure:
     # Use service principle to authenticate locally
     client-key: ${CLIENT_SECRET}
     client-id: ${CLIENT_ID}
-    tenant-id: ${TENANT_ID}
+    tenant-id: ${CLIENT_TENANT_ID}

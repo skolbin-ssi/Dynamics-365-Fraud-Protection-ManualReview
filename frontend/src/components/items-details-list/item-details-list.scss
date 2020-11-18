@@ -1,0 +1,181 @@
+@import "../../styles/variables";
+
+.items-details-list {
+  width: 100%;
+
+  &--with-row-cursor-pointer {
+    .ms-DetailsRow {
+      cursor: pointer;
+      color: $neutralSecondary;
+    }
+  }
+
+  .ms-DetailsHeader {
+    padding-top: 0 !important;
+  }
+
+  .ms-DetailsRow-fields {
+    height: 43px;
+  }
+
+  &__center-aligned {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__cell {
+    color: $neutralSecondary;
+  }
+
+  &__fully-aligned-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__fully-aligned-cell-header {
+    & > span > span > span {
+      text-align: center;
+      padding-left: 6px; // gutter width
+    }
+  }
+
+  &__fraud_score {
+    font-size: 16px;
+  }
+
+  &__order-id-cell {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__high-risk-colored {
+    color: $highRiskColor;
+  }
+
+  &__medium-risk-colored {
+    color: $mediumRiskColor;
+  }
+
+  &__low-risk-colored {
+    color: $lowRiskColor;
+  }
+
+  &__score-cell {
+    color: $neutralDark;
+    font-weight: 600;
+  }
+
+  &__awaiting-status {
+    color: $neutralTertiary;
+  }
+
+  &__good-status {
+    color: $goodColor;
+  }
+
+  &__bad-status {
+    color: $badColor;
+  }
+
+  &__escalated-status {
+    color: $escalateColor;
+  }
+
+  &__value-with-opacity {
+    color: $neutralSecondary;
+    font-size: 16px;
+    cursor: default;
+
+    &.translucent {
+      color: $neutralQuaternaryAlt;
+    }
+  }
+
+  &__queue-item-tags,
+  &__queue-item-notes {
+    cursor: pointer;
+
+    &.translucent {
+      cursor: default;
+    }
+  }
+
+  &__load_more_orders {
+    color: $neutralDark;
+    width: 100%;
+    padding: 12px 20px;
+    background: $neutralLight;
+    margin-top: 8px;
+    cursor: pointer;
+    border: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    span {
+      font-weight: 600;
+    }
+  }
+
+  &__queue,&__time-left {
+    display: flex;
+    align-items: center;
+  }
+
+  &__queues-dropdown {
+    height: 100%;
+    font-size: 12px;
+    color: $neutralSecondary;
+    padding: 0;
+
+    .ms-Button-label {
+      margin: 0;
+    }
+  }
+
+  &__contextual-menu-link {
+    width: 100%;
+    padding: 0 6px;
+    border: none;
+    line-height: 36px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 400;
+    color: $neutralDark;
+    background-color: transparent;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $neutralLighter;
+    }
+    &:focus {
+      outline: none;
+    }
+
+    &__content {
+      display: flex;
+      padding: 0 4px;
+    }
+
+    &__text {
+      flex-grow: 1;
+      margin-right: 25px;
+    }
+  }
+
+  &__time-left-text {
+    padding-left: 8px;
+    color: $neutralSecondary;
+
+    &--overdue-text {
+      padding-left: 8px;
+      color: $highRiskColor;
+    }
+  }
+}

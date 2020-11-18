@@ -59,6 +59,8 @@ export class ReviewConsoleScreenStore {
 
     @observable settings: Setting[] = [];
 
+    @observable isItemDetailsOpenedFromSearch: boolean = false;
+
     @computed get blockActionButtons(): boolean {
         return (!!this.queue && !this.queue.size)
             || !!this.loadingQueueDataError
@@ -153,7 +155,8 @@ export class ReviewConsoleScreenStore {
             } catch (e) {
                 this.itemUpdatingError = e;
                 this.appStore.showToast({
-                    type: NOTIFICATION_TYPE.LABEL_ADDED_ERROR,
+                    type: NOTIFICATION_TYPE.GENERIC_ERROR,
+                    message: 'The label was not applied. Probably, the current item has been unlocked.'
                 });
 
                 return;
@@ -171,7 +174,9 @@ export class ReviewConsoleScreenStore {
     }
 
     @action
-    async getQueueData(queueId: string) {
+    async getQueueData(queueId?: string) {
+        if (!queueId) return;
+
         this.loadingQueueData = true;
         try {
             this.queue = await this.queueService.getQueue(queueId);
@@ -234,7 +239,8 @@ export class ReviewConsoleScreenStore {
         } catch (e) {
             this.itemUpdatingError = e;
             this.appStore.showToast({
-                type: NOTIFICATION_TYPE.NOTE_ADDED_ERROR,
+                type: NOTIFICATION_TYPE.GENERIC_ERROR,
+                message: 'The note was not added. Probably, the current item has been unlocked.'
             });
         } finally {
             this.isNoteSubmitting = false;
@@ -285,7 +291,8 @@ export class ReviewConsoleScreenStore {
             } catch (e) {
                 this.itemUpdatingError = e;
                 this.appStore.showToast({
-                    type: NOTIFICATION_TYPE.TAGS_UPDATED_ERROR,
+                    type: NOTIFICATION_TYPE.GENERIC_ERROR,
+                    message: 'The item tags were not updated. Probably, the current item has been unlocked.'
                 });
 
                 return;
@@ -302,6 +309,11 @@ export class ReviewConsoleScreenStore {
         this.isInAddTagMode = false;
         this.tagToAdd = '';
         this.reviewItemTags = this.reviewItem?.tags || [];
+    }
+
+    @action
+    setIsItemDetailsOpenedFromSearch(value: boolean) {
+        this.isItemDetailsOpenedFromSearch = value;
     }
 
     @computed

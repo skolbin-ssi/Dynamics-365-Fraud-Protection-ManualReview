@@ -31,6 +31,9 @@
     "tenantId": {
       "type": "string"
     },
+    "clientTenantId": {
+      "type": "string"
+    },
     "keyVaultName": {
       "type": "string"
     },
@@ -106,7 +109,11 @@
       "type": "string",
       "defaultValue": ""
     },
-    "mapsGroupId": {
+    "mapAppId": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "mapSpId": {
       "type": "string",
       "defaultValue": ""
     },
@@ -126,7 +133,7 @@
     "dfpSpId": {
       "type": "string"
     },
-    "tenantShortName": {
+    "clientTenantShortName": {
       "type": "string"
     },
     "alertReceivers": {
@@ -343,7 +350,7 @@
             "value": "[parameters('mapAccountSku')]"
           },
           "principalId": {
-            "value": "[parameters('mapsGroupId')]"
+            "value": "[parameters('mapSpId')]"
           }
         }
       }
@@ -607,6 +614,9 @@
           "tenantId": {
             "value": "[parameters('tenantId')]"
           },
+          "clientTenantId": {
+            "value": "[parameters('clientTenantId')]"
+          },
           "appJavaOpts": {
             "value": "[variables('appJavaOpts')]"
           },
@@ -622,8 +632,8 @@
           "dfpSpId": {
             "value": "[parameters('dfpSpId')]"
           },
-          "tenantShortName": {
-            "value": "[parameters('tenantShortName')]"
+          "clientTenantShortName": {
+            "value": "[parameters('clientTenantShortName')]"
           },
           "keyVaultEndpoint": {
             "value": "[variables('keyVaultEndpoint')]"
@@ -636,6 +646,9 @@
           },
           "logWorkspaceName": {
             "value": "[variables('LogWorkspaceName')]"
+          },
+          "mapAppId": {
+            "value": "[parameters('mapAppId')]"
           }
         }
       }
@@ -703,6 +716,9 @@
           "tenantId": {
             "value": "[parameters('tenantId')]"
           },
+          "clientTenantId": {
+            "value": "[parameters('clientTenantId')]"
+          },
           "appJavaOpts": {
             "value": "[variables('appJavaOptsSecondary')]"
           },
@@ -718,8 +734,8 @@
           "dfpSpId": {
             "value": "[parameters('dfpSpId')]"
           },
-          "tenantShortName": {
-            "value": "[parameters('tenantShortName')]"
+          "clientTenantShortName": {
+            "value": "[parameters('clientTenantShortName')]"
           },
           "keyVaultEndpoint": {
             "value": "[variables('keyVaultEndpoint')]"
@@ -732,6 +748,9 @@
           },
           "logWorkspaceName": {
             "value": "[variables('LogWorkspaceSecondaryName')]"
+          },
+          "mapAppId": {
+            "value": "[parameters('mapAppId')]"
           }
         }
       }
@@ -799,6 +818,9 @@
           "tenantId": {
             "value": "[parameters('tenantId')]"
           },
+          "clientTenantId": {
+            "value": "[parameters('clientTenantId')]"
+          },
           "appJavaOpts": {
             "value": "[variables('appJavaOpts')]"
           },
@@ -814,8 +836,8 @@
           "dfpSpId": {
             "value": "[parameters('dfpSpId')]"
           },
-          "tenantShortName": {
-            "value": "[parameters('tenantShortName')]"
+          "clientTenantShortName": {
+            "value": "[parameters('clientTenantShortName')]"
           },
           "keyVaultEndpoint": {
             "value": "[variables('keyVaultEndpoint')]"
@@ -828,6 +850,9 @@
           },
           "logWorkspaceName": {
             "value": "[variables('LogWorkspaceName')]"
+          },
+          "mapAppId": {
+            "value": "[parameters('mapAppId')]"
           }
         }
       }
@@ -895,6 +920,9 @@
           "tenantId": {
             "value": "[parameters('tenantId')]"
           },
+          "clientTenantId": {
+            "value": "[parameters('clientTenantId')]"
+          },
           "appJavaOpts": {
             "value": "[variables('appJavaOptsSecondary')]"
           },
@@ -910,8 +938,8 @@
           "dfpSpId": {
             "value": "[parameters('dfpSpId')]"
           },
-          "tenantShortName": {
-            "value": "[parameters('tenantShortName')]"
+          "clientTenantShortName": {
+            "value": "[parameters('clientTenantShortName')]"
           },
           "keyVaultEndpoint": {
             "value": "[variables('keyVaultEndpoint')]"
@@ -924,6 +952,9 @@
           },
           "logWorkspaceName": {
             "value": "[variables('LogWorkspaceSecondaryName')]"
+          },
+          "mapAppId": {
+            "value": "[parameters('mapAppId')]"
           }
         }
       }
@@ -1201,7 +1232,7 @@
               "value": "[parameters('appClientId')]"
           },
           "tenantId":{
-              "value": "[parameters('tenantId')]"
+              "value": "[parameters('clientTenantId')]"
           },
           "mapClientId":{
               "value": "[reference('mapAccountTemplate').outputs.mapsAccountClientId.value]"

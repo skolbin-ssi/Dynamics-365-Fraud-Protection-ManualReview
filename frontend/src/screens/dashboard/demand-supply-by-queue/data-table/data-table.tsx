@@ -144,12 +144,12 @@ export class DataTable<T extends Item> extends React.Component<DataTableProps<T>
             headerClassName: cx(`${CN}__data-header-cell`, `${CN}__analysts-header-cell`),
             className: `${CN}__analysts-col`,
             onRender: (item: Item) => {
-                if (!item.reviewUser && !item.holdUser) { return null; }
+                if (!item.analyst) { return null; }
 
                 return (
                     <Facepile
                         personaSize={PersonaSize.size24}
-                        personas={item.reviewUserAsPersons}
+                        personas={item.analystAsPersons}
                         getPersonaProps={() => ({ hidePersonaDetails: true })}
                     />
                 );

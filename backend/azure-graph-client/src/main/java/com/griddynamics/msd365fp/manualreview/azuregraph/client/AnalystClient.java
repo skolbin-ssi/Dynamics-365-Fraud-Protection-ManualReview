@@ -131,6 +131,8 @@ public class AnalystClient {
                     .uri(properties.getUserPhotoUrlTemplate().replace(USER_ID_PLACEHOLDER, id))
                     .retrieve()
                     .bodyToMono(byte[].class)
+                    .timeout(properties.getTimeout())
+                    .retry(properties.getRetries() == null ? 0 : properties.getRetries())
                     .block();
         } catch (WebClientResponseException.NotFound e) {
             throw new EmptySourceException();
@@ -161,6 +163,8 @@ public class AnalystClient {
                 .uri(properties.getAppServicePrincipalUrl())
                 .retrieve()
                 .bodyToMono(ServicePrincipalDTO.class)
+                .timeout(properties.getTimeout())
+                .retry(properties.getRetries() == null ? 0 : properties.getRetries())
                 .block(Duration.of(1, ChronoUnit.MINUTES));
 
         return Stream.ofNullable(res);
@@ -173,6 +177,8 @@ public class AnalystClient {
                 .uri(properties.getUserUrlTemplate().replace(USER_ID_PLACEHOLDER, id))
                 .retrieve()
                 .bodyToMono(UserDTO.class)
+                .timeout(properties.getTimeout())
+                .retry(properties.getRetries() == null ? 0 : properties.getRetries())
                 .block();
     }
 
@@ -213,6 +219,8 @@ public class AnalystClient {
                     .uri(url)
                     .retrieve()
                     .bodyToMono(cls)
+                    .timeout(properties.getTimeout())
+                    .retry(properties.getRetries() == null ? 0 : properties.getRetries())
                     .block();
             url = null;
             if (response != null) {

@@ -77,24 +77,7 @@ export class ToastNotification extends Component<{}, never> {
                 this.setToastTimeout();
                 return TOASTS_FOR_ITEM_LABELS.get(notification.label)!;
             }
-            case NOTIFICATION_TYPE.LABEL_ADDED_ERROR: {
-                return {
-                    ...GENERAL_TOAST_SETTINGS.get(TOAST_TYPE.ERROR)!,
-                    message: 'The label was not applied. Probably, the current item has been unlocked.'
-                };
-            }
-            case NOTIFICATION_TYPE.TAGS_UPDATED_ERROR: {
-                return {
-                    ...GENERAL_TOAST_SETTINGS.get(TOAST_TYPE.ERROR)!,
-                    message: 'The item tags were not updated. Probably, the current item has been unlocked.'
-                };
-            }
-            case NOTIFICATION_TYPE.NOTE_ADDED_ERROR: {
-                return {
-                    ...GENERAL_TOAST_SETTINGS.get(TOAST_TYPE.ERROR)!,
-                    message: 'The note was not added. Probably, the current item has been unlocked.'
-                };
-            }
+
             case NOTIFICATION_TYPE.QUEUE_MUTATION_SUCCESS: {
                 this.setToastTimeout();
                 return {
@@ -111,6 +94,14 @@ export class ToastNotification extends Component<{}, never> {
                         .composeErrorMessageForQueueAction(notification.mutation, notification.queueName)
                 };
             }
+
+            case NOTIFICATION_TYPE.GENERIC_ERROR: {
+                return {
+                    ...GENERAL_TOAST_SETTINGS.get(TOAST_TYPE.ERROR)!,
+                    message: notification.message
+                };
+            }
+
             case NOTIFICATION_TYPE.CUSTOM:
             default: {
                 this.setToastTimeout(notification.dismissTimeout);

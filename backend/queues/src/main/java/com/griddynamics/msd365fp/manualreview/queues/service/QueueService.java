@@ -103,7 +103,7 @@ public class QueueService {
      */
     public List<String> reconcileQueueAssignments() throws BusyException {
         log.info("Starting reconciliation procedure for queue assignments.");
-        Set<String> users = new HashSet<>(userService.getActiveUserIds());
+        Set<String> users = new HashSet<>(userService.getActiveUserIds(Set.of(USER_ROLES_ALLOWED_FOR_QUEUE_PROCESSING)));
         Set<String> managers = new HashSet<>(userService.getActiveUserIds(Set.of(ADMIN_MANAGER_ROLE)));
         Collection<Queue> queues = PageProcessingUtility.getAllPages(
                 continuation -> queueRepository.getQueueList(

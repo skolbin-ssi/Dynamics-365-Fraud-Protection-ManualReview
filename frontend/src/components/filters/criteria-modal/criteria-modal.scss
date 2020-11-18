@@ -1,0 +1,51 @@
+@import "../../../styles/variables";
+
+.criteria-modal {
+  width: 570px;
+  padding: 20px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  &__title {
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  &__description {
+    font-size: 14px;
+    margin-bottom: 32px;
+  }
+
+  &__content {
+    margin-bottom: 30px;
+  }
+
+  &__filters-dropdown {
+    margin-bottom: 10px;
+  }
+
+  &__acceptable-criteria-dropdown {
+    width: 150px;
+  }
+
+  &__action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &-add-criteria {
+      margin-right: 8px;
+    }
+  }
+
+  &__context-menu {
+    width: 200px;
+    height: 40px;
+    color: $themeDark;
+  }
+}

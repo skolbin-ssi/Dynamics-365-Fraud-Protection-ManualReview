@@ -14,7 +14,7 @@ import {
     QueueToUpdate
 } from '../../models';
 import { TYPES } from '../../types';
-import { Logger, UserBuilder } from '../../utility-services';
+import { FiltersBuilder, Logger, UserBuilder } from '../../utility-services';
 import { PatchQueueRequest, PostQueueRequest } from '../api-services/queue-api-service/api-models';
 import { BaseDomainService } from '../base-domain-service';
 import {
@@ -36,6 +36,7 @@ import { QueuesOverview } from '../../models/queues';
 export class QueueServiceImpl extends BaseDomainService implements QueueService {
     constructor(
         @inject(TYPES.QUEUE_API_SERVICE) private readonly queueApiService: QueueApiService,
+        @inject(TYPES.FILTERS_BUILDER) private readonly filtersBuilder: FiltersBuilder,
         @inject(TYPES.DICTIONARY_API_SERVICE) private readonly dictionaryApiService: DictionaryApiService,
         @inject(TYPES.LOGGER) protected readonly logger: Logger,
         @inject(TYPES.USER_BUILDER) protected readonly userBuilder: UserBuilder
@@ -44,7 +45,7 @@ export class QueueServiceImpl extends BaseDomainService implements QueueService 
     }
 
     async getQueues(params: { viewType: QUEUE_VIEW_TYPE }): Promise<Queue[]> {
-        const dataTransformer = new GetQueuesTransformer(this.userBuilder);
+        const dataTransformer = new GetQueuesTransformer(this.userBuilder, this.filtersBuilder);
         let response;
 
         try {
@@ -67,7 +68,7 @@ export class QueueServiceImpl extends BaseDomainService implements QueueService 
     }
 
     async getQueue(id: string): Promise<Queue> {
-        const dataTransformer = new GetQueueTransformer(this.userBuilder);
+        const dataTransformer = new GetQueueTransformer(this.userBuilder, this.filtersBuilder);
         let response;
 
         try {
@@ -168,7 +169,7 @@ export class QueueServiceImpl extends BaseDomainService implements QueueService 
     }
 
     async createQueue(newQueue: NewQueue): Promise<Queue> {
-        const dataTransformer = new PostQueueTransformer(this.userBuilder);
+        const dataTransformer = new PostQueueTransformer(this.userBuilder, this.filtersBuilder);
         let response;
 
         const newQueueDto: PostQueueRequest = {
@@ -207,7 +208,7 @@ export class QueueServiceImpl extends BaseDomainService implements QueueService 
 
     async updateQueue(queueToUpdate: QueueToUpdate): Promise<Queue> {
         const { queueId, viewId } = queueToUpdate;
-        const dataTransformer = new PostQueueTransformer(this.userBuilder);
+        const dataTransformer = new PostQueueTransformer(this.userBuilder, this.filtersBuilder);
         let response;
 
         const queueToUpdateDto: PatchQueueRequest = {
@@ -274,7 +275,7 @@ export class QueueServiceImpl extends BaseDomainService implements QueueService 
     }
 
     async getQueuesOverview(timeToSla: string, timeToTimeout: string): Promise<QueuesOverview> {
-        const dataTransformer = new GetQueuesOverviewTransformer(this.userBuilder);
+        const dataTransformer = new GetQueuesOverviewTransformer(this.userBuilder, this.filtersBuilder);
         let response;
 
         try {

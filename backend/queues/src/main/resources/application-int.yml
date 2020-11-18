@@ -5,6 +5,16 @@ mr:
   instance-type: prim
   task-reset-timeout-multiplier: 4.0
   task-warning-timeout-multiplier: 2.0
+  cache:
+    traversal-purchase:
+      invalidation-interval: PT2M
+      max-size: 500
+    traversal-pi:
+      invalidation-interval: PT5M
+      max-size: 500
+    traversal-user:
+      invalidation-interval: PT1M
+      max-size: 200
   tasks:
     prim-health-analysis-task:
       enabled: true
@@ -37,6 +47,9 @@ mr:
       delay: PT1M
       timeout: PT5M
       enrichment-delay: PT30S
+      max-enrichment-delay: PT2M
+      max-enrichment-attempts: 10
+      history-depth: 10
     dictionary-reconciliation-task:
       enabled: true
       delay: PT1M
@@ -51,6 +64,8 @@ mr:
     ttl: PT10M
   search-query:
     ttl: P30D
+  email-domain:
+    ttl: P7D
 
 
 azure:
@@ -63,6 +78,8 @@ azure:
     user-url-template: https://graph.microsoft.com/v1.0/users/#user_id#
     app-service-principal-url: https://graph.microsoft.com/v1.0/servicePrincipals/${DFP_SP_ID}
     user-photo-url-template: https://graph.microsoft.com/beta/users/#user_id#/photo/$value
+    timeout: PT5S
+    retries: 2
     role-mapping:
       ManualReviewFraudManager: ADMIN_MANAGER
       ManualReviewSeniorAnalyst: SENIOR_ANALYST
@@ -71,7 +88,7 @@ azure:
       Sandbox_ManualReviewSeniorAnalyst: SENIOR_ANALYST
       Sandbox_ManualReviewAnalyst: ANALYST
   dfp:
-    graph-explorer-url: https://${TENANT_SHORT_NAME}-${TENANT_ID}.api.dfp.dynamics-int.com/knowledgegateway/customersupport/v1.0/explorer/traversal
+    graph-explorer-url: https://${CLIENT_TENANT_SHORT_NAME}-${CLIENT_TENANT_ID}.api.dfp.dynamics-int.com/knowledgegateway/customersupport/v1.0/explorer/traversal
     purchase-event-url: https://intz.api.dfp.dynamics-int.com/v1.0/merchantservices/events/Purchase
     bank-event-url: https://intz.api.dfp.dynamics-int.com/v1.0/merchantservices/events/BankEvent
   dfp-auth:
@@ -86,22 +103,26 @@ azure:
     health-check-allowed-delay: PT60M
 
 swagger:
-  auth-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/authorize?resource=${CLIENT_ID}
+  auth-url: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/authorize?resource=${CLIENT_ID}
 
 spring:
   security:
     oauth2:
       client:
         registration:
+          azure-maps-api:
+            scope: https://atlas.microsoft.com/.default
           azure-graph-api:
             scope: https://graph.microsoft.com/.default
           azure-dfp-api:
             scope: https://api.dfp.microsoft-int.com/.default
         provider:
+          azure-maps-api:
+            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
           azure-graph-api:
-            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+            token-uri: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/v2.0/token
           azure-dfp-api:
-            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+            token-uri: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/v2.0/token
 
 resilience4j.retry:
   instances:

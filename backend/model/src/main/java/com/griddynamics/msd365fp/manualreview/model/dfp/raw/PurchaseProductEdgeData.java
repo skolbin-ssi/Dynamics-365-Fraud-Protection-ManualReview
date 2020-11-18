@@ -19,6 +19,9 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class PurchaseProductEdgeData extends EdgeData {
+    public static final String EDGE_DIRECT_NAME = "PurchaseProduct";
+    public static final String EDGE_REVERSED_NAME = "ProductPurchase";
+
     private String purchaseId;
     private String productId;
     private Double purchasePrice;

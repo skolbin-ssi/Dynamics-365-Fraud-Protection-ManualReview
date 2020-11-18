@@ -54,6 +54,13 @@ This parameter modifies following configuration settings
 3. The appropriate spring profile will be configured for backend Java Web App
 
 ## Technical alert configuration
+
+Technical alerts are not related to business metric alerts inside application. Technical
+alerts are intended for troubleshooting and support. 
+
+**Warning!** Technical alerts can contain information from logs.
+
+### Alerts notificatioin email
 In order to configure health/availability alerts for the solution, add the following parameter with
 list of email addresses to properties file:
 ```
@@ -68,8 +75,27 @@ Alerts will be sent to this list of recepients.
 
 When this parameter is absent in the configuration file, technical alerts will be disabled.
 
-**WARNING!** Technical alerts are not related to business metric alerts inside application. Technical
-alerts are intended for troubleshooting and support. It can contain information from logs. 
+### Technical alerts parameters
+It is possible to tune alerts parameters, such as threshold, frequence, windowSize.
+The configuration should always be done by adding or changing corresponding values in properties
+file.
+
+The full list of available configuration parameters and allowed values can be found in
+*parameters* section of *main.json* template file.
+
+As an example, the following parameters could be provided to change defaults for 
+*NoIncomingEventsDfphub* alert:
+```
+"NoIncomingEventsDfphubEvaluationFrequency": {
+   "value": "PT1H"
+},
+"NoIncomingEventsDfphubThreshold": {
+   "value": 0
+},
+"NoIncomingEventsDfphubWindowSize": {
+   "value": "P1D"
+}
+```
 
 ## Custom domain configuration
 In order to provide custom domain as entry point to the solution, following steps should be 
@@ -107,14 +133,18 @@ Configuration files are available in the future in AppService.
 **WARNING!** Redeployment will override any manual changes in configuration files made at AppService.
 
 # Deploy application
-## Initial deployment
+## Single tenant deployment
+Single tenant deployment creates all objects (Azure AD applications, azure resources) in single tenant.
+It also use same tenant Active Directory to authenticate users, accessing the application.
+
+### Initial deployment (single tenant)
 When deploying the application for the first time, the mail account password should be provided (see step 2 on
 *Prerequisites*). Use the following command to initiate deployment with prompting for mail account password:
 ```
 pwsh deploy.ps1 -config main.parameters.<X>.json -setMailPassword
 ```
 Mail account password is stored in Azure Key Vault.
-## Redeployments
+### Redeployments (single tenants)
 If solution is already deployed, in order to apply changes, use the following command
 ```
 pwsh deploy.ps1 -config main.parameters.<X>.json
@@ -126,6 +156,68 @@ Note: it is possible to automate deployment and exclude prompting password by in
 from some powershell wrapper script, and provide mail account password as **secureString** type parameter
 **-mailSecurePassword** .
 
+## Two tenants deployment
+Two tenants deployment separates deployment of objects into two tenants: client and provider.
+Client tenant in this case used to create Azure AD application with necessary permissions, to install
+DFP application, and to authenticate users, accessing the application.
+Provider tenant is used to deploy all Azure resources required to implement the application.
+ 
+Two tenants deployment splitted into two phases. Phase one should be performed in client tenant, and phase
+two in provider tenant
+ 
+### Initial deployment (two tenants)
+ 
+#### Phase one (client side)
+During this phase Azure AD application and service principal will be created in the client tenant.
+Use the following command:
+```pwsh ./deploy_ad_app.ps1 -prefix <prefix> -envType <Dev|Prod> -tenantId <tenant_id>```
+At this phase one will be prompted for the azure active directory application secret. This secret should
+be shared with the provider in a secure manner. Also the output block starting from `Collect shared parameters`
+should be shared with the provider.
+ 
+#### Phase two (provider side)
+Before starting deployment on provider side, shared parameters from client (see previous step) should be
+added to environment configuration file main.parameters.<X>.json
+```json
+"clientTenantId": {
+  "value": ""
+},
+"clientTenantShortName": {
+  "value": ""
+},
+"appClientId": {
+  "value": ""
+},
+"appSpId": {
+  "value": ""
+},
+"dfpSpId": {
+  "value": ""
+}
+```
+When the environment configuration file is ready, run the following command to start the deployment:
+```
+pwsh ./deploy.ps1 -config main.parameters.<X>.json -setMailPassword -SetClientSecret -twoTenants
+```
+One will be prompted to enter the mail account password and azure application secret, which was shared
+with the client on phase one.
+ 
+### Redeployments (two tenants)
+ 
+#### Redeployment (two tenants, client side)
+Normally there is no reason to re-run deployment on the client side. It can happen when there is a requirement
+to update client application secret, application reply urls, or client application permissions.
+The redeployment can be run with the command
+```pwsh ./deploy_phase1.ps1 -prefix <prefix> -envType <Dev|Prod> -tenantId <tenant_id>```
+Be aware, that when client application is updated, it is not applied to service principal automatically. It
+might require to re-create service principal for the application.
+ 
+#### Redeployment (two tenants, provider side)
+If solution is already deployed, in order to apply changes, use the following command
+```
+pwsh deploy.ps1 -config main.parameters.<X>.json -twoTenants
+```
+
 ## Post-deployment actions
 Once you've installed the new environment from scratch you need to configure application for your needs.
 Please, find below the tuning description.
@@ -133,7 +225,7 @@ Please, find below the tuning description.
 ### Notification templates
 Analytics BE module uses notification templates that are stored in the related CosmosDB database called `AnalyticsDB`.
 The application creates default templates automatically if there are no other templates in the DB. 
-In order to change a desired template, you can find it in the `ConfigurableAppSetting` container and edit it as your wish.
+In order to change a desired template, you can find it in the `ConfigurableAppSettings` container and edit it as your wish.
 
 You can use any placeholder that mentioned in 
 [code](../backend/analytics/src/main/java/com/griddynamics/msd365fp/manualreview/analytics/config/Constants.java)
@@ -142,7 +234,7 @@ with the `MAIL_TAG_` prefix
 ### External tool links
 Queue BE module store templates of External Tool Links in the related Cosmos DB database `QueuesDB`.
 There are no default templates in the application code, so you need to define them manually. 
-For that, open the `ConfigurableAppSetting` container and put templates in the following format:
+For that, open the `ConfigurableAppSettings` container and put templates in the following format:
 ```json
 {
     "type": "review-console-links",

@@ -46,7 +46,7 @@ public class QueueCreationDTO {
     private QueueSortSettings sorting;
     @NotEmpty(message = "there should be at least one filter")
     @NotNull
-    private Set<@FieldConditionCombination ItemFilter> filters;
+    private Set<@FieldConditionCombination @Valid ItemFilter> filters;
     @Schema(type = "string", format = SWAGGER_DURATION_FORMAT, example = SWAGGER_DURATION_EXAMPLE)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Duration processingDeadline;

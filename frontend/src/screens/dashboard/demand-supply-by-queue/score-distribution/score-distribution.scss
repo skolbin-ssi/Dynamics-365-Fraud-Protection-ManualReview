@@ -1,0 +1,68 @@
+@import "../../../../styles/variables";
+
+.score-distribution {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__decision-pie-chart {
+    height: 350px;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  &__pie-chart {
+    height: 350px;
+  }
+
+  &__tooltip {
+    width: 200px;
+    display: flex;
+    padding: 5px;
+
+    &-bg {
+      width: 10px;
+      height: 10px;
+      margin-right: 15px;
+    }
+
+    &-text {
+      display: flex;
+    }
+  }
+
+  &__legends {
+    display: flex;
+    width: 200px;
+    justify-content: center;
+    flex-direction: column
+  }
+
+  &__legend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  &__legend-score-text {
+    display: flex;
+    align-items: center;
+  }
+
+  &__legend-color-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50px;
+    margin-right: 5px;
+  }
+
+  &__legend-count {
+    color: $neutralSecondary;
+  }
+
+  &__legend-values {
+    color: $neutralPrimary;
+  }
+
+}

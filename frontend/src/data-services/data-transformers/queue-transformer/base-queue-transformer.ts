@@ -2,13 +2,14 @@
 // Licensed under the MIT license.
 
 import { Queue, User } from '../../../models';
-import { UserBuilder } from '../../../utility-services';
+import { FiltersBuilder, UserBuilder } from '../../../utility-services';
 import { QueueViewDTO } from '../../api-services/models';
 import { BaseTransformer } from '../base-transformer';
 
 export class BaseQueueTransformer extends BaseTransformer {
     constructor(
-        private readonly userBuilder: UserBuilder
+        private readonly userBuilder: UserBuilder,
+        private readonly filtersBuilder: FiltersBuilder
     ) {
         super();
     }
@@ -16,6 +17,9 @@ export class BaseQueueTransformer extends BaseTransformer {
     protected mapSingleQueue(queue: QueueViewDTO): Queue {
         const queueModel = new Queue();
         const populatedModel = queueModel.fromDTO(queue);
+
+        const filters = this.filtersBuilder.getPopulatedFilterFields(queue.filters);
+        populatedModel.setFilters(filters);
 
         if (populatedModel.assignees && Array.isArray(populatedModel.assignees)) {
             const reviewUsers = populatedModel.assignees.reduce<User[]>((ru, reviewerId) => {

@@ -41,7 +41,32 @@
         },
         "exceptionsThresholdAlert": {
             "type": "int",
-            "defaultValue": 200
+            "defaultValue": 1
+        },
+        "exceptionsEvaluationFrequency": {
+            "type": "string",
+            "defaultValue": "PT1M",
+            "allowedValues": [
+                "PT1M",
+                "PT5M",
+                "PT15M",
+                "PT30M",
+                "PT1H"
+            ]
+        },
+        "exceptionsWindowSize": {
+            "type": "string",
+            "defaultValue": "PT5M",
+            "allowedValues": [
+                "PT1M",
+                "PT5M",
+                "PT15M",
+                "PT30M",
+                "PT1H",
+                "PT6H",
+                "PT12H",
+                "P1D"
+            ]
         },
         "backendAppList": {
             "type": "array"
@@ -111,7 +136,7 @@
         },
         "metricalertTraceWarnSeverityThreshold": {
             "type": "int",
-            "defaultValue": 100
+            "defaultValue": 1
         },
         "metricalertTraceErrorSeverityEvaluationFrequency": {
             "type": "string",
@@ -140,7 +165,7 @@
         },
         "metricalertTraceErrorSeverityThreshold": {
             "type": "int",
-            "defaultValue": 10
+            "defaultValue": 1
         }
     },
     "variables": {
@@ -239,7 +264,8 @@
             "name": "[variables('frontdoorsEntrypointWebtestName')]",
             "location": "global",
             "dependsOn": [
-                "[resourceId('microsoft.insights/webtests', variables('frontdoorsEntrypointWebtestName'))]"
+                "[resourceId('microsoft.insights/webtests', variables('frontdoorsEntrypointWebtestName'))]",
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
             ],
             "tags": {
                 "[concat('hidden-link:',resourceId('microsoft.insights/components/', parameters('appInsightName')))]": "Resource",
@@ -296,7 +322,8 @@
             "name": "[variables('frontdoorsEntrypointWebtestSecondaryName')]",
             "location": "global",
             "dependsOn": [
-                "[resourceId('microsoft.insights/webtests', variables('frontdoorsEntrypointWebtestSecondaryName'))]"
+                "[resourceId('microsoft.insights/webtests', variables('frontdoorsEntrypointWebtestSecondaryName'))]",
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
             ],
             "tags": {
                 "[concat('hidden-link:',resourceId('microsoft.insights/components/', parameters('appInsightSecondaryName')))]": "Resource",
@@ -330,7 +357,9 @@
             "apiVersion": "2018-03-01",
             "name": "[variables('fdBackendAlertName')]",
             "location": "global",
-            "dependsOn": [],
+            "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
+            ],
             "properties": {
                 "description": "Alert rule for Front Doors backends state",
                 "severity": 1,
@@ -377,7 +406,9 @@
             "apiVersion": "2018-03-01",
             "name": "[variables('metricalertExceptionsName')]",
             "location": "global",
-            "dependsOn": [],
+            "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
+            ],
             "properties": {
                 "description": "Alert rule for server exceptions in backend applications",
                 "severity": 1,
@@ -385,8 +416,8 @@
                 "scopes": [
                     "[resourceId('microsoft.insights/components', parameters('appInsightName'))]"
                 ],
-                "evaluationFrequency": "PT1M",
-                "windowSize": "PT5M",
+                "evaluationFrequency": "[parameters('exceptionsEvaluationFrequency')]",
+                "windowSize": "[parameters('exceptionsWindowSize')]",
                 "criteria": {
                     "allOf": [
                         {
@@ -424,7 +455,9 @@
             "apiVersion": "2018-03-01",
             "name": "[variables('metricalertExceptionsSecondaryName')]",
             "location": "global",
-            "dependsOn": [],
+            "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
+            ],
             "properties": {
                 "description": "Alert rule for server exceptions in backend applications",
                 "severity": 1,
@@ -432,8 +465,8 @@
                 "scopes": [
                     "[resourceId('microsoft.insights/components', parameters('appInsightSecondaryName'))]"
                 ],
-                "evaluationFrequency": "PT1M",
-                "windowSize": "PT5M",
+                "evaluationFrequency": "[parameters('exceptionsEvaluationFrequency')]",
+                "windowSize": "[parameters('exceptionsWindowSize')]",
                 "criteria": {
                     "allOf": [
                         {
@@ -471,7 +504,9 @@
             "apiVersion": "2018-04-16",
             "name": "[variables('scheduledqueryrulesTaskIdleTooLongName')]",
             "location": "[parameters('primaryRegion')]",
-            "dependsOn": [],
+            "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
+            ],
             "properties": {
                 "description": "Backend Java application task idle for too long time",
                 "enabled": "true",
@@ -511,7 +546,9 @@
             "apiVersion": "2018-04-16",
             "name": "[variables('scheduledqueryrulesTaskIdleTooLongSecondaryName')]",
             "location": "[parameters('secondaryRegion')]",
-            "dependsOn": [],
+            "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
+            ],
             "properties": {
                 "description": "Backend Java application task idle for too long time",
                 "enabled": "true",
@@ -551,7 +588,9 @@
             "apiVersion": "2018-03-01",
             "name": "[variables('metricalertNoIncomingEventsDfphubName')]",
             "location": "global",
-            "dependsOn": [],
+            "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
+            ],
             "properties": {
                 "description": "No incoming messages in dfp-hub for long period of time",
                 "severity": 3,
@@ -600,7 +639,9 @@
             "apiVersion": "2018-03-01",
             "name": "[variables('metricalertNoIncomingEventsDfphubSecondaryName')]",
             "location": "global",
-            "dependsOn": [],
+            "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
+            ],
             "properties": {
                 "description": "No incoming messages in dfp-hub for long period of time",
                 "severity": 3,
@@ -650,6 +691,7 @@
             "name": "[variables('metricalertTraceWarnSeverityName')]",
             "location": "global",
             "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
             ],
             "properties": {
                 "description": "Number of traces with WARN severity is high",
@@ -700,6 +742,7 @@
             "name": "[variables('metricalertTraceWarnSeveritySecondaryName')]",
             "location": "global",
             "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
             ],
             "properties": {
                 "description": "Number of traces with WARN severity is high",
@@ -750,6 +793,7 @@
             "name": "[variables('metricalertTraceErrorSeverityName')]",
             "location": "global",
             "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
             ],
             "properties": {
                 "description": "Number of traces with ERROR severity is high",
@@ -800,6 +844,7 @@
             "name": "[variables('metricalertTraceErrorSeveritySecondaryName')]",
             "location": "global",
             "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
             ],
             "properties": {
                 "description": "Number of traces with ERROR severity is high",
@@ -850,6 +895,7 @@
             "name": "[variables('scheduledqueryrulesFatalErrorName')]",
             "location": "[parameters('primaryRegion')]",
             "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
             ],
             "properties": {
                 "description": "Fatal error in backend application log",
@@ -885,6 +931,7 @@
             "name": "[variables('scheduledqueryrulesFatalErrorSecondaryName')]",
             "location": "[parameters('secondaryRegion')]",
             "dependsOn": [
+                "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
             ],
             "properties": {
                 "description": "Fatal error in backend application log",

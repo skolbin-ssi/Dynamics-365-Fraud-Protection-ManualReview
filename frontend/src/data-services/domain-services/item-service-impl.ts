@@ -5,7 +5,7 @@ import { inject, injectable } from 'inversify';
 import { DICTIONARY_TYPE, LABEL, SETTING_TYPE } from '../../constants';
 import { Item, Queue } from '../../models';
 import { TYPES } from '../../types';
-import { AzureMapsSearch, Logger, UserBuilder } from '../../utility-services';
+import { AzureMapsService, Logger, UserBuilder } from '../../utility-services';
 import { SettingDTO } from '../api-services/models';
 import { BaseDomainService } from '../base-domain-service';
 import { GetLockedItemsTransformer, GetReviewItemTransformer } from '../data-transformers';
@@ -28,7 +28,7 @@ export class ItemServiceImpl extends BaseDomainService implements ItemService {
         @inject(TYPES.USER_SERVICE) private readonly userService: UserService,
         @inject(TYPES.LOGGER) protected readonly logger: Logger,
         @inject(TYPES.USER_BUILDER) protected readonly userBuilder: UserBuilder,
-        @inject(TYPES.AZURE_MAPS_SEARCH) protected readonly azureMapsSearch: AzureMapsSearch,
+        @inject(TYPES.AZURE_MAPS_SERVICE) protected readonly azureMapsService: AzureMapsService,
         @inject(TYPES.DICTIONARY_API_SERVICE) private readonly dictionaryApiService: DictionaryApiService,
         @inject(TYPES.SETTINGS_API_SERVICE) private readonly settingsApiService: SettingsApiService
     ) {
@@ -43,7 +43,7 @@ export class ItemServiceImpl extends BaseDomainService implements ItemService {
     async getReviewItem(
         queueId: string
     ): Promise<Item | null> {
-        const dataTransformer = new GetReviewItemTransformer(this.userService, this.userBuilder, this.azureMapsSearch);
+        const dataTransformer = new GetReviewItemTransformer(this.userService, this.userBuilder, this.azureMapsService);
         let response;
 
         try {
@@ -79,7 +79,7 @@ export class ItemServiceImpl extends BaseDomainService implements ItemService {
         queueId: string,
         itemId: string
     ): Promise<Item | null> {
-        const dataTransformer = new GetReviewItemTransformer(this.userService, this.userBuilder, this.azureMapsSearch);
+        const dataTransformer = new GetReviewItemTransformer(this.userService, this.userBuilder, this.azureMapsService);
         let response;
 
         try {
@@ -122,12 +122,12 @@ export class ItemServiceImpl extends BaseDomainService implements ItemService {
         return reviewItem;
     }
 
-    async finishReview(itemId: string): Promise<Item | null> {
-        const dataTransformer = new GetReviewItemTransformer(this.userService, this.userBuilder, this.azureMapsSearch);
+    async finishReview(itemId: string, queueId?: string): Promise<Item | null> {
+        const dataTransformer = new GetReviewItemTransformer(this.userService, this.userBuilder, this.azureMapsService);
         let response;
 
         try {
-            response = await this.itemApiService.deleteItemLock(itemId);
+            response = await this.itemApiService.deleteItemLock(itemId, queueId);
         } catch (e) {
             throw this.handleApiException('deleteItemLock', e, {
                 500: `Failed to unlock queue item ${itemId}`
@@ -150,7 +150,7 @@ export class ItemServiceImpl extends BaseDomainService implements ItemService {
     }
 
     async getItem(itemId: string, queueId?: string): Promise<Item | null> {
-        const dataTransformer = new GetReviewItemTransformer(this.userService, this.userBuilder, this.azureMapsSearch);
+        const dataTransformer = new GetReviewItemTransformer(this.userService, this.userBuilder, this.azureMapsService);
 
         let response;
 
@@ -187,15 +187,17 @@ export class ItemServiceImpl extends BaseDomainService implements ItemService {
      * label item
      * @param itemId
      * @param label
+     * @param queueId
      */
     async labelItem(
         itemId: string,
-        label: LABEL
+        label: LABEL,
+        queueId?: string
     ) {
         let response;
 
         try {
-            response = await this.itemApiService.patchItemLabel(itemId, label);
+            response = await this.itemApiService.patchItemLabel(itemId, label, queueId);
         } catch (e) {
             throw this.handleApiException('labelItem', e, {
                 500: `Failed to apply label to an item ${itemId}`
@@ -216,10 +218,11 @@ export class ItemServiceImpl extends BaseDomainService implements ItemService {
 
     async putItemNote(
         itemId: string,
-        note: string
+        note: string,
+        queueId?: string
     ) {
         try {
-            return await this.itemApiService.putItemNote(itemId, note);
+            return await this.itemApiService.putItemNote(itemId, note, queueId);
         } catch (e) {
             throw this.handleApiException('putItemNote', e, {
                 500: `Failed to add note to an item ${itemId}`
@@ -229,10 +232,11 @@ export class ItemServiceImpl extends BaseDomainService implements ItemService {
 
     async patchItemTags(
         itemId: string,
-        tags: string[]
+        tags: string[],
+        queueId?: string,
     ) {
         try {
-            return await this.itemApiService.patchItemTag(itemId, tags);
+            return await this.itemApiService.patchItemTag(itemId, tags, queueId);
         } catch (e) {
             throw this.handleApiException('putItemTag', e, {
                 500: `Failed to add tag to an item ${itemId}`

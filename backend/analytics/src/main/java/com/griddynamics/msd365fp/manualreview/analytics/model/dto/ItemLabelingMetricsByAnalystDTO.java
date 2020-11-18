@@ -18,8 +18,6 @@ import java.util.Map;
 @AllArgsConstructor
 public class ItemLabelingMetricsByAnalystDTO {
     private String id;
-    @Deprecated
-    private String displayName; //TODO: delete
     private Map<OffsetDateTime, ItemLabelingMetricDTO> data;
     private ItemLabelingMetricDTO total;
 }

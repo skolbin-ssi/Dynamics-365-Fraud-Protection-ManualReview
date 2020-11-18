@@ -430,8 +430,8 @@ export class AlertEditForm extends Component<AlertEditFormProps, AlertEditFormSt
                                                 onEmptyResolveSuggestions={this.resolveEmptyQueuesSuggestions}
                                                 onChange={this.handleQueueSelected}
                                                 pickerSuggestionsProps={{
-                                                    suggestionsHeaderText: 'Suggested Queues',
-                                                    noResultsFoundText: 'No Queues found',
+                                                    suggestionsHeaderText: 'Suggested queues',
+                                                    noResultsFoundText: 'No queues found',
                                                     className: `${CN}__analysts-suggestion`
                                                 }}
                                                 inputProps={{
@@ -491,8 +491,8 @@ export class AlertEditForm extends Component<AlertEditFormProps, AlertEditFormSt
                                                 onEmptyResolveSuggestions={this.resolveEmptyAnalystSuggestions}
                                                 onChange={this.handleReviewerSelected}
                                                 pickerSuggestionsProps={{
-                                                    suggestionsHeaderText: 'Suggested Analysts',
-                                                    noResultsFoundText: 'No Analysts found',
+                                                    suggestionsHeaderText: 'Suggested analysts',
+                                                    noResultsFoundText: 'No analysts found',
                                                     className: `${CN}__analysts-suggestion`
                                                 }}
                                                 inputProps={{

@@ -1,6 +1,11 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
 mr:
   tasks:
-    fail-fast-healthcheck-task:
+    prim-health-analysis-task:
+      enabled: false
+    sec-health-analysis-task:
       enabled: false
     residual-queue-reconciliation-task:
       enabled: false
@@ -30,4 +35,4 @@ azure:
     enabled: true
     client-key: ${CLIENT_SECRET}
     client-id: ${CLIENT_ID}
-    tenant-id: ${TENANT_ID}
+    tenant-id: ${CLIENT_TENANT_ID}

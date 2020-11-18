@@ -5,10 +5,12 @@ package com.griddynamics.msd365fp.manualreview.queues.repository.impl;
 
 import com.azure.data.cosmos.CosmosItemProperties;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.ExtendedCosmosContainer;
+import com.griddynamics.msd365fp.manualreview.model.Label;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
 import com.griddynamics.msd365fp.manualreview.queues.model.*;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepositoryCustomMethods;
+import com.griddynamics.msd365fp.manualreview.queues.validation.FieldConditionCombination;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -152,12 +154,18 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
 
     @Override
     public PageableCollection<String> findUnenrichedItemIds(
-            final OffsetDateTime updatedUpperBoundary,
+            final OffsetDateTime importedUpperBoundary,
             final int size,
             final String continuationToken) {
         ExtendedCosmosContainer.Page res = itemsContainer.runCrossPartitionPageableQuery(
-                String.format("SELECT i.id FROM i WHERE IS_NULL(i.enriched) AND i._ts <= %s",
-                        updatedUpperBoundary.toEpochSecond()),
+                String.format("SELECT i.id FROM i WHERE IS_NULL(i.enriched) " +
+                                "AND (" +
+                                "   NOT IS_DEFINED(i.enrichmentFailed) " +
+                                "   OR IS_NULL(i.enrichmentFailed) " +
+                                "   OR NOT i.enrichmentFailed " +
+                                ") AND i.imported <= %s " +
+                                "ORDER BY i._ts",
+                        importedUpperBoundary.toEpochSecond()),
                 size,
                 continuationToken);
         List<String> queriedItems = res.getContent()
@@ -233,7 +241,6 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
                 .and().notEscalation()
                 .and().updatedAfter(enrichedSince)
                 .and().includeLocked(includeLocked)
-                .order(order)
                 .constructSelectExecutor(itemsContainer)
                 .execute(size, continuationToken);
     }
@@ -258,12 +265,12 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
 
     @Override
     public Set<String> findFilterSamples(
-            @NonNull final ItemDataField field,
+            @NonNull final ItemFilterField field,
             @Nullable final OffsetDateTime enrichedAfter) {
         return ItemQuery.constructor("i")
                 .filterFieldIsDefined(field)
                 .and().enrichedAfter(enrichedAfter)
-                .constructSampleExecutor(itemsContainer, field)
+                .constructSampleExecutor(itemsContainer, field.getItemDataField())
                 .execute();
     }
 
@@ -359,5 +366,39 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
                 .map(cip -> itemsContainer.castCosmosObjectToClassInstance(cip.toJson(), Bucket.class))
                 .filter(Optional::isPresent)
                 .map(Optional::get);
+    }
+
+    @Override
+    public PageableCollection<Item> searchForItems(
+            @Nullable Set<String> ids,
+            @Nullable Set<String> queueIds,
+            boolean residual,
+            @Nullable Boolean isActive,
+            @Nullable Set<@FieldConditionCombination ItemFilter> itemFilters,
+            @Nullable Set<String> lockOwnerIds,
+            @Nullable Set<String> holdOwnerIds,
+            @Nullable Set<Label> labels,
+            @Nullable Set<String> labelAuthorIds,
+            @NonNull ItemDataField sortingField,
+            @NonNull Sort.Direction sortingOrder,
+            @Nullable Set<String> tags,
+            final int size,
+            @Nullable final String continuationToken) {
+        return ItemQuery.constructor("i")
+                //JOIN
+                .collectionInCollectionField(ItemDataField.TAGS, tags)//no ".and" because here we use JOIN part, not WHERE one
+                //WHERE
+                .inField(ItemDataField.ID, ids)
+                .and().queueIds(queueIds, residual)
+                .and().active(isActive)
+                .and().all(itemFilters)
+                .and().inField(ItemDataField.LOCK_OWNER_ID, lockOwnerIds)
+                .and().inField(ItemDataField.HOLD_OWNER_ID, holdOwnerIds)
+                .and().label(labels)
+                .and().inField(ItemDataField.LABEL_AUTHOR_ID, labelAuthorIds)
+                //ORDER BY
+                .order(new Sort.Order(sortingOrder, sortingField.getPath()))
+                .constructSelectExecutor(itemsContainer)
+                .execute(size, continuationToken);
     }
 }

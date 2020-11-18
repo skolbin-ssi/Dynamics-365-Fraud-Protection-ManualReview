@@ -2,13 +2,14 @@
 // Licensed under the MIT license.
 
 import { inject } from 'inversify';
+
 import { SETTING_TYPE } from '../../../constants';
 import { TYPES } from '../../../types';
 import { AuthenticationService } from '../../../utility-services';
 import { Configuration } from '../../../utility-services/configuration';
 import { BaseApiService } from '../../base-api-service';
 import { SettingsApiService } from '../../interfaces';
-import { GetSettingValuesResponse } from './api-models/get-setting-values-response';
+import { GetStaticFilterFieldsResponse, GetSettingValuesResponse } from './api-models';
 
 export class SettingsApiServiceImpl extends BaseApiService implements SettingsApiService {
     /**
@@ -34,5 +35,9 @@ export class SettingsApiServiceImpl extends BaseApiService implements SettingsAp
 
     getSettingValues(type: SETTING_TYPE) {
         return this.get<GetSettingValuesResponse>(`/${type}`);
+    }
+
+    getStaticFilterFields() {
+        return this.get<GetStaticFilterFieldsResponse>('/static/filter-fields');
     }
 }

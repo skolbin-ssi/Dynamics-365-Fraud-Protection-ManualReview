@@ -2,9 +2,9 @@
 // Licensed under the MIT license.
 
 import { LABEL, QUEUE_VIEW_TYPE } from '../../../constants';
-import { ItemFilterDTO } from './item-filter-dto';
 import { QueueSortingSettingsDTO } from './queue-sorting-settings-dto';
 import { QueueViewByTypeDto } from './queue-view-by-type-dto';
+import { FilterConditionDto } from './settings/filter-condition-dto';
 
 /**
  * QueueDTO model from API
@@ -20,7 +20,7 @@ export interface QueueViewDTO {
     reviewers: string[];
     supervisors: string[];
     sorting: QueueSortingSettingsDTO;
-    filters: ItemFilterDTO[];
+    filters: FilterConditionDto[];
 
     /**
      * string($PnDTnHnMn.nS)

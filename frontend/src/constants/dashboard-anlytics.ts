@@ -246,3 +246,82 @@ export const OVERTURN_LABELS_TO_OVERTURN_CHART_KEYS_COLORS = new Map<OVERTURN_LA
         }
     ]
 ]);
+
+/**
+ * __ CONSTANTS FOR CHART "RISK SCORE DISTRIBUTION" ON THE QUEUE PERFORMANCE PAGE __
+ */
+
+/**
+ * Describes all possible bucket groups
+ */
+export const BUCKETS_RANGE = [
+    '0 - 99', '100 - 199', '200 - 299', '300 - 399', '400 - 499',
+    '500 - 599', '600 - 699', '700 - 799', '800 - 899', '900 - 1000'
+];
+
+/**
+ * Number of buckets
+ */
+export const BUCKET_COUNT = 10;
+
+export enum QUEUE_RISK_SCORE_KEYS {
+    GOOD = 'GOOD',
+    BAD = 'BAD',
+    WATCHED = 'WATCHED',
+    SCORE_DISTRIBUTION_RANGE = 'SCORE_DISTRIBUTION_RANGE'
+}
+
+export enum QUEUE_RISK_SCORE_DATUM_KEYS {
+    good = 'good',
+    watched = 'watched',
+    bad = 'bad',
+    scoreDistributionRange = 'scoreDistributionRange'
+}
+
+export const QUEUE_RISK_SCORE_CHART_DATUM_KEYS = {
+    [QUEUE_RISK_SCORE_KEYS.GOOD]: QUEUE_RISK_SCORE_DATUM_KEYS.good,
+    [QUEUE_RISK_SCORE_KEYS.BAD]: QUEUE_RISK_SCORE_DATUM_KEYS.bad,
+    [QUEUE_RISK_SCORE_KEYS.WATCHED]: QUEUE_RISK_SCORE_DATUM_KEYS.watched,
+    [QUEUE_RISK_SCORE_KEYS.SCORE_DISTRIBUTION_RANGE]: QUEUE_RISK_SCORE_DATUM_KEYS.scoreDistributionRange
+};
+
+export const QUEUE_RISK_SCORE_DISPLAY_CHART_KEYS_MAP = {
+    [QUEUE_RISK_SCORE_KEYS.GOOD]: {
+        label: 'Good',
+        color: COLORS.queueRiskScoreDistributionChart.goodLight,
+    },
+    [QUEUE_RISK_SCORE_KEYS.WATCHED]: {
+        label: 'Watch',
+        color: COLORS.queueRiskScoreDistributionChart.watched,
+    },
+    [QUEUE_RISK_SCORE_KEYS.BAD]: {
+        label: 'Bad',
+        color: COLORS.queueRiskScoreDistributionChart.badLight,
+    },
+};
+
+export const DATUM_KEYS_TO_CHART_KEYS = {
+    good: QUEUE_RISK_SCORE_KEYS.GOOD,
+    bad: QUEUE_RISK_SCORE_KEYS.BAD,
+    watched: QUEUE_RISK_SCORE_KEYS.WATCHED
+};
+
+export const QUEUE_RISK_SCORE_LABELS_TO_RISK_SCORE_KEYS_COLORS = new Map<QUEUE_RISK_SCORE_KEYS, { color: string, key: QUEUE_RISK_SCORE_DATUM_KEYS}>([
+    [
+        QUEUE_RISK_SCORE_KEYS.GOOD, {
+            color: COLORS.queueRiskScoreDistributionChart.goodLight,
+            key: QUEUE_RISK_SCORE_DATUM_KEYS.good
+        }
+    ],
+    [
+        QUEUE_RISK_SCORE_KEYS.WATCHED, {
+            color: COLORS.queueRiskScoreDistributionChart.watched,
+            key: QUEUE_RISK_SCORE_DATUM_KEYS.watched
+        }
+    ], [
+        QUEUE_RISK_SCORE_KEYS.BAD, {
+            color: COLORS.queueRiskScoreDistributionChart.badLight,
+            key: QUEUE_RISK_SCORE_DATUM_KEYS.bad
+        }
+    ]
+]);

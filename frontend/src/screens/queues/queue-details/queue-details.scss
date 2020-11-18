@@ -3,24 +3,10 @@
 .queue-details {
     width: 100%;
 
-    &--with-row-cursor-pointer {
-        .ms-DetailsRow {
-            cursor: pointer;
-        }
-    }
-
     &__common-wrapper {
         display: flex;
         flex-direction: column;
         min-height: 100%;
-    }
-
-    .ms-DetailsHeader {
-        padding-top: 0 !important;
-    }
-
-    .ms-DetailsRow-fields {
-        height: 43px;
     }
 
     &__center-aligned {
@@ -30,107 +16,5 @@
         display: flex;
         justify-content: center;
         align-items: center;
-    }
-
-    &__vertically-aligned-cell {
-        color: $neutralSecondary;
-        display: flex;
-        align-items: center;
-    }
-
-    &__fully-aligned-cell {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    &__fully-aligned-cell-header {
-        & > span > span > span {
-            text-align: center;
-            padding-left: 6px; // gutter width
-        }
-    }
-
-    &__fraud_score {
-        font-size: 16px;
-    }
-
-    &__order-id-cell {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    &__high-risk-colored {
-        color: $highRiskColor;
-    }
-
-    &__medium-risk-colored {
-        color: $mediumRiskColor;
-    }
-
-    &__low-risk-colored {
-        color: $lowRiskColor;
-    }
-
-    &__score-cell {
-        color: $neutralDark;
-        // font-size: 1.3em;
-        font-weight: 600;
-    }
-
-    &__grayed-out-value {
-        color: $neutralTertiaryAlt;
-    }
-
-    &__value-with-opacity {
-        color: $neutralSecondary;
-        font-size: 16px;
-        cursor: default;
-
-        &.translucent {
-            color: $neutralLight;
-        }
-    }
-
-    &__queue-item-tags,
-    &__queue-item-notes {
-        cursor: pointer;
-
-        &.translucent {
-            cursor: default;
-        }
-    }
-
-    &__load_more_orders {
-        color: $neutralDark;
-        width: 100%;
-        padding: 12px 20px;
-        background: $neutralLight;
-        margin-top: 8px;
-        cursor: pointer;
-        border: none;
-
-        &:focus {
-            outline: none;
-        }
-
-        span {
-            font-weight: 600;
-        }
-    }
-
-    &__time-left {
-        display: flex;
-        align-items: center;
-    }
-
-    &__time-left-text {
-        padding-left: 8px;
-        color: $neutralSecondary;
-
-        &--overdue-text {
-            padding-left: 8px;
-            color: $highRiskColor;
-        }
     }
 }

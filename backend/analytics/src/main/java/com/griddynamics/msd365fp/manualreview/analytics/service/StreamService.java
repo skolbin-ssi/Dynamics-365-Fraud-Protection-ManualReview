@@ -3,14 +3,15 @@
 
 package com.griddynamics.msd365fp.manualreview.analytics.service;
 
+import com.griddynamics.msd365fp.manualreview.analytics.config.properties.ApplicationProperties;
 import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.*;
 import com.griddynamics.msd365fp.manualreview.analytics.repository.*;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.model.DurableEventHubProcessorClientRegistry;
-import com.griddynamics.msd365fp.manualreview.ehub.durable.model.DurableEventHubProducerClientRegistry;
-import com.griddynamics.msd365fp.manualreview.ehub.durable.streaming.DurableEventHubProcessorClient;
-import com.griddynamics.msd365fp.manualreview.ehub.durable.streaming.DurableEventHubProducerClient;
+import com.griddynamics.msd365fp.manualreview.ehub.durable.model.HealthCheckProcessor;
 import com.griddynamics.msd365fp.manualreview.model.event.internal.*;
 import com.griddynamics.msd365fp.manualreview.model.event.type.ItemPlacementType;
+import com.microsoft.azure.spring.data.cosmosdb.exception.CosmosDBAccessException;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,13 +23,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
 
 import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.OVERALL_PLACEMENT_ID;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StreamService {
+public class StreamService implements HealthCheckProcessor {
+
+    public static final String EVENT_HUB_CONSUMER = "event-hub-consumer";
+    public static final String EH_HEALTH_CHECK_PREFIX = "EH";
 
     private final ResolutionRepository resolutionRepository;
     private final ItemLockActivityRepository lockActivitiesRepository;
@@ -36,26 +43,92 @@ public class StreamService {
     private final QueueSizeCalculationActivityRepository queueSizeCalculationActivityRepository;
     private final ItemLabelActivityRepository itemLabelActivityRepository;
     private final ItemPlacementActivityRepository itemPlacementActivityRepository;
+    private final HealthCheckRepository healthCheckRepository;
+    private final ApplicationProperties applicationProperties;
 
     private final ModelMapper modelMapper;
     @Setter(onMethod = @__({@Autowired}))
-    private DurableEventHubProducerClientRegistry producerRegistry;
-    @Setter(onMethod = @__({@Autowired}))
     private DurableEventHubProcessorClientRegistry processorRegistry;
+    @Setter(onMethod = @__({@Autowired}))
+    private StreamService thisService;
 
     @Value("${azure.cosmosdb.default-ttl}")
     private Duration defaultTtl;
+    @Value("${azure.event-hub.health-check-ttl}")
+    private Duration healthCheckTtl;
+    @Value("${azure.event-hub.health-check-allowed-delay}")
+    private Duration healthCheckAllowedDelay;
+    @Value("${azure.event-hub.health-check-batch-size}")
+    private long healthCheckBatchSize;
+
+    private final String healthCheckId = UUID.randomUUID().toString();
+    private long healthCheckNum = 0;
+
+    @Override
+    public void processConsumerHealthCheck(final String hubName, final String partition, final String checkId) {
+        try {
+            thisService.saveReceivedHealthCheck(hubName, partition, checkId);
+        } catch (Exception e) {
+            log.warn("Health-check [{}] for [{}] has been received on partition [{}] but can't be saved to DB due to:",
+                    checkId, hubName, partition, e);
+        }
+    }
+
+    @Retry(name = "cosmosOptimisticUpdate")
+    protected void saveReceivedHealthCheck(final String hubName, final String partition, final String checkId) {
+        HealthCheck healthCheck = healthCheckRepository.findById(checkId).orElseGet(() ->
+                HealthCheck.builder()
+                        .id(checkId)
+                        .type(EVENT_HUB_CONSUMER)
+                        .receivedBy(applicationProperties.getInstanceId())
+                        .ttl(healthCheckTtl.toSeconds())
+                        .build());
+        healthCheck.setActive(false);
+        healthCheck.setDetails("partition:" + partition);
+        healthCheck.setResult(true);
+        healthCheckRepository.save(healthCheck);
+    }
 
     public boolean checkStreamingHealth() {
-        long failures = 0;
-        failures += processorRegistry.values().stream()
-                .filter(DurableEventHubProcessorClient::requireRestart)
-                .count();
-        failures += producerRegistry.values().stream()
-                .filter(DurableEventHubProducerClient::requireRestart)
-                .count();
-        log.debug("Streaming healthcheck has discovered [{}] failures", failures);
-        return failures < 1;
+        List<HealthCheck> overdueHealthChecks = healthCheckRepository.findAllByTypeAndActiveIsTrueAndCreatedLessThan(
+                EVENT_HUB_CONSUMER,
+                OffsetDateTime.now().minus(healthCheckAllowedDelay).toEpochSecond());
+        if (!overdueHealthChecks.isEmpty()) {
+            log.error("Negative Event Hub health-check have been discovered:{}", overdueHealthChecks);
+        }
+        overdueHealthChecks.forEach(hc -> {
+            hc.setResult(false);
+            hc.setActive(false);
+            healthCheckRepository.save(hc);
+        });
+
+        processorRegistry.forEach((hub, client) -> {
+            for (int i = 0; i < healthCheckBatchSize; i++) {
+                HealthCheck healthCheck = HealthCheck.builder()
+                        .id(String.join("-",
+                                EH_HEALTH_CHECK_PREFIX,
+                                applicationProperties.getInstanceType(),
+                                hub,
+                                String.valueOf(healthCheckNum),
+                                healthCheckId))
+                        .type(EVENT_HUB_CONSUMER)
+                        .generatedBy(applicationProperties.getInstanceId())
+                        .active(true)
+                        .created(OffsetDateTime.now())
+                        .ttl(healthCheckTtl.toSeconds())
+                        ._etag("new")
+                        .build();
+                client.sendHealthCheckPing(healthCheck.getId(), () -> {
+                    try {
+                        healthCheckRepository.save(healthCheck);
+                    } catch (CosmosDBAccessException e) {
+                        log.debug("Receiver already inserted this [{}] health-check entry", healthCheck.getId());
+                    }
+                });
+                healthCheckNum++;
+            }
+        });
+        return overdueHealthChecks.isEmpty();
     }
 
     public void processItemLockEvent(ItemLockEvent event) {
@@ -201,7 +274,15 @@ public class StreamService {
             log.error("QueueUpdate event is configured incorrectly. Event has null queueId. [{}]", event);
             return;
         }
-        CollectedQueueInfoEntity infoEntity = modelMapper.map(event, CollectedQueueInfoEntity.class);
+        CollectedQueueInfoEntity infoEntity = collectedQueueInfoRepository.findById(event.getId())
+                .orElseGet(CollectedQueueInfoEntity::new);
+        if (event.getReviewers() != null) {
+            infoEntity.getAllTimeReviewers().addAll(event.getReviewers());
+        }
+        if (event.getSupervisors() != null) {
+            infoEntity.getAllTimeSupervisors().addAll(event.getSupervisors());
+        }
+        modelMapper.map(event, infoEntity);
         infoEntity.setTtl(defaultTtl.toSeconds());
         collectedQueueInfoRepository.save(modelMapper.map(event, CollectedQueueInfoEntity.class));
     }

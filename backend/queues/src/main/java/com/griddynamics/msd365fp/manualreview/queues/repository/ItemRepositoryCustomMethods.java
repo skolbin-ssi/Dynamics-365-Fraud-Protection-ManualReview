@@ -3,12 +3,11 @@
 
 package com.griddynamics.msd365fp.manualreview.queues.repository;
 
+import com.griddynamics.msd365fp.manualreview.model.Label;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
-import com.griddynamics.msd365fp.manualreview.queues.model.ItemDataField;
-import com.griddynamics.msd365fp.manualreview.queues.model.ItemFilter;
-import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewType;
-import com.griddynamics.msd365fp.manualreview.queues.model.Bucket;
+import com.griddynamics.msd365fp.manualreview.queues.model.*;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
+import com.griddynamics.msd365fp.manualreview.queues.validation.FieldConditionCombination;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -56,7 +55,7 @@ public interface ItemRepositoryCustomMethods {
             final String continuationToken);
 
     PageableCollection<String> findUnenrichedItemIds(
-            final OffsetDateTime updatedUpperBoundary,
+            final OffsetDateTime importedUpperBoundary,
             final int size,
             final String continuationToken);
 
@@ -109,9 +108,25 @@ public interface ItemRepositoryCustomMethods {
             String continuationToken);
 
     Set<String> findFilterSamples(
-            @NonNull final ItemDataField field,
+            @NonNull final ItemFilterField field,
             @Nullable final OffsetDateTime enrichedAfter);
 
     Stream<Bucket> getRiskScoreDistribution(int bucketSize,
                                             String queueId);
+
+    PageableCollection<Item> searchForItems(
+            @Nullable Set<String> ids,
+            @Nullable Set<String> queueIds,
+            boolean residual,
+            @Nullable Boolean isActive,
+            @Nullable Set<@FieldConditionCombination ItemFilter> itemFilters,
+            @Nullable Set<String> lockOwnerIds,
+            @Nullable Set<String> holdOwnerIds,
+            @Nullable Set<Label> labels,
+            @Nullable Set<String> labelAuthorIds,
+            @NonNull ItemDataField sortingField,
+            @NonNull Sort.Direction sortingOrder,
+            @Nullable Set<String> tags,
+            int size,
+            @Nullable String continuationToken);
 }

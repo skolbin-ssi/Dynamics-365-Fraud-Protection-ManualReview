@@ -58,7 +58,7 @@ public class PublicItemService {
         if (queueId != null) {
             queueView = publicQueueClient.getActiveQueueView(queueId);
         }
-        Item item = publicItemClient.getActiveItem(itemId, queueView);
+        Item item = publicItemClient.getItem(itemId, queueView, null);
         return modelMapper.map(item, ItemDTO.class);
     }
 
@@ -120,7 +120,7 @@ public class PublicItemService {
         }
 
         // Get the item and check item-related conditions
-        Item item = publicItemClient.getActiveItem(itemId, queueView);
+        Item item = publicItemClient.getItem(itemId, queueView, true);
         if (item.getLock() != null &&
                 item.getLock().getOwnerId() != null &&
                 !actor.equals(item.getLock().getOwnerId())) {
@@ -167,32 +167,54 @@ public class PublicItemService {
     }
 
     @Retry(name = "cosmosOptimisticUpdate")
-    public ItemDTO unlockItem(final String itemId) throws NotFoundException, IncorrectConditionException {
+    public ItemDTO unlockItem(final String itemId, final String queueId) throws NotFoundException, IncorrectConditionException {
         log.info("Trying to unlock item [{}].", itemId);
-        Item item = publicItemClient.getActiveItem(itemId, null);
+
+        QueueView queueView = null;
+        if (queueId != null) {
+            queueView = publicQueueClient.getActiveQueueView(queueId);
+        }
+        Item item = publicItemClient.getItem(itemId, queueView, true);
         if (item.getLock() == null || item.getLock().getOwnerId() == null) {
-            throw new IncorrectConditionException("Item isn't locked");
+            throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED);
+        }
+        if (queueView != null && !queueView.getViewId().equals(item.getLock().getQueueViewId())){
+            throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED_IN_QUEUE);
         }
         Item oldItem = SerializationUtils.clone(item);
+
         item.unlock();
+
         publicItemClient.updateItem(item, oldItem);
         streamService.sendItemLockEvent(item, oldItem.getLock(), LockActionType.MANUAL_RELEASE);
         return modelMapper.map(item, ItemDTO.class);
     }
 
     @Retry(name = "cosmosOptimisticUpdate")
-    public void labelItem(final String id, final LabelDTO labelAssignment)
+    public void labelItem(final String id, final String queueId, final LabelDTO labelAssignment)
             throws IncorrectConditionException, NotFoundException {
         // Get the actor
         String actor = UserPrincipalUtility.getUserId();
         log.info("User [{}] is trying to label item [{}] with label [{}].", actor, id, labelAssignment);
 
         // Get the item
-        Item item = publicItemClient.getActiveItem(id, null);
+        QueueView queueView = null;
+        if (queueId != null) {
+            queueView = publicQueueClient.getActiveQueueView(queueId);
+        }
+        Item item = publicItemClient.getItem(id, queueView, true);
+        if (item.getLock() == null || item.getLock().getOwnerId() == null) {
+            throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED);
+        }
+        if (queueView != null && !queueView.getViewId().equals(item.getLock().getQueueViewId())){
+            throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED_IN_QUEUE);
+        }
+        if (queueView == null){
+            queueView = publicQueueClient.getActiveQueueView(item.getLock().getQueueViewId());
+        }
         Item oldItem = SerializationUtils.clone(item);
 
         // Get queue and check queue-related conditions
-        QueueView queueView = publicQueueClient.getActiveQueueView(item.getLock().getQueueViewId());
         if (!queueView.getAllowedLabels().contains(labelAssignment.getLabel())) {
             log.warn("User [{}] attempted to label an item [{}] with the disabled label [{}].",
 
@@ -233,9 +255,19 @@ public class PublicItemService {
     }
 
     @Retry(name = "cosmosOptimisticUpdate")
-    public void commentItem(final String id, final NoteDTO noteAssignment) throws NotFoundException {
+    public void commentItem(final String id, final String queueId, final NoteDTO noteAssignment) throws NotFoundException, IncorrectConditionException {
         // Get the item
-        Item item = publicItemClient.getActiveItem(id, null);
+        QueueView queueView = null;
+        if (queueId != null) {
+            queueView = publicQueueClient.getActiveQueueView(queueId);
+        }
+        Item item = publicItemClient.getItem(id, queueView, true);
+        if (item.getLock() == null || item.getLock().getOwnerId() == null) {
+            throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED);
+        }
+        if (queueView != null  && !queueView.getViewId().equals(item.getLock().getQueueViewId())){
+            throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED_IN_QUEUE);
+        }
         Item oldItem = SerializationUtils.clone(item);
 
         // Add the comment
@@ -248,9 +280,19 @@ public class PublicItemService {
     }
 
     @Retry(name = "cosmosOptimisticUpdate")
-    public void tagItem(final String id, final TagDTO tagAssignment) throws NotFoundException {
+    public void tagItem(final String id, final String queueId, final TagDTO tagAssignment) throws NotFoundException, IncorrectConditionException {
         // Get the item
-        Item item = publicItemClient.getActiveItem(id, null);
+        QueueView queueView = null;
+        if (queueId != null) {
+            queueView = publicQueueClient.getActiveQueueView(queueId);
+        }
+        Item item = publicItemClient.getItem(id, queueView, true);
+        if (item.getLock() == null || item.getLock().getOwnerId() == null) {
+            throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED);
+        }
+        if (queueView != null && !queueView.getViewId().equals(item.getLock().getQueueViewId())){
+            throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED_IN_QUEUE);
+        }
         Item oldItem = SerializationUtils.clone(item);
 
         // Change tags

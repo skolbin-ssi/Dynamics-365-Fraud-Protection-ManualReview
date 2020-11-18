@@ -20,6 +20,8 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class DeviceContextNodeData extends NodeData {
+    public static final String NODE_NAME = "DeviceContext";
+
     private String deviceContextId;
     private String provider;
     private String deviceContextDC;

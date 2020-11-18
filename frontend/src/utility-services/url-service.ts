@@ -23,6 +23,8 @@ interface ReadSearchQueryFields extends ParsedQuery {
     overturnedAggregation?: string;
     from?: string;
     to?: string;
+    sortingField?: string,
+    sortingOrder?: string
 }
 
 /**
@@ -110,6 +112,22 @@ export function readUrlSearchQueryOptions(search: string, fields: BooleanReadSea
         }
     }
 
+    if (fields.sortingField) {
+        const parsedQuery = queryString
+            .parse(search) as ReadSearchQueryFields;
+        if (parsedQuery.sortingField) {
+            searchQueryFields.sortingField = parsedQuery.sortingField;
+        }
+    }
+
+    if (fields.sortingOrder) {
+        const parsedQuery = queryString
+            .parse(search) as ReadSearchQueryFields;
+        if (parsedQuery.sortingOrder) {
+            searchQueryFields.sortingOrder = parsedQuery.sortingOrder;
+        }
+    }
+
     return searchQueryFields;
 }
 
@@ -144,6 +162,16 @@ export function stringifyIntoUrlQueryString(fields: Partial<ReadSearchQueryField
     if (fields.overturnedAggregation) {
         const overturnedAggregation = queryString.stringify({ overturnedAggregation: fields.overturnedAggregation });
         result = result.concat(`&${overturnedAggregation}`);
+    }
+
+    if (fields.sortingField) {
+        const sortingField = queryString.stringify({ sortingField: fields.sortingField });
+        result = result.concat(`&${sortingField}`);
+    }
+
+    if (fields.sortingOrder) {
+        const sortingOrder = queryString.stringify({ sortingOrder: fields.sortingOrder });
+        result = result.concat(`&${sortingOrder}`);
     }
 
     return result

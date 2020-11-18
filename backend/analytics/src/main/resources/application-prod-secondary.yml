@@ -1,3 +1,13 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+mr:
+  instance-type: sec
+  tasks:
+    prim-health-analysis-task:
+      enabled: false
+    sec-health-analysis-task:
+      enabled: true
 azure:
   event-hub:
     connection-string: ${spring-cloud-azure-eventhub-secondary-connection-string:${EVENT_HUB_CONNECTION_STRING}}

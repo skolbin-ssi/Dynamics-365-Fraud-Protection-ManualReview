@@ -25,6 +25,7 @@ public class Constants {
     public static final String TASK_CONTAINER_NAME = "Tasks";
     public static final String ALERT_CONTAINER_NAME = "Alerts";
     public static final String APP_SETTINGS_CONTAINER_NAME = "ConfigurableAppSettings";
+    public static final String HEALTH_CHECK_CONTAINER_NAME = "HealthChecks";
 
     public static final String REGISTRATION_NAME = "azure-dfp-api";
 
@@ -60,7 +61,6 @@ public class Constants {
     public static final String MAIL_TAG_PERIOD = "\\[period]";
 
     public static final int INCORRECT_CONFIG_STATUS = 1;
-    public static final int FAIL_FAST_STATUS = 2;
 
 
 }

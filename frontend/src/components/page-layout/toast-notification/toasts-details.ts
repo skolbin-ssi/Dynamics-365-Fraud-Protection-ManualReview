@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { MessageBarType } from '@fluentui/react/lib/MessageBar';
 import { LABEL, TOAST_TYPE } from '../../../constants';
 import { Toast, ToastSettings } from '../../../models';
@@ -40,7 +43,7 @@ export const TOASTS_FOR_ITEM_LABELS = new Map<LABEL, Toast>([
             title: 'Bad',
             type: TOAST_TYPE.BAD,
             messageBarType: MessageBarType.error,
-            iconName: 'ErrorBadge',
+            iconName: 'Blocked2',
             message: 'The order was labeled as "Bad"'
         }
     ],

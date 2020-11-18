@@ -2,46 +2,56 @@
 // Licensed under the MIT license.
 
 import { inject, injectable } from 'inversify';
-import { action, computed, observable } from 'mobx';
+import {
+    action, computed, observable, runInAction
+} from 'mobx';
 
 import { Serie } from '@nivo/line';
-import { PieDatum } from '@nivo/pie';
 
-import { UnparseObject } from 'papaparse';
 import { AxiosError } from 'axios';
 import { BasePerformanceStore } from './base-performance-store';
 
 import { TYPES } from '../../types';
-import { AnalystPerformance, PerformanceMetrics } from '../../models/dashboard';
+import { Queue } from '../../models';
 import { Report } from '../../models/misc';
-import { DURATION_PERIOD, } from '../../constants';
 
 import {
-    CollectedInfoService, DashboardService, QueueService, UserService
+    AnalystPerformance,
+    QueueRiskScoreOverview,
+    QueueRiskScoreDistributionBarDatum
+} from '../../models/dashboard';
+import {
+    DURATION_PERIOD,
+    DEFAULT_RISK_SCORE_DISTRIBUTION_BUCKET_SIZE,
+} from '../../constants';
+import { NOT_FOUND } from '../../constants/http-status-codes';
+import {
+    UserService,
+    QueueService,
+    DashboardService,
+    CollectedInfoService
 } from '../../data-services/interfaces';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
-import { formatMetricToPercentageString } from '../../utils/text';
-import { Queue } from '../../models';
+import { QueueStore } from '../queues';
 
 @injectable()
 export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerformance> {
-    @observable totalPerformance: PerformanceMetrics | null = null;
-
-    @observable isTotalPerformanceLoading = false;
+    @observable riskScoreDistribution: QueueRiskScoreOverview | null = null;
 
     @observable queueId: string = '';
 
     @observable queue: Queue | null = null;
 
-    @observable
-    isQueueLoading = false;
+    @observable isQueueLoading = false;
+
+    @observable isRiskScoreDistributionDataLoading = false;
 
     constructor(
         @inject(TYPES.QUEUE_SERVICE) private queueService: QueueService,
         @inject(TYPES.COLLECTED_INFO_SERVICE) private readonly collectedInfoService: CollectedInfoService,
         @inject(TYPES.DASHBOARD_SERVICE) protected dashboardService: DashboardService,
-        @inject(TYPES.USER_SERVICE) private userService: UserService
-
+        @inject(TYPES.USER_SERVICE) private userService: UserService,
+        @inject(TYPES.QUEUE_STORE) private queueStore: QueueStore,
     ) {
         super();
     }
@@ -56,7 +66,8 @@ export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerforman
             const { queueId } = this;
 
             if (queueId) {
-                this.fetchTotalPerformanceMetrics(from, to, aggregation, queueId);
+                this.fetchRiskScoreDistribution(queueId, from, to);
+
                 return this.fetchPerformanceData(from, to, aggregation, queueId);
             }
 
@@ -84,21 +95,55 @@ export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerforman
     }
 
     @action
-    async fetchTotalPerformanceMetrics(from: string, to: string, aggregation: DURATION_PERIOD, queue: string) {
-        this.isTotalPerformanceLoading = true;
+    async fetchRiskScoreDistribution(queueId: string, from: string, to: string) {
+        this.isRiskScoreDistributionDataLoading = true;
 
         try {
-            this.totalPerformance = await this
-                .dashboardService
-                .getTotalPerformanceMetrics({
-                    from, to, aggregation, queue
-                });
+            const riskScoreDistribution = await this.dashboardService.getQueueRiskScoreOverview({
+                bucketSize: DEFAULT_RISK_SCORE_DISTRIBUTION_BUCKET_SIZE,
+                queue: queueId,
+                from,
+                to
+            });
 
-            this.isTotalPerformanceLoading = false;
+            runInAction(() => {
+                this.riskScoreDistribution = riskScoreDistribution;
+                this.isRiskScoreDistributionDataLoading = false;
+            });
         } catch (e) {
-            this.isTotalPerformanceLoading = false;
+            runInAction(() => {
+                this.isRiskScoreDistributionDataLoading = false;
+            });
 
             throw e;
+        }
+    }
+
+    @action
+    async loadQueue() {
+        this.isQueueLoading = true;
+
+        try {
+            const queue = this.queueStore.getQueueById(this.queueId) || await this.queueService.getQueue(this.queueId);
+
+            runInAction(() => {
+                this.isQueueLoading = false;
+                this.queue = queue;
+            });
+        } catch (err) {
+            runInAction(() => {
+                if (err && err.response) {
+                    const { response } = err as AxiosError;
+
+                    if (response && response.status === NOT_FOUND) {
+                        this.fetchHistoricalQueue(this.queueId);
+                    }
+                }
+            });
+        } finally {
+            runInAction(() => {
+                this.isQueueLoading = false;
+            });
         }
     }
 
@@ -112,9 +157,18 @@ export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerforman
     }
 
     @computed
-    get pieChartData(): PieDatum[] {
-        if (this.totalPerformance) {
-            return this.totalPerformance.chartData;
+    get riskScoreDistributionBarChartData(): QueueRiskScoreDistributionBarDatum[] {
+        if (this.riskScoreDistribution) {
+            return this.riskScoreDistribution.barChartData;
+        }
+
+        return [];
+    }
+
+    @computed
+    get substitutionRiskScoreDistributionBarChartData(): QueueRiskScoreDistributionBarDatum[] {
+        if (this.riskScoreDistribution) {
+            return this.riskScoreDistribution.substitutionBarChartData;
         }
 
         return [];
@@ -153,31 +207,31 @@ export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerforman
             reports.push(this.performanceReport('Analysts performance')!);
         }
 
-        if (this.totalDecisionsReport) {
-            reports.push(this.totalDecisionsReport);
+        if (this.riskScoreDistributionReport) {
+            reports.push(this.riskScoreDistributionReport);
         }
 
         return reports;
     }
 
-    // TODO: Move out this logic to more generic class
+    // TODO: Implement report generating for the risk-score distribution and remove commented code, once API will be ready
     @computed
-    private get totalDecisionsReport(): Report | null {
-        if (this.totalPerformance) {
-            const REPORT_NAME = 'Decisions for the period';
-            const reportRawData = this.totalPerformance.totalDecisionsReport;
-
-            const rawObjectData: UnparseObject = {
-                fields: ['good', 'bad', 'watched'],
-                data: [
-                    formatMetricToPercentageString(+reportRawData.good),
-                    formatMetricToPercentageString(+reportRawData.bad),
-                    formatMetricToPercentageString(+reportRawData.watched)
-                ]
-            };
-
-            return QueuePerformanceStore.buildReport(REPORT_NAME, rawObjectData);
-        }
+    private get riskScoreDistributionReport(): Report | null {
+        // if (this.totalPerformance) {
+        //     const REPORT_NAME = 'Decisions for the period';
+        //     const reportRawData = this.totalPerformance.risckScoreDistributionReport;
+        //
+        //     const rawObjectData: UnparseObject = {
+        //         fields: ['approved', 'rejected', 'watched'],
+        //         data: [
+        //             formatMetricToPercentageString(+reportRawData.approved),
+        //             formatMetricToPercentageString(+reportRawData.rejected),
+        //             formatMetricToPercentageString(+reportRawData.watched)
+        //         ]
+        //     };
+        //
+        //     return QueuePerformanceStore.buildReport(REPORT_NAME, rawObjectData);
+        // }
 
         return null;
     }
@@ -191,42 +245,20 @@ export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerforman
         return '';
     }
 
-    // TODO: Move this logic to a separate service and put under one generic method getQueue()
-    //  and make the benefit of checking cached queues if any
     @action
-    async loadQueue() {
-        this.isQueueLoading = true;
-
-        try {
-            this.isQueueLoading = true;
-
-            this.queue = await this.queueService.getQueue(this.queueId);
-            this.isQueueLoading = false;
-            return this.queue;
-        } catch (err) {
-            if (err && err.response) {
-                const axiosError = err as AxiosError;
-                if (axiosError.response && axiosError.response.status === 404) {
-                    this.queue = await this.fetchHistoricalQueue(this.queueId);
-                    return this.queue;
-                }
-            }
-
-            return null;
-        }
-    }
-
-    // TODO: Move this logic to a separate service and put under one generic method getQueue()
-    //  and make the benefit of checking cached queues if any
     private async fetchHistoricalQueue(queueId: string) {
-        this.isQueueLoading = true;
-
         try {
-            this.queue = await this.collectedInfoService.getQueueCollectedInfo(queueId);
-            this.isQueueLoading = false;
-            return this.queue;
+            const queue = await this.collectedInfoService.getQueueCollectedInfo(queueId);
+
+            runInAction(() => {
+                this.queue = queue;
+                this.isQueueLoading = false;
+            });
         } catch (e) {
-            this.isQueueLoading = false;
+            runInAction(() => {
+                this.isQueueLoading = false;
+            });
+
             throw e;
         }
     }
@@ -237,7 +269,13 @@ export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerforman
     }
 
     @action
+    clearRiskScoreDistributionData() {
+        this.riskScoreDistribution = null;
+    }
+
+    @action
     clearStore() {
+        this.clearRiskScoreDistributionData();
         this.clearPerformanceData();
         this.resetRating();
         this.resetAggregation();

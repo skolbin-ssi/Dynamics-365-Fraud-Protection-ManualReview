@@ -36,7 +36,8 @@ import {
     CHART_AGGREGATION_PERIOD,
     CHART_AGGREGATION_PERIOD_DISPLAY,
     QUEUE_VIEW_TYPE,
-    ROUTES, WARNING_MESSAGES
+    ROUTES,
+    WARNING_MESSAGES
 } from '../../../constants';
 import { TYPES } from '../../../types';
 import { Item } from '../../../models/item';
@@ -49,6 +50,7 @@ import { ReportsModalStore } from '../../../view-services';
 import { SwitchTabs } from '../../../components/switch-tabs';
 
 import './demand-supply-by-queue.scss';
+import { ScoreDistribution } from './score-distribution';
 
 const CN = 'demand-supply-by-queue-dashboard';
 
@@ -93,6 +95,7 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
 
         if (queueId) {
             this.demandQueuePerformanceStore.setQueueId(queueId);
+            this.demandQueuePerformanceStore.riskScoreDistributionStore.fetchRiskScoreOverview(queueId);
         }
 
         this.readStorageAutoRefresh();
@@ -281,7 +284,7 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
             <>
                 {queue ? (<ProgressCell className={`${CN}__progress`} cellsViewMap={cells} />) : <div />}
                 <div />
-                { (hasEscalationQueueView || hasRegularQueueView) && (
+                {(hasEscalationQueueView || hasRegularQueueView) && (
                     <div className={this.calloutAnchorClassName}>
                         {this.renderGoToQueueButton()}
                         {this.renderGoToQueueViewsOptions()}
@@ -319,7 +322,7 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
         const faces: JSX.Element = (
             <>
                 {queue && this.renderFaces(queue.supervisorsFacepilePersonas, MAX_SUPERVISORS_TO_SHOW, true)}
-                { showDivider && (<div className={`${CN}__faces-wrapper-divider`} />) }
+                {showDivider && (<div className={`${CN}__faces-wrapper-divider`} />)}
                 {queue && this.renderFaces(queue.reviewersFacepilePersonas, MAX_REVIEWERS_TO_SHOW)}
             </>
 
@@ -593,7 +596,7 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
                     />
                 </div>
             )
-            : `Queue: ${this.demandQueuePerformanceStore.getQueueName}`;
+            : `Queue: ${this.demandQueuePerformanceStore.getQueueName || this.demandQueuePerformanceStore.getQueueId}`;
     }
 
     renderRealTimeDataSection() {
@@ -630,14 +633,13 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
                         </div>
                     </div>
                 </div>
-                {isQueueItemsDataAvailable && this.renderNoDataMessage()}
-                <section className={`${CN}__real-time-data`}>
+                {isQueueItemsDataAvailable && !isQueueItemsLoading && this.renderNoDataMessage()}
+                <div>
                     <div className={`${CN}__queue-items-tables`}>
                         {this.renderRegularQueueItemsDataTable()}
                         {this.renderEscalatedQueueItemsDataTable()}
                     </div>
-                    <div className={`${CN}__score-distribution-chart-container`} />
-                </section>
+                </div>
             </>
         );
     }
@@ -710,7 +712,8 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
         const {
             aggregation,
             isQueueLoading,
-            isRealtimeDataAvailable
+            isRealtimeDataAvailable,
+            riskScoreDistributionStore
         } = this.demandQueuePerformanceStore;
 
         const realTimeDataSectionToRender: JSX.Element = isRealtimeDataAvailable
@@ -735,9 +738,17 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
                     {this.renderRemainingChart()}
                     {this.renderItemPlacementChart()}
                 </section>
-                {isQueueLoading
-                    ? (this.renderRealtimeSectionShimmerSubstitution())
-                    : realTimeDataSectionToRender}
+                <section className={`${CN}__wrapper`}>
+                    <div className={`${CN}__real-time-data`}>
+                        {isQueueLoading
+                            ? (this.renderRealtimeSectionShimmerSubstitution())
+                            : realTimeDataSectionToRender}
+                    </div>
+                    <div className={`${CN}__score-distribution-chart-container`}>
+                        <ScoreDistribution fraudScoreDistributionStore={riskScoreDistributionStore} />
+                    </div>
+                </section>
+
             </div>
         );
     }

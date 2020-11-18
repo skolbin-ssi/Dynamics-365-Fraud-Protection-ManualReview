@@ -3,7 +3,11 @@
 
 import { inject, injectable } from 'inversify';
 
-import { DashboardApiService, DashboardRequestApiParams } from '../../interfaces/dashboard-api-service';
+import {
+    DashboardApiService,
+    DashboardRequestApiParams,
+    QueueRiskScoreOverviewApiParams
+} from '../../interfaces/dashboard-api-service';
 import { BaseApiService } from '../../base-api-service';
 import { TYPES } from '../../../types';
 import { Configuration } from '../../../utility-services/configuration';
@@ -15,6 +19,7 @@ import { GetAnalystsPerformanceResponse } from './analyst/api-models';
 import { GetTotalPerformanceMetricsResponse } from './performance-metrics/api-models';
 import { GetProcessingTimeMetricResponse } from './processing-time-metric/api-models';
 import { GetProgressPerformanceMetric } from './progress-performance-metric/api-models';
+import { GetQueueRiskScoreOverviewResponse } from './risk-score-overview/api-models';
 
 @injectable()
 export class DashboardApiServiceImpl extends BaseApiService implements DashboardApiService {
@@ -69,5 +74,9 @@ export class DashboardApiServiceImpl extends BaseApiService implements Dashboard
 
     getProgressPerformanceMetric(params: DashboardRequestApiParams) {
         return this.get<GetProgressPerformanceMetric>('labeling/progress', { params });
+    }
+
+    getQueueRiskScoreOverview(params: QueueRiskScoreOverviewApiParams) {
+        return this.get<GetQueueRiskScoreOverviewResponse>('labeling/distribution/risk-score', { params });
     }
 }

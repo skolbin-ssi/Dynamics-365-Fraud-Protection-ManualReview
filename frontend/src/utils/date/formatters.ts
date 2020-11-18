@@ -61,6 +61,23 @@ export function formatToLocaleMonthDayFormat(dateString: string): string {
 }
 
 /**
+ * Format any MomentInput to a date object in a default moment format (ISO 8601 with local time zone)
+ * e.g.: 2020-09-08T12:15:30+03:00 => Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time)
+ *
+ * @param date - MomentInput
+ * @returns date - JS Date object with a time
+ */
+export function formatDateStringToJSDate(date: MomentInput) {
+    const dateMoment = moment(date);
+
+    if (!dateMoment.isValid()) {
+        return undefined;
+    }
+
+    return moment(date, moment.defaultFormat).toDate();
+}
+
+/**
  * If date is valid formats MomentInput to a local date string format,
  * otherwise it returns a passed placeholder
  * e.g.: Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time) ==> 9/8/2020

@@ -20,7 +20,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.ROLES_ALLOWED_FOR_ACCESS;
-import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.USER_ROLES_ALLOWED_FOR_QUEUE_PROCESSING;
 
 @Slf4j
 @Service
@@ -29,15 +28,6 @@ public class UserService {
 
     private final AnalystClient analystClient;
     private final ModelMapper modelMapper;
-
-    public boolean checkUsersExist(final Set<String> users) {
-        return analystClient.getAnalystIds(Set.of(USER_ROLES_ALLOWED_FOR_QUEUE_PROCESSING))
-                .containsAll(users);
-    }
-
-    public Collection<String> getActiveUserIds() {
-        return analystClient.getAnalystIds(Set.of(USER_ROLES_ALLOWED_FOR_QUEUE_PROCESSING));
-    }
 
     public Collection<String> getActiveUserIds(final Set<String> roles) {
         return analystClient.getAnalystIds(roles);

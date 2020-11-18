@@ -2,14 +2,14 @@
 // Licensed under the MIT license.
 
 import { inject, injectable } from 'inversify';
-import {
-    action, computed, observable
-} from 'mobx';
+import { action, computed, observable } from 'mobx';
 
 import { TYPES } from '../../types';
 import { QueueStore } from '../queues';
 import { CollectedInfoService, QueueService, UserService } from '../../data-services/interfaces';
 import { User } from '../../models/user';
+import { CurrentUserStore } from '../current-user-store';
+import { DASHBOARD_MANAGEMENT } from '../../constants';
 
 @injectable()
 export class DashboardScreenStore {
@@ -30,7 +30,10 @@ export class DashboardScreenStore {
         public readonly queueService: QueueService,
 
         @inject(TYPES.COLLECTED_INFO_SERVICE)
-        private readonly collectedInfoService: CollectedInfoService
+        private readonly collectedInfoService: CollectedInfoService,
+
+        @inject(TYPES.CURRENT_USER_STORE)
+        private readonly currentUserStore: CurrentUserStore
     ) {
         /**
          * Loading users and users photo for the search bar
@@ -44,14 +47,14 @@ export class DashboardScreenStore {
         this.queueStore.loadQueues();
 
         /**
-         * Loads historical users beforehand
-         */
-        this.collectedInfoService.getCollectedInfoUsersAndCache();
-
-        /**
          * Loads historical queues beforehand
          */
         this.collectedInfoService.getQueuesCollectedInfo();
+
+        /**
+         * Loads historical users beforehand
+         */
+        this.fetchCollectedUsersInfo();
     }
 
     @computed
@@ -78,5 +81,15 @@ export class DashboardScreenStore {
     clearDates() {
         this.toDate = null;
         this.fromDate = null;
+    }
+
+    @action
+    fetchCollectedUsersInfo() {
+        const canUserAccessDashboards = this.currentUserStore
+            .checkUserCan(DASHBOARD_MANAGEMENT.ACCESS);
+
+        if (canUserAccessDashboards) {
+            this.collectedInfoService.getCollectedInfoUsersAndCache();
+        }
     }
 }

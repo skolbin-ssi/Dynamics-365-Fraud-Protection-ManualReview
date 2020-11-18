@@ -67,3 +67,12 @@ export const DEFAULT_TIME_TO_TIMEOUT_DURATION = `PT${DEFAULT_TIME_TO_TIMEOUT_COU
  * Update timeout interval for the real-time data on demand/supply by queue dashboard
  */
 export const DEFAULT_TIMEOUT_COUNTDOWN_INTERVAL_MILLISECONDS = 60 * 1000;
+
+/**
+ * Default bucket size for the chart score distribution
+ */
+export const DEFAULT_RISK_SCORE_DISTRIBUTION_BUCKET_SIZE = 100;
+
+export const MAX_RISK_SCORE_BUCKET_SIZE_GROUPS = 10;
+
+export const MAX_RISK_SCORE_BUCKET_SIZE = DEFAULT_RISK_SCORE_DISTRIBUTION_BUCKET_SIZE * MAX_RISK_SCORE_BUCKET_SIZE_GROUPS;

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { MessageBar } from '@fluentui/react/lib/MessageBar';
 import autobind from 'autobind-decorator';
 import { resolve } from 'inversify-react';
@@ -24,7 +27,7 @@ export class ToastNotification extends Component<{}, never> {
     static composeSuccessMessageForQueueAction(mutation: QUEUE_MUTATION_TYPES, name: string) {
         return (
             <>
-                The Queue with the name &quot;
+                The queue with the name &quot;
                 <b>{name}</b>
                 &quot; has been successfully
                 {' '}
@@ -41,7 +44,7 @@ export class ToastNotification extends Component<{}, never> {
                 {' '}
                 {mutation}
                 {' '}
-                the Queue with the name &quot;
+                the queue with the name &quot;
                 <b>{name}</b>
                 &quot;. Please, try again or write to IT.
             </>
@@ -74,12 +77,6 @@ export class ToastNotification extends Component<{}, never> {
                 this.setToastTimeout();
                 return TOASTS_FOR_ITEM_LABELS.get(notification.label)!;
             }
-            case NOTIFICATION_TYPE.LABEL_ADDED_ERROR: {
-                return {
-                    ...GENERAL_TOAST_SETTINGS.get(TOAST_TYPE.ERROR)!,
-                    message: 'The label was not applied. Probably, the current item has been unlocked.'
-                };
-            }
 
             case NOTIFICATION_TYPE.QUEUE_MUTATION_SUCCESS: {
                 this.setToastTimeout();
@@ -97,6 +94,14 @@ export class ToastNotification extends Component<{}, never> {
                         .composeErrorMessageForQueueAction(notification.mutation, notification.queueName)
                 };
             }
+
+            case NOTIFICATION_TYPE.GENERIC_ERROR: {
+                return {
+                    ...GENERAL_TOAST_SETTINGS.get(TOAST_TYPE.ERROR)!,
+                    message: notification.message
+                };
+            }
+
             case NOTIFICATION_TYPE.CUSTOM:
             default: {
                 this.setToastTimeout(notification.dismissTimeout);

@@ -10,15 +10,16 @@ import { CollectedInfoService, DashboardService, UserService } from '../interfac
 import { DashboardApiServiceImpl } from '../api-services/dashboard-api-service/dashboard-api-service-impl';
 import {
     GetQueuePerformanceTransformer,
-    GetItemPlacementMetricsTransformer,
+    GetQueueSizeHistoryTransformer,
     GetAnalystsPerformanceTransformer,
-    GetQueueSizeHistoryTransformer
+    GetItemPlacementMetricsTransformer,
+    GetQueueRiskScoreOverviewTransformer
 } from '../data-transformers/dashboard-transformers';
-import { DashboardRequestApiParams } from '../interfaces/dashboard-api-service';
+import { DashboardRequestApiParams, QueueRiskScoreOverviewApiParams } from '../interfaces/dashboard-api-service';
 import { AnalystPerformance, PerformanceMetrics, ProcessingTimeMetric } from '../../models/dashboard';
 import { ProgressPerformanceMetric } from '../../models/dashboard/progress-performance-metric';
 import { GetProcessingTimeTransformer } from '../data-transformers/dashboard-transformers/get-processing-time-transformer';
-import { UserBuilder, CacheStoreService } from '../../utility-services';
+import { UserBuilder } from '../../utility-services';
 
 @injectable()
 export class DashboardServiceImpl extends BaseDomainService implements DashboardService {
@@ -28,13 +29,12 @@ export class DashboardServiceImpl extends BaseDomainService implements Dashboard
         @inject(TYPES.USER_SERVICE) private readonly userService: UserService,
         @inject(TYPES.USER_BUILDER) protected readonly userBuilder: UserBuilder,
         @inject(TYPES.LOGGER) protected readonly logger: Logger,
-        @inject(TYPES.CACHE_STORE_SERVICE) private readonly cacheStoreService: CacheStoreService
     ) {
         super(logger, 'DashboardService');
     }
 
     async getQueuesPerformance(params: DashboardRequestApiParams) {
-        const dataTransformer = new GetQueuePerformanceTransformer(this.cacheStoreService);
+        const dataTransformer = new GetQueuePerformanceTransformer();
         let response;
 
         try {
@@ -267,6 +267,34 @@ export class DashboardServiceImpl extends BaseDomainService implements Dashboard
                 throw this.handleException(
                     'getProgressPerformanceMetric',
                     'Failed to parse response from API while retrieving progress performance metric',
+                    e
+                );
+            }
+        }
+
+        return null;
+    }
+
+    async getQueueRiskScoreOverview(params: QueueRiskScoreOverviewApiParams) {
+        const dataTransformer = new GetQueueRiskScoreOverviewTransformer();
+
+        let response;
+
+        try {
+            response = await this.dashboardApiService.getQueueRiskScoreOverview(params);
+        } catch (e) {
+            throw this.handleApiException('getQueueRiskScoreOverview', e, {
+                500: 'Failed to get queue risk score overview data from the API due to internal server error'
+            });
+        }
+
+        if (response.data) {
+            try {
+                return dataTransformer.mapResponse(response.data);
+            } catch (e) {
+                throw this.handleException(
+                    'getQueueRiskScoreOverview',
+                    'Failed to parse response from API while retrieving queue risk score overview data',
                     e
                 );
             }

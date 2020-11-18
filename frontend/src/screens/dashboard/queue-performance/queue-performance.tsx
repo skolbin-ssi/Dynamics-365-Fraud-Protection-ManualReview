@@ -9,9 +9,9 @@ import { History } from 'history';
 import { disposeOnUnmount, observer } from 'mobx-react';
 
 import { DefaultButton } from '@fluentui/react/lib/Button';
+import { Shimmer } from '@fluentui/react/lib/Shimmer';
 
 import { LineChart } from '../line-chart';
-import { PieChart } from '../pie-chart';
 import { DataTableCompact } from '../data-table-compact';
 import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
 import { BlurLoader } from '../blur-loader';
@@ -37,7 +37,7 @@ import { TYPES } from '../../../types';
 import './queue-performance.scss';
 import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
 import { BarChart } from '../bar-chart';
-import { WarningChartMessage } from '../warning-chart-message';
+import { ScoreDistribution } from './score-distribution';
 
 const CN = 'queue-performance';
 
@@ -242,37 +242,26 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
         this.reportsModalStore.showReportsModal([...queuePerformanceReports, ...overturnedPerformanceReports]);
     }
 
-    renderDecisionPieChart() {
-        const { isTotalPerformanceLoading, pieChartData } = this.queuePerformanceStore;
+    renderQueueName() {
+        const { isQueueLoading, getQueueName } = this.queuePerformanceStore;
 
-        const isAllPieDatumsEqualsZero = pieChartData.every(datum => !datum.value);
-        const isDataNotAvailable = isAllPieDatumsEqualsZero && !isTotalPerformanceLoading;
-
-        if (isDataNotAvailable) {
-            return (
-                <div className={`${CN}__pie-chart-no-data-placeholder`}>
-                    <WarningChartMessage
-                        className={`${CN}__warning-message`}
-                        message="Total decisions metrics are not available"
+        return isQueueLoading
+            ? (
+                <div className={`${CN}__queue-name-container`}>
+                    <span>Queue:</span>
+                    <Shimmer
+                        className={`${CN}__queue-name-shimmer`}
+                        styles={{
+                            shimmerWrapper: {
+                                paddingTop: 2,
+                                height: 10
+                            }
+                        }}
+                        width="200px"
                     />
                 </div>
-            );
-        }
-
-        const filteredNotZeroPieData = pieChartData.filter(datum => datum.value !== 0);
-
-        return (
-            <div className={`${CN}__decision-pie-chart`}>
-                <BlurLoader
-                    isLoading={isTotalPerformanceLoading}
-                    spinnerProps={{
-                        label: 'Please, wait! Loading chart data ...'
-                    }}
-                >
-                    <PieChart data={filteredNotZeroPieData} className={`${CN}__pie-chart`} />
-                </BlurLoader>
-            </div>
-        );
+            )
+            : `Queue: ${getQueueName}`;
     }
 
     render() {
@@ -280,11 +269,13 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
             isDataLoading,
             rating,
             getPerformanceData,
+            riskScoreDistributionBarChartData,
+            substitutionRiskScoreDistributionBarChartData,
             hasSelectedItems,
             hasStorePerformanceData,
             lineChartData,
             aggregation,
-            getQueueName
+            isRiskScoreDistributionDataLoading,
         } = this.queuePerformanceStore;
 
         const {
@@ -301,8 +292,7 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
             <>
                 <div className={`${CN}__header`}>
                     <div className={`${CN}__header-title`}>
-                        <span>Queue: </span>
-                        {getQueueName}
+                        {this.renderQueueName()}
                     </div>
 
                     <DefaultButton text="Generate reports" onClick={this.handleGenerateReportsButtonClick} />
@@ -346,7 +336,15 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
                                 data={getPerformanceData}
                             />
                         </div>
-                        {this.renderDecisionPieChart()}
+                        <div className={`${CN}__decision-pie-chart`}>
+                            <ScoreDistribution
+                                isEmpty={!riskScoreDistributionBarChartData.length}
+                                data={riskScoreDistributionBarChartData.length
+                                    ? riskScoreDistributionBarChartData
+                                    : substitutionRiskScoreDistributionBarChartData}
+                                isDataLoading={isRiskScoreDistributionDataLoading}
+                            />
+                        </div>
                     </section>
                 </section>
                 <section className={`${CN}__overturned-analytics-section`}>

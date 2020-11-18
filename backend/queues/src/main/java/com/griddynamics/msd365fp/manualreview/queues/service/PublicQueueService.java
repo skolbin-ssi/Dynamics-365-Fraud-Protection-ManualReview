@@ -58,32 +58,21 @@ public class PublicQueueService {
     public QueueViewDTO getQueue(final String id) throws NotFoundException {
         QueueView queueView = publicQueueClient.getActiveQueueView(id);
         publicItemClient.recalculateQueueViewSizes(new ArrayList<>(Collections.singletonList(queueView)));
-        Collection<String> activeUsers = userService.getActiveUserIds();
-        QueueViewDTO result = modelMapper.map(queueView, QueueViewDTO.class);
-        result.getReviewers().retainAll(activeUsers);
-        result.getSupervisors().retainAll(activeUsers);
-
-        return result;
+        return modelMapper.map(queueView, QueueViewDTO.class);
     }
 
     public Collection<QueueViewDTO> getQueues(final QueueViewType viewType) throws BusyException {
         Collection<QueueView> queueViews = publicQueueClient.getActiveQueueViewList(null, viewType);
         publicItemClient.recalculateQueueViewSizes(queueViews);
-        Collection<String> activeUsers = userService.getActiveUserIds();
         return queueViews.stream()
-                .map(queueView -> {
-                    QueueViewDTO result = modelMapper.map(queueView, QueueViewDTO.class);
-                    result.getReviewers().retainAll(activeUsers);
-                    result.getSupervisors().retainAll(activeUsers);
-                    return result;
-                })
+                .map(queueView -> modelMapper.map(queueView, QueueViewDTO.class))
                 .collect(Collectors.toList());
     }
 
     public List<QueueViewDTO> createQueue(final QueueCreationDTO creationDTO) throws IncorrectConfigurationException {
         log.info("Trying to create a queue: [{}]", creationDTO);
         Queue queue = modelMapper.map(creationDTO, Queue.class);
-        checkQueueAssignments(queue);
+        reconcileQueueAssignments(queue);
 
         OffsetDateTime created = OffsetDateTime.now();
 
@@ -118,7 +107,7 @@ public class PublicQueueService {
 
         // prepare changes
         modelMapper.map(parameters, queue);
-        checkQueueAssignments(queue);
+        reconcileQueueAssignments(queue);
 
         // update info in the storage
         publicQueueClient.updateQueue(queue, oldQueue);
@@ -244,7 +233,11 @@ public class PublicQueueService {
         return minAllowedTimeoutTime.minus(unlockTimeout);
     }
 
-    private void checkQueueAssignments(final Queue queue) throws IncorrectConfigurationException {
+    private void reconcileQueueAssignments(final Queue queue) throws IncorrectConfigurationException {
+        Collection<String> activeUsers = userService.getActiveUserIds(Set.of(USER_ROLES_ALLOWED_FOR_QUEUE_PROCESSING));
+        queue.getReviewers().retainAll(activeUsers);
+        queue.getSupervisors().retainAll(activeUsers);
+
         if (queue.getSupervisors() == null || queue.getSupervisors().isEmpty()) {
             throw new IncorrectConfigurationException(MESSAGE_NO_SUPERVISORS);
         }
@@ -253,12 +246,6 @@ public class PublicQueueService {
                 Objects.requireNonNullElse(queue.getReviewers(), Collections.emptySet()),
                 queue.getSupervisors()).isEmpty()) {
             throw new IncorrectConfigurationException(MESSAGE_INCORRECT_QUEUE_ASSIGNMENT);
-        }
-
-        if (!userService.checkUsersExist(SetUtils.union(
-                Objects.requireNonNullElse(queue.getReviewers(), Collections.emptySet()),
-                Objects.requireNonNullElse(queue.getSupervisors(), Collections.emptySet())))) {
-            throw new IncorrectConfigurationException(MESSAGE_INCORRECT_USER);
         }
     }
 }

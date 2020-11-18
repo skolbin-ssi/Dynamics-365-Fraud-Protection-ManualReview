@@ -5,10 +5,14 @@ package com.griddynamics.msd365fp.manualreview.model.dfp.raw;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.griddynamics.msd365fp.manualreview.model.jackson.FlexibleDateFormatDeserializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+
+import java.time.OffsetDateTime;
 
 /**
  * Implementation of {@link EdgeData}
@@ -20,6 +24,9 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class PurchaseDeviceContextEdgeData extends EdgeData {
+    public static final String EDGE_DIRECT_NAME = "PurchaseDeviceContext";
+    public static final String EDGE_REVERSED_NAME = "DeviceContextPurchase";
+
     private String purchaseId;
     private String deviceContextId;
     @JsonProperty("IPAddress")
@@ -36,5 +43,6 @@ public class PurchaseDeviceContextEdgeData extends EdgeData {
     private String ipCountry;
     @JsonProperty("IPState")
     private String ipState;
-    private String merchantLocalDate;
+    @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
+    private OffsetDateTime merchantLocalDate;
 }

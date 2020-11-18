@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 export enum TOAST_TYPE {
     SUCCESS = 'success',
     ERROR = 'error',
@@ -10,9 +13,9 @@ export enum TOAST_TYPE {
 
 export enum NOTIFICATION_TYPE {
     LABEL_ADDED_SUCCESS = 'LABEL_ADDED_SUCCESS',
-    LABEL_ADDED_ERROR = 'LABEL_ADDED_ERROR',
     QUEUE_MUTATION_SUCCESS = 'QUEUE_MUTATION_SUCCESS',
     QUEUE_MUTATION_ERROR = 'QUEUE_MUTATION_ERROR',
+    GENERIC_ERROR = 'GENERIC_ERROR',
     CUSTOM = 'CUSTOM',
 }
 

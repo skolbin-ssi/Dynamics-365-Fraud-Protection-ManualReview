@@ -6,8 +6,7 @@ import { QUEUE_VIEW_TYPE } from '../../../constants';
 import { TYPES } from '../../../types';
 import { AuthenticationService, Configuration } from '../../../utility-services';
 import { BaseApiService } from '../../base-api-service';
-import { QueueItemsOverviewApiParams } from '../../interfaces/queue-api-service';
-import { QueueApiService } from '../../interfaces';
+import { QueueApiService, QueueItemsOverviewApiParams } from '../../interfaces';
 import {
     DeleteQueueResponse, GetQueueItemsResponse,
     GetQueueResponse, GetQueuesOverviewResponse,

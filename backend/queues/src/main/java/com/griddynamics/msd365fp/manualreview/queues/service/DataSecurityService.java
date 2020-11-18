@@ -111,6 +111,7 @@ public class DataSecurityService {
         List<String> roles = Objects.requireNonNull(UserPrincipalUtility.extractUserRoles(authentication));
 
         return (queueView == null || itemBelongsToQueue(item, queueView)) &&
+                (item.isActive() || roles.contains(ADMIN_MANAGER_ROLE)) &&
                 (userHasAccessToItemAsLockOwner(item, actor) ||
                         roles.contains(ADMIN_MANAGER_ROLE) ||
                         roles.contains(SENIOR_ANALYST_ROLE) ||
@@ -158,7 +159,7 @@ public class DataSecurityService {
             @NonNull final Queue queue,
             @NonNull final String actor) {
         return SetUtils.union(
-                Objects.requireNonNullElse(queue.getReviewers(), Collections.emptySet()),
+                Objects.requireNonNullElse(queue.getSupervisors(), Collections.emptySet()),
                 Objects.requireNonNullElse(queue.getReviewers(), Collections.emptySet()))
                 .contains(actor);
     }

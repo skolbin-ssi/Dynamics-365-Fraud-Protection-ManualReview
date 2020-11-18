@@ -10,16 +10,17 @@ import { BasePerformanceStore } from './base-performance-store';
 
 import { DURATION_PERIOD } from '../../constants';
 import { TYPES } from '../../types';
-import { QueuePerformance } from '../../models/dashboard';
+import { QueuePerformance, Report } from '../../models';
 import { CollectedInfoService, DashboardService } from '../../data-services/interfaces';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
-import { Report } from '../../models/misc';
+import { QueueStore } from '../queues';
 
 @injectable()
 export class QueuesPerformanceStore extends BasePerformanceStore<QueuePerformance> {
     constructor(
         @inject(TYPES.COLLECTED_INFO_SERVICE) private readonly collectedInfoService: CollectedInfoService,
         @inject(TYPES.DASHBOARD_SERVICE) private dashboardService: DashboardService,
+        @inject(TYPES.QUEUE_STORE) private queueStore: QueueStore
     ) {
         super();
     }
@@ -36,9 +37,16 @@ export class QueuesPerformanceStore extends BasePerformanceStore<QueuePerformanc
         this.isDataLoading = true;
 
         try {
+            await this.queueStore.loadRegularAndHistoricalQueues();
+
             const performanceData = await this
                 .dashboardService
                 .getQueuesPerformance({ from, to, aggregation });
+
+            (performanceData || []).forEach(queuePerformance => {
+                const queue = this.queueStore.getQueueById(queuePerformance.id);
+                queuePerformance.setQueueName(queue?.name || queuePerformance.id);
+            });
 
             this.isDataLoading = false;
             return performanceData;

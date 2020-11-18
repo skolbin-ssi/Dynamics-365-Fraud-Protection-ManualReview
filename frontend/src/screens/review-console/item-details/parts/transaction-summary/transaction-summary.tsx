@@ -116,7 +116,7 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
         },
         {
             key: 'riskScore',
-            name: 'Risk score',
+            name: 'Fraud score',
             fieldName: '',
             minWidth: 80,
             maxWidth: 80,
@@ -151,7 +151,7 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
             { key: 'Original order ID', value: purchase.originalOrderId, className: `${CN}__id` },
             { key: 'Customer local date', value: formatToLocalStringWithPassedTimeZone(purchase.customerLocalDate, this.valuePlaceholder) },
             { key: 'Merchant local date', value: formatToLocalStringWithPassedTimeZone(purchase.merchantLocalDate, this.valuePlaceholder) },
-            { key: 'Shipping Method', value: purchase.shippingMethod }
+            { key: 'Shipping method', value: purchase.shippingMethod }
         ];
 
         return renderingConfig.map(({ key, value, className }) => (

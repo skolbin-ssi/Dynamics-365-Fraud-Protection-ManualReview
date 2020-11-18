@@ -8,7 +8,6 @@ import com.griddynamics.msd365fp.manualreview.model.Label;
 import com.griddynamics.msd365fp.manualreview.queues.model.ItemFilter;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueSortSettings;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewSettings;
-import com.griddynamics.msd365fp.manualreview.queues.validation.FieldConditionCombination;
 import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;
 import com.microsoft.azure.spring.data.cosmosdb.core.mapping.PartitionKey;
 import lombok.*;
@@ -90,7 +89,7 @@ public class Queue implements Serializable {
      * Currentky checked peridically in the backgroung.
      */
     @Builder.Default
-    private Set<@FieldConditionCombination ItemFilter> filters = Collections.emptySet();
+    private Set<ItemFilter> filters = Collections.emptySet();
 
     /**
      * The period for SLA calculation. Items that were

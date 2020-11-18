@@ -28,6 +28,7 @@ $collapsedLeftNavigationWidth: 48px;
 $expandedLeftNavigationWidth: 230px;
 $maxTableSwitchWidth: 1328px;
 $customFooterHeight: 50px;
+$mainPageBackground: #FAF9F8;
 
 $verticalTabHeight: 44px;
 
@@ -48,11 +49,13 @@ $badLabelBackground: #FDE7E9;
 $goodColor: #107C10;
 $badColor: #D83B01;
 
-$vividMostColor: #FF8E09;
-$vividMediumColor: #F0C694;
-$vividLightColor: #FFF4E6;
+$escalateColor: #106EBE;
+$escalateBorderColor: #C7E0F4;
+$escalateBackgroundColor: #EFF6FC;
 
 $gray: #8A8886;
+
+$formInvalidColor: #A4262C;
 
 //___ charts variables ___
 
@@ -93,6 +96,21 @@ $defaultBlurFilterValue: 7px;
   background: url("#{ getSvgDataImageUri($svgIcon)}") no-repeat;
 }
 
+@mixin headerBoxShadow() {
+  box-shadow: inset 0px -1px 0px #{$neutralLight};
+}
+
+/*!
+ *  Styles for grid container for filter tiles
+ */
+@mixin filterTileGridContainer() {
+  $tileWidth: 260px;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($tileWidth, 1fr));
+  grid-column-gap: 8px;
+  grid-row-gap: 8px;
+}
 
 // SVG Icons
 $svgSortArrowDown: "<svg width='9' height='16' viewBox='0 0 9 16' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M7.65625 11.3984L8.36719 12.1016L4.51562 15.9531L0.65625 12.1016L1.36719 11.3984L4.00781 14.0391L4 0.0234375H5L5.00781 14.0469L7.65625 11.3984Z' fill='black'/></svg>";

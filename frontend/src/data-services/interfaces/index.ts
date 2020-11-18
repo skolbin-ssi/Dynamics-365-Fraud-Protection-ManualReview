@@ -10,9 +10,10 @@ export * from './item-service';
 export * from './user-service';
 export * from './dashboard-service';
 export * from './dictionary-api-service';
-export * from './settings-api-service';
-export * from './settings-service';
+export * from './domain-interfaces/settings-service';
 export * from './alerts-api-service';
 
-export * from './api-interfaces/collected-info-api-service';
+export * from './api-interfaces';
 export * from './domain-interfaces/collected-info-service';
+
+export * from './api-interfaces/maps-token-api-service';

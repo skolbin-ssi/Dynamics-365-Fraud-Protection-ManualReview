@@ -96,6 +96,10 @@
 
   }
 
+  &__tooltip-row:last-child {
+    margin-bottom: 0;
+  }
+
   &__tooltip-value {
     margin-left: auto;
     justify-self: flex-end;

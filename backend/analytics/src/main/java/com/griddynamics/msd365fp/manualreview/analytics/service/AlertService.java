@@ -15,9 +15,10 @@ import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.Alert;
 import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.ConfigurableAppSetting;
 import com.griddynamics.msd365fp.manualreview.analytics.repository.AlertRepository;
 import com.griddynamics.msd365fp.manualreview.analytics.repository.ConfigurableAppSettingRepository;
-import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.ItemLabelingMetricService;
+import com.griddynamics.msd365fp.manualreview.analytics.service.dashboard.PublicItemLabelingMetricService;
 import com.griddynamics.msd365fp.manualreview.azuregraph.client.AnalystClient;
 import com.griddynamics.msd365fp.manualreview.dfpauth.util.UserPrincipalUtility;
+import com.griddynamics.msd365fp.manualreview.model.Analyst;
 import com.griddynamics.msd365fp.manualreview.model.exception.IncorrectConfigurationException;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -52,7 +54,7 @@ import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.
 @Slf4j
 public class AlertService {
 
-    private final ItemLabelingMetricService metricService;
+    private final PublicItemLabelingMetricService metricService;
     private final AnalystClient analystClient;
     private final AlertRepository alertRepository;
     private final ConfigurableAppSettingRepository appSettingRepository;
@@ -150,7 +152,7 @@ public class AlertService {
      * Send mail for all {@link Alert}s met their condition once per day.
      * If {@link Alert} has been sent today, then no mails for this {@link Alert}
      * would be sent. Data for queues and analysts is retrieved by
-     * {@link ItemLabelingMetricService}.
+     * {@link PublicItemLabelingMetricService}.
      * <p>
      * Mail metadata are taken from {@link ConfigurableAppSetting} container in
      * CosmosDB. The type of parameter is {@link AppSettingsType#MAIL_TEMPLATES}.
@@ -175,41 +177,51 @@ public class AlertService {
         Duration period = alert.getPeriod();
         OffsetDateTime now = OffsetDateTime.now();
         OffsetDateTime since = now.minus(period);
-        ItemLabelingMetricDTO totalMetrics = metricService
-                .getItemLabelingTotalMetrics(since, now, alert.getAnalysts(), alert.getQueues());
-
-        double metricValue = getValueByMetric(totalMetrics, alert.getMetricType());
-        boolean alertInvoke = evaluateValue(metricValue, alert);
-        alert.getLastCheck().setChecked(now);
-        alert.getLastCheck().setValue(metricValue);
-        alert.getLastCheck().setResult(alertInvoke);
-        if (alertInvoke) {
-            alert.getLastCheck().setMessage(getAlertMessage(alert, templates));
-        } else {
-            alert.getLastCheck().setMessage(null);
-        }
-
 
         boolean alertSent = false;
 
+        try {
+            Analyst analyst = analystClient.getAnalystById(alert.getOwnerId());
+            UserPrincipalUtility.setEmulatedAuth(analyst);
+            ItemLabelingMetricDTO totalMetrics = metricService
+                    .getItemLabelingTotalMetrics(since, now, alert.getAnalysts(), alert.getQueues());
+            UserPrincipalUtility.clearEmulatedAuth();
 
-        if (alertInvoke && !isNotificationSentToday(alert, now)) {
-            String email = null;
-            try {
-                email = analystClient.getAnalystById(alert.getOwnerId()).getMail();
-            } catch (NotFoundException e) {
-                log.info("User [{}] can't be retrieved from AD for alert sending", alert.getOwnerId());
-            }
-            if (StringUtils.isNotBlank(email)) {
-                alertSent = sendEmail(email, getAlertSubject(alert, templates), alert.getLastCheck().getMessage());
-                if (alertSent) {
-                    alert.getLastNotification().setSent(now);
-                    alert.getLastNotification().setEmail(email);
-                }
+            double metricValue = getValueByMetric(totalMetrics, alert.getMetricType());
+            boolean alertInvoke = evaluateValue(metricValue, alert);
+            alert.getLastCheck().setChecked(now);
+            alert.getLastCheck().setValue(metricValue);
+            alert.getLastCheck().setResult(alertInvoke);
+            if (alertInvoke) {
+                alert.getLastCheck().setMessage(getAlertMessage(alert, templates));
             } else {
-                log.info("Alert [{}] should be sent to user [{}] but can't due to email missing",
-                        alert.getId(), alert.getOwnerId());
+                alert.getLastCheck().setMessage(null);
             }
+
+            if (alertInvoke && !isNotificationSentToday(alert, now)) {
+                String email = analyst.getMail();
+                if (StringUtils.isNotBlank(email)) {
+                    alertSent = sendEmail(email, getAlertSubject(alert, templates), alert.getLastCheck().getMessage());
+                    if (alertSent) {
+                        alert.getLastNotification().setSent(now);
+                        alert.getLastNotification().setEmail(email);
+                    }
+                } else {
+                    log.info("Alert [{}] should be sent to user [{}] but can't due to email missing",
+                            alert.getId(), alert.getOwnerId());
+                }
+            }
+        } catch (NotFoundException e) {
+            alert.setActive(false);
+            alert.getLastCheck().setChecked(now);
+            alert.getLastCheck().setResult(false);
+            alert.getLastCheck().setMessage("Alert has been disabled due to author inactivity.");
+        } catch (AccessDeniedException e){
+            alert.setActive(false);
+            alert.getLastCheck().setChecked(now);
+            alert.getLastCheck().setResult(false);
+            alert.getLastCheck().setMessage("Alert has been disabled due to security reasons.");
+            log.warn("Alert [{}] has been disabled due to security reasons", alert.getId());
         }
 
         alertRepository.save(alert);

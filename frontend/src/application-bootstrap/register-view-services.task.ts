@@ -21,9 +21,13 @@ import { QueueMutationStore, QueueMutationModalStore } from '../view-services/es
 import { ReviewPermissionStore } from '../view-services/review-permission-store';
 import { DashboardDemandSupplyScreenStore } from '../view-services/dashboard/dashboard-demand-supply-screen-store';
 import { AnalystsPerformanceStore } from '../view-services/dashboard/analysts-performance-store';
-import { AnalystPerformanceStore } from '../view-services/dashboard/analyst-performance-store';
-import { QueueOverturnedPerformanceStore } from '../view-services/dashboard/queue-overturned-performance-store';
+import {
+    QueueOverturnedPerformanceStore,
+    AnalystPerformanceStore
+} from '../view-services/dashboard';
 import { DemandQueuePerformanceStore } from '../view-services/dashboard/demand-queue-performance-store';
+import { FiltersStore } from '../view-services/essence-mutation-services/filters-store';
+import { SearchScreenStore } from '../view-services/search';
 
 export const registerViewServicesTask = {
     execute: async (logger: Logger, container: Container) => {
@@ -88,6 +92,15 @@ export const registerViewServicesTask = {
         container
             .bind<AlertsMutationStore>(TYPES.ALERTS_MUTATION_STORE)
             .to(AlertsMutationStore);
+
+        container
+            .bind<SearchScreenStore>(TYPES.SEARCH_SCREEN_STORE)
+            .to(SearchScreenStore)
+            .inSingletonScope();
+
+        container
+            .bind<FiltersStore>(TYPES.FILTERS_STORE)
+            .to(FiltersStore);
 
         //  ____  DASHBOARD STORES ____
 

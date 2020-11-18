@@ -3,6 +3,7 @@
 
 package com.griddynamics.msd365fp.manualreview.model.dfp.raw;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Data;
@@ -19,6 +20,8 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class AddressNodeData extends NodeData {
+    public static final String NODE_NAME = "Address";
+
     private String addressId;
     private String street1;
     private String street2;
@@ -26,6 +29,7 @@ public class AddressNodeData extends NodeData {
     private String city;
     private String state;
     private String zipCode;
-    private String countryRegion;
+    @JsonProperty("CountryRegion")
+    private String country;
 
 }

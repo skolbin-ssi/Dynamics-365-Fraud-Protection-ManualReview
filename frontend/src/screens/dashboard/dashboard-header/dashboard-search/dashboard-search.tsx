@@ -157,7 +157,7 @@ export class DashboardSearch extends Component<SearchProps, SearchState> {
             <BasePicker
                 <IPersonaProps, IBasePickerProps<IPersonaProps>>
                 inputProps={{
-                    placeholder: 'Find a Queue or an Analyst',
+                    placeholder: 'Find a queue or an analyst',
                     className: `${CN}__input`
                 }}
                 selectedItems={[]}
@@ -165,8 +165,8 @@ export class DashboardSearch extends Component<SearchProps, SearchState> {
                 onEmptyResolveSuggestions={this.resolveEmptyUsersSuggestions}
                 onChange={this.handleAnalystSelectionChange}
                 pickerSuggestionsProps={{
-                    suggestionsHeaderText: 'Suggested Analysts',
-                    noResultsFoundText: 'No Analysts found',
+                    suggestionsHeaderText: 'Suggested analysts',
+                    noResultsFoundText: 'No analysts found',
                     className: `${CN}__assignment-suggestion`
                 }}
                 itemLimit={1}
@@ -182,7 +182,7 @@ export class DashboardSearch extends Component<SearchProps, SearchState> {
             <BasePicker
                 <Queue, IBasePickerProps<Queue>>
                 inputProps={{
-                    placeholder: 'Find a Queue or an Analyst',
+                    placeholder: 'Find a queue or an analyst',
                     className: `${CN}__input`
                 }}
                 selectedItems={[]}
@@ -190,8 +190,8 @@ export class DashboardSearch extends Component<SearchProps, SearchState> {
                 onEmptyResolveSuggestions={this.resolveEmptyQueueSuggestions}
                 onChange={this.handleQueueSelectionChange}
                 pickerSuggestionsProps={{
-                    suggestionsHeaderText: 'Suggested Queues',
-                    noResultsFoundText: 'No Queues found',
+                    suggestionsHeaderText: 'Suggested queues',
+                    noResultsFoundText: 'No queues found',
                     className: `${CN}__assignment-suggestion`
                 }}
                 itemLimit={1}

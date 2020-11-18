@@ -7,11 +7,7 @@ import cn from 'classnames';
 import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
 
-import {
-    DefaultButton,
-    IconButton,
-    PrimaryButton
-} from '@fluentui/react/lib/Button';
+import { DefaultButton, IconButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import { FontIcon } from '@fluentui/react/lib/Icon';
 import { Overlay } from '@fluentui/react/lib/Overlay';
 import { Spinner } from '@fluentui/react/lib/Spinner';
@@ -22,7 +18,7 @@ import { Queue } from '../../../models';
 import { TYPES } from '../../../types';
 import { QueueMutationModalStore } from '../../../view-services/essence-mutation-services';
 
-import { QUEUE_MUTATION_TYPES, QUEUE_MANAGEMENT, CreateQueueModalTabs } from '../../../constants';
+import { CreateQueueModalTabs, QUEUE_MANAGEMENT, QUEUE_MUTATION_TYPES } from '../../../constants';
 
 import { GeneralTab } from './general-tab/general-tab';
 import { FiltersTab } from './filters-tab/filters-tab';
@@ -31,6 +27,7 @@ import { DeleteTab } from './delete-tab/delete-tab';
 import { CurrentUserStore } from '../../../view-services';
 
 import './create-edit-queue.scss';
+import { FiltersStore } from '../../../view-services/essence-mutation-services/filters-store';
 
 interface CreateEditQueueModalProps {
     closeCreateEditQueueModal: () => void;
@@ -50,6 +47,9 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
     @resolve(TYPES.QUEUE_MUTATION_MODAL_STORE)
     private queueCreationModalStore!: QueueMutationModalStore;
 
+    @resolve(TYPES.FILTERS_STORE)
+    private filtersStore!: FiltersStore;
+
     @resolve(TYPES.CURRENT_USER_STORE)
     private userStore!: CurrentUserStore;
 
@@ -64,11 +64,22 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
         const { mutationType, queue, initialTab } = this.props;
         this.queueCreationModalStore.queueMutationStore.setMutationType(mutationType);
         if (mutationType === QUEUE_MUTATION_TYPES.UPDATE) {
-            this.queueCreationModalStore.queueMutationStore.setCurrentValue(queue as Queue);
+            this.queueCreationModalStore.queueMutationStore.setCurrentValue(queue as Queue)
+                .then(() => this.setQueueFiltersToFiltersStoreMutatedFilters());
         }
         this.queueCreationModalStore.queueMutationStore.getUsersIfNecessary();
         if (initialTab) {
             this.setState({ activeTab: initialTab });
+        }
+    }
+
+    setQueueFiltersToFiltersStoreMutatedFilters() {
+        const { queueMutationStore: { fields: { filters } } } = this.queueCreationModalStore;
+        const { mutationType } = this.props;
+
+        if (mutationType === QUEUE_MUTATION_TYPES.UPDATE) {
+            this.filtersStore.clearMutatedFilters();
+            this.filtersStore.setMutatedFilters(filters);
         }
     }
 
@@ -235,6 +246,7 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
         const { isValid } = queueMutationStore;
 
         const isCreateModal = mutationType === QUEUE_MUTATION_TYPES.CREATE;
+        const isUpdateState = mutationType === QUEUE_MUTATION_TYPES.UPDATE;
 
         let tabToRender: JSX.Element;
         let primaryBtnText = isCreateModal ? 'Next' : 'Update';
@@ -249,7 +261,13 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
                 }
                 break;
             case 'filter':
-                tabToRender = <FiltersTab queueMutationModalStoreInstance={this.queueCreationModalStore} />;
+                tabToRender = (
+                    <FiltersTab
+                        isDisabled={isUpdateState}
+                        filtersStore={this.filtersStore}
+                        queueMutationModalStoreInstance={this.queueCreationModalStore}
+                    />
+                );
                 if (isCreateModal) {
                     primaryBtnAction = () => this.setActiveTab('assign');
                 }
@@ -280,8 +298,8 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
                     >
                         {
                             isCreateModal
-                                ? 'Create a new Queue'
-                                : `${activeTab === 'delete' ? 'Delete' : 'Edit'} Queue`
+                                ? 'Create a new queue'
+                                : `${activeTab === 'delete' ? 'Delete' : 'Edit'} queue`
                         }
                     </Text>
                     <IconButton

@@ -8,6 +8,12 @@ import { PieDatum } from '@nivo/pie';
 import { PerformanceMetricsDTO } from '../../data-services/api-services/models/dashboard';
 import { COLORS } from '../../styles/variables';
 
+export interface DecisionPieDatum extends PieDatum {
+    percentage: string;
+    color: string;
+    label: string;
+}
+
 export class PerformanceMetrics implements PerformanceMetricsDTO {
     @observable reviewed: number = 0;
 
@@ -34,7 +40,7 @@ export class PerformanceMetrics implements PerformanceMetricsDTO {
     }
 
     @computed
-    get chartData(): PieDatum[] {
+    get chartData(): DecisionPieDatum[] {
         const { good, bad, watched } = this.getPieChartPerformanceMetricsInPercentages();
 
         return [

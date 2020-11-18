@@ -64,7 +64,7 @@ export class Header extends Component<HeaderProps, never> {
                             variant="mediumPlus"
                             styles={headingStyles}
                         >
-                            {title || 'DFP Manual Review'}
+                            {title || 'Dynamics 365 Fraud Protection Manual Review'}
                         </Text>
                     </Stack>
                 </Stack.Item>

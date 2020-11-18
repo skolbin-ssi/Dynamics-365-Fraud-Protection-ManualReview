@@ -28,7 +28,9 @@ public class Task {
     private TaskStatus status;
     private Map<String,String> variables;
     private OffsetDateTime previousRun;
-    private String failedStatusMessage;
+    private Boolean previousRunSuccessfull;
+    private String lastFailedRunMessage;
+    private String instanceId;
 
     @Version
     @SuppressWarnings("java:S116")

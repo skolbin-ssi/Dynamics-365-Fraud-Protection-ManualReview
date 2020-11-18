@@ -75,6 +75,9 @@
     "tenantId": {
       "type": "string"
     },
+    "clientTenantId": {
+      "type": "string"
+    },
     "appJavaOpts": {
       "type": "string"
     },
@@ -99,10 +102,13 @@
     "appInsightName": {
       "type": "String"
     },
-    "tenantShortName": {
+    "clientTenantShortName": {
       "type": "String"
     },
     "logWorkspaceName": {
+      "type": "string"
+    },
+    "mapAppId": {
       "type": "string"
     }
   },
@@ -175,8 +181,16 @@
                   "value": "[parameters('appSpId')]"
                 },
                 {
+                  "name": "MAP_CLIENT_ID",
+                  "value": "[parameters('mapAppId')]"
+                },
+                {
                   "name": "TENANT_ID",
                   "value": "[parameters('tenantId')]"
+                },
+                {
+                  "name": "CLIENT_TENANT_ID",
+                  "value": "[parameters('clientTenantId')]"
                 },
                 {
                   "name": "MAIL_USERNAME",
@@ -195,8 +209,8 @@
                   "value": "[parameters('dfpSpId')]"
                 },
                 {
-                  "name": "TENANT_SHORT_NAME",
-                  "value": "[parameters('tenantShortName')]"
+                  "name": "CLIENT_TENANT_SHORT_NAME",
+                  "value": "[parameters('clientTenantShortName')]"
                 },
                 {
                   "name": "KEYVAULT_ENDPOINT",

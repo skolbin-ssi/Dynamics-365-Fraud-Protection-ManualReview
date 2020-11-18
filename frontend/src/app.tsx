@@ -18,7 +18,8 @@ import {
     MANUAL_REVIEW,
     QUEUE_MANAGEMENT,
     USER_INFO_MANAGEMENT,
-    ROUTES
+    SEARCH_MANAGEMENT,
+    ROUTES,
 } from './constants';
 import {
     AlertEdit,
@@ -28,7 +29,8 @@ import {
     Login,
     Queues,
     ReviewConsole,
-    PersonalPerformance
+    PersonalPerformance,
+    SearchScreen,
 } from './screens';
 import { QueueTiles } from './screens/queue-tiles/queue-tiles';
 
@@ -113,7 +115,36 @@ export const ROUTES_LIST = [
         isPrivate: true,
         showLockedOrders: true,
         accessPermission: ALERTS_MANAGEMENT.ACCESS
-    }
+    },
+    {
+        path: [
+            ROUTES.SEARCH_NEW,
+            ROUTES.SEARCH_BY_ID,
+        ],
+        component: SearchScreen,
+        exact: true,
+        isPrivate: true,
+        showLockedOrders: true,
+        accessPermission: SEARCH_MANAGEMENT.ACCESS
+    },
+    {
+        path: ROUTES.SEARCH_INACTIVE_ITEM_DETAILS,
+        component: ReviewConsole,
+        isPrivate: true,
+        accessPermission: SEARCH_MANAGEMENT.ACCESS
+    },
+    {
+        path: ROUTES.SEARCH_ITEM_DETAILS,
+        component: ReviewConsole,
+        isPrivate: true,
+        accessPermission: MANUAL_REVIEW.ACCESS
+    },
+    {
+        path: ROUTES.SEARCH_ITEM_DETAILS_REVIEW_CONSOLE,
+        component: ReviewConsole,
+        isPrivate: true,
+        accessPermission: MANUAL_REVIEW.ACCESS
+    },
 ];
 
 export class App extends React.Component<AppProps, never> {

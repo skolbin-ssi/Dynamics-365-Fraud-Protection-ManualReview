@@ -10,14 +10,23 @@ import ch.qos.logback.core.spi.FilterReply;
 import org.slf4j.Marker;
 
 public class EventHubSpamErrorFilter extends TurboFilter {
+
+    public static final String DEGRADED_LOG_LEVEL_PREFIX = "Degraded log level: ";
+
     @Override
     public FilterReply decide(final Marker marker, final Logger logger, final Level level, final String format, final Object[] params, final Throwable t) {
-        if (level != null && level.isGreaterOrEqual(Level.WARN) &&
-                logger != null && logger.getName() != null && logger.getName().contains("com.azure") &&
+        if (level != null &&
                 format != null &&
-                (format.contains("New receiver 'nil' with higher epoch of '0' is created hence current receiver 'nil' with epoch '0' is getting disconnected") ||
-                        format.endsWith("Error occurred in link."))) {
-            return FilterReply.DENY;
+                logger != null && logger.getName() != null &&
+                (logger.getName().contains("com.azure.messaging.eventhubs") ||
+                        logger.getName().contains("com.azure.core.amqp.implementation"))) {
+            if (level.isGreaterOrEqual(Level.WARN)){
+                logger.info(marker, DEGRADED_LOG_LEVEL_PREFIX + format, params);
+                return FilterReply.DENY;
+            } else if (level.isGreaterOrEqual(Level.INFO) && !format.startsWith(DEGRADED_LOG_LEVEL_PREFIX)){
+                logger.debug(marker, DEGRADED_LOG_LEVEL_PREFIX + format, params);
+                return FilterReply.DENY;
+            }
         }
         return FilterReply.NEUTRAL;
     }

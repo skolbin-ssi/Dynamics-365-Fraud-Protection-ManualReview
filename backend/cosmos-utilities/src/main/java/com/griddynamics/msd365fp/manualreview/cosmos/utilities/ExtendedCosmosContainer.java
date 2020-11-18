@@ -55,7 +55,9 @@ public class ExtendedCosmosContainer {
         final FeedOptions feedOptions = new FeedOptions();
         feedOptions.enableCrossPartitionQuery(true);
         feedOptions.maxItemCount(size);
-        feedOptions.requestContinuation(continuationToken);
+        if (continuationToken != null) {
+            feedOptions.requestContinuation(continuationToken);
+        }
         Flux<FeedResponse<CosmosItemProperties>> feedResponseFlux =
                 container.queryItems(query, feedOptions);
         FeedResponse<CosmosItemProperties> res = feedResponseFlux.blockFirst(Duration.ofSeconds(DEFAULT_COSMOS_TIMEOUT_SEC));

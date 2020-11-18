@@ -6,37 +6,41 @@ package com.griddynamics.msd365fp.manualreview.ehub.durable.streaming;
 
 import com.azure.core.amqp.exception.AmqpErrorCondition;
 import com.azure.core.amqp.exception.AmqpException;
-import com.azure.messaging.eventhubs.EventProcessorClient;
-import com.azure.messaging.eventhubs.EventProcessorClientBuilder;
+import com.azure.messaging.eventhubs.*;
 import com.azure.messaging.eventhubs.checkpointstore.blob.BlobCheckpointStore;
 import com.azure.messaging.eventhubs.models.*;
 import com.azure.storage.blob.BlobContainerAsyncClient;
 import com.azure.storage.blob.BlobContainerClientBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.config.properties.EventHubProperties;
+import com.griddynamics.msd365fp.manualreview.ehub.durable.model.HealthCheckProcessor;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
-import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 
 @Slf4j
+@RequiredArgsConstructor
 public class DurableEventHubProcessorClient<T> {
 
     public static final String NONE_PARTITION = "NONE";
     public static final String PARTITION_TAG = "partition";
     public static final String HUB_TAG = "hub";
     public static final int MAX_EHUB_PARTITIONS = 32;
+    public static final String MR_HEALTH_CHECK_PREFIX = "{\"mr-eh-health-check\":true,\"checkId\":\"";
+    public static final String MR_HEALTH_CHECK_SUFFIX = "\"}";
 
     private final EventHubProperties properties;
     private final String hubName;
@@ -44,34 +48,44 @@ public class DurableEventHubProcessorClient<T> {
     private final Class<T> klass;
     private final Consumer<T> eventProcessor;
     private final Consumer<Throwable> errorProcessor;
+    private final HealthCheckProcessor healthcheckProcessor;
     private final MeterRegistry meterRegistry;
 
     private final Map<String, EventPosition> positionMap = new ConcurrentHashMap<>();
     private final Map<String, Counter> processingLagCounters = new ConcurrentHashMap<>();
     private final Map<String, Counter> processingCounters = new ConcurrentHashMap<>();
+    private final Map<String, Counter> healthCheckReceivingCounters = new ConcurrentHashMap<>();
     private final Map<String, Counter> errorCounters = new ConcurrentHashMap<>();
     private final Map<String, Counter> rebalancingCounters = new ConcurrentHashMap<>();
     private final Map<String, OffsetDateTime> localCheckpoints = new ConcurrentHashMap<>();
-    private EventProcessorClient internalClient;
-    private final int errorThreshhold;
-    private final AtomicInteger errorsFound = new AtomicInteger(0);
 
-    @Builder
-    public DurableEventHubProcessorClient(final EventHubProperties properties,
-                                          final String hubName,
-                                          final ObjectMapper mapper,
-                                          final Class<T> klass,
-                                          final Consumer<T> eventProcessor,
-                                          final Consumer<Throwable> errorProcessor,
-                                          final MeterRegistry meterRegistry) {
-        this.properties = properties;
-        this.hubName = hubName;
-        this.mapper = mapper;
-        this.klass = klass;
-        this.eventProcessor = eventProcessor;
-        this.errorProcessor = errorProcessor;
-        this.meterRegistry = meterRegistry;
-        this.errorThreshhold = properties.getConsumerErrorThreshold();
+    private EventProcessorClient internalClient;
+    private EventHubProducerAsyncClient healthcheckClient;
+    private Counter healthCheckSendingCounter;
+    private Counter healthCheckSendingErrorCounter;
+
+
+    public void sendHealthCheckPing(String id, Runnable callback) {
+        if (healthcheckClient != null) {
+            EventData data = new EventData(MR_HEALTH_CHECK_PREFIX + id + MR_HEALTH_CHECK_SUFFIX);
+            healthcheckClient.send(Set.of(data))
+                    .timeout(properties.getSendingTimeout())
+                    .retry(properties.getSendingRetries())
+                    .doOnSuccess(res -> {
+                        log.debug("Health-check [{}] has been successfully sent.", id);
+                        healthCheckSendingCounter.increment();
+                        callback.run();
+                    })
+                    .doOnError(e -> {
+                        log.warn("Error during health-check [{}] sending.", id, e);
+                        healthCheckSendingErrorCounter.increment();
+                    })
+                    .subscribeOn(Schedulers.elastic())
+                    .subscribe();
+        } else {
+            log.warn("EH healthcheck is called before client initialization");
+        }
+
     }
 
     public synchronized void start() {
@@ -107,38 +121,42 @@ public class DurableEventHubProcessorClient<T> {
 
             internalClient = eventProcessorClientBuilder.buildEventProcessorClient();
         }
+        if (healthcheckClient == null) {
+            healthCheckSendingCounter = meterRegistry.counter(
+                    "event-hub.health-check-sending",
+                    Tags.of(HUB_TAG, hubName));
+            healthCheckSendingErrorCounter = meterRegistry.counter(
+                    "event-hub.health-check-sending-error",
+                    Tags.of(HUB_TAG, hubName));
+            healthcheckClient = new EventHubClientBuilder()
+                    .connectionString(
+                            properties.getConnectionString(),
+                            properties.getConsumers().get(hubName).getDestination())
+                    .buildAsyncProducerClient();
+        }
 
         log.info("Start EventHub listening for [{}]", hubName);
         internalClient.start();
     }
 
-    public boolean requireRestart() {
-        return errorsFound.get() > errorThreshhold;
-    }
-
     protected void onReceive(EventContext eventContext) {
         String partition = eventContext.getPartitionContext().getPartitionId();
         Long sequenceNumber = eventContext.getEventData().getSequenceNumber();
-        log.info("Processing event from partition [{}] in [{}] with sequence number [{}]",
-                partition,
-                hubName,
-                sequenceNumber);
 
-        Counter lagCounter = processingLagCounters.get(partition);
-        Counter processingCounter = processingCounters.get(partition);
         long lag = eventContext.getLastEnqueuedEventProperties().getSequenceNumber() - sequenceNumber;
         OffsetDateTime received = OffsetDateTime.now();
+        byte[] bodyBytes = eventContext.getEventData().getBody();
+        String bodyString = new String(bodyBytes);
 
-        try {
-            T body = mapper.readValue(
-                    eventContext.getEventData().getBody(), klass);
-            eventProcessor.accept(body);
-        } catch (Exception e) {
-            errorProcessor.accept(e);
+        if (bodyString.startsWith(MR_HEALTH_CHECK_PREFIX)) {
+            healthCheckReceivingCounters.get(partition).increment();
+            processHealthCheckEvent(partition, bodyString);
+        } else {
+            processingCounters.get(partition).increment();
+            processDataEvent(partition, sequenceNumber, bodyBytes);
         }
 
-        processingCounter.increment();
-        lagCounter.increment(lag);
+        processingLagCounters.get(partition).increment(lag);
         if (lag == 0 ||
                 localCheckpoints.get(partition)
                         .plus(properties.getCheckpointInterval())
@@ -151,6 +169,31 @@ public class DurableEventHubProcessorClient<T> {
             eventContext.updateCheckpoint();
         }
 
+    }
+
+    private void processDataEvent(final String partition, final Long sequenceNumber, final byte[] bodyBytes) {
+        log.info("Processing event from partition [{}] in [{}] with sequence number [{}]",
+                partition,
+                hubName,
+                sequenceNumber);
+
+        try {
+            T body = mapper.readValue(bodyBytes, klass);
+            eventProcessor.accept(body);
+        } catch (Exception e) {
+            errorProcessor.accept(e);
+        }
+    }
+
+    private void processHealthCheckEvent(final String partition, final String bodyString) {
+        String checkId = bodyString.substring(
+                MR_HEALTH_CHECK_PREFIX.length(),
+                bodyString.lastIndexOf(MR_HEALTH_CHECK_SUFFIX));
+        if (healthcheckProcessor != null) {
+            healthcheckProcessor.processConsumerHealthCheck(hubName, partition, checkId);
+        } else {
+            log.info("Health-check [{}] for [{}] has been received on partition [{}]", checkId, hubName, partition);
+        }
     }
 
     protected void onError(ErrorContext errorContext) {
@@ -167,7 +210,6 @@ public class DurableEventHubProcessorClient<T> {
                     errorContext.getThrowable());
             Counter errorCounter = errorCounters.get(partition);
             errorCounter.increment();
-            errorsFound.incrementAndGet();
             errorProcessor.accept(errorContext.getThrowable());
         }
     }
@@ -208,6 +250,9 @@ public class DurableEventHubProcessorClient<T> {
         rebalancingCounters.computeIfAbsent(partition, key -> meterRegistry.counter(
                 "event-hub.rebalancing",
                 Tags.of(HUB_TAG, hubName, PARTITION_TAG, partition)));
+        healthCheckReceivingCounters.computeIfAbsent(partition, key -> meterRegistry.counter(
+                "event-hub.health-check-receiving",
+                Tags.of(HUB_TAG, hubName, PARTITION_TAG, partition)));
 
         // prepare local variables
         localCheckpoints.computeIfAbsent(
@@ -218,8 +263,9 @@ public class DurableEventHubProcessorClient<T> {
     }
 
     protected void onClose(CloseContext context) {
-        log.info("Stopped receiving on partition [{}] in [{}]. Reason: {}",
-                context.getPartitionContext().getPartitionId(),
+        String partition = context.getPartitionContext().getPartitionId();
+        log.info("Stopped receiving from partition [{}] in [{}]. Reason: {}",
+                partition,
                 hubName,
                 context.getCloseReason());
     }

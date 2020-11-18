@@ -47,6 +47,7 @@ public class TaskService {
     private final ThreadPoolTaskExecutor taskExecutor;
     private final QueueService queueService;
     private final ItemService itemService;
+    private final ItemEnrichmentService itemEnrichmentService;
     private final DictionaryService dictionaryService;
     private final StreamService streamService;
 
@@ -56,18 +57,14 @@ public class TaskService {
     private Duration partialCheckObservedPeriod;
 
     private Map<String, TaskExecution<Object, Exception>> taskExecutions;
-    private Map<String, TaskCondition<Exception>> taskConditions;
 
     @PostConstruct
     private void initializeTasks() {
-        this.taskConditions = Map.of(
-                FAIL_FAST_TASK_NAME, this::failFastCondition);
-
         this.taskExecutions = Map.of(
                 QUEUE_ASSIGNMENT_TASK_NAME, task ->
                         queueService.reconcileQueueAssignments(),
                 ENRICHMENT_TASK_NAME, task ->
-                        itemService.enrichAllPoorItems(false),
+                        itemEnrichmentService.enrichAllPoorItems(false),
                 OVERALL_SIZE_TASK_NAME, task ->
                         streamService.sendOverallSizeEvent(itemService.countActiveItems()),
                 QUEUE_SIZE_TASK_NAME, task ->
@@ -81,7 +78,8 @@ public class TaskService {
                                 task.getPreviousRun(),
                                 applicationProperties.getTasks().get(task.getId()).getDelay()),
                 ITEM_ASSIGNMENT_TASK_NAME, this::itemStateFetch,
-                FAIL_FAST_TASK_NAME, this::failFast
+                PRIM_HEALTH_ANALYSIS_TASK_NAME, this::healthAnalysis,
+                SEC_HEALTH_ANALYSIS_TASK_NAME, this::healthAnalysis
         );
 
         Optional<Map.Entry<String, ApplicationProperties.TaskProperties>> incorrectTimingTask = applicationProperties.getTasks().entrySet().stream()
@@ -115,7 +113,7 @@ public class TaskService {
         allTasks.forEach(task -> {
             if (!READY.equals(task.getStatus())) {
                 task.setStatus(READY);
-                task.setFailedStatusMessage("Restored manually");
+                task.setLastFailedRunMessage("Restored manually");
                 taskRepository.save(task);
             }
         });
@@ -162,7 +160,7 @@ public class TaskService {
 
                     // Create task if absent
                     if (task == null) {
-                        createStoredTask(taskName);
+                        createStoredTask(taskName, taskPropertiesEntry.getValue());
                     }
 
                     // Restore task if it's stuck
@@ -184,7 +182,7 @@ public class TaskService {
             timeAfterPreviousRun = Duration.between(
                     task.getPreviousRun(), OffsetDateTime.now());
         } else {
-            timeAfterPreviousRun = Duration.ZERO;
+            timeAfterPreviousRun = Duration.between(OffsetDateTime.MIN, OffsetDateTime.now());
         }
         Duration timeout = Objects.requireNonNullElse(taskProperties.getTimeout(), taskProperties.getDelay());
         Duration acceptableDelayBeforeWarning = Duration.ofSeconds(
@@ -193,13 +191,13 @@ public class TaskService {
                 (long) (timeout.toSeconds() * applicationProperties.getTaskResetTimeoutMultiplier()));
         if (timeAfterPreviousRun.compareTo(acceptableDelayBeforeWarning) > 0) {
             log.warn("Task [{}] is idle for too long. Last execution was [{}] minutes ago with status message: [{}]",
-                    task.getId(), timeAfterPreviousRun.toMinutes(), task.getFailedStatusMessage());
+                    task.getId(), timeAfterPreviousRun.toMinutes(), task.getLastFailedRunMessage());
         }
         if (!READY.equals(task.getStatus()) && timeAfterPreviousRun.compareTo(acceptableDelayBeforeReset) > 0) {
             try {
                 log.info("Start [{}] task restore", task.getId());
                 task.setStatus(READY);
-                task.setFailedStatusMessage("Restored after long downtime");
+                task.setLastFailedRunMessage("Restored after long downtime");
                 taskRepository.save(task);
                 log.info("Task [{}] has been restored", task.getId());
             } catch (CosmosDBAccessException e) {
@@ -208,12 +206,13 @@ public class TaskService {
         }
     }
 
-    private void createStoredTask(final String taskName) {
+    private void createStoredTask(final String taskName, final ApplicationProperties.TaskProperties properties) {
         try {
             log.info("Trying to create task [{}]", taskName);
             taskRepository.save(Task.builder()
                     .id(taskName)
                     ._etag(taskName)
+                    .previousRun(OffsetDateTime.now().minus(properties.getDelay()))
                     .status(READY)
                     .build());
             log.info("Task [{}] has been initialized successfully.", taskName);
@@ -243,7 +242,7 @@ public class TaskService {
      * have to be saved to the database with updated {@link Task#getStatus()}.
      * </p>
      * In case task execution failed with an exception,
-     * {@link Task#getFailedStatusMessage()} is set to
+     * {@link Task#getLastFailedRunMessage()} is set to
      * {@link Exception#getMessage()} and new state saved into the database.
      *
      * @param task which should represent a lock object
@@ -255,26 +254,19 @@ public class TaskService {
         ApplicationProperties.TaskProperties taskProperties =
                 applicationProperties.getTasks().get(task.getId());
         TaskExecution<Object, Exception> taskExecution = taskExecutions.get(task.getId());
-        TaskCondition<Exception> taskCondition = taskConditions.get(task.getId());
 
         // check possibility to execute
         if (!READY.equals(task.getStatus())) {
             return false;
         }
-        if (taskCondition != null) {
-            try {
-                if (!taskCondition.check(task)) {
-                    return false;
-                }
-            } catch (Exception e) {
-                log.warn("Condition checking for [{}] task ended with an exception", task.getId(), e);
-                return false;
-            }
-        }
 
         // acquire a lock
+        OffsetDateTime startTime = OffsetDateTime.now();
         task.setStatus(RUNNING);
-        task.setPreviousRun(OffsetDateTime.now());
+        task.setInstanceId(applicationProperties.getInstanceId());
+        if (task.getPreviousRun() == null){
+            task.setPreviousRun(startTime);
+        }
         Task runningTask;
         try {
             runningTask = taskRepository.save(task);
@@ -304,10 +296,13 @@ public class TaskService {
                         TimeUnit.MILLISECONDS)
                 .whenComplete((result, exception) -> {
                     runningTask.setStatus(READY);
+                    runningTask.setPreviousRun(startTime);
+                    runningTask.setPreviousRunSuccessfull(true);
                     if (exception != null) {
                         log.warn("Task [{}] finished its execution with an exception.",
                                 runningTask.getId(), exception);
-                        runningTask.setFailedStatusMessage(exception.getMessage());
+                        runningTask.setLastFailedRunMessage(exception.getMessage());
+                        runningTask.setPreviousRunSuccessfull(false);
                         taskRepository.save(runningTask);
                     } else if (result.isEmpty()) {
                         log.info("Task [{}] finished its execution with empty result.", runningTask.getId());
@@ -321,21 +316,18 @@ public class TaskService {
     }
 
 
-    private boolean failFastCondition(Task task) {
+    private boolean healthAnalysis(Task task) {
         boolean resourcesAreHealthy;
         try {
             resourcesAreHealthy = streamService.checkStreamingHealth();
         } catch (Exception e) {
-            log.error("Exception during fail fast reconciliation.", e);
+            log.error("Exception during health-check.", e);
             resourcesAreHealthy = false;
         }
-        return !resourcesAreHealthy;
-    }
-
-    private boolean failFast(Task task) {
-        log.error("Fatal error has been discovered. Initiate fail-fast recovery.");
-        System.exit(FAIL_FAST_STATUS);
-        return true;
+        if (!resourcesAreHealthy) {
+            log.warn("One of health checks has failed.");
+        }
+        return resourcesAreHealthy;
     }
 
 
@@ -366,10 +358,5 @@ public class TaskService {
     @FunctionalInterface
     public interface TaskExecution<T, E extends Exception> {
         T apply(Task task) throws E;
-    }
-
-    @FunctionalInterface
-    public interface TaskCondition<E extends Exception> {
-        boolean check(Task task) throws E;
     }
 }

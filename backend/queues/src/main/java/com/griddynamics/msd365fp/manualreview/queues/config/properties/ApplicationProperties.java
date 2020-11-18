@@ -18,6 +18,8 @@ import java.util.Map;
 @AllArgsConstructor
 public class ApplicationProperties {
 
+    private final String instanceType;
+    private final String instanceId;
     private final Map<String, TaskProperties> tasks;
     private final double taskResetTimeoutMultiplier;
     private final double taskWarningTimeoutMultiplier;

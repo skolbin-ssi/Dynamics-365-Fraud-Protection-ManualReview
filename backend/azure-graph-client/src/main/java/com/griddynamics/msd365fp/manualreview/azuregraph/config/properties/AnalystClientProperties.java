@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
+import java.time.Duration;
 import java.util.Map;
 
 @Getter
@@ -31,5 +32,7 @@ public class AnalystClientProperties {
     private final String usersUrl;
     private final String userUrlTemplate;
     private final String userPhotoUrlTemplate;
+    private final Duration timeout;
+    private final Long retries;
 
 }

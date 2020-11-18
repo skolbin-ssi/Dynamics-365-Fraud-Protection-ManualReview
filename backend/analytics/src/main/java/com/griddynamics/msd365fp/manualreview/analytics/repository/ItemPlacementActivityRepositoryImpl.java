@@ -31,11 +31,11 @@ public class ItemPlacementActivityRepositoryImpl implements ItemPlacementActivit
         return itemPlacementActivityContainer.runCrossPartitionQuery(
                 String.format(
                         "SELECT VALUE root FROM " +
-                                "(SELECT c.type, count(c.type) AS cnt, c.queueId AS id, udf.getTimestampBucket(%1$s,%3$s, c.actioned) AS bucket " +
+                                "(SELECT c.type, count(c.type) AS cnt, c.queueId AS id, FLOOR((c.actioned-%1$s)/%3$s) AS bucket " +
                                 "FROM c where " +
                                 "(c.actioned BETWEEN %1$s AND %2$s) " +
                                 "%4$s " +
-                                "group by c.queueId, udf.getTimestampBucket(%1$s,%3$s,c.actioned), c.type) " +
+                                "group by c.queueId, FLOOR((c.actioned-%1$s)/%3$s), c.type) " +
                                 "AS root",
                         startDateTime.toEpochSecond(),
                         endDateTime.toEpochSecond(),

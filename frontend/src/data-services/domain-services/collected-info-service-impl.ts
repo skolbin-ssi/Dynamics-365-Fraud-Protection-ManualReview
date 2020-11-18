@@ -11,7 +11,7 @@ import { Logger } from '../../utility-services/logger';
 import { GetCurrentUserTransformer, GetUsersTransformer } from '../data-transformers/user-transformer';
 import { User } from '../../models/user';
 import { GetCollectedInfoQueueTransformer } from '../data-transformers/collected-info-transformers/get-collected-info-queue-transformer';
-import { CacheStoreService, UserBuilder } from '../../utility-services';
+import { UserBuilder } from '../../utility-services';
 import { GetCollectedQueuesInfoTransformer } from '../data-transformers/collected-info-transformers/get-collected-queues-info-transformer';
 
 export class CollectedInfoServiceImpl extends BaseDomainService implements CollectedInfoService {
@@ -25,16 +25,15 @@ export class CollectedInfoServiceImpl extends BaseDomainService implements Colle
         @inject(TYPES.USER_BUILDER) protected readonly userBuilder: UserBuilder,
         @inject(TYPES.USER_SERVICE) protected readonly userService: UserService,
         @inject(TYPES.LOGGER) protected readonly logger: Logger,
-        @inject(TYPES.CACHE_STORE_SERVICE) private readonly cacheStoreService: CacheStoreService
     ) {
         super(logger, 'CollectedInfoServiceImpl');
     }
 
     async getHistoricalUser(userId: string) {
-        const cacheUser = this.userBuilder.buildById(userId);
+        const cachedUser = this.userBuilder.buildById(userId) || this.historicalUserCacheMap.get(userId);
 
-        if (cacheUser) {
-            return cacheUser;
+        if (cachedUser) {
+            return cachedUser;
         }
 
         const user = await this.getAnalystCollectedInfo(userId);
@@ -141,9 +140,7 @@ export class CollectedInfoServiceImpl extends BaseDomainService implements Colle
         }
 
         try {
-            const historicalQueues = dataTransformer.mapResponse(response.data);
-            this.cacheStoreService.saveHistoricalQueues(historicalQueues);
-            return historicalQueues;
+            return dataTransformer.mapResponse(response.data);
         } catch (e) {
             throw this.handleException(
                 'getQueuesCollectedInfo',

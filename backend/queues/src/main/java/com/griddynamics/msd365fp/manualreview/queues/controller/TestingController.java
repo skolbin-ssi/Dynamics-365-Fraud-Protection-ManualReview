@@ -5,6 +5,12 @@ package com.griddynamics.msd365fp.manualreview.queues.controller;
 
 import com.azure.data.cosmos.CosmosClient;
 import com.azure.data.cosmos.CosmosContainer;
+import com.azure.messaging.eventhubs.EventData;
+import com.azure.messaging.eventhubs.EventHubClientBuilder;
+import com.azure.messaging.eventhubs.EventHubProducerAsyncClient;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,31 +18,34 @@ import com.github.javafaker.Faker;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.ExtendedCosmosContainer;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
 import com.griddynamics.msd365fp.manualreview.dfpauth.util.UserPrincipalUtility;
+import com.griddynamics.msd365fp.manualreview.ehub.durable.config.properties.EventHubProperties;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.model.DurableEventHubProducerClientRegistry;
+import com.griddynamics.msd365fp.manualreview.model.DisposabilityCheck;
 import com.griddynamics.msd365fp.manualreview.model.ItemLabel;
 import com.griddynamics.msd365fp.manualreview.model.ItemLock;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
 import com.griddynamics.msd365fp.manualreview.model.event.Event;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.model.exception.IncorrectConditionException;
-import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
 import com.griddynamics.msd365fp.manualreview.queues.model.ItemDataField;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemFilterField;
+import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewType;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.model.testing.MicrosoftDynamicsFraudProtectionV1ModelsBankEventActivityBankEvent;
 import com.griddynamics.msd365fp.manualreview.queues.model.testing.MicrosoftDynamicsFraudProtectionV1ModelsPurchaseActivityPurchase;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepository;
+import com.griddynamics.msd365fp.manualreview.queues.service.ItemEnrichmentService;
 import com.griddynamics.msd365fp.manualreview.queues.service.TestingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -68,12 +77,15 @@ public class TestingController {
 
     private final ItemRepository itemRepository;
     private final TestingService testingService;
+    private final ItemEnrichmentService itemEnrichmentService;
+    private final EventHubProperties ehProperties;
     @Qualifier("cosmosdbObjectMapper")
     private final ObjectMapper mapper;
     private final DurableEventHubProducerClientRegistry clientRegistry;
     private final CosmosClient cosmosClient;
     @Setter(onMethod = @__({@Autowired, @Qualifier("azureDFPAPIWebClient")}))
     private WebClient dfpClient;
+    private final Random rand = new Random();
 
     @Value("${azure.dfp.purchase-event-url}")
     private String purchaseEventUrl;
@@ -100,15 +112,35 @@ public class TestingController {
         return res;
     }
 
-    @Operation(summary = "Duplicate all items in the queue")
-    @PostMapping(value = "/items/duplicate/queue/{queueId}")
-    public void duplicateItems(@PathVariable("queueId") final String queueId) throws NotFoundException, BusyException {
-        testingService.duplicate(queueId);
+    @Operation(summary = "Trigger forced item enrichment")
+    @PostMapping(value = "/items/{id}/enrichment")
+    public void enrichItemById(@PathVariable final String id) {
+        itemEnrichmentService.enrichItem(id, true);
+    }
+
+    @Operation(summary = "Randomize scores for items in a queue")
+    @PostMapping(value = "/queue/{queueId}/score/randomize")
+    public void randomizeScore(@PathVariable final String queueId) throws BusyException {
+        PageProcessingUtility.executeForAllPages(
+                continuationToken -> itemRepository.findActiveItemsByQueueView(
+                        QueueViewType.DIRECT,
+                        queueId,
+                        20,
+                        continuationToken,
+                        new Sort.Order(Sort.Direction.ASC, ItemDataField.IMPORT_DATE.getPath()),
+                        null,
+                        null),
+                items -> items.getValues().forEach(item -> {
+                    int score = rand.nextInt(999);
+                    item.getAssessmentResult().setRiskScore(score);
+                    item.getDecision().setRiskScore(score);
+                    itemRepository.save(item);
+                }));
     }
 
     @Operation(summary = "Get filter samples")
     @PostMapping(value = "/filters/{field}/samples")
-    public Set<String> getFilterSamples(@PathVariable("field") final ItemDataField field) {
+    public Set<String> getFilterSamples(@PathVariable("field") final ItemFilterField field) {
         return itemRepository.findFilterSamples(field, null);
     }
 
@@ -174,11 +206,66 @@ public class TestingController {
                         }));
     }
 
+    @Data
+    @ToString(callSuper = true)
+    @EqualsAndHashCode(callSuper = true)
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DummyEvent extends HashMap<String, Object> implements Event {
+        private String id;
+        @JsonIgnore
+        private Map<String, Object> additionalParams = new HashMap<>();
+
+        @JsonAnySetter
+        public void setAdditionalParam(String name, Object value) {
+            additionalParams.put(name, value);
+        }
+
+        @JsonAnyGetter
+        public Object getAdditionalParam(String name) {
+            return additionalParams.get(name);
+        }
+    }
+
     @Operation(summary = "Send custom event to EventHub")
     @PostMapping(value = "/events/{topic}")
     public void sendEvent(@PathVariable("topic") final String topic,
-                          @RequestBody final Event body) {
-        clientRegistry.get(topic).send(body);
+                          @RequestBody final DummyEvent body) throws JsonProcessingException {
+        EventHubProducerAsyncClient client = new EventHubClientBuilder()
+                .connectionString(
+                        ehProperties.getConnectionString(),
+                        topic)
+                .buildAsyncProducerClient();
+        EventData data = new EventData(mapper.writeValueAsString(body));
+        client.send(Set.of(data))
+                .subscribeOn(Schedulers.elastic())
+                .subscribe();
+    }
+
+    @Operation(summary = "Send bunch of dummy events to EventHub topics")
+    @PostMapping(value = "/events/bunch/{topic}")
+    public void sendEvent(@PathVariable("topic") final Set<String> topics) throws JsonProcessingException {
+        topics.forEach(name -> {
+            EventHubProducerAsyncClient client = new EventHubClientBuilder()
+                    .connectionString(
+                            ehProperties.getConnectionString(),
+                            name)
+                    .buildAsyncProducerClient();
+            for (int i = 0; i < 100; i++) {
+                DummyEvent event = new DummyEvent();
+                event.setId(UUID.randomUUID().toString());
+                event.put("payload", name + " " + i);
+                EventData data = null;
+                try {
+                    data = new EventData(mapper.writeValueAsString(event));
+                    client.send(Set.of(data))
+                            .subscribeOn(Schedulers.elastic())
+                            .subscribe();
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Operation(summary = "Hard delete for all items by IDs")
@@ -242,6 +329,12 @@ public class TestingController {
             result.add(data);
         }
         return result;
+    }
+
+    @Operation(summary = "Check disposable email domains for all the items")
+    @PostMapping(value = "/check-email-domains")
+    public List<DisposabilityCheck> checkEmailDomains() {
+        return testingService.checkDisposableEmails();
     }
 
     @Data

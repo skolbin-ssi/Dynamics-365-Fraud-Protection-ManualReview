@@ -211,15 +211,27 @@ export class QueueTiles extends Component<QueueTilesComponentProps, never> {
         } = queueStore;
 
         if (queues && activeTilesQueueList === QUEUE_LIST_TYPE.ALL) {
-            return queues.map(this.renderTile);
+            return (
+                <div className={`${CN}__queues`}>
+                    {queues.map(this.renderTile)}
+                </div>
+            );
         }
 
         if (queuesSupervisedByCurrentUser && activeTilesQueueList === QUEUE_LIST_TYPE.SUPERVISED) {
-            return queuesSupervisedByCurrentUser.map(this.renderTile);
+            return (
+                <div className={`${CN}__queues`}>
+                    {queuesSupervisedByCurrentUser.map(this.renderTile)}
+                </div>
+            );
         }
 
         if (allQueuesAssignedToCurrentUser && activeTilesQueueList === QUEUE_LIST_TYPE.ASSIGNED) {
-            return allQueuesAssignedToCurrentUser.map(this.renderTile);
+            return (
+                <div className={`${CN}__queues`}>
+                    {allQueuesAssignedToCurrentUser.map(this.renderTile)}
+                </div>
+            );
         }
 
         if (loadingQueues) {
@@ -257,13 +269,11 @@ export class QueueTiles extends Component<QueueTilesComponentProps, never> {
                             className={`${CN}__add-new-item-btn`}
                             onClick={this.onCreateQueueClick}
                         >
-                            Create Queue
+                            Create queue
                         </DefaultButton>
                     )}
                 </div>
-                <div className={`${CN}__queues`}>
-                    {this.renderTiles()}
-                </div>
+                {this.renderTiles()}
             </div>
         );
     }

@@ -14,9 +14,9 @@ public class RegexpValidator implements ConstraintValidator<ValidRegexp, String>
         try {
             java.util.regex.Pattern.compile(value);
         } catch (PatternSyntaxException ignored) {
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
 }

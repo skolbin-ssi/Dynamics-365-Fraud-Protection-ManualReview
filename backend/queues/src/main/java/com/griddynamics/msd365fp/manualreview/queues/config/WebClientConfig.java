@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ClientCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
@@ -45,6 +46,7 @@ public class WebClientConfig {
     }
 
     @Bean
+    @Primary
     WebClient azureDFPAPIWebClient(OAuth2AuthorizedClientManager authorizedClientManager, ObjectMapper mapper) {
         ServletOAuth2AuthorizedClientExchangeFilterFunction oauth2Client =
                 new ServletOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
@@ -60,6 +62,12 @@ public class WebClientConfig {
                         .codecs(clientCodecConfigurerConsumer)
                         .codecs(configurer -> configurer.customCodecs().registerWithDefaultConfig(new Jackson2JsonDecoder(mapper, MediaType.APPLICATION_OCTET_STREAM)))
                         .build())
+                .build();
+    }
+
+    @Bean
+    WebClient nonAuthorizingWebClient() {
+        return WebClient.builder()
                 .build();
     }
 

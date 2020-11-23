@@ -9,10 +9,14 @@ import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.model.exception.EmptySourceException;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
+import com.griddynamics.msd365fp.manualreview.queues.model.BasicItemInfo;
+import com.griddynamics.msd365fp.manualreview.queues.model.BatchUpdateResult;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueView;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewType;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
+import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Queue;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepository;
+import com.microsoft.azure.spring.data.cosmosdb.exception.CosmosDBAccessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -26,10 +30,9 @@ import org.springframework.security.access.prepost.PreFilter;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.*;
@@ -40,10 +43,11 @@ import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.*;
 public class PublicItemClient {
 
     private final ItemRepository itemRepository;
+    private final DataSecurityService dataSecurityService;
 
 
     @PostFilter("@dataSecurityService.checkPermissionForItemReading(authentication, filterObject, #queueView)")
-    public PageableCollection<Item> getActiveItemPageableList(
+    public PageableCollection<Item> getQueueViewItemList(
             @NonNull QueueView queueView,
             int pageSize,
             @Nullable String continuationToken) throws BusyException {
@@ -70,6 +74,24 @@ public class PublicItemClient {
                     }
                 });
     }
+
+    @PostFilter("@dataSecurityService.checkPermissionForItemReading(authentication, filterObject, #queues)")
+    public Collection<BasicItemInfo> getItemInfoByIds(
+            @NonNull Set<String> ids,
+            @Nullable Collection<Queue> queues) throws BusyException {
+        return PageProcessingUtility.getAllPages(
+                continuation -> itemRepository.findEnrichedItemInfoByIds(ids, DEFAULT_ITEM_INFO_PAGE_SIZE, continuation));
+    }
+
+    @PostFilter("@dataSecurityService.checkPermissionForItemReading(authentication, filterObject, #queues)")
+    public Collection<Item> getItemListByIds(
+            @NonNull Set<String> ids,
+            @Nullable Collection<Queue> queues) throws BusyException {
+        return PageProcessingUtility.getAllPages(
+                continuation -> itemRepository.findEnrichedItemsByIds(ids, DEFAULT_ITEM_PAGE_SIZE, continuation));
+    }
+
+
 
 
     @PostFilter("@dataSecurityService.checkPermissionForItemReading(authentication, filterObject, #queueView)")
@@ -183,6 +205,48 @@ public class PublicItemClient {
         } else {
             log.info("Item [{}] has been modified.", newVersion.getId());
         }
+    }
+
+
+    public <T> Collection<BatchUpdateResult> batchUpdate(
+            @NonNull Set<String> ids,
+            @Nullable Collection<Queue> queues,
+            @NonNull Function<Item, T> modifier,
+            @NonNull BiConsumer<Item, T> postprocessor) throws BusyException {
+        Map<String, BatchUpdateResult> results = new HashMap<>();
+        PageProcessingUtility.executeForAllPages(continuationToken ->
+                        itemRepository.findEnrichedItemsByIds(ids, DEFAULT_ITEM_PAGE_SIZE, continuationToken),
+                items -> {
+                    for (Item item : items) {
+                        String check = dataSecurityService.checkPermissionRestrictionForItemUpdateWithoutLock(UserPrincipalUtility.getAuth(), item, queues);
+                        if (check != null) {
+                            results.put(item.getId(), new BatchUpdateResult(item.getId(), false, check));
+                        } else {
+                            try {
+                                T context = modifier.apply(item);
+                                item = itemRepository.save(item);
+                                postprocessor.accept(item, context);
+                                results.put(item.getId(), new BatchUpdateResult(item.getId(), true, "Successfully updated."));
+                                log.info("Item [{}] has been modified in batch operation.", item.getId());
+                            } catch (CosmosDBAccessException e) {
+                                results.put(item.getId(), new BatchUpdateResult(item.getId(), false, "Item has been modified by another process."));
+                            } catch (Exception e) {
+                                log.warn("Exception during bulk operation for item [{}]: {}", item.getId(), e.getMessage());
+                                log.warn("Exception during bulk operation for item [{}]", item.getId(), e);
+                                results.put(item.getId(), new BatchUpdateResult(item.getId(), false, "Internal exception."));
+                            }
+                        }
+                    }
+                }
+        );
+
+
+        ids.stream()
+                .filter(id -> !results.containsKey(id))
+                .forEach(id -> results.put(id, new BatchUpdateResult(id, false, "Item not found.")));
+
+        return results.values();
+
     }
 
 

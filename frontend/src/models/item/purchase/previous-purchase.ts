@@ -1,7 +1,10 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { Address } from './address';
+import { DeviceContext } from './device-context';
 import { PreviousPurchaseDTO } from '../../../data-services/api-services/models/previous-purchase-dto';
+import { PaymentInstrument } from './payment-instrument';
 
 export class PreviousPurchase {
     purchaseId: string = '';
@@ -41,6 +44,24 @@ export class PreviousPurchase {
 
     type: string = 'Purchase';
 
+    lastMerchantStatus: string = '';
+
+    lastMerchantStatusReason: string = '';
+
+    lastMerchantStatusDate: string = '';
+
+    lastBankEventStatus: string = '';
+
+    lastBankEventResponseCode: string = '';
+
+    lastBankEventDate: string = '';
+
+    addressList: Address[] = [];
+
+    deviceContext: DeviceContext = new DeviceContext();
+
+    paymentInstrumentList: PaymentInstrument[] = [];
+
     fromDTO(pp: PreviousPurchaseDTO) {
         const {
             PurchaseId,
@@ -59,7 +80,16 @@ export class PreviousPurchase {
             HashedEvaluationId,
             RiskScore,
             ReasonCodes,
-            PolicyApplied
+            PolicyApplied,
+            LastMerchantStatus,
+            LastMerchantStatusReason,
+            LastMerchantStatusDate,
+            LastBankEventStatus,
+            LastBankEventResponseCode,
+            LastBankEventDate,
+            AddressList,
+            DeviceContext: deviceContext,
+            PaymentInstrumentList
         } = pp;
 
         this.purchaseId = PurchaseId;
@@ -79,6 +109,30 @@ export class PreviousPurchase {
         this.riskScore = RiskScore;
         this.reasonCodes = ReasonCodes;
         this.policyApplied = PolicyApplied;
+        this.lastMerchantStatus = LastMerchantStatus;
+        this.lastMerchantStatusReason = LastMerchantStatusReason;
+        this.lastMerchantStatusDate = LastMerchantStatusDate;
+        this.lastBankEventStatus = LastBankEventStatus;
+        this.lastBankEventResponseCode = LastBankEventResponseCode;
+        this.lastBankEventDate = LastBankEventDate;
+
+        if (deviceContext) {
+            this.deviceContext.fromDTO(deviceContext);
+        }
+
+        if (Array.isArray(AddressList)) {
+            this.addressList = AddressList.map<Address>(address => {
+                const addressModel = new Address();
+                return addressModel.fromDTO(address);
+            });
+        }
+
+        if (Array.isArray(PaymentInstrumentList)) {
+            this.paymentInstrumentList = PaymentInstrumentList.map<PaymentInstrument>(pi => {
+                const piModel = new PaymentInstrument();
+                return piModel.fromDTO(pi);
+            });
+        }
 
         return this;
     }

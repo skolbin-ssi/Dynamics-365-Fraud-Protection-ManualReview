@@ -13,6 +13,7 @@ import './entity-header.scss';
 const CN = 'entity-header';
 
 interface EntityHeaderComponentProps {
+    isGenerateReportButtonDisabled: boolean;
     handleGenerateReportsButtonClick(): void
     analystPerformanceStore: AnalystPerformanceStore;
 }
@@ -38,14 +39,18 @@ export class EntityHeader extends Component<EntityHeaderComponentProps, never> {
     }
 
     render() {
-        const { handleGenerateReportsButtonClick } = this.props;
+        const { handleGenerateReportsButtonClick, isGenerateReportButtonDisabled } = this.props;
         return (
             <div className={`${CN}__header`}>
                 <div className={`${CN}__sub-header `}>
                     <span className={`${CN}__header-title`}>Fraud analyst: </span>
                     {this.renderAnalystPersona()}
                 </div>
-                <DefaultButton text="Generate reports" onClick={handleGenerateReportsButtonClick} />
+                <DefaultButton
+                    disabled={isGenerateReportButtonDisabled}
+                    text="Generate reports"
+                    onClick={handleGenerateReportsButtonClick}
+                />
             </div>
         );
     }

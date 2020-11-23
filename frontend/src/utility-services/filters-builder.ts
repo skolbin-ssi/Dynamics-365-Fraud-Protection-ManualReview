@@ -16,7 +16,6 @@ interface FieldConditionGroup {
 
 @injectable()
 export class FiltersBuilder {
-    // TODO: Register conditionsFactory in container and use a single instance
     private conditionsFactory: ConditionsFactory = new ConcreteConditionFactory();
 
     private filterFields: Map<string, FilterField>;
@@ -71,7 +70,7 @@ export class FiltersBuilder {
             .filter(conditionDto => conditionDto.field === field)
             .forEach(filterConditionDTO => {
                 usedConditions.push(filterConditionDTO.condition);
-                const createdConditionModel = this.createCondition(filterConditionDTO);
+                const createdConditionModel = this.createCondition(filterConditionDTO, field);
 
                 if (createdConditionModel) {
                     createdConditionModel.setIsConditionUsed(true);
@@ -83,21 +82,24 @@ export class FiltersBuilder {
         const filter = this.filterFields.get(field);
 
         if (filter) {
-            const { acceptableConditions } = filter;
+            const { acceptableConditions, lowerBound, upperBound } = filter;
 
             emptyFilterConditions = acceptableConditions
                 .filter(acceptableCondition => !usedConditions.includes(acceptableCondition))
-                .map(acceptableCondition => this.conditionsFactory.createCondition(acceptableCondition));
+                .map(acceptableCondition => this.conditionsFactory
+                    .createCondition(acceptableCondition, { lowerBound, upperBound }));
         }
 
         return [...createdConditionModels, ...emptyFilterConditions];
     }
 
-    private createCondition(filterConditionDto: FilterConditionDto): Condition | null {
+    private createCondition(filterConditionDto: FilterConditionDto, field: string): Condition | null {
         const { condition } = filterConditionDto;
 
+        const { lowerBound, upperBound } = this.filterFields.get(field) || { lowerBound: null, upperBound: null };
+
         const conditionModal = this.conditionsFactory
-            .createCondition(condition, { lowerBound: null, upperBound: null });
+            .createCondition(condition, { lowerBound, upperBound });
 
         if (conditionModal) {
             return conditionModal.fromDto(filterConditionDto);

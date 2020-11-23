@@ -18,7 +18,7 @@ export class FilterValidatorFactory {
     createValidator(type: FILTER_VALIDATOR_TYPES, constraints?: ConditionConstraints): ConditionValidator {
         switch (type) {
             case FILTER_VALIDATOR_TYPES.AT_LEAST_ONE_VALUE: {
-                return new AtLeastOneValueValidator(type, constraints!);
+                return new AtLeastOneValueValidator(type, constraints);
             }
 
             case FILTER_VALIDATOR_TYPES.MIN_EXISTS: {
@@ -30,7 +30,7 @@ export class FilterValidatorFactory {
             }
 
             case FILTER_VALIDATOR_TYPES.LOWER_BOUND_CONSTRAINT:
-                return new LowerBoundConstraintValidator(type, constraints!);
+                return new LowerBoundConstraintValidator(type, constraints);
 
             case FILTER_VALIDATOR_TYPES.UPPER_BOUND_CONSTRAINT:
                 return new UpperBoundConstraintValidator(type, constraints);

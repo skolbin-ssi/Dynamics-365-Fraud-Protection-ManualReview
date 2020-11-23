@@ -1,12 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import {
-    action
-} from 'mobx';
+import { action, observable } from 'mobx';
 import { Condition } from '../condition';
 
 export class BooleanCondition extends Condition {
+    @observable
+    values = ['false'];
+
     @action
     setValue(isChecked: boolean) {
         this.values = [`${isChecked}`];

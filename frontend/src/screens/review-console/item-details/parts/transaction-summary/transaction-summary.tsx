@@ -13,9 +13,9 @@ import autobind from 'autobind-decorator';
 import cn from 'classnames';
 import React, { Component } from 'react';
 
-import { Price } from '../../../../../components';
+import { IconText, Price } from '../../../../../components';
 import { Item } from '../../../../../models/item';
-import { PreviousPurchase } from '../../../../../models/item/purchase/previous-purchase';
+import { BankEvent } from '../../../../../models/item/purchase/bank-event';
 import {
     formatToLocalStringWithPassedTimeZone,
     convertToUTCAndFormatToLocalString,
@@ -33,8 +33,8 @@ interface TransactionSummaryProps {
 }
 
 enum TRANSACTION_SUMMARY_VIEW {
-    TRANSACTION = 'transaction',
-    HISTORY = 'history'
+    RECEIPT = 'receipt',
+    CC_AUTH_RESULT = 'cc_auth_result'
 }
 
 interface TransactionSummaryState {
@@ -42,99 +42,75 @@ interface TransactionSummaryState {
 }
 
 export class TransactionSummary extends Component<TransactionSummaryProps, TransactionSummaryState> {
-    private readonly valuePlaceholder = (<span className={`${CN}__pl`}>N/A</span>);
+    private readonly valuePlaceholder = (<span className="placeholder">N/A</span>);
 
-    private readonly purchaseHistoryColumns: IColumn[] = [
+    private readonly bankEventsColumns: IColumn[] = [
         {
-            key: 'merchantLocalDate',
+            key: 'bankEventTimestamp',
             name: 'Transaction date, UTC',
             minWidth: 150,
-            maxWidth: 150,
             isPadded: true,
             columnActionsMode: ColumnActionsMode.disabled,
-            className: `${CN}__score-cell`,
-            onRender: (pp: PreviousPurchase) => (
+            className: `${CN}__transaction-date`,
+            onRender: (bankEvent: BankEvent) => (
                 <Text variant="medium">
-                    {convertToUTCAndFormatToLocalString(pp.merchantLocalDate, this.valuePlaceholder)}
+                    {convertToUTCAndFormatToLocalString(bankEvent.bankEventTimestamp, this.valuePlaceholder)}
                 </Text>
             )
         },
         {
-            key: 'amount',
-            name: 'Amount',
-            minWidth: 100,
-            maxWidth: 150,
+            key: 'paymentProcessor',
+            name: 'Payment gateway',
+            fieldName: '',
+            minWidth: 250,
+            maxWidth: 300,
             isPadded: true,
-            fieldName: 'totalAmountInUSD',
             columnActionsMode: ColumnActionsMode.disabled,
-            className: `${CN}__align-right`,
-            onRender: (pp: PreviousPurchase) => (
-                <Price value={pp.totalAmountInUSD} />
+            onRender: (bankEvent: BankEvent) => (
+                <Text variant="small">{bankEvent.paymentProcessor}</Text>
             )
         },
         {
             key: 'type',
-            name: 'Type',
+            name: 'Bank event type',
             fieldName: '',
-            minWidth: 70,
+            minWidth: 150,
             maxWidth: 250,
             isPadded: true,
             columnActionsMode: ColumnActionsMode.disabled,
-            onRender: (pp: PreviousPurchase) => (
-                <Text variant="medium" className={`${CN}__score-cell`}>
-                    {pp.type}
-                </Text>
+            onRender: (bankEvent: BankEvent) => (
+                <Text variant="small">{bankEvent.type}</Text>
             )
         },
         {
-            key: 'currency',
-            name: 'Currency',
+            key: 'bankResponseCode',
+            name: 'Code',
             fieldName: '',
-            minWidth: 70,
-            maxWidth: 200,
+            minWidth: 100,
+            maxWidth: 250,
             isPadded: true,
             columnActionsMode: ColumnActionsMode.disabled,
-            onRender: (pp: PreviousPurchase) => (
-                <Text variant="medium" className={`${CN}__score-cell`}>
-                    {pp.currency}
-                </Text>
+            onRender: (bankEvent: BankEvent) => (
+                <Text variant="small">{bankEvent.bankResponseCode}</Text>
             )
         },
         {
-            key: 'shippingMethod',
-            name: 'Shipping method',
-            fieldName: 'shippingMethod',
-            minWidth: 150,
-            maxWidth: 600,
-            isPadded: true,
-            columnActionsMode: ColumnActionsMode.disabled,
-            onRender: (pp: PreviousPurchase) => (
-                <Text variant="medium" className={`${CN}__score-cell`}>
-                    {pp.shippingMethod}
-                </Text>
-            )
-        },
-        {
-            key: 'riskScore',
-            name: 'Fraud score',
+            key: 'status',
+            name: 'Status',
             fieldName: '',
-            minWidth: 80,
-            maxWidth: 80,
+            minWidth: 100,
+            maxWidth: 250,
             isPadded: true,
             columnActionsMode: ColumnActionsMode.disabled,
-            onRender: (pp: PreviousPurchase) => (
-                <Text variant="medium" className={`${CN}__score-cell`}>
-                    {pp.riskScore}
-                </Text>
-            )
-        }
+            onRender: this.renderBankStatus,
+        },
     ];
 
     constructor(props: TransactionSummaryProps) {
         super(props);
 
         this.state = {
-            selectedPivotKey: TRANSACTION_SUMMARY_VIEW.TRANSACTION
+            selectedPivotKey: TRANSACTION_SUMMARY_VIEW.RECEIPT
         };
     }
 
@@ -143,24 +119,60 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
         this.setState({ selectedPivotKey: itemKey });
     }
 
+    renderBankStatus(bankEvent: BankEvent) {
+        return (
+            <IconText
+                text={bankEvent.status}
+                textVariant="small"
+                placeholder="N/A"
+                iconValue={bankEvent.status}
+                icons={{
+                    GOOD: {
+                        value: 'Approved',
+                        iconName: 'CompletedSolid'
+                    },
+                    BAD: {
+                        value: 'Declined',
+                        iconName: 'Blocked2Solid'
+                    },
+                    UNKNOWN: {
+                        value: 'Unknown',
+                        iconName: 'UnknownSolid'
+                    }
+                }}
+            />
+        );
+    }
+
     renderGeneralInfo() {
         const { item } = this.props;
         const { purchase } = item;
 
         const renderingConfig = [
-            { key: 'Original order ID', value: purchase.originalOrderId, className: `${CN}__id` },
+            {
+                key: 'Original order ID',
+                value: purchase.originalOrderId,
+                valueToCopy: purchase.originalOrderId,
+                className: `${CN}__id`,
+            },
             { key: 'Customer local date', value: formatToLocalStringWithPassedTimeZone(purchase.customerLocalDate, this.valuePlaceholder) },
             { key: 'Merchant local date', value: formatToLocalStringWithPassedTimeZone(purchase.merchantLocalDate, this.valuePlaceholder) },
-            { key: 'Shipping method', value: purchase.shippingMethod }
+            { key: 'Shipping method', value: purchase.shippingMethod, valueToCopy: purchase.shippingMethod }
         ];
 
-        return renderingConfig.map(({ key, value, className }) => (
+        return renderingConfig.map(({
+            key,
+            value,
+            valueToCopy,
+            className,
+        }) => (
             <ItemDetailsKeyValue
                 className={`${CN}__key-value`}
                 contentClassName={className}
                 key={stringToKebabCase(key)}
                 label={key}
                 value={value}
+                valueToCopy={valueToCopy}
             />
         ));
     }
@@ -249,14 +261,6 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
                     <div />
                     <div />
                     <div />
-                    {/*
-                    <Text
-                        variant="medium"
-                        className={cn(colClassName, `${colClassName}__currency-conversion-factor`)}
-                    >
-                        {`Currency conversion factor: ${purchase.currencyConversionFactor}`}
-                    </Text>
-                    */}
                     <Text
                         variant="medium"
                         className={cn(colClassName, `${colClassName}__total-label`)}
@@ -272,17 +276,16 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
         );
     }
 
-    renderHistory() {
+    renderBankEventsList() {
         const { item } = this.props;
 
         return (
             <DetailsList
-                items={item.purchase.previousPurchaseList}
-                columns={this.purchaseHistoryColumns}
+                items={item.purchase.bankEventsList}
+                columns={this.bankEventsColumns}
                 layoutMode={DetailsListLayoutMode.justified}
                 selectionMode={SelectionMode.none}
                 isHeaderVisible
-                // className={cn(CN, `${CN}--with-row-cursor-pointer`)}
                 cellStyleProps={{
                     cellExtraRightPadding: 5,
                     cellLeftPadding: 10,
@@ -297,15 +300,15 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
 
         switch (selectedPivotKey) {
             default:
-            case TRANSACTION_SUMMARY_VIEW.TRANSACTION:
+            case TRANSACTION_SUMMARY_VIEW.RECEIPT:
                 return (
                     <>
                         {this.renderGeneralInfo()}
                         {this.renderProductsList()}
                     </>
                 );
-            case TRANSACTION_SUMMARY_VIEW.HISTORY:
-                return this.renderHistory();
+            case TRANSACTION_SUMMARY_VIEW.CC_AUTH_RESULT:
+                return this.renderBankEventsList();
         }
     }
 
@@ -315,10 +318,10 @@ export class TransactionSummary extends Component<TransactionSummaryProps, Trans
 
         let pivots;
 
-        if (Array.isArray(item.purchase.previousPurchaseList) && item.purchase.previousPurchaseList.length) {
+        if (Array.isArray(item.purchase.bankEventsList) && item.purchase.bankEventsList.length) {
             pivots = [
-                { headerText: 'Transaction', itemKey: TRANSACTION_SUMMARY_VIEW.TRANSACTION },
-                { headerText: 'History', itemKey: TRANSACTION_SUMMARY_VIEW.HISTORY }
+                { headerText: 'Receipt', itemKey: TRANSACTION_SUMMARY_VIEW.RECEIPT },
+                { headerText: 'CC authentication result', itemKey: TRANSACTION_SUMMARY_VIEW.CC_AUTH_RESULT }
             ];
         }
 

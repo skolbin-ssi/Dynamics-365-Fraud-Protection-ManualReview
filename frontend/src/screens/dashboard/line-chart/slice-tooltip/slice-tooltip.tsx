@@ -28,7 +28,8 @@ interface SliceTooltipProps {
 export interface ExtendedPoint extends Point {
     data: Point['data'] & {
         name: string;
-        user?: User
+        user?: User;
+        entityId: string;
     }
 }
 
@@ -102,7 +103,7 @@ export const SliceTooltip: React.FC<SliceTooltipProps & NivoSliceTooltipProps> =
                         >
                             <div className={`${CN}__title`}>
                                 {renderIndicator(value as ExtendedPoint)}
-                                <div className={`${CN}__field-name`}>{(value as ExtendedPoint).data.name}</div>
+                                <div className={`${CN}__field-name`}>{(value as ExtendedPoint).data.name || (value as ExtendedPoint).data?.entityId }</div>
                             </div>
                             <div className={`${CN}__field-value`}>{value.data.y}</div>
                         </div>

@@ -34,6 +34,7 @@ public class ItemLockActivityRepositoryImpl implements ItemLockActivityRepositor
                                 "(SELECT c.actionType, sum(c.released-c.locked) AS totalDuration, count(c.released) AS cnt " +
                                 "FROM c where " +
                                 "(c.released BETWEEN %1$s AND %2$s) " +
+                                "AND IS_DEFINED(c.queueId) AND NOT IS_NULL(c.queueId) " +
                                 "%3$s " +
                                 "%4$s " +
                                 "group by c.actionType) " +

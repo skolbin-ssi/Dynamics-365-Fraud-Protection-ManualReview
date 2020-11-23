@@ -52,10 +52,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -70,7 +73,7 @@ import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.SEC
 @SecurityRequirement(name = SECURITY_SCHEMA_IMPLICIT)
 @RequiredArgsConstructor
 @Secured({ADMIN_MANAGER_ROLE})
-@SuppressWarnings({"java:S5411", "java:S3776", "java:S3358"})
+@SuppressWarnings({"java:S5411", "java:S3776", "java:S3358" })
 public class TestingController {
 
     private static final Faker faker = new Faker();
@@ -117,6 +120,20 @@ public class TestingController {
     public void enrichItemById(@PathVariable final String id) {
         itemEnrichmentService.enrichItem(id, true);
     }
+
+    @Operation(summary = "Trigger forced item enrichment for ALL active items")
+    @PostMapping(value = "/items/enrichment")
+    public void enrichAllActiveItems() throws BusyException {
+        Collection<String> items = PageProcessingUtility.getAllPages(
+                c -> itemRepository.findActiveItemIds(300, c));
+        log.warn("We're trying to reenrich {} items", items.size());
+        Scheduler scheduler = Schedulers.fromExecutor(Executors.newSingleThreadExecutor());
+        Flux.fromIterable(items)
+                .doOnNext(item -> itemEnrichmentService.enrichItem(item, true))
+                .subscribeOn(scheduler)
+                .subscribe();
+    }
+
 
     @Operation(summary = "Randomize scores for items in a queue")
     @PostMapping(value = "/queue/{queueId}/score/randomize")
@@ -268,15 +285,19 @@ public class TestingController {
         });
     }
 
-    @Operation(summary = "Hard delete for all items by IDs")
-    @DeleteMapping(value = "/items")
+    @Operation(summary = "Hard delete for all entries by IDs")
+    @DeleteMapping(value = "/databases/{dbName}/container/{containerName}/entries")
     public void deleteAllById(
+            @PathVariable("dbName") final String dbName,
+            @PathVariable("containerName") final String containerName,
             @Parameter(hidden = true)
             @AuthenticationPrincipal PreAuthenticatedAuthenticationToken principal,
             @RequestBody List<Map<String, String>> ids) {
+        CosmosContainer container = cosmosClient.getDatabase(dbName).getContainer(containerName);
         List<String> toDelete = ids.stream().map(mp -> mp.get("id")).collect(Collectors.toList());
-        itemRepository.deleteAll(itemRepository.findAllById(toDelete));
-        log.info("User [{}] has deleted items [{}].", UserPrincipalUtility.extractUserId(principal), toDelete);
+        toDelete.forEach(id ->
+                container.getItem(id, id).delete().block());
+        log.warn("User [{}] has deleted items [{}].", UserPrincipalUtility.extractUserId(principal), toDelete);
     }
 
     @Operation(summary = "Generate specified amount of purchases. Send them to the DFP. " +

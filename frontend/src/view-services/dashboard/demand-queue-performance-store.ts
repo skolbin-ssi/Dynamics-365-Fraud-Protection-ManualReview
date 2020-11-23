@@ -19,20 +19,17 @@ import { Item, Queue, Report } from '../../models';
 import { COLORS } from '../../styles/variables';
 import { CollectedInfoService, DashboardService, QueueService } from '../../data-services/interfaces';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
-import {
-    getCurrentTimeDiff,
-    formatToISOStringWithLocalTimeZone,
-} from '../../utils/date';
+import { formatToISOStringWithLocalTimeZone, getCurrentTimeDiff, } from '../../utils/date';
 import { CurrentProgress } from '../../models/dashboard/progress-performance-metric';
 import { ItemPlacementMetrics, QueueSizeHistory } from '../../models/dashboard/deman-supply';
 import {
-    QUEUE_VIEW_TYPE,
-    STATISTIC_AGGREGATION,
     CHART_AGGREGATION_PERIOD,
+    DEFAULT_QUEUE_AUTO_REFRESH_CHECK_MILLISECONDS,
+    DEFAULT_QUEUE_AUTO_REFRESH_INTERVAL_MILLISECONDS,
     DEFAULT_TIME_TO_SLA_DURATION,
     DEFAULT_TIME_TO_TIMEOUT_DURATION,
-    DEFAULT_QUEUE_AUTO_REFRESH_CHECK_MILLISECONDS,
-    DEFAULT_QUEUE_AUTO_REFRESH_INTERVAL_MILLISECONDS
+    QUEUE_VIEW_TYPE,
+    STATISTIC_AGGREGATION
 } from '../../constants';
 import { getProcessingDeadlineValues } from '../../utils';
 import { LockedItemsStore } from '../locked-items-store';
@@ -41,6 +38,7 @@ import { AutoRefreshStorageItemManger } from '../misc/auto-refresh-storage-item-
 import { CSVReportBuilder, LocalStorageService } from '../../utility-services';
 import { FraudScoreDistributionStore } from './demand-fraud-score-distribution-store';
 import { OverviewService } from '../../data-services/interfaces/domain-interfaces/overview-service';
+import { DASHBOARD_REPORTS_NAMES } from '../../constants/dashboard-reports';
 
 export interface QueueItem {
     viewId: string;
@@ -192,7 +190,7 @@ export class DemandQueuePerformanceStore {
     /**
      * CSV report builder
      */
-    private readonly CSVReportBuilder = new CSVReportBuilder();
+    private readonly csvReportBuilder = new CSVReportBuilder();
 
     /**
      * Is auto refresh feature (toggle) enabled
@@ -355,7 +353,6 @@ export class DemandQueuePerformanceStore {
         }
     }
 
-    // TODO: Refactor this method and move to the appropriate Item model
     setTimeLeft(data: Item[]) {
         if (this.queue && this.queue.processingDeadline) {
             return data.map(item => {
@@ -576,75 +573,94 @@ export class DemandQueuePerformanceStore {
 
     /* ---- STORE GENERATE REPORTING METHODS * ----  */
 
+    @computed
+    get isGenerateReportsButtonDisabled() {
+        return [
+            this.isQueueLoading,
+            this.isQueueSizeHistoryLoading,
+            this.isItemsPlacementMetricsLoading,
+            this.isQueueItemsLoading
+        ].some(item => item);
+    }
+
     /**
      * Collects reports for the dashboard
      */
     @computed
     get reports(): Report[] {
-        const reports = [];
+        const {
+            DEMAND_QUEUE_REMAINING_ORDERS,
+            DEMAND_QUEUE_NEW_RELEASED_ORDERS,
+            DEMAND_QUEUE_RISK_SCORE_DISTRIBUTION,
+            DEMAND_QUEUE_REGULAR_ACTIVE,
+            DEMAND_QUEUE_ESCALATED_ACTIVE,
+        } = DASHBOARD_REPORTS_NAMES.DEMAND_BY_QUEUE;
 
-        if (this.totalReviewedNewItemsReport) {
-            reports.push(this.totalReviewedNewItemsReport);
-        }
-
-        if (this.totalRemainingOrdersReport) {
-            reports.push(this.totalRemainingOrdersReport);
-        }
-
-        if (this.getQueueItemsReport(QUEUE_VIEW_TYPE.REGULAR)) {
-            reports.push(this.getQueueItemsReport(QUEUE_VIEW_TYPE.REGULAR));
-        }
-
-        if (this.getQueueItemsReport(QUEUE_VIEW_TYPE.ESCALATION)) {
-            reports.push(this.getQueueItemsReport(QUEUE_VIEW_TYPE.ESCALATION));
-        }
-
-        return reports as Array<any>;
+        return [
+            this.totalRemainingOrdersReport(DEMAND_QUEUE_REMAINING_ORDERS),
+            this.totalReviewedNewItemsReport(DEMAND_QUEUE_NEW_RELEASED_ORDERS),
+            this.riskScoreDistributionReport(DEMAND_QUEUE_RISK_SCORE_DISTRIBUTION),
+            this.getQueueItemsReport(DEMAND_QUEUE_REGULAR_ACTIVE, QUEUE_VIEW_TYPE.REGULAR),
+            this.getQueueItemsReport(DEMAND_QUEUE_ESCALATED_ACTIVE, QUEUE_VIEW_TYPE.ESCALATION)
+        ].filter(report => report !== null) as Report[];
     }
+    /** ___ START REPORTS GENERATION METHODS ___ */
 
-    @computed
-    private get totalReviewedNewItemsReport() {
-        if (this.itemPlacementMetric) {
-            const REPORT_NAME = 'Total reviewed/new orders';
-            const rawData = this.itemPlacementMetric.fullTotalReviewedNewItemsReport;
-
-            if (rawData?.length) {
-                const unparseObject: UnparseObject = {
-                    fields: ['date', 'reviewed orders', 'released orders', 'new orders'],
-                    data: rawData.flat()
-                };
-
-                return this.CSVReportBuilder.buildReport(REPORT_NAME, unparseObject);
-            }
-        }
-
-        return null;
-    }
-
-    @computed
-    private get totalRemainingOrdersReport() {
-        if (this.queueSizeHistory) {
-            const REPORT_NAME = 'Total remaining orders';
-            const rawData = this.queueSizeHistory.remainingOrdersReport;
-
-            if (rawData?.length) {
-                const unparseObject: UnparseObject = {
-                    fields: ['date', 'remaining orders'],
-                    data: rawData
-                };
-                return this.CSVReportBuilder.buildReport(REPORT_NAME, unparseObject);
-            }
-        }
-
-        return null;
-    }
-
-    private getQueueItemsReport(viewType: QUEUE_VIEW_TYPE): Report | null {
+    private totalRemainingOrdersReport(name: string) {
         return computed(() => {
-            const REPORT_NAME = viewType === QUEUE_VIEW_TYPE.REGULAR
-                ? 'Regular orders real time data overview'
-                : 'Escalated orders real time data overview';
+            if (this.queueSizeHistory) {
+                const rawData = this.queueSizeHistory.remainingOrdersReport;
 
+                if (rawData?.length) {
+                    const unparseObject: UnparseObject = {
+                        fields: ['date', 'remaining orders'],
+                        data: rawData
+                    };
+                    return this.csvReportBuilder.buildReport(name, unparseObject);
+                }
+            }
+
+            return null;
+        }).get();
+    }
+
+    private totalReviewedNewItemsReport(name: string) {
+        return computed(() => {
+            if (this.itemPlacementMetric) {
+                const rawData = this.itemPlacementMetric.fullTotalReviewedNewItemsReport;
+
+                if (rawData?.length) {
+                    const unparseObject: UnparseObject = {
+                        fields: ['date', 'reviewed orders', 'released orders', 'new orders'],
+                        data: rawData.flat()
+                    };
+
+                    return this.csvReportBuilder.buildReport(name, unparseObject);
+                }
+            }
+
+            return null;
+        }).get();
+    }
+
+    private riskScoreDistributionReport(name: string): Report | null {
+        return computed(() => {
+            if (this.riskScoreDistributionStore.pieChartData.length) {
+                const reportRawData: Object[] = this.riskScoreDistributionStore.pieChartData
+                    .map(({ id, value }) => ({
+                        bucket: id,
+                        orders: value
+                    }));
+
+                return this.csvReportBuilder.buildReport(name, reportRawData);
+            }
+
+            return null;
+        }).get();
+    }
+
+    private getQueueItemsReport(name: string, viewType: QUEUE_VIEW_TYPE): Report | null {
+        return computed(() => {
             const queueItems = viewType === QUEUE_VIEW_TYPE.ESCALATION
                 ? this.escalatedQueueItem
                 : this.regularQueueItems;
@@ -659,13 +675,13 @@ export class DemandQueuePerformanceStore {
                     let itemTimeLeft: number | string | undefined = item?.timeLeft
                         ? item.timeLeft.days
                         : undefined;
-                    itemTimeLeft = itemTimeLeft && itemTimeLeft < 0 ? 'overdue' : itemTimeLeft;
+                    itemTimeLeft = itemTimeLeft && itemTimeLeft < 0 ? 'Overdue' : itemTimeLeft;
 
                     return [
                             item.decision?.riskScore,
                             item.id,
                             item.amount,
-                            item.displayImportDateTime,
+                            item.importDate,
                             itemTimeout,
                             itemTimeLeft,
                             item.lockedById
@@ -677,12 +693,14 @@ export class DemandQueuePerformanceStore {
                     data: rawReportData
                 };
 
-                return this.CSVReportBuilder.buildReport(REPORT_NAME, unparseObject);
+                return this.csvReportBuilder.buildReport(name, unparseObject);
             }
 
             return null;
         }).get();
     }
+
+    /** ___ END REPORTS GENERATION METHODS ___ */
 
     /* ---- STORE FETCHING METHODS ----   */
 
@@ -766,7 +784,6 @@ export class DemandQueuePerformanceStore {
         }
     }
 
-    // TODO: Make benefit cache of checking queues store, maybe implement some kind of Cache service
     @action
     private async fetchQueue(queueId: string) {
         this.isQueueLoading = true;

@@ -15,24 +15,15 @@ import { TYPES } from '../../types';
 import { Queue } from '../../models';
 import { Report } from '../../models/misc';
 
-import {
-    AnalystPerformance,
-    QueueRiskScoreOverview,
-    QueueRiskScoreDistributionBarDatum
-} from '../../models/dashboard';
-import {
-    DURATION_PERIOD,
-    DEFAULT_RISK_SCORE_DISTRIBUTION_BUCKET_SIZE,
-} from '../../constants';
+import { AnalystPerformance, QueueRiskScoreDistributionBarDatum, QueueRiskScoreOverview } from '../../models/dashboard';
+import { DEFAULT_RISK_SCORE_DISTRIBUTION_BUCKET_SIZE, DURATION_PERIOD, } from '../../constants';
 import { NOT_FOUND } from '../../constants/http-status-codes';
 import {
-    UserService,
-    QueueService,
-    DashboardService,
-    CollectedInfoService
+    CollectedInfoService, DashboardService, QueueService, UserService
 } from '../../data-services/interfaces';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
 import { QueueStore } from '../queues';
+import { DASHBOARD_REPORTS_NAMES } from '../../constants/dashboard-reports';
 
 @injectable()
 export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerformance> {
@@ -197,43 +188,17 @@ export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerforman
      */
     @computed
     get reports(): Report[] {
-        const reports = [];
+        const {
+            QUEUE_TOTAL_REVIEWED_STATS,
+            QUEUE_ANALYSTS_PERFORMANCE,
+            QUEUE_RISK_SCORE_DISTRIBUTION
+        } = DASHBOARD_REPORTS_NAMES.QUEUE;
 
-        if (this.totalReviewedReport) {
-            reports.push(this.totalReviewedReport);
-        }
-
-        if (this.performanceReport('Analysts performance')) {
-            reports.push(this.performanceReport('Analysts performance')!);
-        }
-
-        if (this.riskScoreDistributionReport) {
-            reports.push(this.riskScoreDistributionReport);
-        }
-
-        return reports;
-    }
-
-    // TODO: Implement report generating for the risk-score distribution and remove commented code, once API will be ready
-    @computed
-    private get riskScoreDistributionReport(): Report | null {
-        // if (this.totalPerformance) {
-        //     const REPORT_NAME = 'Decisions for the period';
-        //     const reportRawData = this.totalPerformance.risckScoreDistributionReport;
-        //
-        //     const rawObjectData: UnparseObject = {
-        //         fields: ['approved', 'rejected', 'watched'],
-        //         data: [
-        //             formatMetricToPercentageString(+reportRawData.approved),
-        //             formatMetricToPercentageString(+reportRawData.rejected),
-        //             formatMetricToPercentageString(+reportRawData.watched)
-        //         ]
-        //     };
-        //
-        //     return QueuePerformanceStore.buildReport(REPORT_NAME, rawObjectData);
-        // }
-
-        return null;
+        return [
+            this.totalReviewdStats(QUEUE_TOTAL_REVIEWED_STATS),
+            this.performanceReport(QUEUE_ANALYSTS_PERFORMANCE),
+            this.riskScoreDistributionReport(QUEUE_RISK_SCORE_DISTRIBUTION)
+        ].filter(report => report !== null) as Report[];
     }
 
     @computed
@@ -244,6 +209,58 @@ export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerforman
 
         return '';
     }
+
+    @action
+    clearQueue() {
+        this.queue = null;
+    }
+
+    @action
+    clearRiskScoreDistributionData() {
+        this.riskScoreDistribution = null;
+    }
+
+    @computed
+    get isGenerateReportButtonDisabled() {
+        return this.isDataLoading
+            || this.isRiskScoreDistributionDataLoading;
+    }
+
+    @action
+    clearStore() {
+        this.clearRiskScoreDistributionData();
+        this.clearPerformanceData();
+        this.resetRating();
+        this.resetAggregation();
+    }
+
+    /** ___ START REPORTS GENERATION METHODS ___ */
+
+    /**
+     * Returns generated report for risk score distribution
+     * @param name - report name
+     */
+    private riskScoreDistributionReport(name: string): Report | null {
+        return computed(() => {
+            if (this.riskScoreDistributionBarChartData.length) {
+                const reportRawData: Object[] = this.riskScoreDistributionBarChartData
+                    .map(({
+                        scoreDistributionRange, bad, watched, good
+                    }) => ({
+                        bucket: scoreDistributionRange,
+                        good,
+                        watched,
+                        bad
+                    }));
+
+                return this.csvReportBuilder.buildReport(name, reportRawData);
+            }
+
+            return null;
+        }).get();
+    }
+
+    /** ___ END REPORTS GENERATION METHODS ___ */
 
     @action
     private async fetchHistoricalQueue(queueId: string) {
@@ -261,23 +278,5 @@ export class QueuePerformanceStore extends BasePerformanceStore<AnalystPerforman
 
             throw e;
         }
-    }
-
-    @action
-    clearQueue() {
-        this.queue = null;
-    }
-
-    @action
-    clearRiskScoreDistributionData() {
-        this.riskScoreDistribution = null;
-    }
-
-    @action
-    clearStore() {
-        this.clearRiskScoreDistributionData();
-        this.clearPerformanceData();
-        this.resetRating();
-        this.resetAggregation();
     }
 }

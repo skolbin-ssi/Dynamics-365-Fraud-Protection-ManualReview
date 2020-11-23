@@ -3,6 +3,8 @@
 
 mr:
   tasks:
+    resolution-sending-task:
+      enabled: false
     prim-health-analysis-task:
       enabled: false
     sec-health-analysis-task:

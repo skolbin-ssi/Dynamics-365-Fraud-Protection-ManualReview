@@ -24,6 +24,7 @@ public class DeviceContextNodeData extends NodeData {
 
     private String deviceContextId;
     private String provider;
+    private String merchantFuzzyDeviceId;
     private String deviceContextDC;
     private String userAgent;
     private String screenResolution;

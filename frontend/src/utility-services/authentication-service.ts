@@ -88,7 +88,6 @@ export class AuthenticationService {
      * Redirect user to Azure AD Login Page
      */
     redirectToAzureLogin(returnLocation: Location = this.defaultRedirectLocation) {
-        // window.location.href = this.generateLoginUrl(returnLocation);
         this.msal.loginRedirect({
             scopes: [
                 'openid',
@@ -124,7 +123,6 @@ export class AuthenticationService {
 
     clearTokenAndSignOut() {
         this.msal.logout();
-        // this.navigateTo(ROUTES.LOGIN);
     }
 
     apiRequestInterceptor(config: ApiServiceRequestConfig) {
@@ -168,8 +166,12 @@ export class AuthenticationService {
 
                 try {
                     stateObj = JSON.parse(response?.accountState || '{}');
+
+                    if (stateObj.pathname === ROUTES.LOGIN) {
+                        stateObj = this.defaultRedirectLocation;
+                    }
                 } catch (e) {
-                    stateObj = { pathname: ROUTES.QUEUES };
+                    stateObj = this.defaultRedirectLocation;
                 }
 
                 handler({

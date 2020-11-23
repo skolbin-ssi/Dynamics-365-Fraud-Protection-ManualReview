@@ -8,4 +8,6 @@ import com.microsoft.azure.spring.data.cosmosdb.repository.CosmosRepository;
 
 public interface EmailDomainRepository extends CosmosRepository<EmailDomain, String> {
 
+    Iterable<EmailDomain> findByEmailDomainName(String emailDomainName);
+
 }

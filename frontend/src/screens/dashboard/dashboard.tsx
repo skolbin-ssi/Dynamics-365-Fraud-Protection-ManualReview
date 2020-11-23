@@ -17,25 +17,24 @@ import { QueuesPerformance } from './queues-performance';
 import { QueuePerformance } from './queue-performance';
 import { AnalystsPerformance } from './analysts-performance';
 import { AnalystPerformance } from './analyst-performance';
-
+import { SwitchTabs } from '../../components/switch-tabs';
 import {
     CurrentUserStore,
     DashboardScreenStore,
     QueuePerformanceStore,
-    QueuesPerformanceStore
 } from '../../view-services';
-import { SwitchTabs } from '../../components/switch-tabs';
-import { Queue, User } from '../../models';
-import { TYPES } from '../../types';
+import { readUrlSearchQueryOptions } from '../../utility-services';
 import {
     DASHBOARD_MANAGEMENT,
     DASHBOARD_SEGMENTATION,
     DASHBOARD_SEGMENTATION_DISPLAY_VIEW,
     ROUTES,
 } from '../../constants';
+import { Queue, User } from '../../models';
+import { TYPES } from '../../types';
+import { ReportsModal } from '../../components/reports-modal';
 
 import './dashboard.scss';
-import { ReportsModal } from '../../components/reports-modal';
 
 const CN = 'dashboard';
 
@@ -50,14 +49,33 @@ export class Dashboard extends Component<DashboardProps, any> {
     @resolve(TYPES.DASHBOARD_SCREEN_STORE)
     private dashboardScreenStore!: DashboardScreenStore;
 
-    @resolve(TYPES.QUEUES_PERFORMANCE_STORE)
-    private queuesPerformanceStore!: QueuesPerformanceStore;
-
     @resolve(TYPES.QUEUE_PERFORMANCE_STORE)
     private queuePerformanceStore!: QueuePerformanceStore;
 
     @resolve(TYPES.CURRENT_USER_STORE)
     private userStore!: CurrentUserStore;
+
+    componentDidMount() {
+        const { location: { search } } = this.props;
+        const query = readUrlSearchQueryOptions(search, { from: true, to: true });
+
+        this.dashboardScreenStore.setParsedUrlParams(query);
+    }
+
+    componentDidUpdate(prevProps: DashboardProps) {
+        const { location: { pathname } } = this.props;
+        const { location: { pathname: prevPathname } } = prevProps;
+        const dashboard = document.getElementById('dashboard');
+
+        /**
+         * This is the known solution for scrolling to the top of the page after the route change.
+         * For more details see https://reactrouter.com/web/guides/scroll-restoration
+         * We need it here, since the dashboard div has overflow-y: auto
+         */
+        if (dashboard && pathname !== prevPathname) {
+            dashboard.scrollTo(0, 0);
+        }
+    }
 
     @autoBind
     getActiveSegmentationTab() {
@@ -74,7 +92,6 @@ export class Dashboard extends Component<DashboardProps, any> {
         return DASHBOARD_SEGMENTATION.DEMAND;
     }
 
-    // TODO: Clear commented code after decision should we keep previous URL params on not
     /**
      * Redirect to the specific Analyst page
      * @param analyst
@@ -82,14 +99,6 @@ export class Dashboard extends Component<DashboardProps, any> {
     @autoBind
     handlePersonSearchSelection(analyst: User) {
         const { match: { params } } = this.props;
-        // const { location: { search } } = this.history;
-
-        // const shouldPreserveLocationSearch = path === ROUTES.DASHBOARD_ANALYST_PERFORMANCE;
-        //
-        // let preservedLocationSearch = '';
-        // if (shouldPreserveLocationSearch) {
-        //     preservedLocationSearch = search;
-        // }
 
         if (params) {
             const { analystId } = params as any;
@@ -111,7 +120,6 @@ export class Dashboard extends Component<DashboardProps, any> {
     @autoBind
     handleQueueSearchChange(queue: Queue) {
         const { match: { params } } = this.props;
-        // const { location: { search } } = this.history;
 
         if (params) {
             const { queueId } = params as any;
@@ -119,13 +127,6 @@ export class Dashboard extends Component<DashboardProps, any> {
                 return;
             }
         }
-
-        // const shouldPreserveLocationSearch = path === ROUTES.DASHBOARD_QUEUE_PERFORMANCE;
-        //
-        // let preservedLocationSearch = '';
-        // if (shouldPreserveLocationSearch) {
-        //     preservedLocationSearch = search;
-        // }
 
         this.history.push(
             `${ROUTES.build.dashboard.queue(queue.queueId)}`
@@ -245,7 +246,7 @@ export class Dashboard extends Component<DashboardProps, any> {
         const canUserViewDemandSupplyDashboard = this.userStore.checkUserCan(DASHBOARD_MANAGEMENT.VIEW_DEMAND_SUPPLY_REPORT);
 
         return (
-            <div className={CN}>
+            <div id="dashboard" className={CN}>
                 <DashboardHeader
                     onGoBackClick={this.handleGoBackHeaderClick}
                     isSearchBarDisplayed={!(canUserViewAnalystsPerformanceDashboard || canUserViewQueuesPerformanceDashboard)}

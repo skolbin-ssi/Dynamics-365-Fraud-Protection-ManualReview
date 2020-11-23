@@ -38,6 +38,7 @@ import './queue-performance.scss';
 import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
 import { BarChart } from '../bar-chart';
 import { ScoreDistribution } from './score-distribution';
+import { formatToQueryDateString } from '../../../utils/date';
 
 const CN = 'queue-performance';
 
@@ -163,10 +164,17 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
     }
 
     @autoBind
-    updateQueueUrlQuerySearch({ ids, rating, aggregation }: UpdateQuerySearchReactionParams) {
+    updateQueueUrlQuerySearch({
+        ids, rating, aggregation, from, to,
+    }: UpdateQuerySearchReactionParams) {
         const { location: { search } } = this.props;
         const { queueId } = this.queuePerformanceStore;
-        const searchPart = readUrlSearchQueryOptions(search, { overturnedIds: true, overturnedRating: true, overturnedAggregation: true });
+        const searchPart = readUrlSearchQueryOptions(search,
+            {
+                overturnedIds: true,
+                overturnedRating: true,
+                overturnedAggregation: true,
+            });
 
         const stringifiedQuery = stringifyIntoUrlQueryString({
             selectedIds: ids,
@@ -174,7 +182,9 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
             aggregation,
             overturnedIds: searchPart.overturnedIds,
             overturnedRating: searchPart.overturnedRating,
-            overturnedAggregation: searchPart.aggregation
+            overturnedAggregation: searchPart.aggregation,
+            from: formatToQueryDateString(from, null),
+            to: formatToQueryDateString(to, null),
         });
 
         this.history.replace(`${ROUTES.build.dashboard.queue(queueId)}?${stringifiedQuery}`);
@@ -182,7 +192,9 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
     }
 
     @autoBind
-    updateOverturnedUrlQuerySearch({ ids, rating, aggregation }: UpdateQuerySearchReactionParams) {
+    updateOverturnedUrlQuerySearch({
+        ids, rating, aggregation, from, to,
+    }: UpdateQuerySearchReactionParams) {
         const { location: { search } } = this.props;
         const { queueId } = this.queuePerformanceStore;
 
@@ -194,7 +206,9 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
             aggregation: searchPart.aggregation,
             overturnedIds: ids,
             overturnedRating: rating,
-            overturnedAggregation: aggregation
+            overturnedAggregation: aggregation,
+            from: formatToQueryDateString(from, null),
+            to: formatToQueryDateString(to, null),
         });
 
         this.history.replace(`${ROUTES.build.dashboard.queue(queueId)}?${strigifiedFields}`);
@@ -276,6 +290,7 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
             lineChartData,
             aggregation,
             isRiskScoreDistributionDataLoading,
+            isGenerateReportButtonDisabled
         } = this.queuePerformanceStore;
 
         const {
@@ -295,7 +310,11 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
                         {this.renderQueueName()}
                     </div>
 
-                    <DefaultButton text="Generate reports" onClick={this.handleGenerateReportsButtonClick} />
+                    <DefaultButton
+                        disabled={isGenerateReportButtonDisabled || isOverturnedDataLoading}
+                        text="Generate reports"
+                        onClick={this.handleGenerateReportsButtonClick}
+                    />
                 </div>
                 <section className={`${CN}__performance-analyst-section`}>
                     <AggregationHeader

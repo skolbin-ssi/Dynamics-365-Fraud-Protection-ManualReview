@@ -3,7 +3,7 @@
 .item-details-transaction-summary {
   $root: &;
 
-  &--transaction {
+  &--receipt {
     &__content {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -24,16 +24,14 @@
     color: $themePrimary;
   }
 
-  &--history {
+  &--cc_auth_result {
     .ms-DetailsHeader {
-      .ms-DetailsHeader-cell:nth-child(2) > span > span {
-        justify-content: flex-end;
-      }
+      background-color: $mainPageBackground;
+      padding-top: 1px;
     }
 
-    #{$root}__align-right {
-      justify-content: flex-end;
-      display: flex;
+    #{$root}__transaction-date {
+      color: $neutralDark;
     }
   }
 
@@ -52,6 +50,7 @@
 
 
       &-header {
+        height: 43px;
         background-color: $neutralLighterAlt;
 
         & > span {

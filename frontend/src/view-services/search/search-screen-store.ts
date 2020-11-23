@@ -24,7 +24,7 @@ import { ItemService, UserService } from '../../data-services/interfaces';
 import { FiltersBuilder } from '../../utility-services';
 
 @injectable()
-export class SearchScreenStore implements ItemsLoadable {
+export class SearchScreenStore implements ItemsLoadable<Item> {
     /**
      * Found items from API
      */
@@ -63,6 +63,8 @@ export class SearchScreenStore implements ItemsLoadable {
     @observable users?: User[];
 
     @observable tags?: string[];
+
+    private residualQueueId?: string;
 
     constructor(
         @inject(TYPES.SEARCH_SERVICE) private searchService: SearchService,
@@ -136,8 +138,14 @@ export class SearchScreenStore implements ItemsLoadable {
     @action
     updateSearchQueryObject(updatedSearchQuery: ItemSearchQueryDTO) {
         if (updatedSearchQuery?.queueIds?.length) {
-            const residual = updatedSearchQuery.queueIds
-                .some(queueId => this.queueStore.getQueueById(queueId)?.residual);
+            let residual = false;
+            updatedSearchQuery.queueIds
+                .forEach(queueId => {
+                    if (this.queueStore.getQueueById(queueId)?.residual) {
+                        residual = true;
+                        this.residualQueueId = queueId;
+                    }
+                });
 
             this.searchQuery = { ...updatedSearchQuery, residual };
         } else {
@@ -217,7 +225,7 @@ export class SearchScreenStore implements ItemsLoadable {
     // and sets it as selected for the search results table
     @autobind
     selectQueueForItem(item: Item) {
-        let selectedQueueId = item.queueIds[0];
+        let selectedQueueId = item.queueIds[0] || this.residualQueueId;
         let minDaysLeft: number = Infinity;
 
         item.queueIds.forEach(queueId => {

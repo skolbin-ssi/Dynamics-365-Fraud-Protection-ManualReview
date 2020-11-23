@@ -21,9 +21,6 @@ public class EventHubProperties {
     private final String connectionString;
     private final String checkpointStorageAccount;
     private final String checkpointConnectionString;
-    private final Duration checkpointInterval;
-    private final Duration sendingTimeout;
-    private final long sendingRetries;
     private final Map<String, ProducerProperties> producers;
     private final Map<String, ConsumerProperties> consumers;
 
@@ -32,6 +29,9 @@ public class EventHubProperties {
     @ToString
     public static class ProducerProperties {
         private final String destination;
+        private final Duration sendingPeriod;
+        private final long sendingWorkers;
+        private final int bufferSize;
     }
 
     @AllArgsConstructor
@@ -39,6 +39,7 @@ public class EventHubProperties {
     public static class ConsumerProperties {
         private final String destination;
         private final String group;
+        private final Duration checkpointInterval;
     }
 
 }

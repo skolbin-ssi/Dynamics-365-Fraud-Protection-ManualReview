@@ -47,6 +47,9 @@ export const TYPES = {
     ALERTS_MUTATION_STORE: Symbol('alertMutationStore'),
     SEARCH_SCREEN_STORE: Symbol('searchScreenStore'),
     FILTERS_STORE: Symbol('filtersStore'),
+    LINK_ANALYSIS_STORE: Symbol('linkAnalysisStore'),
+    LINK_ANALYSIS_MR_ITEMS_STORE: Symbol('LinkAnalysisMrItemsStore'),
+    LINK_ANALYSIS_DFP_ITEMS_STORE: Symbol('LinkAnalysisDfpItemsStore'),
 
     // Dashboard stores
     DASHBOARD_DEMAND_SUPPLY_SCREEN_STORE: Symbol('dashboardDemandSupplyScreenStore'),

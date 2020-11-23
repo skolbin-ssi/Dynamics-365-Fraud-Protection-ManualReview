@@ -31,7 +31,7 @@ class RegularAnalystSimulation extends Simulation {
     .exec(RegularAnalystOpenQueuesView.action)
     .exitHereIfFailed
     .pause(5 seconds, 30 seconds)
-    .during(30 minutes) {
+    .during(15 minutes) {
         exec(RegularAnalystReviewsOrder.action)
     }
     .exec(RegularAnalystUnlockOrder.action)

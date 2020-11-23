@@ -2,14 +2,23 @@
 // Licensed under the MIT license.
 
 import { inject, injectable } from 'inversify';
-import { DICTIONARY_TYPE, LABEL, SETTING_TYPE } from '../../constants';
-import { Item, Queue } from '../../models';
+import {
+    DEFAULT_QUEUE_ITEMS_PER_PAGE, DICTIONARY_TYPE, LABEL, SETTING_TYPE
+} from '../../constants';
+import { Item, PageableList, Queue } from '../../models';
 import { TYPES } from '../../types';
 import { AzureMapsService, Logger, UserBuilder } from '../../utility-services';
 import { SettingDTO } from '../api-services/models';
 import { BaseDomainService } from '../base-domain-service';
-import { GetLockedItemsTransformer, GetReviewItemTransformer } from '../data-transformers';
 import {
+    GetLinkAnalysisDfpItemsTransformer,
+    GetLinkAnalysisMrItemsTransformer,
+    GetLockedItemsTransformer,
+    GetReviewItemTransformer,
+    PostLinkAnalysisTransformer
+} from '../data-transformers';
+import {
+    BatchItemsLabelApiParams,
     DictionaryApiService,
     ItemApiService,
     ItemService,
@@ -17,6 +26,7 @@ import {
     SettingsApiService,
     UserService
 } from '../interfaces';
+import { LinkAnalysisDfpItem, LinkAnalysisMrItem, PostLinkAnalysisBody } from '../../models/item/link-analysis';
 
 @injectable()
 export class ItemServiceImpl extends BaseDomainService implements ItemService {
@@ -216,6 +226,28 @@ export class ItemServiceImpl extends BaseDomainService implements ItemService {
         }
     }
 
+    async batchLabelItems(params: BatchItemsLabelApiParams) {
+        let response;
+
+        try {
+            response = await this.itemApiService.patchBatchLabel(params);
+        } catch (e) {
+            throw this.handleApiException('patchBatchLabel', e, {
+                500: `Failed to apply batch label to an items ${params.itemIds.join(', ')}`
+            });
+        }
+
+        try {
+            return response.data;
+        } catch (e) {
+            throw this.handleException(
+                'batchLabelItems',
+                'Failed to parse response from API while label batch items',
+                e
+            );
+        }
+    }
+
     async putItemNote(
         itemId: string,
         note: string,
@@ -302,6 +334,103 @@ export class ItemServiceImpl extends BaseDomainService implements ItemService {
             this.settingsMap.set(type, data);
         } catch (e) {
             this.logger.warn('Failed to load item settings');
+        }
+    }
+
+    async postLinkAnalysis(postLinkAnalysisBody: PostLinkAnalysisBody) {
+        const dataTransformer = new PostLinkAnalysisTransformer();
+        let response;
+
+        try {
+            response = await this.itemApiService.postLinkAnalysis(postLinkAnalysisBody);
+        } catch (e) {
+            throw this.handleApiException('postLinkAnalysis', e, {
+                500: 'Failed to post link analysis body'
+            });
+        }
+
+        if (response.data) {
+            try {
+                return dataTransformer.mapResponse(response.data);
+            } catch (e) {
+                throw this.handleException(
+                    'postLinkAnalysis',
+                    'Failed to parse response from API while trying post link analysis body',
+                    e
+                );
+            }
+        }
+
+        return null;
+    }
+
+    async getLinkAnalysisMrItems(
+        chainContinuationIdentifier: string,
+        id: string,
+        shouldLoadMore: boolean,
+        size: number = DEFAULT_QUEUE_ITEMS_PER_PAGE
+    ): Promise<PageableList<LinkAnalysisMrItem>> {
+        const dataTransformer = new GetLinkAnalysisMrItemsTransformer(this.userBuilder);
+        const uniqueSequenceChainId = `${chainContinuationIdentifier}-${id}`;
+        let response;
+
+        try {
+            const token = shouldLoadMore ? this.getContinuationToken(uniqueSequenceChainId) : null;
+            response = await this.itemApiService.getLinkAnalysisMrItems(id, size, token);
+        } catch (e) {
+            throw this.handleApiException('getLinkAnalysisMrItems', e, {
+                500: `Failed to get link analysis mr items for search id (${id}) from the Api due to internal server error`
+            });
+        }
+
+        try {
+            const canLoadMore = this.storeContinuationToken(uniqueSequenceChainId, response.data);
+
+            return {
+                data: dataTransformer.mapResponse(response.data),
+                canLoadMore
+            };
+        } catch (e) {
+            throw this.handleException(
+                'getLinkAnalysisItems',
+                `Failed to parse response from API while getting items for mr link analysis (${id})`,
+                e
+            );
+        }
+    }
+
+    async getLinkAnalysisDfpItems(
+        chainContinuationIdentifier: string,
+        id: string,
+        shouldLoadMore: boolean,
+        size: number = DEFAULT_QUEUE_ITEMS_PER_PAGE
+    ): Promise<PageableList<LinkAnalysisDfpItem>> {
+        const dataTransformer = new GetLinkAnalysisDfpItemsTransformer(this.userBuilder);
+        const uniqueSequenceChainId = `${chainContinuationIdentifier}-${id}`;
+        let response;
+
+        try {
+            const token = shouldLoadMore ? this.getContinuationToken(uniqueSequenceChainId) : null;
+            response = await this.itemApiService.getLinkAnalysisDfpItems(id, size, token);
+        } catch (e) {
+            throw this.handleApiException('getLinkAnalysisDfpItems', e, {
+                500: `Failed to get link analysis dfp items for search id (${id}) from the Api due to internal server error`
+            });
+        }
+
+        try {
+            const canLoadMore = this.storeContinuationToken(uniqueSequenceChainId, response.data);
+
+            return {
+                data: dataTransformer.mapResponse(response.data),
+                canLoadMore
+            };
+        } catch (e) {
+            throw this.handleException(
+                'getLinkAnalysisDfpItems',
+                `Failed to parse response from API while getting items for mr link analysis (${id})`,
+                e
+            );
         }
     }
 }

@@ -32,6 +32,7 @@ import { TYPES } from '../../../types';
 import { QueuePerformance } from '../../../models/dashboard';
 
 import './queues-performance.scss';
+import { formatToQueryDateString } from '../../../utils/date';
 
 const CN = 'queues-performance';
 
@@ -99,11 +100,15 @@ export class QueuesPerformance extends Component<QueuePerformanceProps, any> {
     }
 
     @autoBind
-    updateParams({ ids, rating, aggregation }: UpdateQuerySearchReactionParams) {
+    updateParams({
+        ids, rating, aggregation, from, to,
+    }: UpdateQuerySearchReactionParams) {
         const strigifiedFields = stringifyIntoUrlQueryString({
             selectedIds: ids,
             rating,
-            aggregation
+            aggregation,
+            from: formatToQueryDateString(from, null),
+            to: formatToQueryDateString(to, null),
         });
 
         this.history.replace(`${ROUTES.DASHBOARD_QUEUES_PERFORMANCE}?${strigifiedFields}`);
@@ -141,8 +146,11 @@ export class QueuesPerformance extends Component<QueuePerformanceProps, any> {
     }
 
     renderGenerateReportButton() {
+        const { isDataLoading } = this.queuesPerformanceStore;
+
         return (
             <DefaultButton
+                disabled={isDataLoading}
                 className={`${CN}__generate-reports-button`}
                 text="Generate reports"
                 onClick={this.handleGenerateReportsButtonClick}

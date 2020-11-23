@@ -13,7 +13,7 @@ import { calculateDaysLeft, getProcessingDeadlineValues } from '../../utils';
 import { QUEUE_VIEW_TYPE } from '../../constants';
 
 @injectable()
-export class QueueStore implements ItemsLoadable {
+export class QueueStore implements ItemsLoadable<Item> {
     /**
      * Queues list
      */

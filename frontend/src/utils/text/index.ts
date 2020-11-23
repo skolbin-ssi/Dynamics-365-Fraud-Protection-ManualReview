@@ -7,3 +7,5 @@ export * from './digest-message-to-hex-hash';
 export * from './placehold';
 export * from './format-to-percentage-string';
 export * from './encode-string-for-css';
+export * from './string-to-start-case';
+export * from './capitilize';

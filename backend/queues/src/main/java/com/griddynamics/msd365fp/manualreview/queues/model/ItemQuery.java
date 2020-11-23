@@ -369,6 +369,12 @@ public class ItemQuery {
             return this;
         }
 
+        public ItemQueryConstructor enriched() {
+            queryParts.add(
+                    String.format("IS_DEFINED(%1$s.enriched) AND NOT IS_NULL(%1$s.enriched)", alias)
+            );
+            return this;
+        }
 
         public ItemQueryConstructor enrichedAfter(OffsetDateTime time) {
             if (time != null) {
@@ -436,6 +442,13 @@ public class ItemQuery {
         public ItemQueryConstructor queueIdsAreEmpty() {
             queryParts.add(String.format(
                     "(IS_NULL(%1$s.queueIds) OR %1$s.queueIds = [])",
+                    alias));
+            return this;
+        }
+
+        public ItemQueryConstructor hasEvents() {
+            queryParts.add(String.format(
+                    "(ARRAY_LENGTH(%1$s.events) > 0)",
                     alias));
             return this;
         }

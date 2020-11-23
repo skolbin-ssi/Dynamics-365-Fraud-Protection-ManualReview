@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import {
-    action, computed, observable
-} from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { inject, injectable } from 'inversify';
 import { UnparseObject } from 'papaparse';
 
@@ -12,10 +10,7 @@ import { Serie } from '@nivo/line';
 import { BasePerformanceStore } from './base-performance-store';
 
 import {
-    DecisionPieDatum,
-    PerformanceMetrics,
-    ProcessingTimeMetric,
-    QueuePerformance
+    DecisionPieDatum, PerformanceMetrics, ProcessingTimeMetric, QueuePerformance
 } from '../../models/dashboard';
 import { TYPES } from '../../types';
 import { CollectedInfoService, DashboardService, UserService } from '../../data-services/interfaces';
@@ -23,10 +18,13 @@ import { DURATION_PERIOD } from '../../constants';
 import { ProgressPerformanceMetric } from '../../models/dashboard/progress-performance-metric';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
 import { Report } from '../../models/misc';
-import { formatMetricToPercentageString } from '../../utils/text';
 import { User } from '../../models/user';
 import { PerformanceParsedQueryUrl } from '../../utility-services';
 import { QueueStore } from '../queues';
+import {
+    ANALYSTS_PERFORMANCE_OVERVIEW_REPORT_NAMES,
+    DASHBOARD_REPORTS_NAMES
+} from '../../constants/dashboard-reports';
 
 @injectable()
 export class AnalystPerformanceStore extends BasePerformanceStore<QueuePerformance> {
@@ -253,100 +251,134 @@ export class AnalystPerformanceStore extends BasePerformanceStore<QueuePerforman
         this.analyst = null;
     }
 
+    @computed
+    get isGenerateButtonsDisabled() {
+        return this.isDataLoading
+            || this.isTotalPerformanceLoading
+            || this.isProcessingTimeMetricLoading;
+    }
+
     /**
      * Collects reports for the dashboard
+     *
+     * @param isPersonal - indicates whether it is personal reports page
      */
-    @computed
-    get reports(): Report[] {
-        const reports = [];
-
-        if (this.totalReviewedReport) {
-            reports.push(this.totalReviewedReport);
-        }
-
-        if (this.performanceReport('Queues performance')) {
-            reports.push(this.performanceReport('Queues performance')!);
-        }
-
-        if (this.analystOverviewReport) {
-            reports.push(this.analystOverviewReport);
-        }
-
-        if (this.totalDecisionsReport) {
-            reports.push(this.totalDecisionsReport);
-        }
-
-        return reports;
-    }
-
-    // TODO: Move out this logic to more generic class
-    @computed
-    private get totalDecisionsReport(): Report | null {
-        if (this.totalPerformance) {
-            const REPORT_NAME = 'Decisions for the period';
-            const reportRawData = this.totalPerformance.totalDecisionsReport;
-
-            const rawObjectData: UnparseObject = {
-                fields: ['good', 'bad', 'watched'],
-                data: [
-                    formatMetricToPercentageString(+reportRawData.good),
-                    formatMetricToPercentageString(+reportRawData.bad),
-                    formatMetricToPercentageString(+reportRawData.watched)
-                ]
-            };
-
-            return AnalystPerformanceStore.buildReport(REPORT_NAME, rawObjectData);
-        }
-
-        return null;
-    }
-
-    @computed
-    private get analystOverviewReport() {
-        if (this.progressPerformanceMetric) {
-            const REPORT_NAME = 'Analyst performance overview';
-
+    reports(isPersonal = false): Report[] {
+        return computed(() => {
             const {
-                reviewedProgress,
-                annualReviewedProgress,
-                goodDecisionsProgress,
-                annualGoodDecisionsProgress,
-                watchDecisionsProgress,
-                annualWatchDecisionsProgress,
-                badDecisionsProgress,
-                annualBadDecisionsProgress,
-                escalatedItemsProgress,
-                annualEscalatedItemsProgress
-            } = this.progressPerformanceMetric;
+                totalReviewedStats,
+                performanceByQueue,
+                performanceOverview,
+                decisions
+            } = this.getReportsNames(isPersonal);
 
-            let unparseObject: Object = {
-                'number of decisions': reviewedProgress.current,
-                'annual number of decisions': annualReviewedProgress.current,
-                'good decisions': goodDecisionsProgress.current,
-                'annual good decisions': annualGoodDecisionsProgress.current,
-                'watch decisions': watchDecisionsProgress.current,
-                'annual watch decisions': annualWatchDecisionsProgress.current,
-                'bad decisions': badDecisionsProgress.current,
-                'annual bad decisions': annualBadDecisionsProgress.current,
-                'escalated items': escalatedItemsProgress.current,
-                'annual escalated items': annualEscalatedItemsProgress.current
-            };
+            return [
+                this.totalReviewdStats(totalReviewedStats),
+                this.performanceReport(performanceByQueue),
+                this.analystOverviewReport(performanceOverview),
+                this.totalDecisionsReport(decisions)
+            ].filter(report => report !== null) as Report[];
+        }).get();
+    }
 
-            if (this.processingTimeMetric) {
-                const { waistedTime, getTimeToMakeDecision } = this.processingTimeMetric;
-                unparseObject = {
-                    ...unparseObject,
-                    'waisted time': waistedTime.current,
-                    'time to make a decision': getTimeToMakeDecision.current
+    private getReportsNames(isPersonal: boolean) {
+        const {
+            ANALYST_TOTAL_REVIEWED_STATS,
+            ANALYST_DECISIONS_BY_QUEUE,
+            ANALYST_PERFORMANCE_OVERVIEW,
+            ANALYST_DECISIONS
+        } = DASHBOARD_REPORTS_NAMES.ANALYST;
 
+        const {
+            PERSONAL_TOTAL_REVIEWED_STATS,
+            PERSONAL_PERFORMANCE_BY_QUEUE,
+            PERSONAL_PERFORMANCE_OVERVIEW,
+            PERSONAL_DECISIONS
+        } = DASHBOARD_REPORTS_NAMES.PERSONAL_PERFORMANCE;
+
+        let totalReviewedStats = ANALYST_TOTAL_REVIEWED_STATS;
+        let performanceByQueue = ANALYST_DECISIONS_BY_QUEUE;
+        let performanceOverview = ANALYST_PERFORMANCE_OVERVIEW;
+        let decisions = ANALYST_DECISIONS;
+
+        if (isPersonal) {
+            totalReviewedStats = PERSONAL_TOTAL_REVIEWED_STATS;
+            performanceByQueue = PERSONAL_PERFORMANCE_BY_QUEUE;
+            performanceOverview = PERSONAL_PERFORMANCE_OVERVIEW;
+            decisions = PERSONAL_DECISIONS;
+        }
+
+        return {
+            performanceByQueue,
+            totalReviewedStats,
+            performanceOverview,
+            decisions
+        };
+    }
+
+    /** ___ STARTS REPORTS GENERATION METHODS ___ */
+
+    /**
+     * Returns report
+     * @param name - report name
+     */
+    private totalDecisionsReport(name: string): Report | null {
+        return computed(() => {
+            if (this.totalPerformance) {
+                const reportRawData = this.totalPerformance.totalDecisionsReport;
+
+                const rawObjectData: UnparseObject = {
+                    fields: ['good, %', 'bad, %', 'watched, %'],
+                    data: [
+                        +reportRawData.good,
+                        +reportRawData.bad,
+                        +reportRawData.watched
+                    ]
                 };
 
-                return this.CSVReportBuilder.buildReport(REPORT_NAME, [unparseObject]);
+                return this.csvReportBuilder.buildReport(name, rawObjectData);
             }
 
-            return this.CSVReportBuilder.buildReport(REPORT_NAME, [unparseObject]);
-        }
-
-        return null;
+            return null;
+        }).get();
     }
+
+    /**
+     * Returns report
+     * @param name - report name
+     */
+    private analystOverviewReport(name: string) {
+        return computed(() => {
+            if (this.progressPerformanceMetric && this.processingTimeMetric) {
+                let rawData: any[] = [];
+
+                const reportsSummary = [
+                    ...this.progressPerformanceMetric.reportSummary,
+                    ...this.processingTimeMetric.reportSummary
+                ];
+
+                try {
+                    const displayNames = Object.values(ANALYSTS_PERFORMANCE_OVERVIEW_REPORT_NAMES);
+
+                    rawData = reportsSummary.map((progress, index) => [
+                        [displayNames[index], progress.current],
+                        [`${displayNames[index]}, %`, progress.progress || 0]
+                    ]).flat(1);
+                } catch (e) {
+                    rawData = [];
+                }
+
+                const unparseObject = {
+                    fields: ['name', 'metric'],
+                    data: rawData
+                };
+
+                return this.csvReportBuilder.buildReport(name, unparseObject);
+            }
+
+            return null;
+        }).get();
+    }
+
+    /** ___ END REPORTS GENERATION METHODS ___ */
 }

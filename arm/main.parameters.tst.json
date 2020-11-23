@@ -60,13 +60,13 @@
             "value": "S1"
         },
         "appBackendSku": {
-            "value": "B2"
+            "value": "B3"
         },
         "appBackendNumOfWorkers": {
-            "value": 1
+            "value": 2
         },
         "appJavaOpts": {
-            "value": "-Xms3072m -Xmx3072m"
+            "value": "-Xms6016m -Xmx6016m"
         },
         "mailUsername": {
             "value": "dfp-mr-notificator@outlook.com"

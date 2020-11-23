@@ -6,7 +6,7 @@ import io.gatling.http.Predef._
 object RegularAnalystUnlockOrder {
 
   val action = exec(
-    http("Unlock top item in a queue")
+    http("Unlock top item")
       .delete("/api/items/${reviewOrder}/lock")
       .header("Virtual-User", "${virtualUser}")
   )

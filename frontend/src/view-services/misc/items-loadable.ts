@@ -1,10 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { Item } from '../../models/item';
-
-export interface ItemsLoadable {
-    items: Item[];
+export interface ItemsLoadable<T> {
+    items: T[];
     loadingMoreItems: boolean;
     wasFirstPageLoaded: boolean;
     canLoadMore: boolean;

@@ -7,7 +7,6 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
 import scala.concurrent.duration._
-
 import scala.util.Random
 
 object DashboardExploration {
@@ -24,29 +23,6 @@ object DashboardExploration {
 
   val action = exec(_.set("currentStartOfDay", currentStartOfDay.toInstant))
     .exec(_.set("currentEndOfDay", currentEndOfDay.toInstant))
-    .exec(
-      http("Get map of queue overviews for Overview dashboard")
-        .get("/api/queues/overview?timeToSla=P2D&timeToTimeout=PT5M")
-    )
-    .exec(
-      http("Get list of collected analysts")
-        .get("/api/collected-info/analysts")
-    )
-    .exec(
-      http("Get list of collected queues")
-        .get("/api/collected-info/queues")
-    )
-    .exec(
-      http("Get all direct queues")
-        .get("/api/queues?viewType=DIRECT")
-    )
-    .exec(
-      http("Get size history metrics for all queues")
-        .get(
-          "/api/dashboards/size-history/overall?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P1D"
-        )
-    )
-    .pause(2 minutes)
     .foreach(1 to (random.nextInt(5) + 5), "i") {
       exec(
         http("Get all regular queues")
@@ -59,71 +35,58 @@ object DashboardExploration {
               .saveAs("queueId")
           )
       )
+        .pause(30 seconds)
         .exec(
-          http("Get demand/supply metrics for all queues")
+          http("Get Queues dashboard")
+            .get(
+              "/api/dashboards/labeling/queues?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P1D"
+            )
+        )
+        .pause(30 seconds)
+        .exec(
+        http("Get Queue details")
+            .get(
+              "/api/dashboards/labeling/analysts?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P1D&queue=${queueId}"
+            )
+        )
+        .exec(
+          http("Get Queue details")
+            .get(
+              "/api/dashboards/labeling/distribution/risk-score?bucketSize=100&queue=${queueId}&from=${currentStartOfDay}&to=${currentEndOfDay}"
+            )
+        )
+        .pause(30 seconds)
+        .exec(
+          http("Get Analysts dashboard")
+            .get(
+              "/api/dashboards/labeling/analysts?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P1D"
+            )
+        )
+        .pause(30 seconds)
+        .exec(
+          http("Get Demand/Supply dashboard data")
             .get(
               "/api/dashboards/item-placement/overall?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P1D"
             )
         )
         .exec(
-          http("Get demand/supply metrics for list of queues")
+          http("Get Demand/Supply dashboard data")
             .get(
-              "/api/dashboards/item-placement/queues?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P1D"
-            )
-        )
-        .pause(1 minute)
-        .exec(
-          http("Get size history metrics for list of queues")
-            .get(
-              "/api/dashboards/size-history/queues?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P1D&queue=${queueId}"
+              "/api/dashboards/size-history/overall?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P1D"
             )
         )
         .exec(
-          http("Get queue view details by ID")
-            .get("/api/queues/${queueId}")
+          http("Get Demand/Supply dashboard data")
+            .get("/api/queues/overview?timeToSla=P2D&timeToTimeout=PT5M")
         )
         .exec(
-          http("Get demand/supply metrics for list of queues")
+          http("Get Demand/Supply dashboard data")
+            .get("/api/queues?viewType=DIRECT")
+        )
+        .exec(
+          http("Get Demand/Supply dashboard data")
             .get(
               "/api/dashboards/item-placement/queues?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P1D&queue=${queueId}"
-            )
-        )
-        .exec(
-          http("Get list of items by queue for Overview Dashboard")
-            .get(
-              "/api/queues/${queueId}-REGULAR/overview?size=18&timeToSla=P2D&timeToTimeout=PT5M"
-            )
-        )
-        .exec(
-          http("Get list of items by queue for Overview Dashboard")
-            .get(
-              "/api/queues/${queueId}-ESCALATION/overview?size=18&timeToSla=P2D&timeToTimeout=PT5M"
-            )
-        )
-        .pause(1 minute)
-        .exec(
-          http("Get size history metrics for list of queues")
-            .get(
-              "/api/dashboards/size-history/queues?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P7D&queue=${queueId}"
-            )
-        )
-        .exec(
-          http("Get demand/supply metrics for list of queues")
-            .get(
-              "/api/dashboards/item-placement/queues?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P7D&queue=${queueId}"
-            )
-        )
-        .pause(1 minute)
-        .exec(
-          http("Get size history metrics for list of queues")
-            .get(
-              "/api/dashboards/size-history/queues?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P31D&queue=${queueId}"
-            )
-        )
-        .exec(
-          http("Get demand/supply metrics for list of queues")
-            .get(
-              "/api/dashboards/item-placement/queues?from=${currentStartOfDay}&to=${currentEndOfDay}&aggregation=P31D&queue=${queueId}"
             )
         )
     }

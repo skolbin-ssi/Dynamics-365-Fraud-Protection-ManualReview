@@ -5,13 +5,14 @@ mr:
   instance-type: prim
   task-reset-timeout-multiplier: 4.0
   task-warning-timeout-multiplier: 2.0
+  task-successful-runs-timeout-multiplier: 8.0
   tasks:
     prim-health-analysis-task:
       enabled: true
-      delay: PT10M
+      delay: PT1M
     sec-health-analysis-task:
       enabled: false
-      delay: PT10M
+      delay: PT1M
     resolution-send-task:
       enabled: true
       delay: PT10M
@@ -50,12 +51,24 @@ azure:
     token-cache-size: 500
     token-cache-retention: PT10M
   event-hub:
-    checkpoint-interval: PT3M
-    sending-timeout: PT10M
-    sending-retries: 3
     health-check-ttl: PT24H
-    health-check-batch-size: 5
+    health-check-batch-size: 1
     health-check-allowed-delay: PT60M
+    consumers:
+      item-lock-event-hub:
+        checkpoint-interval: PT1M
+      item-label-event-hub:
+        checkpoint-interval: PT1M
+      item-resolution-event-hub:
+        checkpoint-interval: PT1M
+      item-assignment-event-hub:
+        checkpoint-interval: PT1M
+      queue-size-event-hub:
+        checkpoint-interval: PT1M
+      queue-update-event-hub:
+        checkpoint-interval: PT1M
+      overall-size-event-hub:
+        checkpoint-interval: PT1M
 
 swagger:
   token-url: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/v2.0/token

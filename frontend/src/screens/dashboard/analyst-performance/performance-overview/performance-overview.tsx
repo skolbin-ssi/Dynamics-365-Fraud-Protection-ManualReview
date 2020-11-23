@@ -30,7 +30,6 @@ export class PerformanceOverview extends Component<PerformanceOverviewComponentP
     renderProgressTableCells() {
         const { analystPerformanceStore: { progressPerformanceMetric, processingTimeMetric } } = this.props;
         if (progressPerformanceMetric && processingTimeMetric) {
-            // TODO: Move string keys to the constant values, and create a mapper related with reports
             const renderMapCells = new Map<string, CurrentProgress>([
                 ['Number of decisions', progressPerformanceMetric.reviewedProgress],
                 ['Annual number of decisions', progressPerformanceMetric.annualReviewedProgress],

@@ -11,3 +11,4 @@ export * from './queues-screen-store';
 export * from './alerts-store';
 export * from './alerts-mutation-store';
 export * from './reports-modal-store';
+export * from './link-analysis';

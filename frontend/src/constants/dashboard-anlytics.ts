@@ -95,10 +95,11 @@ export const DATE_RANGE_DISPLAY = {
     [DATE_RANGE.CUSTOM]: 'Custom range'
 };
 
-export const DATE_RANGE_DAYS = {
+export const DATE_RANGE_DAYS: Record<DATE_RANGE, number> = {
     [DATE_RANGE.TWO_WEEKS]: 14,
     [DATE_RANGE.FOUR_WEEKS]: 28,
-    [DATE_RANGE.SIX_WEEKS]: 42
+    [DATE_RANGE.SIX_WEEKS]: 42,
+    [DATE_RANGE.CUSTOM]: 0
 };
 
 export enum DASHBOARD_SEARCH_OPTIONS {
@@ -136,16 +137,6 @@ export enum OVERTURN_CHART_KEYS {
 }
 
 /**
- * Overturn chart keys for generating CSV file
- */
-export const OVERTURN_CHART_REPORT_KEYS = {
-    [OVERTURN_CHART_KEYS.GOOD]: 'good',
-    [OVERTURN_CHART_KEYS.OVERTURNED_GOOD]: 'overturned good ',
-    [OVERTURN_CHART_KEYS.BAD]: 'bad',
-    [OVERTURN_CHART_KEYS.OVERTURNED_BAD]: 'overturned bad'
-};
-
-/**
  * Overturned decisions chart keys for the UI
  */
 export enum OVERTURNED_DECISIONS_CHART_KEYS {
@@ -157,26 +148,6 @@ export enum OVERTURNED_DECISIONS_CHART_KEYS {
     BAD_DECISION_OVERTURN_RATE = 'BAD_DECISION_OVERTURN_RATE',
     AVERAGE_OVERTURN_RATE = 'AVERAGE_OVERTURN_RATE'
 }
-
-/**
- * Overturned decisions chart keys for generating CSV file
- */
-export const OVERTURNED_DECISIONS_REPORT_KEYS = {
-    [OVERTURNED_DECISIONS_CHART_KEYS.GOOD_DECISIONS]: 'good decisions',
-    [OVERTURNED_DECISIONS_CHART_KEYS.OVERTURNED_GOOD_DECISIONS]: 'overturned good decisions',
-    [OVERTURNED_DECISIONS_CHART_KEYS.GOOD_DECISION_OVERTURN_RATE]: 'good decision overturn rate',
-    [OVERTURNED_DECISIONS_CHART_KEYS.BAD_DECISIONS]: 'bad decisions',
-    [OVERTURNED_DECISIONS_CHART_KEYS.OVERTURNED_BAD_DECISIONS]: 'overturned bad decisions',
-    [OVERTURNED_DECISIONS_CHART_KEYS.BAD_DECISION_OVERTURN_RATE]: 'bad decision overturn rate',
-    [OVERTURNED_DECISIONS_CHART_KEYS.AVERAGE_OVERTURN_RATE]: 'average overturn rate',
-};
-
-export const OVERTURN_CHART_DATUM_LABELS = {
-    [OVERTURN_CHART_KEYS.GOOD]: 'good',
-    [OVERTURN_CHART_KEYS.OVERTURNED_GOOD]: 'overturnedGood',
-    [OVERTURN_CHART_KEYS.BAD]: 'bad',
-    [OVERTURN_CHART_KEYS.OVERTURNED_BAD]: 'overturnedBad'
-};
 
 export enum OVERTURN_LABELS {
     GOOD = 'GOOD',

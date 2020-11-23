@@ -20,9 +20,7 @@ class QueuesPageSimulation extends Simulation {
 
   val scn = scenario("DashboardPageSimulation")
     .exec(_.set("authToken", AuthorisationInfo.authToken))
-    .repeat(10) {
-      exec(OpenQueuesViewWithFrontend.action)
-    }
+    .exec(OpenQueuesViewWithFrontend.action)
 
   setUp(scn.inject(atOnceUsers(5))).protocols(httpProtocol)
 }

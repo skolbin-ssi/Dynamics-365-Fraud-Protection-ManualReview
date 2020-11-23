@@ -16,7 +16,6 @@ import { AnalystPerformance, BasicEntityPerformance } from '../../../models/dash
 import { DEFAULT_DATA_LIST_SHIMMER_LINES_NUMBER } from '../../../constants';
 
 import './data-grid-list.scss';
-import { User } from '../../../models/user';
 
 const CN = 'data-grid-list';
 
@@ -134,8 +133,9 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
 
     ];
 
-    renderUserRow(user: User | null) {
+    renderUserRow(entity: BasicEntityPerformance) {
         const { onRowClick } = this.props;
+        const user = (entity as AnalystPerformance).analyst;
 
         if (user) {
             return (
@@ -152,7 +152,13 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
             );
         }
 
-        return null;
+        return (
+            <Persona
+                text={`${entity.id}`}
+                size={PersonaSize.size28}
+                className={`${CN}__analyst`}
+            />
+        );
     }
 
     @autoBind
@@ -179,7 +185,7 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
                 />
 
                 {isAnalystTable
-                    ? this.renderUserRow((entity as AnalystPerformance).analyst)
+                    ? this.renderUserRow(entity)
                     : (
                         /* eslint-disable-next-line jsx-a11y/click-events-have-key-events */
                         <div
@@ -194,7 +200,7 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
                                     { [`${CN}__clickable-row`]: !!onRowClick }
                                 )}
                             >
-                                {entity.name}
+                                {entity.name || entity.id}
                             </Text>
                         </div>
                     )}

@@ -13,12 +13,14 @@ export interface KeyValueItem {
     className?: string;
     contentClassName?: string;
     isPrice?: boolean;
+    valueToCopy?: string;
+    customPlaceholder?: string
 }
 
 export class BaseTileRenderer<T, TT> extends Component<T, TT> {
-    protected valuePlaceholder(CN: string) {
+    protected valuePlaceholder(customPlaceholder?: string) {
         return (
-            <span className={`${CN}__pl`}>N/A</span>
+            <span className="placeholder">{customPlaceholder || 'N/A'}</span>
         );
     }
 
@@ -29,7 +31,9 @@ export class BaseTileRenderer<T, TT> extends Component<T, TT> {
                 value,
                 className,
                 contentClassName,
-                isPrice
+                isPrice,
+                valueToCopy,
+                customPlaceholder
             }) => {
                 let valueToRender = value;
 
@@ -43,7 +47,8 @@ export class BaseTileRenderer<T, TT> extends Component<T, TT> {
                         contentClassName={contentClassName}
                         key={stringToKebabCase(key)}
                         label={key}
-                        value={placeHold(valueToRender, this.valuePlaceholder(CN))}
+                        value={placeHold(valueToRender, this.valuePlaceholder(customPlaceholder))}
+                        valueToCopy={valueToCopy}
                     />
                 );
             });

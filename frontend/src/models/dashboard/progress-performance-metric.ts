@@ -123,9 +123,9 @@ export class ProgressPerformanceMetric implements ProgressMetricDto {
     }
 
     @computed
-    get overviewReport() {
+    get reportSummary() {
         return [
-            this.badDecisionsProgress,
+            this.reviewedProgress,
             this.annualReviewedProgress,
             this.goodDecisionsProgress,
             this.annualGoodDecisionsProgress,
@@ -138,7 +138,6 @@ export class ProgressPerformanceMetric implements ProgressMetricDto {
         ];
     }
 
-    // TODO: Move to shared math functions
     private static calculateProgress(current: number, previous: number) {
         const quotient = 100;
         let ratio = 0;

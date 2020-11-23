@@ -37,6 +37,17 @@ public class PublicItemLabelingHistoryClient {
     }
 
     @PreAuthorize("@dataSecurityService.checkPermissionForQueuePerformanceReading(authentication, #analystIds)")
+    public List<ItemLabelingBucket> getBatchLabelingSummary(
+            @NonNull final OffsetDateTime from,
+            @NonNull final OffsetDateTime to,
+            final Set<String> analystIds) {
+        return labelActivityRepository.getBatchPerformance(
+                from,
+                to,
+                analystIds);
+    }
+
+    @PreAuthorize("@dataSecurityService.checkPermissionForQueuePerformanceReading(authentication, #analystIds)")
     public List<ItemLabelingBucket> getItemLabelingHistoryGroupedByQueues(
             @NonNull final OffsetDateTime from,
             @NonNull final OffsetDateTime to,

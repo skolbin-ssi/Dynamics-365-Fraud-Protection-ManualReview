@@ -9,10 +9,10 @@ import { BasicEntityPerformance } from '../../models/dashboard';
 import { PeriodPerformanceMetrics } from '../../data-services/api-services/models/dashboard';
 import { formatToLocaleMonthDayFormat } from '../../utils/date';
 import { calculatePercentageRatio } from '../../utils/math';
-import { OVERTURN_CHART_KEYS, OVERTURN_CHART_REPORT_KEYS, PERFORMANCE_RATING_TO_NUMBER } from '../../constants';
+import { OVERTURN_CHART_KEYS, PERFORMANCE_RATING_TO_NUMBER } from '../../constants';
 import { Report } from '../../models/misc';
-import { formatMetricToPercentageString } from '../../utils/text';
 import { PerformanceParsedQueryUrl } from '../../utility-services';
+import { OVERTURN_CHART_REPORT_KEYS } from '../../constants/dashboard-reports';
 
 export interface AccuracyChartDatum {
     originalDate: string,
@@ -79,7 +79,53 @@ export class BaseOverturnedPerformanceStore<T extends BasicEntityPerformance> ex
         return [] as AccuracyChartDatum[];
     }
 
-    static calculateAccuracyData(periodPerformanceMetrics: PeriodPerformanceMetrics[]): AccuracyChartDatum[] {
+    /** ___ START REPORTS GENERATION METHODS ___ */
+
+    /**
+     * @param name - report name
+     */
+    protected overturnedActionsReport(name: string): Report | null {
+        return computed(() => {
+            if (this.barChartData?.length) {
+                const reportRawData = this.barChartData.map(accuracyChartDatum => ({
+                    date: accuracyChartDatum.originalDate,
+                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.GOOD]]: accuracyChartDatum.good,
+                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.OVERTURNED_GOOD]]: accuracyChartDatum.overturnedGood,
+                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.BAD]]: accuracyChartDatum.bad,
+                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.OVERTURNED_BAD]]: accuracyChartDatum.overturnedBad
+                }));
+
+                return this.csvReportBuilder.buildReport(name, reportRawData);
+            }
+
+            return null;
+        }).get();
+    }
+
+    /**
+     * @param name - report name
+     */
+    protected accuracyReport(name: string): Report | null {
+        return computed(() => {
+            if (this.getPerformanceData?.length) {
+                const reportRawData = this.getPerformanceData
+                    .filter(datum => datum.isChecked)
+                    .map(performanceDatum => performanceDatum.accuracyReport);
+
+                return this.csvReportBuilder.buildReport(name, reportRawData);
+            }
+
+            return null;
+        }).get();
+    }
+
+    /** ___ END REPORTS GENERATION METHODS ___ */
+
+    private sortByDescendingAccuracyAverageRate(a: T, b: T) {
+        return b.averageOverturnRate - a.averageOverturnRate;
+    }
+
+    private static calculateAccuracyData(periodPerformanceMetrics: PeriodPerformanceMetrics[]): AccuracyChartDatum[] {
         return Object.keys(periodPerformanceMetrics[0])
             .reduce((result, date) => {
                 const aggregationData = periodPerformanceMetrics
@@ -118,57 +164,5 @@ export class BaseOverturnedPerformanceStore<T extends BasicEntityPerformance> ex
 
                 return [...result, barData] as Array<AccuracyChartDatum>;
             }, [] as AccuracyChartDatum[]);
-    }
-
-    /**
-     *   ___ REPORTS GENERATION METHODS ___
-     */
-
-    @computed
-    protected get overturnedActionsReport(): Report | null {
-        if (this.barChartData?.length) {
-            const REPORT_NAME = 'Overturned actions';
-
-            const reportRawData = this.barChartData.map(accuracyChartDatum => {
-                const formatter = formatMetricToPercentageString;
-
-                return {
-                    date: accuracyChartDatum.originalDate,
-                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.GOOD]]:
-                        formatter(accuracyChartDatum.good),
-                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.OVERTURNED_GOOD]]:
-                        formatter(accuracyChartDatum.overturnedGood),
-                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.BAD]]:
-                        formatter(accuracyChartDatum.bad),
-                    [OVERTURN_CHART_REPORT_KEYS[OVERTURN_CHART_KEYS.OVERTURNED_BAD]]:
-                        formatter(accuracyChartDatum.overturnedBad)
-                };
-            });
-
-            return BaseOverturnedPerformanceStore.buildReport(REPORT_NAME, reportRawData);
-        }
-
-        return null;
-    }
-
-    /**
-     * Boxed computed expresion function
-     * @param name - report name
-     * @see https://mobx.js.org/refguide/computed-decorator.html#computedexpression-as-function
-     */
-    protected accuracyReport(name: string): Report | null {
-        return computed(() => {
-            if (this.getPerformanceData?.length) {
-                const reportRawData = this.getPerformanceData.map(performanceDatum => performanceDatum.accuracyReport);
-
-                return BaseOverturnedPerformanceStore.buildReport(name, reportRawData);
-            }
-
-            return null;
-        }).get();
-    }
-
-    private sortByDescendingAccuracyAverageRate(a: T, b: T) {
-        return b.averageOverturnRate - a.averageOverturnRate;
     }
 }

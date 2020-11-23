@@ -15,7 +15,13 @@ import {
     AppStore,
     QueuePerformanceStore,
     LockedItemsStore,
-    AnalystOverturnedPerformanceStore, AlertsStore, AlertsMutationStore, ReportsModalStore
+    AnalystOverturnedPerformanceStore,
+    AlertsStore,
+    AlertsMutationStore,
+    ReportsModalStore,
+    LinkAnalysisStore,
+    LinkAnalysisDFPItemsStore,
+    LinkAnalysisMRItemsStore
 } from '../view-services';
 import { QueueMutationStore, QueueMutationModalStore } from '../view-services/essence-mutation-services';
 import { ReviewPermissionStore } from '../view-services/review-permission-store';
@@ -101,6 +107,18 @@ export const registerViewServicesTask = {
         container
             .bind<FiltersStore>(TYPES.FILTERS_STORE)
             .to(FiltersStore);
+
+        container
+            .bind<LinkAnalysisStore>(TYPES.LINK_ANALYSIS_STORE)
+            .to(LinkAnalysisStore);
+
+        container
+            .bind<LinkAnalysisDFPItemsStore>(TYPES.LINK_ANALYSIS_DFP_ITEMS_STORE)
+            .to(LinkAnalysisDFPItemsStore);
+
+        container
+            .bind<LinkAnalysisMRItemsStore>(TYPES.LINK_ANALYSIS_MR_ITEMS_STORE)
+            .to(LinkAnalysisMRItemsStore);
 
         //  ____  DASHBOARD STORES ____
 

@@ -33,7 +33,7 @@
 
   &__bottom {
     display: grid;
-    grid-template-columns: 2fr 2fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 2fr 1fr 1fr;
 
     #{$root}__span-2 {
       grid-column: span 2;
@@ -46,27 +46,25 @@
     top: 0;
   }
 
-  &__pl {
-    color: $neutralTertiary;
-  }
-
-  &__validated-info {
-    &-icon {
-      margin-right: 4px;
-      box-sizing: border-box;
-    }
-
-    &-date {
-      margin-left: 4px;
-      color: $neutralTertiary;
-    }
-
-    &-value {
+  &__complex-value {
+    &__value {
       max-width: 100%;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
-      display: inline-block;
+    }
+
+    &__extra-info {
+       margin-left: 4px;
+       color: $gray;
+    }
+
+    &__icon {
+      font-size: 12px;
+      vertical-align: middle;
+      margin-left: 4px;
+      cursor: default;
+      color: $gray;
     }
   }
 

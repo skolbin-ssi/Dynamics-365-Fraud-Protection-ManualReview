@@ -23,6 +23,7 @@ import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.EMA
 public class EmailDomain implements Serializable {
     @Id
     @PartitionKey
+    private String id;
     private String emailDomainName;
     private DisposabilityCheck disposabilityCheck;
 

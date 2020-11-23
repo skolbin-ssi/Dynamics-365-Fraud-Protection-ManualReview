@@ -29,6 +29,7 @@ public class DeviceContext implements Serializable {
     private String deviceContextId;
     private String provider;
     private String deviceContextDC;
+    private String merchantFuzzyDeviceId;
     private String externalDeviceId;
     private String externalDeviceType;
     private String userAgent;

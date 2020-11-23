@@ -19,7 +19,8 @@
     "jsx": "react",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "types": ["reflect-metadata", "node", "jest"]
+    "types": ["reflect-metadata", "node", "jest"],
+    "downlevelIteration": true
   },
   "include": [
     "src"

@@ -170,7 +170,7 @@ export class DataTable<T extends Item> extends React.Component<DataTableProps<T>
                 {
                     (timeLeft <= 0) ? (
                         <span className={`${CN}__time-left-text--overdue-text`}>
-                            <abbr title={`${Math.abs(timeLeft)}`}>overdue</abbr>
+                            <abbr title={`${Math.abs(timeLeft)}`}>Overdue</abbr>
                         </span>
                     ) : (
                         <Text variant="smallPlus" className={`${CN}__time-left-text`}>

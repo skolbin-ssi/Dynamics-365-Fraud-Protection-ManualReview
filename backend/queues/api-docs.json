@@ -310,7 +310,7 @@
     "/" : {
       "get" : {
         "tags" : [ "health-controller" ],
-        "operationId" : "getHealth",
+        "operationId" : "getHealth_1",
         "responses" : {
           "204" : {
             "description" : "No Content"
@@ -425,7 +425,7 @@
       },
       "head" : {
         "tags" : [ "health-controller" ],
-        "operationId" : "getHealth_1",
+        "operationId" : "getHealth",
         "responses" : {
           "204" : {
             "description" : "No Content"
@@ -1066,6 +1066,145 @@
                   "type" : "array",
                   "items" : {
                     "$ref" : "#/components/schemas/ItemDTO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/batch/label" : {
+      "patch" : {
+        "tags" : [ "items" ],
+        "summary" : "Set the label and release all items",
+        "operationId" : "batchLabelItem",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/BatchLabelDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "properties" : {
+                    "empty" : {
+                      "type" : "boolean"
+                    }
+                  },
+                  "items" : {
+                    "$ref" : "#/components/schemas/LabelResult"
                   }
                 }
               }
@@ -1793,6 +1932,604 @@
                   },
                   "items" : {
                     "$ref" : "#/components/schemas/ItemDTO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/link-analysis" : {
+      "post" : {
+        "tags" : [ "items" ],
+        "summary" : "Initiate link analysis for particular item",
+        "operationId" : "initLinkAnalysis",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LinkAnalysisCreationDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LinkAnalysisDTO"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/link-analysis/{id}" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "Initiate link analysis for particular item",
+        "operationId" : "getLinkAnalysisInfo",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LinkAnalysisDTO"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/link-analysis/{id}/mr-items" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "Get items form MR linked to the current item",
+        "operationId" : "getMRLinks",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "size of a page",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 20
+          }
+        }, {
+          "name" : "continuation",
+          "in" : "query",
+          "description" : "continuation token from previous request",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "required" : [ "empty", "size" ],
+                  "type" : "array",
+                  "properties" : {
+                    "continuationToken" : {
+                      "type" : "string"
+                    },
+                    "size" : {
+                      "type" : "integer",
+                      "format" : "int32"
+                    },
+                    "empty" : {
+                      "type" : "boolean"
+                    },
+                    "values" : {
+                      "type" : "array",
+                      "items" : {
+                        "$ref" : "#/components/schemas/LAItemDTO"
+                      }
+                    }
+                  },
+                  "items" : {
+                    "$ref" : "#/components/schemas/LAItemDTO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/link-analysis/{id}/dfp-items" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "Get items form MR linked to the current item",
+        "operationId" : "getDFPLinks",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "size of a page",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 20
+          }
+        }, {
+          "name" : "continuation",
+          "in" : "query",
+          "description" : "continuation token from previous request",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "required" : [ "empty", "size" ],
+                  "type" : "array",
+                  "properties" : {
+                    "continuationToken" : {
+                      "type" : "string"
+                    },
+                    "size" : {
+                      "type" : "integer",
+                      "format" : "int32"
+                    },
+                    "empty" : {
+                      "type" : "boolean"
+                    },
+                    "values" : {
+                      "type" : "array",
+                      "items" : {
+                        "$ref" : "#/components/schemas/DFPItemDTO"
+                      }
+                    }
+                  },
+                  "items" : {
+                    "$ref" : "#/components/schemas/DFPItemDTO"
                   }
                 }
               }
@@ -4401,6 +5138,120 @@
         } ]
       }
     },
+    "/api/tasks/status/ready" : {
+      "post" : {
+        "tags" : [ "task" ],
+        "summary" : "Set all tasks' statuses to READY",
+        "operationId" : "setAllTasksReady",
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
     "/api/tasks/{name}/execution" : {
       "post" : {
         "tags" : [ "task" ],
@@ -4524,120 +5375,6 @@
                 }
               }
             }
-          }
-        },
-        "security" : [ {
-          "mr_user_auth" : [ ]
-        } ]
-      }
-    },
-    "/api/tasks/status/ready" : {
-      "post" : {
-        "tags" : [ "task" ],
-        "summary" : "Set all tasks' statuses to READY",
-        "operationId" : "setAllTasksReady",
-        "responses" : {
-          "204" : {
-            "description" : "No Content"
-          },
-          "404" : {
-            "description" : "Not Found",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "422" : {
-            "description" : "Unprocessable Entity",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "409" : {
-            "description" : "Conflict",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "429" : {
-            "description" : "Too Many Requests",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "200" : {
-            "description" : "OK"
           }
         },
         "security" : [ {
@@ -5974,6 +6711,127 @@
         } ]
       }
     },
+    "/api/users/me" : {
+      "get" : {
+        "tags" : [ "users" ],
+        "summary" : "Get details about current user if he connected to the system",
+        "operationId" : "getCurrentUser",
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/UserDTO"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
     "/api/users" : {
       "get" : {
         "tags" : [ "users" ],
@@ -6101,127 +6959,6 @@
                   "items" : {
                     "$ref" : "#/components/schemas/UserDTO"
                   }
-                }
-              }
-            }
-          }
-        },
-        "security" : [ {
-          "mr_user_auth" : [ ]
-        } ]
-      }
-    },
-    "/api/users/me" : {
-      "get" : {
-        "tags" : [ "users" ],
-        "summary" : "Get details about current user if he connected to the system",
-        "operationId" : "getCurrentUser",
-        "responses" : {
-          "204" : {
-            "description" : "No Content"
-          },
-          "404" : {
-            "description" : "Not Found",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "401" : {
-            "description" : "Unauthorized",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "403" : {
-            "description" : "Forbidden",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "422" : {
-            "description" : "Unprocessable Entity",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "409" : {
-            "description" : "Conflict",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "429" : {
-            "description" : "Too Many Requests",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ErrorDTO"
-                }
-              }
-            }
-          },
-          "400" : {
-            "description" : "Bad Request",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "500" : {
-            "description" : "Internal Server Error",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "oneOf" : [ {
-                    "$ref" : "#/components/schemas/ErrorDTO"
-                  }, {
-                    "type" : "object"
-                  } ]
-                }
-              }
-            }
-          },
-          "200" : {
-            "description" : "OK",
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/UserDTO"
                 }
               }
             }
@@ -6618,6 +7355,9 @@
             "type" : "string"
           },
           "DeviceContextDC" : {
+            "type" : "string"
+          },
+          "MerchantFuzzyDeviceId" : {
             "type" : "string"
           },
           "ExternalDeviceId" : {
@@ -7422,6 +8162,37 @@
           }
         }
       },
+      "BatchLabelDTO" : {
+        "required" : [ "itemIds", "label" ],
+        "type" : "object",
+        "properties" : {
+          "label" : {
+            "type" : "string",
+            "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
+          },
+          "itemIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
+      "LabelResult" : {
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "string"
+          },
+          "success" : {
+            "type" : "boolean"
+          },
+          "reason" : {
+            "type" : "string"
+          }
+        }
+      },
       "NoteDTO" : {
         "required" : [ "note" ],
         "type" : "object",
@@ -7535,6 +8306,153 @@
           }
         }
       },
+      "LinkAnalysisCreationDTO" : {
+        "required" : [ "itemId" ],
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "string"
+          },
+          "queueId" : {
+            "type" : "string"
+          },
+          "fields" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "CREATION_DATE", "DISCOVERED_IP_ADDRESS", "MERCHANT_FUZZY_DEVICE_ID", "MERCHANT_PAYMENT_INSTRUMENT_ID", "EMAIL", "BIN", "HOLDER_NAME", "ZIPCODE" ]
+            }
+          }
+        }
+      },
+      "FieldLinks" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "enum" : [ "CREATION_DATE", "DISCOVERED_IP_ADDRESS", "MERCHANT_FUZZY_DEVICE_ID", "MERCHANT_PAYMENT_INSTRUMENT_ID", "EMAIL", "BIN", "HOLDER_NAME", "ZIPCODE" ]
+          },
+          "value" : {
+            "type" : "string"
+          },
+          "purchaseCounts" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "LinkAnalysisDTO" : {
+        "required" : [ "id" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "found" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "foundInMR" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "analysisFields" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "CREATION_DATE", "DISCOVERED_IP_ADDRESS", "MERCHANT_FUZZY_DEVICE_ID", "MERCHANT_PAYMENT_INSTRUMENT_ID", "EMAIL", "BIN", "HOLDER_NAME", "ZIPCODE" ]
+            }
+          },
+          "fields" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/FieldLinks"
+            }
+          }
+        }
+      },
+      "LAItemDTO" : {
+        "required" : [ "item" ],
+        "type" : "object",
+        "properties" : {
+          "item" : {
+            "$ref" : "#/components/schemas/ItemDTO"
+          },
+          "availableForLabeling" : {
+            "type" : "boolean"
+          },
+          "userRestricted" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "DFPItemDTO" : {
+        "type" : "object",
+        "properties" : {
+          "purchaseId" : {
+            "type" : "string"
+          },
+          "merchantLocalDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "totalAmount" : {
+            "type" : "number"
+          },
+          "totalAmountInUSD" : {
+            "type" : "number"
+          },
+          "salesTax" : {
+            "type" : "number"
+          },
+          "salesTaxInUSD" : {
+            "type" : "number"
+          },
+          "currency" : {
+            "type" : "string"
+          },
+          "riskScore" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "merchantRuleDecision" : {
+            "type" : "string"
+          },
+          "reasonCodes" : {
+            "type" : "string"
+          },
+          "user" : {
+            "$ref" : "#/components/schemas/LAUser"
+          },
+          "deviceContext" : {
+            "$ref" : "#/components/schemas/LADeviceContext"
+          },
+          "userRestricted" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "LADeviceContext" : {
+        "type" : "object",
+        "properties" : {
+          "ipAdress" : {
+            "type" : "string"
+          }
+        }
+      },
+      "LAUser" : {
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string"
+          },
+          "userId" : {
+            "type" : "string"
+          }
+        }
+      },
       "MapTokenDTO" : {
         "required" : [ "expiresAt", "expiresIn", "token", "tokenType" ],
         "type" : "object",
@@ -7549,9 +8467,6 @@
                 "type" : "integer",
                 "format" : "int64"
               },
-              "zero" : {
-                "type" : "boolean"
-              },
               "units" : {
                 "type" : "array",
                 "items" : {
@@ -7564,14 +8479,14 @@
                           "type" : "integer",
                           "format" : "int64"
                         },
-                        "zero" : {
-                          "type" : "boolean"
-                        },
                         "nano" : {
                           "type" : "integer",
                           "format" : "int32"
                         },
                         "negative" : {
+                          "type" : "boolean"
+                        },
+                        "zero" : {
                           "type" : "boolean"
                         }
                       }
@@ -7593,6 +8508,9 @@
                 "format" : "int32"
               },
               "negative" : {
+                "type" : "boolean"
+              },
+              "zero" : {
                 "type" : "boolean"
               }
             }
@@ -7856,6 +8774,14 @@
           }
         }
       },
+      "Event" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          }
+        }
+      },
       "Item" : {
         "type" : "object",
         "properties" : {
@@ -7932,6 +8858,13 @@
               "type" : "string"
             }
           },
+          "events" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ItemEvent"
+            }
+          },
           "ttl" : {
             "type" : "integer",
             "format" : "int64"
@@ -7942,6 +8875,17 @@
           "_ts" : {
             "type" : "string",
             "format" : "date-time"
+          }
+        }
+      },
+      "ItemEvent" : {
+        "type" : "object",
+        "properties" : {
+          "event" : {
+            "$ref" : "#/components/schemas/Event"
+          },
+          "sendingId" : {
+            "type" : "string"
           }
         }
       },
@@ -8043,18 +8987,59 @@
             "type" : "string",
             "enum" : [ "READY", "RUNNING" ]
           },
+          "previousRun" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "currentRun" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "previousSuccessfulRun" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "previousSuccessfulExecutionTime" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "format" : "int64"
+              },
+              "units" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "durationEstimated" : {
+                      "type" : "boolean"
+                    },
+                    "dateBased" : {
+                      "type" : "boolean"
+                    },
+                    "timeBased" : {
+                      "type" : "boolean"
+                    }
+                  }
+                }
+              },
+              "nano" : {
+                "type" : "integer",
+                "format" : "int32"
+              },
+              "negative" : {
+                "type" : "boolean"
+              },
+              "zero" : {
+                "type" : "boolean"
+              }
+            }
+          },
           "variables" : {
             "type" : "object",
             "additionalProperties" : {
               "type" : "string"
             }
-          },
-          "previousRun" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "previousRunSuccessfull" : {
-            "type" : "boolean"
           },
           "lastFailedRunMessage" : {
             "type" : "string"

@@ -3,13 +3,18 @@
 
 package com.griddynamics.msd365fp.manualreview.analytics.model.persistence;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.griddynamics.msd365fp.manualreview.model.TaskStatus;
+import com.griddynamics.msd365fp.manualreview.model.jackson.FlexibleDateFormatDeserializer;
+import com.griddynamics.msd365fp.manualreview.model.jackson.ISOStringDateTimeSerializer;
 import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;
 import com.microsoft.azure.spring.data.cosmosdb.core.mapping.PartitionKey;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 
 import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.TASK_CONTAINER_NAME;
@@ -25,8 +30,13 @@ public class Task {
     @PartitionKey
     private String id;
     private TaskStatus status;
+    @JsonSerialize(using = ISOStringDateTimeSerializer.class)
     private OffsetDateTime previousRun;
-    private Boolean previousRunSuccessfull;
+    @JsonSerialize(using = ISOStringDateTimeSerializer.class)
+    private OffsetDateTime currentRun;
+    @JsonSerialize(using = ISOStringDateTimeSerializer.class)
+    private OffsetDateTime previousSuccessfulRun;
+    private Duration previousSuccessfulExecutionTime;
     private String lastFailedRunMessage;
     private String instanceId;
 

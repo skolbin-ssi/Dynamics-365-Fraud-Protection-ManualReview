@@ -32,4 +32,8 @@ public class ItemLabelingMetricDTO {
     private int goodOverturned = 0;
     @Builder.Default
     private int badOverturned = 0;
+    @Builder.Default
+    private int goodInBatch = 0;
+    @Builder.Default
+    private int badInBatch = 0;
 }

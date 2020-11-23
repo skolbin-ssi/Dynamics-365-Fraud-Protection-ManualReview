@@ -7,3 +7,4 @@ export * from './switch-tabs';
 export * from './price';
 export * from './pickers';
 export * from './filters';
+export * from './icon-text';

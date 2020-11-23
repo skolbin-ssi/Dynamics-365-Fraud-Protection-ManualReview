@@ -1,21 +1,24 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import React, { Component } from 'react';
+import { observer } from 'mobx-react';
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
-import { observer } from 'mobx-react';
-import React, { Component } from 'react';
 import { IconButton } from '@fluentui/react/lib/Button';
+import { FontIcon } from '@fluentui/react/lib/Icon';
+import { TooltipHost } from '@fluentui/react/lib/Tooltip';
 import { Price } from '../../../../../components/price';
-import { ExternalLink } from '../../../../../models';
-import { Item } from '../../../../../models/item';
-import { formatToMMMDYYY, formatToLocaleString } from '../../../../../utils/date';
-import { placeHold, stringToKebabCase } from '../../../../../utils/text';
 import { ItemDetailsKeyValue } from '../../item-details-key-value';
 import { ItemDetailsTile } from '../../item-details-tile';
-import GreenCheckIcon from '../../../../../assets/icon/green-check.svg';
-import './account-summary.scss';
 import { KeyValueItem, valuePlaceholder } from '../key-value-item';
+import { formatToMMMDYYY, formatToLocaleString } from '../../../../../utils/date';
+import { placeHold, stringToKebabCase } from '../../../../../utils/text';
+import { Item } from '../../../../../models/item';
+import { ExternalLink } from '../../../../../models';
+
+import './account-summary.scss';
+import { IconText } from '../../../../../components/icon-text';
 
 const CN = 'item-details-account-summary';
 
@@ -25,26 +28,8 @@ interface AccountSummaryProps {
     externalLinksMap: ExternalLink[]
 }
 
-interface AccountSummaryState {
-    detailsExpanded: boolean;
-}
-
 @observer
-export class AccountSummary extends Component<AccountSummaryProps, AccountSummaryState> {
-    constructor(props: AccountSummaryProps) {
-        super(props);
-
-        this.state = {
-            detailsExpanded: false
-        };
-    }
-
-    @autobind
-    toggleDetails() {
-        const { detailsExpanded } = this.state;
-        this.setState({ detailsExpanded: !detailsExpanded });
-    }
-
+export class AccountSummary extends Component<AccountSummaryProps, never> {
     renderKeyValueConfig(config: KeyValueItem[]) {
         return config
             .map(({
@@ -52,7 +37,8 @@ export class AccountSummary extends Component<AccountSummaryProps, AccountSummar
                 value,
                 className,
                 contentClassName,
-                isPrice
+                isPrice,
+                valueToCopy,
             }) => {
                 let valueToRender = value;
 
@@ -66,96 +52,161 @@ export class AccountSummary extends Component<AccountSummaryProps, AccountSummar
                         contentClassName={contentClassName}
                         key={stringToKebabCase(key)}
                         label={key}
-                        value={placeHold(valueToRender, valuePlaceholder(CN))}
+                        value={placeHold(valueToRender, valuePlaceholder())}
+                        valueToCopy={valueToCopy}
                     />
                 );
             });
     }
 
-    renderTopInfo() {
-        const { detailsExpanded } = this.state;
-        const { item } = this.props;
-        const { user } = item.purchase;
-
-        const renderingConfigTop: KeyValueItem[] = [
-            { key: 'Total spent', value: user.totalSpend, isPrice: true },
-            { key: 'Last 30 days spent', value: user.last30DaysSpend, isPrice: true },
-            { key: 'Monthly average spent', value: user.monthlyAverageSpend, isPrice: true },
-        ];
-
-        const renderingConfigExpandable: KeyValueItem[] = [
-            { key: 'Total transactions', value: user.totalTransactions },
-            { key: 'Last 30 days transactions', value: user.last30DaysTransactions },
-            { key: 'Monthly average transactions', value: user.monthlyAverageTransactions },
-            { key: 'Total refund amount', value: user.totalRefundAmount, isPrice: true },
-            { key: 'Last 30 days refund amount', value: user.last30DaysRefundAmount, isPrice: true },
-            { key: 'Monthly average refund amount', value: user.monthlyAverageRefundAmount, isPrice: true },
-            { key: 'Total chargeback amount', value: user.totalChargebackAmount, isPrice: true },
-            { key: 'Last 30 days chargeback amount', value: user.last30DaysChargebackAmount, isPrice: true },
-            { key: 'Monthly average chargeback amount', value: user.monthlyAverageChargebackAmount, isPrice: true },
-        ];
-
+    renderValidatedInfo(value: any, isValidated: boolean, tooltipText?: string | JSX.Element) {
         return (
-            <div className={`${CN}__top`}>
-                {this.renderKeyValueConfig(renderingConfigTop)}
-                <IconButton
-                    className={`${CN}__details-toggle`}
-                    iconProps={{
-                        iconName: detailsExpanded ? 'ChevronUp' : 'ChevronDown'
-                    }}
-                    title="Expand/Collapse"
-                    ariaLabel="Expand account summary"
-                    onClick={this.toggleDetails}
-                />
-                <div className={cn(`${CN}__expandable`, detailsExpanded && `${CN}__expandable--expanded`)}>
-                    {this.renderKeyValueConfig(renderingConfigExpandable)}
-                </div>
-            </div>
+            <IconText
+                text={value || null}
+                textVariant="medium"
+                placeholder={valuePlaceholder()}
+                iconValue={isValidated}
+                icons={{
+                    GOOD: {
+                        value: true,
+                        iconName: 'CompletedSolid',
+                        tooltipText
+                    },
+                    BAD: {
+                        value: false,
+                        iconName: 'WarningSolid',
+                        tooltipText
+                    },
+                }}
+            />
         );
     }
 
-    renderValidatedInfo(value: any, isValidated: boolean, timeValidated: string) {
-        if (!value) {
-            return placeHold(value, valuePlaceholder(CN));
-        }
-
+    renderValueWithExtraInfo(value: string | JSX.Element, extraInfo: string | JSX.Element | null, tooltipText?: string) {
+        const tooltipId = `${Math.random()}`;
         return (
             <div>
-                {isValidated && <GreenCheckIcon className={`${CN}__validated-info-icon`} />}
-                <span className={`${CN}__validated-info-value`}>
-                    {placeHold(value, valuePlaceholder(CN))}
+                <span className={`${CN}__complex-value__value`}>
+                    {placeHold(value, valuePlaceholder())}
                 </span>
-                {timeValidated && (
-                    <span className={`${CN}__validated-info-date`}>
+                {extraInfo && (
+                    <span className={`${CN}__complex-value__extra-info`}>
                         (
-                        {formatToMMMDYYY(timeValidated)}
+                        {extraInfo}
                         )
                     </span>
                 )}
+                {
+                    extraInfo && tooltipText && (
+                        <TooltipHost
+                            content={tooltipText}
+                            id={tooltipId}
+                            calloutProps={{ gapSpace: 0 }}
+                        >
+                            <FontIcon
+                                iconName="Info"
+                                className={`${CN}__complex-value__icon`}
+                                aria-describedby={tooltipId}
+                            />
+                        </TooltipHost>
+                    )
+                }
             </div>
         );
     }
 
-    renderBottomInfo() {
+    renderMainContent() {
         const { item } = this.props;
         const { purchase } = item;
-        const { user } = purchase;
+        const { user, calculatedFields } = purchase;
 
         const renderingConfig: KeyValueItem[] = [
-            { key: 'Profile type', value: user.profileType },
-            { key: 'User ID', value: user.userId },
+            { key: 'Profile type', value: user.profileType, className: `${CN}__span-2` },
+            { key: 'User ID', value: user.userId, valueToCopy: user.userId },
             { key: 'Country', value: user.country },
-            { key: 'Zip', value: user.zipCode },
-            { key: 'Name', value: user.fullName },
-            { key: 'Member ID', value: user.membershipId, contentClassName: `${CN}__id` },
+            { key: 'Zip', value: user.zipCode, valueToCopy: user.zipCode },
+            {
+                key: 'Name',
+                value: user.fullName,
+                className: `${CN}__span-2`,
+                valueToCopy: user.fullName,
+            },
+            {
+                key: 'Member ID',
+                value: user.membershipId,
+                contentClassName: `${CN}__id`,
+                valueToCopy: user.membershipId,
+            },
+            {
+                key: 'Phone number',
+                value: this.renderValidatedInfo(
+                    user.phoneNumber,
+                    user.isPhoneNumberValidated,
+                    user.phoneNumberValidatedDate ? `Was validated ${formatToMMMDYYY(user.phoneNumberValidatedDate)}` : ''
+                ),
+                className: `${CN}__span-2`,
+                valueToCopy: user.phoneNumber,
+            },
+            {
+                key: 'Display name',
+                value: user.displayName,
+                className: `${CN}__span-2`,
+                valueToCopy: user.displayName
+            },
+            {
+                key: 'Created',
+                value: this.renderValueWithExtraInfo(
+                    formatToLocaleString(user.creationDate, valuePlaceholder()),
+                    typeof calculatedFields.accountAgeInDays === 'number'
+                        ? `${calculatedFields.accountAgeInDays} ${calculatedFields.accountAgeInDays === 1 ? 'day' : 'days'}`
+                        : null,
+                    'The data was calculated at the time of the transaction'
+                )
+            },
+            {
+                key: 'Email',
+                value: this.renderValidatedInfo(
+                    user.email,
+                    calculatedFields.aggregatedEmailConfirmed,
+                ),
+                className: `${CN}__span-2`,
+                valueToCopy: user.email,
+            },
+            {
+                key: 'Profile name',
+                value: user.profileName,
+                className: `${CN}__span-2`,
+                valueToCopy: user.profileName,
+            },
+            { key: 'Updated', value: formatToLocaleString(user.updateDate, valuePlaceholder()) },
+            {
+                key: 'Email provider',
+                value: user.authenticationProvider,
+                className: `${CN}__span-2`,
+                valueToCopy: user.authenticationProvider,
+            },
             { key: 'Language', value: user.language },
             { key: 'Time zone', value: user.timeZone },
-            { key: 'Display name', value: user.displayName },
-            { key: 'Created', value: formatToLocaleString(user.creationDate, valuePlaceholder(CN)) },
-            { key: 'Phone number', value: this.renderValidatedInfo(user.phoneNumber, user.isPhoneNumberValidated, user.phoneNumberValidatedDate), className: `${CN}__span-2` },
-            { key: 'Profile name', value: user.profileName },
-            { key: 'Updated', value: formatToLocaleString(user.updateDate, valuePlaceholder(CN)) },
-            { key: 'Email', value: this.renderValidatedInfo(user.email, user.isEmailValidated, user.emailValidationDate), className: `${CN}__span-2` },
+            {
+                key: 'First transaction',
+                value: this.renderValueWithExtraInfo(
+                    formatToLocaleString(calculatedFields.firstTransactionDateTime, valuePlaceholder()),
+                    typeof calculatedFields.activityAgeInDays === 'number'
+                        ? `${calculatedFields.activityAgeInDays} ${calculatedFields.activityAgeInDays === 1 ? 'day' : 'days'}`
+                        : null,
+                    'The data was calculated at the time of the transaction'
+                )
+            },
+            {
+                key: 'Email domain',
+                value: this.renderValidatedInfo(
+                    calculatedFields.aggregatedEmailDomain,
+                    !calculatedFields.disposableEmailDomain,
+                    calculatedFields.disposableEmailDomain ? 'Marked as disposable' : '',
+                ),
+                className: `${CN}__span-2`,
+                valueToCopy: calculatedFields.aggregatedEmailDomain,
+            },
         ];
 
         return (
@@ -214,8 +265,7 @@ export class AccountSummary extends Component<AccountSummaryProps, AccountSummar
                 title="Account summary"
                 subtitle={this.renderLinks()}
             >
-                {this.renderTopInfo()}
-                {this.renderBottomInfo()}
+                {this.renderMainContent()}
             </ItemDetailsTile>
         );
     }

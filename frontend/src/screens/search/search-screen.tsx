@@ -31,17 +31,16 @@ import './search-screen.scss';
 import { SearchFiltersSummary } from './search-filters-summary';
 import { FilterConditionDto } from '../../data-services/api-services/models/settings/filter-condition-dto';
 
-export interface SearchRouteParams {
-    searchId: string;
+export interface SearchScreenRouteParams {
+    searchId?: string;
 }
 
-export interface SearchComponentProps extends RouteComponentProps<SearchRouteParams> {
-}
+export type SearchScreenProps = RouteComponentProps<SearchScreenRouteParams>;
 
 const CN = 'search-screen';
 
 @observer
-export class SearchScreen extends Component<RouteComponentProps, any> {
+export class SearchScreen extends Component<SearchScreenProps, never> {
     @resolve(TYPES.HISTORY)
     private history!: History;
 
@@ -158,7 +157,6 @@ export class SearchScreen extends Component<RouteComponentProps, any> {
     parseURLAndUpdateStore() {
         const { match: { params }, location: { search: query } } = this.props;
 
-        // @ts-ignore TODO: fix this
         const { searchId } = params;
 
         if (searchId) {
@@ -318,6 +316,7 @@ export class SearchScreen extends Component<RouteComponentProps, any> {
                             storeForItemsLoading={this.searchScreenStore}
                             handleLoadMoreRowsClick={this.onLoadMoreRows}
                             sortingObject={this.searchScreenStore.sorting}
+                            searchId={searchId}
                             handleSortingUpdate={this.updateSorting}
                             loadingMessage="Searching the orders..."
                             noItemsMessage="No results found. Try adjusting your search or filters to find what you are looking for."

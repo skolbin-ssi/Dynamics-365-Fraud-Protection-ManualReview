@@ -41,8 +41,9 @@ public class ItemLabelActivityRepositoryImpl implements ItemLabelActivityReposit
                 String.format(
                         "SELECT VALUE root FROM " +
                                 "(SELECT c.label, c.merchantRuleDecision, count(c.label) AS cnt, c.queueId AS id, FLOOR((c.labeled-%1$s)/%3$s) AS bucket " +
-                                "FROM c where " +
+                                "FROM c WHERE " +
                                 "(c.labeled BETWEEN %1$s AND %2$s) " +
+                                "AND IS_DEFINED(c.queueId) AND NOT IS_NULL(c.queueId) " +
                                 "%4$s " +
                                 "%5$s " +
                                 "group by c.queueId, FLOOR((c.labeled-%1$s)/%3$s), c.label, c.merchantRuleDecision) " +
@@ -70,8 +71,9 @@ public class ItemLabelActivityRepositoryImpl implements ItemLabelActivityReposit
                 String.format(
                         "SELECT VALUE root FROM " +
                                 "(SELECT c.label, c.merchantRuleDecision, count(c.label) AS cnt, c.analystId as id, FLOOR((c.labeled-%1$s)/%3$s) AS bucket " +
-                                "FROM c where " +
+                                "FROM c WHERE " +
                                 "(c.labeled BETWEEN %1$s AND %2$s) " +
+                                "AND IS_DEFINED(c.queueId) AND NOT IS_NULL(c.queueId) " +
                                 "%4$s " +
                                 "%5$s " +
                                 "group by c.analystId, FLOOR((c.labeled-%1$s)/%3$s), c.label, c.merchantRuleDecision) " +
@@ -99,8 +101,9 @@ public class ItemLabelActivityRepositoryImpl implements ItemLabelActivityReposit
                 String.format(
                         "SELECT VALUE root FROM " +
                                 "(SELECT c.label, c.merchantRuleDecision, count(c.label) AS cnt " +
-                                "FROM c where " +
+                                "FROM c WHERE " +
                                 "(c.labeled BETWEEN %1$s AND %2$s) " +
+                                "AND IS_DEFINED(c.queueId) AND NOT IS_NULL(c.queueId) " +
                                 "%3$s " +
                                 "%4$s " +
                                 "group by c.label, c.merchantRuleDecision) " +
@@ -118,6 +121,30 @@ public class ItemLabelActivityRepositoryImpl implements ItemLabelActivityReposit
     }
 
     @Override
+    public List<ItemLabelingBucket> getBatchPerformance(@NonNull final OffsetDateTime startDateTime,
+                                                        @NonNull final OffsetDateTime endDateTime,
+                                                        final Set<String> analystIds) {
+        return itemLabelActivityContainer.runCrossPartitionQuery(
+                String.format(
+                        "SELECT VALUE root FROM " +
+                                "(SELECT c.label, c.merchantRuleDecision, count(c.label) AS cnt " +
+                                "FROM c WHERE " +
+                                "(c.labeled BETWEEN %1$s AND %2$s) " +
+                                "AND (NOT IS_DEFINED(c.queueId) OR IS_NULL(c.queueId)) " +
+                                "%3$s " +
+                                "group by c.label, c.merchantRuleDecision) " +
+                                "AS root",
+                        startDateTime.toEpochSecond(),
+                        endDateTime.toEpochSecond(),
+                        CollectionUtils.isEmpty(analystIds) ? "" :
+                                String.format("AND c.analystId IN ('%1$s') ", String.join("','", analystIds))))
+                .map(cip -> itemLabelActivityContainer.castCosmosObjectToClassInstance(cip.toJson(), ItemLabelingBucket.class))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<LabelingTimeBucket> getSpentTime(@NonNull final OffsetDateTime startDateTime,
                                                  @NonNull final OffsetDateTime endDateTime,
                                                  final Set<String> analystIds,
@@ -126,8 +153,9 @@ public class ItemLabelActivityRepositoryImpl implements ItemLabelActivityReposit
                 String.format(
                         "SELECT VALUE root FROM " +
                                 "(SELECT c.label, sum(c.decisionApplyingDuration) AS totalDuration, count(c.labeled) AS cnt " +
-                                "FROM c where " +
+                                "FROM c WHERE " +
                                 "(c.labeled BETWEEN %1$s AND %2$s) " +
+                                "AND IS_DEFINED(c.queueId) AND NOT IS_NULL(c.queueId) " +
                                 "%3$s " +
                                 "%4$s " +
                                 "group by c.label) " +
@@ -160,13 +188,14 @@ public class ItemLabelActivityRepositoryImpl implements ItemLabelActivityReposit
                                 + "    Count(1) as count "
                                 + "FROM ("
                                 + "SELECT "
-                                + "    udf.getBucketNumber(c.riskScore,%1$s) as risk_score_bucket, "
+                                + "    FLOOR(c.riskScore/%1$s) as risk_score_bucket, "
                                 + "    c.label "
                                 + "FROM c "
                                 + "WHERE "
                                 + "    (c.labeled BETWEEN %2$s AND %3$s)"
                                 + "    AND IS_DEFINED(c.riskScore) "
                                 + "    AND NOT IS_NULL(c.riskScore) "
+                                + "    AND IS_DEFINED(c.queueId) AND NOT IS_NULL(c.queueId) "
                                 + "    %4$s "
                                 + "    %5$s "
                                 + "    %6$s "

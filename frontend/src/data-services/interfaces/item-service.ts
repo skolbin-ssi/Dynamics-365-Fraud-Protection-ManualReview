@@ -2,9 +2,20 @@
 // Licensed under the MIT license.
 
 import { LABEL } from '../../constants';
-import { Item } from '../../models/item';
+import { BatchLabelItemsResult, Item } from '../../models/item';
 import { ApiServiceResponse } from '../base-api-service';
-import { Queue } from '../../models';
+import { PageableList, Queue } from '../../models';
+import {
+    LinkAnalysisMrItem,
+    LinkAnalysis,
+    PostLinkAnalysisBody,
+    LinkAnalysisDfpItem
+} from '../../models/item/link-analysis';
+
+export interface BatchItemsLabelApiParams {
+    label: LABEL;
+    itemIds: string[]
+}
 
 export interface ItemService {
     /**
@@ -20,6 +31,8 @@ export interface ItemService {
      * @param queueId
      */
     labelItem(itemId: string, label: LABEL, queueId?: string): Promise<ApiServiceResponse<never>>;
+
+    batchLabelItems(params: BatchItemsLabelApiParams): Promise<BatchLabelItemsResult[] | null>;
 
     /**
      * Get item details
@@ -81,4 +94,29 @@ export interface ItemService {
      * @param term
      */
     putTag(term: string): Promise<unknown>;
+
+    /**
+     * Initiate link analysis for particular item
+     *
+     * @param postLinkAnalysisBody
+     */
+    postLinkAnalysis(postLinkAnalysisBody: PostLinkAnalysisBody): Promise<LinkAnalysis | null>;
+
+    /**
+     * Get items by queue id
+     * @param chainContinuationIdentifier - unique id that will be same for first and subsequent calls
+     * @param id - search id
+     * @param shouldLoadMore - should perform initial request or load more from last call
+     * @param size - amount of items to load
+     */
+    getLinkAnalysisMrItems(chainContinuationIdentifier: string, id: string, shouldLoadMore: boolean, size?: number): Promise<PageableList<LinkAnalysisMrItem>>
+
+    /**
+     * Get items by queue id
+     * @param chainContinuationIdentifier - unique id that will be same for first and subsequent calls
+     * @param id - search id
+     * @param shouldLoadMore - should perform initial request or load more from last call
+     * @param size - amount of items to load
+     */
+    getLinkAnalysisDfpItems(chainContinuationIdentifier: string, id: string, shouldLoadMore: boolean, size?: number): Promise<PageableList<LinkAnalysisDfpItem>>
 }

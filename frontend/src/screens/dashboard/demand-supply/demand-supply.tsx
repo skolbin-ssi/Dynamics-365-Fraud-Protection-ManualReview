@@ -286,8 +286,11 @@ export class DemandSupply extends Component<DemandSupplyProps, never> {
     }
 
     renderGenerateReportButton() {
+        const { isGenerateReportsButtonDisabled } = this.dashboardDemandSupplyScreenStore;
+
         return (
             <DefaultButton
+                disabled={isGenerateReportsButtonDisabled}
                 className={`${CN}__generate-reports-button`}
                 text="Generate reports"
                 onClick={this.handleGenerateReportsButtonClick}
@@ -305,7 +308,7 @@ export class DemandSupply extends Component<DemandSupplyProps, never> {
                     <CHART_AGGREGATION_PERIOD>
                     activeTab={aggregation}
                     className={`${CN}__aggregation-header`}
-                    title="Total reviewed / New"
+                    title="Total new / released orders"
                     viewSwitchName="View:"
                     onViewChange={this.handleAggregationChange}
                     viewMap={CHART_AGGREGATION_PERIOD_DISPLAY}

@@ -1,0 +1,50 @@
+@import '../../../../../styles/variables';
+
+.transaction-history {
+  .ms-DetailsHeader {
+    background-color: $mainPageBackground;
+    padding-top: 1px;
+
+    .ms-DetailsHeader-cell:nth-child(2) {
+      .ms-DetailsHeader-cellName {
+        position: relative;
+        overflow: visible;
+
+        &::before {
+          top: 12px;
+          width: 12px;
+          right: -18px;
+          height: 20px;
+          position: absolute;
+          content: '';
+          @include backgroundSvgIcon($svgSortArrowDown)
+        }
+      }
+    }
+  }
+
+  &__message-bar {
+    height: 36px;
+    margin-bottom: 8px;
+    color: $neutralDark;
+    background-color: $themeLighter;
+
+    .ms-MessageBar-icon > i {
+      color: $themePrimary;
+    }
+
+    .ms-MessageBar-text {
+      font-size: 14px;
+    }
+  }
+
+  &__status {
+    font-size: 14px;
+  }
+
+  &__transaction-column {
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}

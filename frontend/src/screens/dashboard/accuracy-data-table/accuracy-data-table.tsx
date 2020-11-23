@@ -20,7 +20,6 @@ import {
 } from '../../../constants';
 
 import './accuracy-data-table.scss';
-import { User } from '../../../models/user';
 
 const CN = 'accuracy-data-table';
 
@@ -185,7 +184,8 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
         return '';
     }
 
-    renderUserRow(user: User | null) {
+    renderUserRow(entity: BasicEntityPerformance) {
+        const user = (entity as AnalystPerformance).analyst;
         if (user) {
             return (
                 <Persona
@@ -200,7 +200,13 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
             );
         }
 
-        return null;
+        return (
+            <Persona
+                text={`${entity.id}`}
+                size={PersonaSize.size28}
+                className={`${CN}__analyst`}
+            />
+        );
     }
 
     @autoBind
@@ -227,7 +233,7 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
                 />
 
                 {isAnalystTable
-                    ? this.renderUserRow((entity as AnalystPerformance).analyst)
+                    ? this.renderUserRow(entity)
                     : (
                         /* eslint-disable-next-line jsx-a11y/click-events-have-key-events */
                         <div
@@ -240,7 +246,7 @@ export class AccuracyDataTable<T extends BasicEntityPerformance> extends Compone
                                 variant="medium"
                                 className={`${CN}__score-cell`}
                             >
-                                {entity.name}
+                                {entity.name || entity.id}
                             </Text>
                         </div>
                     )}

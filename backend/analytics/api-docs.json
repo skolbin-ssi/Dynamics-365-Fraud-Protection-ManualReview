@@ -114,8 +114,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -128,8 +128,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -251,8 +251,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -265,8 +265,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -378,8 +378,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -392,8 +392,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -509,8 +509,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -523,8 +523,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -630,8 +630,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -644,8 +644,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -755,8 +755,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -769,8 +769,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -892,8 +892,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -906,8 +906,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1024,8 +1024,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1038,8 +1038,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1158,8 +1158,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1172,8 +1172,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1290,8 +1290,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1304,8 +1304,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1456,8 +1456,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1470,8 +1470,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1632,8 +1632,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1646,8 +1646,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1812,8 +1812,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1826,8 +1826,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1982,8 +1982,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -1996,8 +1996,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2148,8 +2148,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2162,8 +2162,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2314,8 +2314,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2328,8 +2328,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2478,8 +2478,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2492,8 +2492,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2633,8 +2633,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2647,8 +2647,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2797,8 +2797,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2811,8 +2811,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2952,8 +2952,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -2966,8 +2966,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3127,8 +3127,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3141,8 +3141,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3247,8 +3247,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3261,8 +3261,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3362,8 +3362,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3376,8 +3376,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3488,8 +3488,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3502,8 +3502,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3650,8 +3650,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3664,8 +3664,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3803,8 +3803,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3817,8 +3817,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3924,8 +3924,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -3938,8 +3938,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4048,8 +4048,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4062,8 +4062,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4171,8 +4171,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4185,8 +4185,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4309,8 +4309,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4323,8 +4323,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4447,8 +4447,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4461,8 +4461,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4578,8 +4578,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4592,8 +4592,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4716,8 +4716,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4730,8 +4730,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4839,8 +4839,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4853,8 +4853,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4977,8 +4977,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -4991,8 +4991,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -5107,8 +5107,8 @@
               }
             }
           },
-          "400" : {
-            "description" : "Bad Request",
+          "500" : {
+            "description" : "Internal Server Error",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -5121,8 +5121,8 @@
               }
             }
           },
-          "500" : {
-            "description" : "Internal Server Error",
+          "400" : {
+            "description" : "Bad Request",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -5463,6 +5463,14 @@
           "badOverturned" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "goodInBatch" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "badInBatch" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         }
       },
@@ -5793,8 +5801,49 @@
             "type" : "string",
             "format" : "date-time"
           },
-          "previousRunSuccessfull" : {
-            "type" : "boolean"
+          "currentRun" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "previousSuccessfulRun" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "previousSuccessfulExecutionTime" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "format" : "int64"
+              },
+              "negative" : {
+                "type" : "boolean"
+              },
+              "zero" : {
+                "type" : "boolean"
+              },
+              "nano" : {
+                "type" : "integer",
+                "format" : "int32"
+              },
+              "units" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "durationEstimated" : {
+                      "type" : "boolean"
+                    },
+                    "dateBased" : {
+                      "type" : "boolean"
+                    },
+                    "timeBased" : {
+                      "type" : "boolean"
+                    }
+                  }
+                }
+              }
+            }
           },
           "lastFailedRunMessage" : {
             "type" : "string"
@@ -5840,15 +5889,15 @@
                 "type" : "integer",
                 "format" : "int64"
               },
-              "nano" : {
-                "type" : "integer",
-                "format" : "int32"
+              "negative" : {
+                "type" : "boolean"
               },
               "zero" : {
                 "type" : "boolean"
               },
-              "negative" : {
-                "type" : "boolean"
+              "nano" : {
+                "type" : "integer",
+                "format" : "int32"
               },
               "units" : {
                 "type" : "array",

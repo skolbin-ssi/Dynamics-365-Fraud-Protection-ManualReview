@@ -15,3 +15,4 @@ export * from './alert-dto';
 export * from './maps-token-dto';
 export * from './settings';
 export * from './item-search-query-dto';
+export * from './item';

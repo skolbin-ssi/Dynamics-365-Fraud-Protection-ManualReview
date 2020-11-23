@@ -3,16 +3,20 @@
 
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
+import com.griddynamics.msd365fp.manualreview.cosmos.utilities.IdUtility;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
 import com.griddynamics.msd365fp.manualreview.model.ItemLabel;
 import com.griddynamics.msd365fp.manualreview.model.ItemLock;
 import com.griddynamics.msd365fp.manualreview.model.ItemNote;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
+import com.griddynamics.msd365fp.manualreview.model.event.Event;
 import com.griddynamics.msd365fp.manualreview.model.event.dfp.PurchaseEventBatch;
+import com.griddynamics.msd365fp.manualreview.model.event.internal.ItemResolutionEvent;
 import com.griddynamics.msd365fp.manualreview.model.event.type.LockActionType;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
 import com.griddynamics.msd365fp.manualreview.queues.model.ItemDataField;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemEvent;
 import com.griddynamics.msd365fp.manualreview.queues.model.dto.ItemDTO;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Queue;
@@ -26,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +39,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -60,27 +67,28 @@ public class ItemService {
 
     public void saveEmptyItem(PurchaseEventBatch eventBatch) {
         eventBatch.forEach(event -> {
-            String id = event.getEventId();
-            log.info("Event [{}] has been received from the DFP rule [{}].", id, event.getRuleName());
+            String purchaseId = event.getEventId();
+            String itemId = IdUtility.encodeRestrictedChars(purchaseId);
+            log.info("Event [{}] has been received from the DFP rule [{}].", purchaseId, event.getRuleName());
 
             if ("purchase".equalsIgnoreCase(event.getEventType())) {
                 // Create and save the item
                 Item item = Item.builder()
-                        .id(id)
+                        .id(itemId)
                         .active(false)
                         .imported(OffsetDateTime.now())
-                        ._etag(id)
+                        ._etag(UUID.randomUUID().toString())
                         .build();
                 try {
                     itemRepository.save(item);
-                    log.info("Item [{}] has been saved to the storage.", id);
+                    log.info("Item [{}] has been saved to the storage.", itemId);
                 } catch (CosmosDBAccessException e) {
-                    log.info("Item [{}] has not been saved to the storage because it's already exist.", id);
+                    log.info("Item [{}] has not been saved to the storage because it's already exist.", itemId);
                 } catch (Exception e) {
-                    log.warn("Item [{}] has not been saved to the storage: {}", id, e.getMessage());
+                    log.warn("Item [{}] has not been saved to the storage: {}", itemId, e.getMessage());
                 }
             } else {
-                log.info("The event type of [{}] is [{}]. The event has been ignored.", id, event.getEventType());
+                log.info("The event type of [{}] is [{}]. The event has been ignored.", purchaseId, event.getEventType());
             }
         });
     }
@@ -288,6 +296,46 @@ public class ItemService {
             log.info("Trying to update assignments for around [{}] recently updated items.", count);
             thisService.updateQueueIdsForAllItemsRelatedTo(allActiveQueuesWithFilters, since);
         }
+    }
+
+    /**
+     * Initializes resolution sending.
+     *
+     * @return list of initialized sents
+     */
+    public boolean sendResolutions() throws BusyException {
+        log.info("Start resolution sending.");
+        PageProcessingUtility.executeForAllPages(
+                continuation -> itemRepository.findUnreportedItems(
+                        DEFAULT_ITEM_PAGE_SIZE,
+                        continuation),
+                itemCollection -> {
+                    Set<ImmutablePair<String, ItemEvent>> eventCollection = itemCollection.stream()
+                            .flatMap(item -> item.getEvents().stream()
+                                    .filter(event -> ItemResolutionEvent.class.equals(event.getKlass()))
+                                    .map(event -> new ImmutablePair<>(item.getId(), event)))
+                            .collect(Collectors.toSet());
+                    log.info("Start resolution sending for [{}].", eventCollection);
+                    Set<Mono<Void>> executions = eventCollection.stream()
+                            .map(eventTuple -> streamService.sendItemResolvedEvent(eventTuple.getRight().getEvent())
+                                    .doOnSuccess(v -> thisService.deleteEventFromItem(eventTuple.left, eventTuple.right.getSendingId())))
+                            .collect(Collectors.toSet());
+                    Mono.zipDelayError(executions, r -> r)
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe();
+                });
+        return true;
+    }
+
+    @Retry(name = "cosmosOptimisticUpdate")
+    protected void deleteEventFromItem(String itemId, String sendingId) {
+        Optional<Item> itemOptional = itemRepository.findById(itemId);
+        itemOptional.ifPresent(item -> {
+            if (item.getEvents().removeIf(event -> sendingId.equals(event.getSendingId()))) {
+                itemRepository.save(item);
+                log.info("Event [{}] were reported from item [{}].", sendingId, itemId);
+            }
+        });
     }
 
     /**

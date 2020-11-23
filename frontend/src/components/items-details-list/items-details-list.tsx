@@ -46,9 +46,10 @@ import './item-details-list.scss';
 
 export interface ItemsDetailsListProps {
     queueStore: QueueStore;
-    storeForItemsLoading: ItemsLoadable;
+    storeForItemsLoading: ItemsLoadable<Item>;
     handleLoadMoreRowsClick: () => void;
     handleSortingUpdate?: (sortingObject: ItemSortSettingsDTO) => void;
+    searchId?: string;
     sortingObject?: ItemSortSettingsDTO;
     selectedQueue?: Queue | null;
     loadingMessage?: string;
@@ -249,14 +250,14 @@ export class ItemsDetailsList extends Component<ItemsDetailsListProps, never> {
 
     @autobind
     setItemToItemStore(selectedItem: Item) {
-        if (!selectedItem.active) {
-            this.history.push({ pathname: ROUTES.build.searchInactiveItemDetails(selectedItem.id) });
-            return;
-        }
-
-        const { selectedQueue, queueStore } = this.props;
+        const { queueStore, selectedQueue, searchId } = this.props;
         const { lockedById, lockedOnQueueViewId, status } = selectedItem;
         const { user } = this.user;
+
+        if (searchId && !selectedItem.active) {
+            this.history.push({ pathname: ROUTES.build.searchInactiveItemDetails(searchId, selectedItem.id) });
+            return;
+        }
 
         const isEscalatedItem = status === ITEM_STATUS.ESCALATED || status === ITEM_STATUS.ON_HOLD;
         const queues = isEscalatedItem ? queueStore.escalatedQueues : queueStore.queues;
@@ -276,10 +277,10 @@ export class ItemsDetailsList extends Component<ItemsDetailsListProps, never> {
             this.history.push({ pathname });
         }
 
-        if (!selectedQueue && queueViewId) {
+        if (searchId && !selectedQueue && queueViewId) {
             const pathname = isLockedByCurrent && isLockedInTheCurrentQueue
-                ? ROUTES.build.searchItemDetailsReviewConsole(queueViewId, selectedItem.id)
-                : ROUTES.build.searchItemDetails(queueViewId, selectedItem.id);
+                ? ROUTES.build.searchItemDetailsReviewConsole(searchId, queueViewId, selectedItem.id)
+                : ROUTES.build.searchItemDetails(searchId, queueViewId, selectedItem.id);
 
             this.history.push({ pathname });
         }
@@ -412,7 +413,9 @@ export class ItemsDetailsList extends Component<ItemsDetailsListProps, never> {
     renderQueues(item: Item) {
         const { queueStore } = this.props;
         const { queueIds, selectedQueueId } = item;
-        const selectedQueueName = queueStore.getQueueById(selectedQueueId!)?.name || '';
+        const selectedQueueName = selectedQueueId
+            ? queueStore.getQueueById(selectedQueueId!)?.name || `Deleted queue (ID ${selectedQueueId!.substr(0, 8)}...)`
+            : 'Deleted queue';
         const queuesOptions: IContextualMenuItem[] = this.composeQueueOptionsForItem(item, queueIds);
 
         // The first option is the header "Open in", and only the second one is the real queue

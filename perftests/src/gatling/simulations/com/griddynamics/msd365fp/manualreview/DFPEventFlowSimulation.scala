@@ -8,6 +8,7 @@ class DFPEventFlowSimulation extends Simulation {
 
   val baseUrl = System.getenv("BASE_URL")
   val authToken = System.getenv("AUTH_TOKEN")
+  val queueId = "50ebb4bd-283e-4cc4-84dd-c5212172b7bf-REGULAR"
 
   val httpProtocol = http
     .baseUrl(baseUrl)
@@ -24,10 +25,9 @@ class DFPEventFlowSimulation extends Simulation {
 
   val scn = scenario("DFP EventHub events receiving")
     .exec(_.set("authToken", authToken))
-    .exec(_.set("repeats", 0))
-    .foreach(10 to 70 by 10, "amount") {
-      exec(AdminManagerGenerateOrder.action)
-    }
+    .exec(_.set("queueId", queueId))
+    .exec(_.set("amount", 100))
+    .exec(AdminManagerGenerateOrder.action)
     .exec { session =>
     println(session)
       session

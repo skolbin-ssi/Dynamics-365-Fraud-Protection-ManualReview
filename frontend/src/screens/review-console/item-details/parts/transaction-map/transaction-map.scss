@@ -1,7 +1,31 @@
 @import '../../../../../styles/variables';
 
 .item-details-transaction-map {
-  &__content {
+  &__matching-labels {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+
+    &__label {
+      font-weight: 600;
+    }
+
+    &__icon {
+      font-size: 12px;
+      vertical-align: middle;
+      margin-right: 4px;
+      cursor: default;
+
+      &-success {
+        color: $goodColor;
+      }
+
+      &-warning {
+        color: $badColor;
+      }
+    }
+  }
+
+  &__main-content {
     display: grid;
     grid-template-columns: 2fr 1fr;
   }

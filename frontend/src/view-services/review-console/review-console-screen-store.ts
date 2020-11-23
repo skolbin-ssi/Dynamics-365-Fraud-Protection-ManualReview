@@ -24,6 +24,12 @@ import { TYPES } from '../../types';
 import { LockedItemsStore } from '../locked-items-store';
 import { AppStore } from '../app-store';
 
+export enum ITEM_DETAILS_MODE {
+    DETAILS = 'details',
+    JSON = 'json',
+    LINK_ANALYSIS = 'link'
+}
+
 @injectable()
 export class ReviewConsoleScreenStore {
     /**
@@ -59,7 +65,15 @@ export class ReviewConsoleScreenStore {
 
     @observable settings: Setting[] = [];
 
-    @observable isItemDetailsOpenedFromSearch: boolean = false;
+    @observable searchId: string = '';
+
+    @observable
+    openItemDetailsTab: ITEM_DETAILS_MODE = ITEM_DETAILS_MODE.DETAILS;
+
+    @action
+    setOpenDetailsTab(openItemDetailsTabMode: ITEM_DETAILS_MODE) {
+        this.openItemDetailsTab = openItemDetailsTabMode;
+    }
 
     @computed get blockActionButtons(): boolean {
         return (!!this.queue && !this.queue.size)
@@ -312,8 +326,13 @@ export class ReviewConsoleScreenStore {
     }
 
     @action
-    setIsItemDetailsOpenedFromSearch(value: boolean) {
-        this.isItemDetailsOpenedFromSearch = value;
+    setSearchId(id: string) {
+        this.searchId = id;
+    }
+
+    @action
+    clearSearchId() {
+        this.searchId = '';
     }
 
     @computed

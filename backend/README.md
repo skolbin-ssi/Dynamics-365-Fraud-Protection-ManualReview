@@ -1,12 +1,9 @@
 # Backend
 
-This is a parent module of the Manual Review application. The application follows microservice architecture and contains 
-the following main executable modules:
-* [mr-queues](./queues) that responsible for real-time item processing in the queue-based paradigm.
-* [mr-analytics](./analytics) that responsible for post-processing analysis and reporting. 
+This is a parent module of the Manual Review backend (BE) applications. 
+Please, read more in [BE Contribution guide](./CONTRIBUTION.md).
 
-The module combines all services and provides common
-configurations like `.gitignore` and `settings.gradle`.
+Below you can find main technical information about building/launching of backend part.
 
 ## Getting Started
 

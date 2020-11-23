@@ -6,16 +6,15 @@ package com.griddynamics.msd365fp.manualreview.queues.service;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
 import com.griddynamics.msd365fp.manualreview.dfpauth.util.UserPrincipalUtility;
 import com.griddynamics.msd365fp.manualreview.model.*;
+import com.griddynamics.msd365fp.manualreview.model.event.internal.ItemResolutionEvent;
 import com.griddynamics.msd365fp.manualreview.model.event.type.LockActionType;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.model.exception.EmptySourceException;
 import com.griddynamics.msd365fp.manualreview.model.exception.IncorrectConditionException;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemEvent;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueView;
-import com.griddynamics.msd365fp.manualreview.queues.model.dto.ItemDTO;
-import com.griddynamics.msd365fp.manualreview.queues.model.dto.LabelDTO;
-import com.griddynamics.msd365fp.manualreview.queues.model.dto.NoteDTO;
-import com.griddynamics.msd365fp.manualreview.queues.model.dto.TagDTO;
+import com.griddynamics.msd365fp.manualreview.queues.model.dto.*;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Queue;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -32,10 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.*;
@@ -68,7 +64,7 @@ public class PublicItemService {
             @Nullable final String continuationToken) throws NotFoundException, BusyException {
         QueueView queueView = publicQueueClient.getActiveQueueView(queueId);
         PageableCollection<Item> queriedItems =
-                publicItemClient.getActiveItemPageableList(queueView, pageSize, continuationToken);
+                publicItemClient.getQueueViewItemList(queueView, pageSize, continuationToken);
         return new PageableCollection<>(
                 queriedItems.getValues()
                         .stream()
@@ -178,7 +174,7 @@ public class PublicItemService {
         if (item.getLock() == null || item.getLock().getOwnerId() == null) {
             throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED);
         }
-        if (queueView != null && !queueView.getViewId().equals(item.getLock().getQueueViewId())){
+        if (queueView != null && !queueView.getViewId().equals(item.getLock().getQueueViewId())) {
             throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED_IN_QUEUE);
         }
         Item oldItem = SerializationUtils.clone(item);
@@ -206,10 +202,10 @@ public class PublicItemService {
         if (item.getLock() == null || item.getLock().getOwnerId() == null) {
             throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED);
         }
-        if (queueView != null && !queueView.getViewId().equals(item.getLock().getQueueViewId())){
+        if (queueView != null && !queueView.getViewId().equals(item.getLock().getQueueViewId())) {
             throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED_IN_QUEUE);
         }
-        if (queueView == null){
+        if (queueView == null) {
             queueView = publicQueueClient.getActiveQueueView(item.getLock().getQueueViewId());
         }
         Item oldItem = SerializationUtils.clone(item);
@@ -239,19 +235,77 @@ public class PublicItemService {
             case BAD:
             case WATCH_NA:
             case WATCH_INCONCLUSIVE:
-                labelResolution(item, oldItem);
+                labelResolution(item);
+
+                publicItemClient.updateItem(item, oldItem);
+
+                streamService.sendItemAssignmentEvent(item, oldItem.getQueueIds());
+                streamService.sendItemLockEvent(item, oldItem.getLock(), LockActionType.LABEL_APPLIED_RELEASE);
+                streamService.sendItemLabelEvent(item, oldItem);
                 break;
             case ESCALATE:
-                labelEscalate(item, oldItem, queueView, actor);
+                labelEscalate(item, queueView, actor);
+
+                publicItemClient.updateItem(item, oldItem);
+
+                streamService.sendItemAssignmentEvent(item, oldItem.getQueueIds());
+                streamService.sendItemLockEvent(item, oldItem.getLock(), LockActionType.LABEL_APPLIED_RELEASE);
+                streamService.sendItemLabelEvent(item, oldItem);
                 break;
             case HOLD:
-                labelHold(item, oldItem, queueView, actor);
+                labelHold(item, queueView, actor);
+
+                publicItemClient.updateItem(item, oldItem);
+
+                streamService.sendItemLockEvent(item, oldItem.getLock(), LockActionType.LABEL_APPLIED_RELEASE);
+                streamService.sendItemLabelEvent(item, oldItem);
                 break;
             default:
                 throw new IncorrectConditionException(
                         String.format("User [%s] attempted to label an item [%s] with unsupported label [%s].",
                                 actor, id, labelAssignment.getLabel()));
         }
+    }
+
+
+    public BatchLabelReportDTO batchLabelItem(final BatchLabelDTO batchLabel) throws IncorrectConditionException, BusyException {
+        if (!Label.GOOD.equals(batchLabel.getLabel()) && !Label.BAD.equals(batchLabel.getLabel())) {
+            throw new IncorrectConditionException("Batch labeling accepts only GOOD/BAD labels");
+        }
+
+        String actor = UserPrincipalUtility.getUserId();
+        log.info("User [{}] is trying to label items [{}] with label [{}].", actor, batchLabel.getItemIds(), batchLabel.getLabel());
+
+        Collection<Queue> queues = publicQueueClient.getActiveQueueList(null);
+
+        Collection<BatchLabelReportDTO.LabelResult> results = publicItemClient.batchUpdate(
+                batchLabel.getItemIds(),
+                queues,
+                item -> {
+                    Item oldItem = SerializationUtils.clone(item);
+                    if (item.getLabel() == null) {
+                        item.setLabel(new ItemLabel());
+                    }
+                    item.getLabel().label(batchLabel.getLabel(), actor, null, null);
+                    item.getNotes().add(ItemNote.builder()
+                            .created(OffsetDateTime.now())
+                            .note(String.format("# Applied [%s] label in bulk operation", batchLabel.getLabel()))
+                            .userId(UserPrincipalUtility.getUserId())
+                            .build());
+                    labelResolution(item);
+                    return oldItem;
+                },
+                (item, oldItem) -> {
+                    streamService.sendItemAssignmentEvent(item, oldItem.getQueueIds());
+                    if (oldItem.getLock() != null && oldItem.getLock().getOwnerId()!=null) {
+                        streamService.sendItemLockEvent(item, oldItem.getLock(), LockActionType.LABEL_APPLIED_RELEASE);
+                    }
+                    streamService.sendItemLabelEvent(item, oldItem);
+                }).stream()
+                .map(r -> modelMapper.map(r, BatchLabelReportDTO.LabelResult.class))
+                .collect(Collectors.toSet());
+
+        return new BatchLabelReportDTO(results);
     }
 
     @Retry(name = "cosmosOptimisticUpdate")
@@ -265,7 +319,7 @@ public class PublicItemService {
         if (item.getLock() == null || item.getLock().getOwnerId() == null) {
             throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED);
         }
-        if (queueView != null  && !queueView.getViewId().equals(item.getLock().getQueueViewId())){
+        if (queueView != null && !queueView.getViewId().equals(item.getLock().getQueueViewId())) {
             throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED_IN_QUEUE);
         }
         Item oldItem = SerializationUtils.clone(item);
@@ -290,7 +344,7 @@ public class PublicItemService {
         if (item.getLock() == null || item.getLock().getOwnerId() == null) {
             throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED);
         }
-        if (queueView != null && !queueView.getViewId().equals(item.getLock().getQueueViewId())){
+        if (queueView != null && !queueView.getViewId().equals(item.getLock().getQueueViewId())) {
             throw new IncorrectConditionException(MESSAGE_ITEM_IS_NOT_LOCKED_IN_QUEUE);
         }
         Item oldItem = SerializationUtils.clone(item);
@@ -344,19 +398,18 @@ public class PublicItemService {
                 .collect(Collectors.toList());
     }
 
-    private void labelResolution(Item item, Item oldItem) {
+    private void labelResolution(Item item) {
         item.unlock();
         item.deactivate(defaultTtl.toSeconds());
         item.setQueueIds(Set.of());
-        publicItemClient.updateItem(item, oldItem);
-
-        streamService.sendItemAssignmentEvent(item, oldItem.getQueueIds());
-        streamService.sendItemResolvedEvent(item);
-        streamService.sendItemLockEvent(item, oldItem.getLock(), LockActionType.LABEL_APPLIED_RELEASE);
-        streamService.sendItemLabelEvent(item, oldItem);
+        item.getEvents().add(new ItemEvent(
+                streamService.createItemResolvedEvent(item),
+                ItemResolutionEvent.class,
+                UUID.randomUUID().toString()
+        ));
     }
 
-    private void labelEscalate(Item item, Item oldItem, QueueView queueView, String actor) {
+    private void labelEscalate(Item item, QueueView queueView, String actor) {
         item.unlock();
         item.setEscalation(ItemEscalation.builder()
                 .escalated(OffsetDateTime.now())
@@ -364,14 +417,9 @@ public class PublicItemService {
                 .reviewerId(actor)
                 .build());
         item.setQueueIds(Collections.singleton(queueView.getQueueId()));
-        publicItemClient.updateItem(item, oldItem);
-
-        streamService.sendItemAssignmentEvent(item, oldItem.getQueueIds());
-        streamService.sendItemLockEvent(item, oldItem.getLock(), LockActionType.LABEL_APPLIED_RELEASE);
-        streamService.sendItemLabelEvent(item, oldItem);
     }
 
-    private void labelHold(Item item, Item oldItem, QueueView queueView, String actor) {
+    private void labelHold(Item item, QueueView queueView, String actor) {
         item.unlock();
         item.setHold(ItemHold.builder()
                 .held(OffsetDateTime.now())
@@ -379,9 +427,5 @@ public class PublicItemService {
                 .queueViewId(queueView.getViewId())
                 .ownerId(actor)
                 .build());
-        publicItemClient.updateItem(item, oldItem);
-
-        streamService.sendItemLockEvent(item, oldItem.getLock(), LockActionType.LABEL_APPLIED_RELEASE);
-        streamService.sendItemLabelEvent(item, oldItem);
     }
 }

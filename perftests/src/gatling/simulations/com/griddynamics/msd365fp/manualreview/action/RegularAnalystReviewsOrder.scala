@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 object RegularAnalystReviewsOrder {
 
   val action = exec(
-    http("Lock top item in a queue")
+    http("Lock top item")
       .post("/api/queues/${regularQueue}/top/lock")
       .header("Virtual-User", "${virtualUser}")
       .check(
@@ -18,13 +18,13 @@ object RegularAnalystReviewsOrder {
       )
   )
     .exec(
-      http("Get information about the order")
+      http("Get order info")
         .get("/api/queues/${regularQueue}/items/${reviewOrder}")
         .header("Virtual-User", "${virtualUser}")
     )
     .pause(1 minute, 4 minutes)
     .tryMax(3) {
-      exec(http("Label an item after review")
+      exec(http("Label item")
         .patch("/api/items/${reviewOrder}/label")
         .header("Virtual-User", "${virtualUser}")
         .body(StringBody("{\"label\": \"${allowedLabels.random()}\"}"))

@@ -67,11 +67,8 @@ export class Item {
     @observable
     lockedById: string | null = null;
 
-    // TODO: Fix correct calculation of time left for the item including days and hours,
-    //  implement computed display time left property
     timeLeft: Duration | null = null;
 
-    // TODO: Implement computed display property fot the timeout if that possible
     @observable
     timeout: number | undefined = undefined;
 
@@ -107,7 +104,7 @@ export class Item {
     }
 
     @action
-    selectQueueId(queueId: string) {
+    selectQueueId(queueId?: string) {
         this.selectedQueueId = queueId;
     }
 

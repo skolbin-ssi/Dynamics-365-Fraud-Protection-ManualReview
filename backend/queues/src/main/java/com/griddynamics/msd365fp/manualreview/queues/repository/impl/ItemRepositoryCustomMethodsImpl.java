@@ -94,6 +94,16 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
     }
 
     @Override
+    public PageableCollection<Item> findUnreportedItems(
+            final int size,
+            @Nullable final String continuationToken) {
+        return ItemQuery.constructor("i")
+                .hasEvents()
+                .constructSelectExecutor(itemsContainer)
+                .execute(size, continuationToken);
+    }
+
+    @Override
     public int countActiveItems() {
         return ItemQuery.constructor("i")
                 .active(true)
@@ -146,6 +156,22 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
     }
 
     @Override
+    public PageableCollection<String> findActiveItemIds(
+            final int size,
+            final String continuationToken) {
+        ExtendedCosmosContainer.Page res = itemsContainer.runCrossPartitionPageableQuery(
+                "SELECT i.id FROM i WHERE i.active ORDER BY i._ts",
+                size,
+                continuationToken);
+        List<String> queriedItems = res.getContent()
+                .map(cip -> Optional.ofNullable((String) cip.get("id")))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        return new PageableCollection<>(queriedItems, res.getContinuationToken());
+    }
+
+    @Override
     public PageableCollection<String> findUnenrichedItemIds(
             final int size,
             final String continuationToken) {
@@ -170,6 +196,47 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
                 continuationToken);
         List<String> queriedItems = res.getContent()
                 .map(cip -> Optional.ofNullable((String) cip.get("id")))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        return new PageableCollection<>(queriedItems, res.getContinuationToken());
+    }
+
+    @Override
+    public PageableCollection<BasicItemInfo> findEnrichedItemInfoByIds(
+            @NonNull final Set<String> ids,
+            final int size,
+            @Nullable final String continuationToken) {
+        ExtendedCosmosContainer.Page res = itemsContainer.runCrossPartitionPageableQuery(
+                "SELECT i.id, i.imported, i.enriched, i.active, " +
+                        "i.label, i.queueIds, i.lock, i.escalation, i.hold " +
+                        "FROM i WHERE IS_DEFINED(i.enriched) AND NOT IS_NULL(i.enriched) " +
+                        "AND i.id IN ('" +
+                        String.join("','", ids) + "')",
+                size,
+                continuationToken);
+        List<BasicItemInfo> queriedItems = res.getContent()
+                .map(cip -> itemsContainer.castCosmosObjectToClassInstance(cip.toJson(), Item.class))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+        return new PageableCollection<>(queriedItems, res.getContinuationToken());
+    }
+
+    @Override
+    public PageableCollection<Item> findEnrichedItemsByIds(
+            @NonNull final Set<String> ids,
+            final int size,
+            @Nullable final String continuationToken) {
+        ExtendedCosmosContainer.Page res = itemsContainer.runCrossPartitionPageableQuery(
+                "SELECT i " +
+                        "FROM i WHERE IS_DEFINED(i.enriched) AND NOT IS_NULL(i.enriched) " +
+                        "AND i.id IN ('" +
+                        String.join("','", ids) + "')",
+                size,
+                continuationToken);
+        List<Item> queriedItems = res.getContent()
+                .map(cip -> itemsContainer.castCosmosObjectToClassInstance(cip.get("i"), Item.class))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -348,7 +415,7 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
                                 + "    Count(1) as count "
                                 + "FROM ("
                                 + "SELECT "
-                                + "    udf.getBucketNumber(c.assessmentResult.RiskScore,%1$s) as risk_score_bucket "
+                                + "    FLOOR(c.assessmentResult.RiskScore/%1$s) as risk_score_bucket "
                                 + "FROM c "
                                 + "WHERE "
                                 + "    c.active "
@@ -388,7 +455,8 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
                 //JOIN
                 .collectionInCollectionField(ItemDataField.TAGS, tags)//no ".and" because here we use JOIN part, not WHERE one
                 //WHERE
-                .inField(ItemDataField.ID, ids)
+                .enriched()
+                .and().inField(ItemDataField.ID, ids)
                 .and().queueIds(queueIds, residual)
                 .and().active(isActive)
                 .and().all(itemFilters)
@@ -401,4 +469,5 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
                 .constructSelectExecutor(itemsContainer)
                 .execute(size, continuationToken);
     }
+
 }

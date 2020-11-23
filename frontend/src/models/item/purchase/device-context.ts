@@ -77,7 +77,7 @@ export class DeviceContext {
             IPState,
         } = deviceContext;
 
-        this.deviceContextId = DeviceContextId;
+        this.deviceContextId = DeviceContextId || '';
         this.provider = Provider;
         this.deviceContextDC = DeviceContextDC;
         this.externalDeviceId = ExternalDeviceId;

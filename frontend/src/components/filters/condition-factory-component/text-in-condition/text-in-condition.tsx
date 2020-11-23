@@ -87,7 +87,6 @@ export class TextInCondition extends Component<TextInConditionComponentProps, Te
 
     @autobind
     addCustomItem(input: string) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { filterId, condition } = this.props;
 
         this.filtersStore.postDictionaryValues(filterId, input);

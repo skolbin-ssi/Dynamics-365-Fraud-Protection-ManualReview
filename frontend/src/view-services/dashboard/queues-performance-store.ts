@@ -14,6 +14,7 @@ import { QueuePerformance, Report } from '../../models';
 import { CollectedInfoService, DashboardService } from '../../data-services/interfaces';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
 import { QueueStore } from '../queues';
+import { DASHBOARD_REPORTS_NAMES } from '../../constants/dashboard-reports';
 
 @injectable()
 export class QueuesPerformanceStore extends BasePerformanceStore<QueuePerformance> {
@@ -75,19 +76,17 @@ export class QueuesPerformanceStore extends BasePerformanceStore<QueuePerformanc
 
     /**
      * Collects reports for the dashboard
+     *
+     * @returns - all reports for the dashboard
      */
     @computed
     get reports(): Report[] {
-        const reports = [];
+        const { QUEUES_TOTAL_DECISIONS, QUEUES_TOTAL_REVIEWED_STATS } = DASHBOARD_REPORTS_NAMES.QUEUES;
 
-        if (this.totalReviewedReport) {
-            reports.push(this.totalReviewedReport);
-        }
+        const totalReviewReport = this.totalReviewdStats(QUEUES_TOTAL_REVIEWED_STATS);
+        const fullPerformanceReport = this.fullPerformanceReport(QUEUES_TOTAL_DECISIONS);
 
-        if (this.fullPerformanceReport('Queues performance')) {
-            reports.push(this.fullPerformanceReport('Queues performance')!);
-        }
-
-        return reports;
+        return [totalReviewReport, fullPerformanceReport]
+            .filter(report => report !== null) as Report[];
     }
 }

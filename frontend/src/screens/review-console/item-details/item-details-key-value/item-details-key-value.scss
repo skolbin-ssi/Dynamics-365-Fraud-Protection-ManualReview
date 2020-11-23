@@ -1,7 +1,14 @@
 @import '../../../../styles/variables';
 
 .item-details-key-value {
+  $root: &;
   margin-bottom: 20px;
+
+  &:hover {
+    #{$root}__copy-button {
+      display: inline-block;
+    }
+  }
 
   &__header {
     font-size: 14px;
@@ -11,8 +18,22 @@
   }
 
   &__content {
+    display: flex;
     font-size: 14px;
     line-height: 20px;
     overflow: hidden;
   }
+
+  &__copy-button {
+    display: none;
+    width: 20px;
+    height: 20px;
+    margin-left: 6px;
+    color: $gray;
+  }
+
+  .placeholder {
+    color: $neutralTertiary;
+  }
+
 }

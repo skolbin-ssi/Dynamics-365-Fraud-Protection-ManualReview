@@ -3,9 +3,7 @@
 
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
-import com.griddynamics.msd365fp.manualreview.model.dfp.raw.ExplorerEntity;
-import com.griddynamics.msd365fp.manualreview.model.dfp.raw.ExplorerEntityRequest;
-import com.griddynamics.msd365fp.manualreview.model.dfp.raw.Node;
+import com.griddynamics.msd365fp.manualreview.model.dfp.raw.*;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +29,24 @@ public class DFPExplorerService {
     private WebClient dfpClient;
     @Value("${azure.dfp.graph-explorer-url}")
     private String dfpExplorerUrl;
+    @Value("${azure.dfp.user-email-list-url}")
+    private String userEmailListUrl;
+
+    @Cacheable(value = "user-email-list")
+    public UserEmailListEntity exploreUserEmailList(final String email) {
+        UserEmailListEntityRequest request = new UserEmailListEntityRequest(email);
+        log.info("Start User.Email list retrieving for [{}].", email);
+        UserEmailListEntity result = dfpClient
+                .post()
+                .uri(userEmailListUrl)
+                .body(Mono.just(request), UserEmailListEntityRequest.class)
+                .retrieve()
+                .bodyToMono(UserEmailListEntity.class)
+                .block();
+        log.info("User.Email list for [{}] has been retrieved successfully: [{}].", email,
+                result != null ? result.getCommon() : "null");
+        return result;
+    }
 
     @Cacheable(value = "traversal-purchase", unless = "#result.isEmpty()")
     public ExplorerEntity explorePurchase(final String id) {

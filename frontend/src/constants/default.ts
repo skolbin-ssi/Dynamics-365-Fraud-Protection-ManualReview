@@ -22,6 +22,8 @@ export const DEFAULT_QUEUES_ESCALATION = false;
  */
 export const DEFAULT_QUEUE_ITEMS_PER_PAGE = 18;
 
+export const DEFAULT_LINK_ANALYSIS_ITEMS_PER_PAGE = 10;
+
 /**
  * Maximum queue processing deadline days
  */

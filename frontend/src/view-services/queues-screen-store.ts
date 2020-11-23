@@ -257,21 +257,6 @@ export class QueuesScreenStore {
     }
 
     @computed
-    get allQueuesAssignedToCurrentUser() {
-        const { queues, escalatedQueues } = this.queueStore;
-        const { user } = this.currentUserStore;
-
-        if ((!queues && !escalatedQueues) || !user) {
-            return [];
-        }
-
-        return [
-            ...(queues?.filter(q => q.reviewers.includes(user.id)) || []),
-            ...(escalatedQueues?.filter(q => q.supervisors.includes(user.id)) || [])
-        ];
-    }
-
-    @computed
     get queuesAssignedToCurrentUser() {
         const { queues } = this.queueStore;
         const { user } = this.currentUserStore;

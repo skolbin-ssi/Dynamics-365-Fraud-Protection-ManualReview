@@ -52,20 +52,20 @@ public class User implements Serializable {
     @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
     @JsonSerialize(using = ISOStringDateTimeSerializer.class)
     private OffsetDateTime phoneNumberValidatedDate;
-    private BigDecimal totalSpend;
-    private BigDecimal totalTransactions;
-    private BigDecimal totalRefundAmount;
-    private BigDecimal totalChargebackAmount;
-    private BigDecimal totalDaysOfUse;
-    private BigDecimal last30DaysSpend;
-    private BigDecimal last30DaysTransactions;
-    private BigDecimal last30DaysRefundAmount;
-    private BigDecimal last30DaysChargebackAmount;
-    private BigDecimal last30DaysOfUse;
-    private BigDecimal monthlyAverageSpend;
-    private BigDecimal monthlyAverageTransactions;
-    private BigDecimal monthlyAverageRefundAmount;
-    private BigDecimal monthlyAverageChargebackAmount;
+    private BigDecimal totalSpend = BigDecimal.ZERO;
+    private BigDecimal totalTransactions = BigDecimal.ZERO;
+    private BigDecimal totalRefundAmount = BigDecimal.ZERO;
+    private BigDecimal totalChargebackAmount = BigDecimal.ZERO;
+    private BigDecimal totalDaysOfUse = BigDecimal.ZERO;
+    private BigDecimal last30DaysSpend = BigDecimal.ZERO;
+    private BigDecimal last30DaysTransactions = BigDecimal.ZERO;
+    private BigDecimal last30DaysRefundAmount = BigDecimal.ZERO;
+    private BigDecimal last30DaysChargebackAmount = BigDecimal.ZERO;
+    private BigDecimal last30DaysOfUse = BigDecimal.ZERO;
+    private BigDecimal monthlyAverageSpend = BigDecimal.ZERO;
+    private BigDecimal monthlyAverageTransactions = BigDecimal.ZERO;
+    private BigDecimal monthlyAverageRefundAmount = BigDecimal.ZERO;
+    private BigDecimal monthlyAverageChargebackAmount = BigDecimal.ZERO;
     @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
     @JsonSerialize(using = ISOStringDateTimeSerializer.class)
     private OffsetDateTime measuresIngestionDateTimeUTC;

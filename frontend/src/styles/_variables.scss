@@ -54,6 +54,7 @@ $escalateBorderColor: #C7E0F4;
 $escalateBackgroundColor: #EFF6FC;
 
 $gray: #8A8886;
+$gray190: #201F1E;
 
 $formInvalidColor: #A4262C;
 
@@ -110,6 +111,15 @@ $defaultBlurFilterValue: 7px;
   grid-template-columns: repeat(auto-fill, minmax($tileWidth, 1fr));
   grid-column-gap: 8px;
   grid-row-gap: 8px;
+}
+
+/*!
+ * Trim the text inside the element
+ */
+@mixin trimText() {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 // SVG Icons

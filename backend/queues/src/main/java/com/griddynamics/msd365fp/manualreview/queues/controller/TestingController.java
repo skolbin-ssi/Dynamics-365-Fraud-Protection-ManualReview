@@ -20,18 +20,21 @@ import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUti
 import com.griddynamics.msd365fp.manualreview.dfpauth.util.UserPrincipalUtility;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.config.properties.EventHubProperties;
 import com.griddynamics.msd365fp.manualreview.ehub.durable.model.DurableEventHubProducerClientRegistry;
+import com.griddynamics.msd365fp.manualreview.model.DisposabilityCheck;
 import com.griddynamics.msd365fp.manualreview.model.ItemLabel;
 import com.griddynamics.msd365fp.manualreview.model.ItemLock;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
 import com.griddynamics.msd365fp.manualreview.model.event.Event;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.model.exception.IncorrectConditionException;
-import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemDataField;
 import com.griddynamics.msd365fp.manualreview.queues.model.ItemFilterField;
+import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewType;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.model.testing.MicrosoftDynamicsFraudProtectionV1ModelsBankEventActivityBankEvent;
 import com.griddynamics.msd365fp.manualreview.queues.model.testing.MicrosoftDynamicsFraudProtectionV1ModelsPurchaseActivityPurchase;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepository;
+import com.griddynamics.msd365fp.manualreview.queues.service.ItemEnrichmentService;
 import com.griddynamics.msd365fp.manualreview.queues.service.TestingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,16 +45,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -66,13 +73,14 @@ import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.SEC
 @SecurityRequirement(name = SECURITY_SCHEMA_IMPLICIT)
 @RequiredArgsConstructor
 @Secured({ADMIN_MANAGER_ROLE})
-@SuppressWarnings({"java:S5411", "java:S3776", "java:S3358"})
+@SuppressWarnings({"java:S5411", "java:S3776", "java:S3358" })
 public class TestingController {
 
     private static final Faker faker = new Faker();
 
     private final ItemRepository itemRepository;
     private final TestingService testingService;
+    private final ItemEnrichmentService itemEnrichmentService;
     private final EventHubProperties ehProperties;
     @Qualifier("cosmosdbObjectMapper")
     private final ObjectMapper mapper;
@@ -80,6 +88,7 @@ public class TestingController {
     private final CosmosClient cosmosClient;
     @Setter(onMethod = @__({@Autowired, @Qualifier("azureDFPAPIWebClient")}))
     private WebClient dfpClient;
+    private final Random rand = new Random();
 
     @Value("${azure.dfp.purchase-event-url}")
     private String purchaseEventUrl;
@@ -106,10 +115,44 @@ public class TestingController {
         return res;
     }
 
-    @Operation(summary = "Duplicate all items in the queue")
-    @PostMapping(value = "/items/duplicate/queue/{queueId}")
-    public void duplicateItems(@PathVariable("queueId") final String queueId) throws NotFoundException, BusyException {
-        testingService.duplicate(queueId);
+    @Operation(summary = "Trigger forced item enrichment")
+    @PostMapping(value = "/items/{id}/enrichment")
+    public void enrichItemById(@PathVariable final String id) {
+        itemEnrichmentService.enrichItem(id, true);
+    }
+
+    @Operation(summary = "Trigger forced item enrichment for ALL active items")
+    @PostMapping(value = "/items/enrichment")
+    public void enrichAllActiveItems() throws BusyException {
+        Collection<String> items = PageProcessingUtility.getAllPages(
+                c -> itemRepository.findActiveItemIds(300, c));
+        log.warn("We're trying to reenrich {} items", items.size());
+        Scheduler scheduler = Schedulers.fromExecutor(Executors.newSingleThreadExecutor());
+        Flux.fromIterable(items)
+                .doOnNext(item -> itemEnrichmentService.enrichItem(item, true))
+                .subscribeOn(scheduler)
+                .subscribe();
+    }
+
+
+    @Operation(summary = "Randomize scores for items in a queue")
+    @PostMapping(value = "/queue/{queueId}/score/randomize")
+    public void randomizeScore(@PathVariable final String queueId) throws BusyException {
+        PageProcessingUtility.executeForAllPages(
+                continuationToken -> itemRepository.findActiveItemsByQueueView(
+                        QueueViewType.DIRECT,
+                        queueId,
+                        20,
+                        continuationToken,
+                        new Sort.Order(Sort.Direction.ASC, ItemDataField.IMPORT_DATE.getPath()),
+                        null,
+                        null),
+                items -> items.getValues().forEach(item -> {
+                    int score = rand.nextInt(999);
+                    item.getAssessmentResult().setRiskScore(score);
+                    item.getDecision().setRiskScore(score);
+                    itemRepository.save(item);
+                }));
     }
 
     @Operation(summary = "Get filter samples")
@@ -242,15 +285,19 @@ public class TestingController {
         });
     }
 
-    @Operation(summary = "Hard delete for all items by IDs")
-    @DeleteMapping(value = "/items")
+    @Operation(summary = "Hard delete for all entries by IDs")
+    @DeleteMapping(value = "/databases/{dbName}/container/{containerName}/entries")
     public void deleteAllById(
+            @PathVariable("dbName") final String dbName,
+            @PathVariable("containerName") final String containerName,
             @Parameter(hidden = true)
             @AuthenticationPrincipal PreAuthenticatedAuthenticationToken principal,
             @RequestBody List<Map<String, String>> ids) {
+        CosmosContainer container = cosmosClient.getDatabase(dbName).getContainer(containerName);
         List<String> toDelete = ids.stream().map(mp -> mp.get("id")).collect(Collectors.toList());
-        itemRepository.deleteAll(itemRepository.findAllById(toDelete));
-        log.info("User [{}] has deleted items [{}].", UserPrincipalUtility.extractUserId(principal), toDelete);
+        toDelete.forEach(id ->
+                container.getItem(id, id).delete().block());
+        log.warn("User [{}] has deleted items [{}].", UserPrincipalUtility.extractUserId(principal), toDelete);
     }
 
     @Operation(summary = "Generate specified amount of purchases. Send them to the DFP. " +
@@ -303,6 +350,12 @@ public class TestingController {
             result.add(data);
         }
         return result;
+    }
+
+    @Operation(summary = "Check disposable email domains for all the items")
+    @PostMapping(value = "/check-email-domains")
+    public List<DisposabilityCheck> checkEmailDomains() {
+        return testingService.checkDisposableEmails();
     }
 
     @Data

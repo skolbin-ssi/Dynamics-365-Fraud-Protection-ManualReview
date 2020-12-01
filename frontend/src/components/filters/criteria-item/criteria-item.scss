@@ -1,0 +1,18 @@
+.criteria-item {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  &__criteria-dropdown {
+    min-width: 150px;
+    margin-right: 10px;
+  }
+
+  &__condition {
+    width: 100%;
+  }
+
+  &__delete-button {
+    margin-left: 5px;
+  }
+}

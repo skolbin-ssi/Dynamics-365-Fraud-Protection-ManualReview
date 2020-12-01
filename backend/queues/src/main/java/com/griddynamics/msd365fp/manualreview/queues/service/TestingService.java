@@ -5,16 +5,17 @@ package com.griddynamics.msd365fp.manualreview.queues.service;
 
 import com.github.javafaker.Faker;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
+import com.griddynamics.msd365fp.manualreview.model.DisposabilityCheck;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
+import com.griddynamics.msd365fp.manualreview.model.dfp.CalculatedFields;
+import com.griddynamics.msd365fp.manualreview.model.dfp.MainPurchase;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
-import com.griddynamics.msd365fp.manualreview.model.exception.IncorrectConditionException;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Queue;
 import com.griddynamics.msd365fp.manualreview.queues.model.testing.*;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepository;
 import com.griddynamics.msd365fp.manualreview.queues.repository.QueueRepository;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -33,6 +34,7 @@ import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.MES
 @RequiredArgsConstructor
 public class TestingService {
 
+    private final EmailDomainService emailDomainService;
     private final ItemRepository itemRepository;
     private final QueueRepository queueRepository;
 
@@ -404,6 +406,36 @@ public class TestingService {
             }
         }
         return Locale.US;
+    }
+
+    public List<DisposabilityCheck> checkDisposableEmails() {
+        List<DisposabilityCheck> result = new ArrayList<>();
+
+        itemRepository.findAll()
+                .forEach(item -> {
+                    MainPurchase purchase = item.getPurchase();
+                    if (purchase != null) {
+                        String emailDomain = null;
+
+                        CalculatedFields calculatedFields = purchase.getCalculatedFields();
+                        if (calculatedFields != null) {
+                            emailDomain = calculatedFields.getAggregatedEmailDomain();
+                        } else {
+                            Map<String, String> customData = purchase.getCustomData();
+                            if (customData != null) {
+                                emailDomain = customData.get("email_domain");
+                                calculatedFields = new CalculatedFields();
+                                purchase.setCalculatedFields(calculatedFields);
+                            }
+                        }
+
+                        if (emailDomain != null) {
+                            result.add(emailDomainService.checkDisposability(emailDomain));
+                        }
+                    }
+                });
+
+        return result;
     }
 
     private String generateUsername(String fname, String lname) {

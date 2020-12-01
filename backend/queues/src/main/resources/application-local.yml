@@ -3,6 +3,8 @@
 
 mr:
   tasks:
+    resolution-sending-task:
+      enabled: false
     prim-health-analysis-task:
       enabled: false
     sec-health-analysis-task:
@@ -35,4 +37,4 @@ azure:
     enabled: true
     client-key: ${CLIENT_SECRET}
     client-id: ${CLIENT_ID}
-    tenant-id: ${TENANT_ID}
+    tenant-id: ${CLIENT_TENANT_ID}

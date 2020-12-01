@@ -34,7 +34,9 @@ export enum FILTER_VALIDATOR_TYPES {
     MAX_CONSTRAINT,
     MIN_EXISTS,
     MAX_EXISTS,
-    AT_LEAST_ONE_VALUE
+    AT_LEAST_ONE_VALUE,
+    LOWER_BOUND_CONSTRAINT,
+    UPPER_BOUND_CONSTRAINT
 }
 
 export const FILTER_NAMES = new Map<QUEUE_ITEMS_FIELD, string>([
@@ -71,7 +73,9 @@ export const FILTER_VALIDATOR_ERRORS = new Map<FILTER_VALIDATOR_TYPES, string>([
     [FILTER_VALIDATOR_TYPES.MAX_CONSTRAINT, 'Please keep the maximal value in allowed span'],
     [FILTER_VALIDATOR_TYPES.MIN_EXISTS, 'Please enter the minimal value'],
     [FILTER_VALIDATOR_TYPES.MAX_EXISTS, 'Please enter the maximal value'],
-    [FILTER_VALIDATOR_TYPES.AT_LEAST_ONE_VALUE, 'At least one value is required']
+    [FILTER_VALIDATOR_TYPES.AT_LEAST_ONE_VALUE, 'At least one value is required'],
+    [FILTER_VALIDATOR_TYPES.LOWER_BOUND_CONSTRAINT, 'This value must be greater then or equal to'],
+    [FILTER_VALIDATOR_TYPES.UPPER_BOUND_CONSTRAINT, 'This value must be less then or equal to'],
 ]);
 
 export const FILTER_VALUE_CONSTRAINTS = new Map<QUEUE_ITEMS_FIELD, any[]>([

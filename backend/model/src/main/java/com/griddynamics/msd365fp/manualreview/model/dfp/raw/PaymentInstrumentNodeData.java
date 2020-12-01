@@ -5,10 +5,14 @@ package com.griddynamics.msd365fp.manualreview.model.dfp.raw;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.griddynamics.msd365fp.manualreview.model.jackson.FlexibleDateFormatDeserializer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+
+import java.time.OffsetDateTime;
 
 /**
  * Implementation of {@link NodeData}
@@ -20,11 +24,15 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class PaymentInstrumentNodeData extends NodeData {
+    public static final String NODE_NAME = "PaymentInstrument";
+
     private String paymentInstrumentId;
     private String merchantPaymentInstrumentId;
     private String type;
-    private String creationDate;
-    private String updateDate;
+    @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
+    private OffsetDateTime creationDate;
+    @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
+    private OffsetDateTime updateDate;
     private String state;
     private String cardType;
     private String holderName;

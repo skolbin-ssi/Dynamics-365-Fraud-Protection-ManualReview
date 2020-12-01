@@ -1,12 +1,9 @@
 # Backend
 
-This is a parent module of the Manual Review application. The application follows microservice architecture and contains 
-the following main executable modules:
-* [mr-queues](./queues) that responsible for real-time item processing in the queue-based paradigm.
-* [mr-analytics](./analytics) that responsible for post-processing analysis and reporting. 
+This is a parent module of the Manual Review backend (BE) applications. 
+Please, read more in [BE Contribution guide](./CONTRIBUTION.md).
 
-The module combines all services and provides common
-configurations like `.gitignore` and `settings.gradle`.
+Below you can find main technical information about building/launching of backend part.
 
 ## Getting Started
 
@@ -55,17 +52,25 @@ unoptimized code to avoid unexpected costs in Azure resources.
 ### Configure integration 
 
 To get the whole environment installed, please, refer to  [deployment](../arm/README.md).
-To get environment variables that are used by application to connect to cloud environment, run [script](./getEnv.sh)
+To get environment variables that are used by application to connect to cloud environment, run [script](./getEnv.sh) 
+(works only for single-tenant deployments)
 with specified environment name:
 ```shell script
 /getEnv.sh "<name_that_is_prefix_of_deployment>"
 ```
-__Warning!__ You need to be unlogined in "Az Cli" or be logined with appropriate account. In first case the script will
-route you to login page.   
-__Warning!__ In order to get all variables you should have enough [permissions](#prerequisites).
+>__Warning!__ You need to be unlogined in "Az Cli" or be logined with appropriate account. In first case the script will
+route you to login page. 
+  
+>__Warning!__ In order to get all variables you should have enough [permissions](#prerequisites) and you should
+be authorized to get/list secrets in the KeyVault of the current installation.
+
+>__Warning!__ For some tenants definition of SHORT_TENANT_NAME doesn't work properly. Please, define it manually as substring 
+of your Tenant's Primary domain before `.onmicrosoft.com`.
 
 The script output under the `-----[ Result ]-----` row will contain the set of variables that you need to have 
-established in your environment before local launch or comprehensive build.
+established in your environment before local launch or comprehensive build. Also, please, be aware that application
+which mentioned in the `CLIENT_ID` variable should have permissions to get/list secrets in the KeyVault of 
+the current installation.
 
 __Warning!__ Values in the script output are unescaped. Be careful if there are special symbols. 
 

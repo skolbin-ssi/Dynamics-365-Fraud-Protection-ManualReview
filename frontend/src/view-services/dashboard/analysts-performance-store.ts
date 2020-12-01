@@ -13,6 +13,7 @@ import { DashboardService, UserService } from '../../data-services/interfaces';
 import { TYPES } from '../../types';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
 import { Report } from '../../models/misc';
+import { DASHBOARD_REPORTS_NAMES } from '../../constants/dashboard-reports';
 
 @injectable()
 export class AnalystsPerformanceStore extends BasePerformanceStore<AnalystPerformance> {
@@ -68,16 +69,11 @@ export class AnalystsPerformanceStore extends BasePerformanceStore<AnalystPerfor
      */
     @computed
     get reports(): Report[] {
-        const reports = [];
+        const { ANALYSTS_TOTAL_REVIEWED_STATS, ANALYSTS_TOTAL_DECISIONS } = DASHBOARD_REPORTS_NAMES.ANALYSTS;
 
-        if (this.totalReviewedReport) {
-            reports.push(this.totalReviewedReport);
-        }
-
-        if (this.fullPerformanceReport('Analysts performance')) {
-            reports.push(this.fullPerformanceReport('Analysts performance')!);
-        }
-
-        return reports;
+        return [
+            this.totalReviewdStats(ANALYSTS_TOTAL_REVIEWED_STATS),
+            this.fullPerformanceReport(ANALYSTS_TOTAL_DECISIONS)
+        ].filter(report => report !== null) as Report[];
     }
 }

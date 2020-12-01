@@ -46,39 +46,54 @@
       "dfphubPolicyName": "dfpSend"
   },
   "resources": [
-      {
-          "type": "Microsoft.EventHub/namespaces",
-          "apiVersion": "2018-01-01-preview",
-          "name": "[parameters('ehubName')]",
-          "location": "[parameters('location')]",
-          "sku": {
-              "name": "[parameters('eventHubSku')]",
-              "tier": "[parameters('eventHubSku')]",
-              "capacity": "[parameters('ehubCapacity')]"
-          },
-          "properties": {
-              "zoneRedundant": false,
-              "isAutoInflateEnabled": true,
-              "maximumThroughputUnits": "[parameters('ehubMaximumThroughputUnits')]",
-              "kafkaEnabled": true
-          }
-      },
-      {
-          "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
-          "apiVersion": "2017-04-01",
-          "name": "[concat(parameters('ehubName'), '/RootManageSharedAccessKey')]",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
-          ],
-          "properties": {
-              "rights": [
-                  "Listen",
-                  "Manage",
-                  "Send"
-              ]
-          }
-      },
+        {
+            "type": "Microsoft.EventHub/namespaces",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[parameters('ehubName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "[parameters('eventHubSku')]",
+                "tier": "[parameters('eventHubSku')]",
+                "capacity": "[parameters('ehubCapacity')]"
+            },
+            "properties": {
+                "zoneRedundant": false,
+                "isAutoInflateEnabled": true,
+                "maximumThroughputUnits": "[parameters('ehubMaximumThroughputUnits')]",
+                "kafkaEnabled": true
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/AuthorizationRules",
+            "apiVersion": "2017-04-01",
+            "name": "[concat(parameters('ehubName'), '/RootManageSharedAccessKey')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
+            ],
+            "properties": {
+                "rights": [
+                    "Listen",
+                    "Manage",
+                    "Send"
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.EventHub/namespaces/networkRuleSets",
+            "apiVersion": "2018-01-01-preview",
+            "name": "[concat(parameters('ehubName'), '/default')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]",
+                "[resourceId('Microsoft.EventHub/namespaces/AuthorizationRules',parameters('ehubName'),'RootManageSharedAccessKey')]"
+            ],
+            "properties": {
+                "defaultAction": "Allow",
+                "virtualNetworkRules": [],
+                "ipRules": []
+            }
+       },
       {
           "type": "Microsoft.EventHub/namespaces/eventhubs",
           "apiVersion": "2017-04-01",
@@ -189,20 +204,6 @@
               "messageRetentionInDays": "[parameters('ehubMessageRetentionInDays')]",
               "partitionCount": "[parameters('ehubNumPartitions')]",
               "status": "Active"
-          }
-      },
-      {
-          "type": "Microsoft.EventHub/namespaces/networkRuleSets",
-          "apiVersion": "2018-01-01-preview",
-          "name": "[concat(parameters('ehubName'), '/default')]",
-          "location": "[parameters('location')]",
-          "dependsOn": [
-              "[resourceId('Microsoft.EventHub/namespaces', parameters('ehubName'))]"
-          ],
-          "properties": {
-              "defaultAction": "Allow",
-              "virtualNetworkRules": [],
-              "ipRules": []
           }
       },
        {

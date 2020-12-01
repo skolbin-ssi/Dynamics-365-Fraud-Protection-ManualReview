@@ -3,6 +3,7 @@
 
 import { IconButton } from '@fluentui/react/lib/Button';
 import { Text } from '@fluentui/react/lib/Text';
+import { FontIcon } from '@fluentui/react/lib/Icon';
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
 import { observer } from 'mobx-react';
@@ -21,6 +22,8 @@ import { stringToKebabCase } from '../../../../../utils/text';
 import { ItemDetailsTile } from '../../item-details-tile';
 import { Map, MapMarker } from './map';
 import './transaction-map.scss';
+import { ItemDetailsKeyValue } from '../../item-details-key-value';
+import { KeyValueItem } from '../key-value-item';
 
 const CN = 'item-details-transaction-map';
 
@@ -30,7 +33,7 @@ interface TransactionMapProps {
 }
 
 interface TransactionMapState {
-    detailsExpandedFor: string | null
+    detailsExpandedFor: Record<string, boolean>;
 }
 
 @observer
@@ -45,7 +48,7 @@ export class TransactionMap extends Component<TransactionMapProps, TransactionMa
         super(props);
 
         this.state = {
-            detailsExpandedFor: null
+            detailsExpandedFor: {}
         };
     }
 
@@ -71,7 +74,7 @@ export class TransactionMap extends Component<TransactionMapProps, TransactionMa
             case ADDRESS_TYPE.SHIPPING:
                 return 'Shipping address';
             case ADDRESS_TYPE.GEO:
-                return 'Geo location';
+                return 'IP location';
             case ADDRESS_TYPE.BILLING:
             default:
                 return 'Billing address';
@@ -81,12 +84,12 @@ export class TransactionMap extends Component<TransactionMapProps, TransactionMa
     @autobind
     toggleExpandedAddress(address: Address) {
         const { detailsExpandedFor } = this.state;
-        const key = stringToKebabCase(address.street1);
+        const key = stringToKebabCase(`${address.street1}__${address.type}`);
 
-        if (detailsExpandedFor === key) {
-            this.setState({ detailsExpandedFor: null });
+        if (detailsExpandedFor[key]) {
+            this.setState({ detailsExpandedFor: { ...detailsExpandedFor, [key]: false } });
         } else {
-            this.setState({ detailsExpandedFor: key });
+            this.setState({ detailsExpandedFor: { ...detailsExpandedFor, [key]: true } });
         }
     }
 
@@ -122,9 +125,9 @@ export class TransactionMap extends Component<TransactionMapProps, TransactionMa
         const { address } = geoAddress;
         const { firstName, lastName, phoneNumber } = address;
         const isShippingAddress = geoAddress.address.type === ADDRESS_TYPE.SHIPPING;
-        const key = stringToKebabCase(geoAddress.address.street1);
+        const key = stringToKebabCase(`${geoAddress.address.street1}__${geoAddress.address.type}`);
         const hasDetails = firstName || lastName || phoneNumber;
-        const areDetailsExpanded = detailsExpandedFor === key && hasDetails;
+        const areDetailsExpanded = detailsExpandedFor[key] && hasDetails;
         let distance = null;
 
         if (shippingAddressMarker) {
@@ -198,6 +201,48 @@ export class TransactionMap extends Component<TransactionMapProps, TransactionMa
         );
     }
 
+    renderMatchingLabel(key: string, value: boolean): JSX.Element {
+        return (
+            <div>
+                {value && (
+                    <FontIcon
+                        iconName="CompletedSolid"
+                        className={cn(`${CN}__matching-labels__icon`, `${CN}__matching-labels__icon-success`)}
+                    />
+                )}
+                {!value && (
+                    <FontIcon
+                        iconName="WarningSolid"
+                        className={cn(`${CN}__matching-labels__icon`, `${CN}__matching-labels__icon-warning`)}
+                    />
+                )}
+                <span className={`${CN}__validated-info-value`}>
+                    {key}
+                </span>
+            </div>
+        );
+    }
+
+    renderMatchingLabels() {
+        const { item } = this.props;
+        const calculatedFields = item.purchase?.calculatedFields;
+
+        const matchingFields: KeyValueItem[] = [
+            { key: 'IP/shipping country matching', value: calculatedFields?.matchingOfCountriesForShippingAndIP },
+            { key: 'IP/billing country matching', value: calculatedFields?.matchingOfCountriesForBillingAndIP },
+            { key: 'Shipping/billing country matching', value: calculatedFields?.matchingOfCountriesForBillingAndShipping },
+        ];
+
+        return matchingFields.map(field => (
+            <ItemDetailsKeyValue
+                className={`${CN}__matching-labels__label`}
+                key={stringToKebabCase(field.key)}
+                label=""
+                value={this.renderMatchingLabel(field.key, field.value)}
+            />
+        ));
+    }
+
     render() {
         const { className, item } = this.props;
 
@@ -206,13 +251,18 @@ export class TransactionMap extends Component<TransactionMapProps, TransactionMa
                 className={cn(className, CN)}
                 title="Transaction map"
             >
-                <Map
-                    className={`${CN}__map`}
-                    item={item}
-                    markers={this.getAddresses(item.purchase)}
-                />
-                <div className={`${CN}__address-list`}>
-                    {this.renderAddresses()}
+                <div className={`${CN}__matching-labels`}>
+                    {this.renderMatchingLabels()}
+                </div>
+                <div className={`${CN}__main-content`}>
+                    <Map
+                        className={`${CN}__map`}
+                        item={item}
+                        markers={this.getAddresses(item.purchase)}
+                    />
+                    <div className={`${CN}__address-list`}>
+                        {this.renderAddresses()}
+                    </div>
                 </div>
             </ItemDetailsTile>
         );

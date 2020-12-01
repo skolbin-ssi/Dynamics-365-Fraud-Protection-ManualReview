@@ -5,26 +5,60 @@ package com.griddynamics.msd365fp.manualreview.model.dfp;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.griddynamics.msd365fp.manualreview.model.jackson.EpochSecondsDateTimeSerializer;
+import com.griddynamics.msd365fp.manualreview.model.jackson.FlexibleDateFormatDeserializer;
+import com.griddynamics.msd365fp.manualreview.model.jackson.ISOStringDateTimeSerializer;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-import java.util.List;
+import java.time.OffsetDateTime;
 
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class PreviousPurchase extends Purchase {
     private Integer riskScore;
     private String reasonCodes;
     private String policyApplied;
+
     private String lastMerchantStatus;
-    private DeviceContext deviceContext;
-    private List<Address> addressList;
-    private List<PaymentInstrument> paymentInstrumentList;
-    private List<BankEvent> bankEventsList;
+    private String lastMerchantStatusReason;
+    @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
+    @JsonSerialize(using = ISOStringDateTimeSerializer.class)
+    private OffsetDateTime lastMerchantStatusDate;
+    private String lastBankEventStatus;
+    private String lastBankEventResponseCode;
+    @JsonDeserialize(using = FlexibleDateFormatDeserializer.class)
+    @JsonSerialize(using = ISOStringDateTimeSerializer.class)
+    private OffsetDateTime lastBankEventDate;
+
+
+    /**
+     * Getter for advanced serialization.
+     * Json object will contain both representation of DateTime field -
+     * timestamp (for SQL queries) and string representation.
+     */
+    @SuppressWarnings("unused")
+    @JsonSerialize(using = EpochSecondsDateTimeSerializer.class)
+    public OffsetDateTime getLastMerchantStatusDateEpochSeconds() {
+        return lastMerchantStatusDate;
+    }
+
+
+    /**
+     * Getter for advanced serialization.
+     * Json object will contain both representation of DateTime field -
+     * timestamp (for SQL queries) and string representation.
+     */
+    @SuppressWarnings("unused")
+    @JsonSerialize(using = EpochSecondsDateTimeSerializer.class)
+    public OffsetDateTime getLastBankEventDateEpochSeconds() {
+        return lastBankEventDate;
+    }
 }

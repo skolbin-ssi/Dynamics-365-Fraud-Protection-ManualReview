@@ -31,6 +31,7 @@ import {
 import { PerformanceParsedQueryUrl } from '../../utility-services';
 
 import './personal-performance.scss';
+import { formatToQueryDateString } from '../../utils/date';
 
 export interface PersonalPerformanceComponentProps extends RouteComponentProps {}
 
@@ -66,6 +67,7 @@ export class PersonalPerformance extends Component<PersonalPerformanceComponentP
             this.analystPerformanceStore.setAnalystId(user.id);
         }
 
+        this.dashboardScreenStore.setParsedUrlParams(parsedQuery);
         this.analystPerformanceStore.setParsedUrlParams(parsedQuery);
         this.overturnedPerformanceStore.setParsedUrlParams(parsedQuery);
 
@@ -85,35 +87,63 @@ export class PersonalPerformance extends Component<PersonalPerformanceComponentP
     @autoBind
     updateOverturnedUrlQuerySearchParams(params: UpdateQuerySearchReactionParams) {
         const { ids, rating, aggregation } = this.getUrlParsedQuery();
-        const { ids: overturnedIds, aggregation: overturnedAggregation, rating: overturnedRating } = params;
+        const {
+            ids: overturnedIds,
+            aggregation: overturnedAggregation,
+            rating: overturnedRating,
+            from,
+            to,
+        } = params;
 
-        const mergerParams = {
-            ids, rating, aggregation, overturnedIds, overturnedRating, overturnedAggregation
+        const mergedParams = {
+            ids,
+            rating,
+            aggregation,
+            overturnedIds,
+            overturnedRating,
+            overturnedAggregation,
+            from: formatToQueryDateString(from, null),
+            to: formatToQueryDateString(to, null),
         };
 
-        const strigifiedUrlParams = queryString.stringify(mergerParams, { arrayFormat: 'comma' });
+        const stringifiedUrlParams = queryString.stringify(mergedParams, { arrayFormat: 'comma' });
 
-        this.history.replace(`${ROUTES.PERSONAL_PERFORMANCE}?${strigifiedUrlParams}`);
+        this.history.replace(`${ROUTES.PERSONAL_PERFORMANCE}?${stringifiedUrlParams}`);
         this.overturnedPerformanceStore.setUrlSelectedIds(overturnedIds); // sync URL selected ids with store selected overturnedIds
     }
 
     @autoBind
     updateUrlQuerySearchParams(params: UpdateQuerySearchReactionParams) {
         const { overturnedIds, overturnedRating, overturnedAggregation } = this.getUrlParsedQuery();
+        const {
+            ids,
+            aggregation,
+            rating,
+            from,
+            to,
+        } = params;
 
         const mergedParams = {
-            ...params, overturnedAggregation, overturnedRating, overturnedIds
+            ids,
+            rating,
+            aggregation,
+            overturnedIds,
+            overturnedRating,
+            overturnedAggregation,
+            from: formatToQueryDateString(from, null),
+            to: formatToQueryDateString(to, null),
         };
-        const strigifiedUrlParams = queryString.stringify(mergedParams, { arrayFormat: 'comma' });
 
-        this.history.replace(`${ROUTES.PERSONAL_PERFORMANCE}?${strigifiedUrlParams}`);
+        const stringifiedUrlParams = queryString.stringify(mergedParams, { arrayFormat: 'comma' });
+
+        this.history.replace(`${ROUTES.PERSONAL_PERFORMANCE}?${stringifiedUrlParams}`);
         this.analystPerformanceStore.setUrlSelectedIds(params.ids); // sync URL selected ids with store selected Ids
     }
 
     @autoBind
     handleGenerateReportsButtonClick() {
-        const { reports: analystPerformanceReports } = this.analystPerformanceStore;
-        const { reports: overturnedPerformanceReports } = this.overturnedPerformanceStore;
+        const analystPerformanceReports = this.analystPerformanceStore.reports(true);
+        const overturnedPerformanceReports = this.overturnedPerformanceStore.reports(true);
 
         this.reportsModalStore.showReportsModal([...analystPerformanceReports, ...overturnedPerformanceReports]);
     }
@@ -126,6 +156,9 @@ export class PersonalPerformance extends Component<PersonalPerformanceComponentP
     }
 
     render() {
+        const { isGenerateButtonsDisabled } = this.analystPerformanceStore;
+        const { isDataLoading } = this.overturnedPerformanceStore;
+
         return (
             <div className={CN}>
                 <DashboardHeader
@@ -134,6 +167,7 @@ export class PersonalPerformance extends Component<PersonalPerformanceComponentP
                 />
                 <div className={`${CN}__content`}>
                     <EntityHeader
+                        isGenerateReportButtonDisabled={isGenerateButtonsDisabled || isDataLoading}
                         handleGenerateReportsButtonClick={this.handleGenerateReportsButtonClick}
                         analystPerformanceStore={this.analystPerformanceStore}
                     />

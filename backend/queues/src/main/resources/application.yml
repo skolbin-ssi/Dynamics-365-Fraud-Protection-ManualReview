@@ -9,13 +9,30 @@ mr:
   instance-id: ${WEBSITE_INSTANCE_ID}
   task-reset-timeout-multiplier: 4.0
   task-warning-timeout-multiplier: 2.0
+  task-successful-runs-timeout-multiplier: 8.0
+  cache:
+    user-email-list:
+      invalidation-interval: PT10M
+      max-size: 500
+    traversal-purchase:
+      invalidation-interval: PT2M
+      max-size: 500
+    traversal-pi:
+      invalidation-interval: PT5M
+      max-size: 500
+    traversal-user:
+      invalidation-interval: PT1M
+      max-size: 200
   tasks:
+    resolution-sending-task:
+      enabled: true
+      delay: PT2M
     prim-health-analysis-task:
       enabled: true
-      delay: PT10M
+      delay: PT1M
     sec-health-analysis-task:
       enabled: false
-      delay: PT10M
+      delay: PT1M
     residual-queue-reconciliation-task:
       enabled: true
       delay: PT10M
@@ -41,6 +58,9 @@ mr:
       delay: PT1M
       timeout: PT5M
       enrichment-delay: PT30S
+      max-enrichment-delay: PT2M
+      max-enrichment-attempts: 10
+      history-depth: 10
     dictionary-reconciliation-task:
       enabled: true
       delay: PT1H
@@ -55,11 +75,22 @@ mr:
     corepool-size: 5
     max-pool-size: 10
     queue-capacity: 25
-    timeout-seconds: PT5M
   dictionary:
     ttl: P14D
   search-query:
     ttl: P30D
+  link-analysis:
+    ttl: P1D
+#    check-user-restriction: true
+    check-user-restriction: false
+  email-domain:
+    ttl: P7D
+  disposable-email-checker:
+    open-kickbox:
+      url: https://open.kickbox.com/v1/disposable/
+    name-api:
+      url: http://api.nameapi.org/rest/v5.3/email/disposableemailaddressdetector?apiKey=%s&emailAddress=test@%s
+      api-key: ${NAME_API_KEY:}
 
 logging:
   level:
@@ -89,6 +120,8 @@ azure:
     user-url-template: https://graph.microsoft.com/v1.0/users/#user_id#
     app-service-principal-url: https://graph.microsoft.com/v1.0/servicePrincipals/${DFP_SP_ID}
     user-photo-url-template: https://graph.microsoft.com/beta/users/#user_id#/photo/$value
+    timeout: PT5S
+    retries: 2
     role-mapping:
       ManualReviewFraudManager: ADMIN_MANAGER
       ManualReviewSeniorAnalyst: SENIOR_ANALYST
@@ -97,9 +130,13 @@ azure:
       Sandbox_ManualReviewSeniorAnalyst: SENIOR_ANALYST
       Sandbox_ManualReviewAnalyst: ANALYST
   dfp:
-    graph-explorer-url: https://${TENANT_SHORT_NAME}-${TENANT_ID}.api.dfp.dynamics-int.com/knowledgegateway/customersupport/v1.0/explorer/traversal
-    purchase-event-url: https://intz.api.dfp.dynamics-int.com/v1.0/merchantservices/events/Purchase
-    bank-event-url: https://intz.api.dfp.dynamics-int.com/v1.0/merchantservices/events/BankEvent
+    link-analysis-full-url: https://${CLIENT_TENANT_SHORT_NAME}-${CLIENT_TENANT_ID}.api.dfp.dynamics-int.com/knowledgegateway/v1.0/customersupport/connectedentities?queryType=full
+    link-analysis-count-url: https://${CLIENT_TENANT_SHORT_NAME}-${CLIENT_TENANT_ID}.api.dfp.dynamics-int.com/knowledgegateway/v1.0/customersupport/connectedentities?queryType=count
+    link-analysis-details-url: https://${CLIENT_TENANT_SHORT_NAME}-${CLIENT_TENANT_ID}.api.dfp.dynamics-int.com/knowledgegateway/v1.0/customersupport/purchasedetails
+    graph-explorer-url: https://${CLIENT_TENANT_SHORT_NAME}-${CLIENT_TENANT_ID}.api.dfp.dynamics-int.com/knowledgegateway/customersupport/v1.0/explorer/traversal
+    user-email-list-url: https://${CLIENT_TENANT_SHORT_NAME}-${CLIENT_TENANT_ID}.api.dfp.dynamics-int.com/knowledgegateway/v1.0/sparta/customersupport/lists/status/User.Email
+    purchase-event-url: https://${CLIENT_TENANT_SHORT_NAME}-${CLIENT_TENANT_ID}.api.dfp.dynamics-int.com/v1.0/merchantservices/events/Purchase
+    bank-event-url: https://${CLIENT_TENANT_SHORT_NAME}-${CLIENT_TENANT_ID}.api.dfp.dynamics-int.com/v1.0/merchantservices/events/BankEvent
   dfp-auth:
     token-cache-size: 500
     token-cache-retention: PT10M
@@ -111,35 +148,54 @@ azure:
     connection-string: ${spring-cloud-azure-eventhub-connection-string:${EVENT_HUB_CONNECTION_STRING}}
     checkpoint-storage-account: ${EVENT_HUB_OFFSET_STORAGE_NAME}
     checkpoint-connection-string: DefaultEndpointsProtocol=https;AccountName=${EVENT_HUB_OFFSET_STORAGE_NAME};AccountKey=${spring-cloud-azure-eventhub-checkpoint-access-key:${EVENT_HUB_OFFSET_STORAGE_KEY}};EndpointSuffix=core.windows.net
-    checkpoint-interval: PT1M
-    sending-timeout: PT10M
-    sending-retries: 3
     health-check-ttl: PT24H
-    health-check-batch-size: 5
+    health-check-batch-size: 2
     health-check-allowed-delay: PT60M
     consumers:
       dfp-hub:
         destination: dfp-hub
         group: ${spring.application.name}
+        checkpoint-interval: PT1M
     producers:
       item-lock-event-hub:
         destination: item-lock-event-hub
+        sending-period: PT1S
+        sending-workers: 4
+        buffer-size: 100
       item-label-event-hub:
         destination: item-label-event-hub
+        sending-period: PT1S
+        sending-workers: 4
+        buffer-size: 10
       item-resolution-event-hub:
         destination: item-resolution-event-hub
+        sending-period: PT1S
+        sending-workers: 6
+        buffer-size: 10
       item-assignment-event-hub:
         destination: item-assignment-event-hub
+        sending-period: PT2S
+        sending-workers: 6
+        buffer-size: 1000
       queue-size-event-hub:
         destination: queue-size-event-hub
+        sending-period: PT1S
+        sending-workers: 4
+        buffer-size: 200
       queue-update-event-hub:
         destination: queue-update-event-hub
+        sending-period: PT1S
+        sending-workers: 4
+        buffer-size: 100
       overall-size-event-hub:
         destination: overall-size-event-hub
+        sending-period: PT1S
+        sending-workers: 4
+        buffer-size: 100
 
 
 swagger:
-  auth-url: https://login.microsoftonline.com/${TENANT_ID}/oauth2/authorize?resource=${CLIENT_ID}
+  auth-url: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/authorize?resource=${CLIENT_ID}
 
 spring:
   application:
@@ -148,6 +204,11 @@ spring:
     oauth2:
       client:
         registration:
+          azure-maps-api:
+            client-id: ${MAP_CLIENT_ID}
+            client-secret: ${map-client-secret:${MAP_CLIENT_SECRET}}
+            authorization-grant-type: client_credentials
+            scope: https://atlas.microsoft.com/.default
           azure-graph-api:
             client-id: ${CLIENT_ID}
             client-secret: ${client-secret:${CLIENT_SECRET}}
@@ -155,14 +216,23 @@ spring:
             scope: https://graph.microsoft.com/.default
           azure-dfp-api:
             client-id: ${CLIENT_ID}
-            client-secret:  ${client-secret:${CLIENT_SECRET}}
+            client-secret: ${client-secret:${CLIENT_SECRET}}
+            authorization-grant-type: client_credentials
+            scope: https://api.dfp.microsoft-int.com/.default
+          azure-dfp-la-api:
+            client-id: b2238e4d-a9ee-4939-ab8e-944f29fa7eb3
+            client-secret: daadc627-e96b-4e2d-a8b7-dd135d11e753
             authorization-grant-type: client_credentials
             scope: https://api.dfp.microsoft-int.com/.default
         provider:
+          azure-maps-api:
+            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
           azure-graph-api:
-            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+            token-uri: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/v2.0/token
           azure-dfp-api:
-            token-uri: https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token
+            token-uri: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/v2.0/token
+          azure-dfp-la-api:
+            token-uri: https://login.microsoftonline.com/${CLIENT_TENANT_ID}/oauth2/v2.0/token
   aop:
     proxyTargetClass: true
 

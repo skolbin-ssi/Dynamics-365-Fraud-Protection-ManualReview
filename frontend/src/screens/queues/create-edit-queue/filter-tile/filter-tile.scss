@@ -1,0 +1,77 @@
+@import "../../../../styles/variables";
+
+.filter-tile {
+  $root: &;
+  $deleteButtonWidth: 32px;
+
+  display: flex;
+
+  min-height: 60px;
+
+  border: 1px solid $gray;
+  border-radius: 4px;
+
+  &__name {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+
+  &__container {
+    padding: 8px 0 8px 8px;
+
+    width: calc(100% - #{$deleteButtonWidth});
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__conditions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &__condition {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px
+  }
+
+  &__condition,
+  &__separator {
+    color: #605E5C;
+  }
+
+  &__separator {
+    padding-right: 5px;
+  }
+
+  &__delete-btn {
+    height: auto;
+    cursor: pointer;
+
+    &:hover {
+      background: #C8C6C4;
+    }
+  }
+
+  &__delete-icon {
+    color: #605E5C;
+  }
+
+  &:hover {
+    background: #F3F2F1;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+
+  &--disabled {
+    background: #F3F2F1;
+    border: 1px solid transparent;
+    cursor: not-allowed;
+
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+}

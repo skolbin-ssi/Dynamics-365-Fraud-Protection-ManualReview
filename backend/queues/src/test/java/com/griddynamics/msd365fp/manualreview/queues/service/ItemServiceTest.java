@@ -6,9 +6,7 @@ package com.griddynamics.msd365fp.manualreview.queues.service;
 import com.griddynamics.msd365fp.manualreview.model.ItemLock;
 import com.griddynamics.msd365fp.manualreview.model.Label;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
-import com.griddynamics.msd365fp.manualreview.model.dfp.raw.ExplorerEntity;
 import com.griddynamics.msd365fp.manualreview.model.event.type.LockActionType;
-import com.griddynamics.msd365fp.manualreview.queues.config.DFPModelMapperConfig;
 import com.griddynamics.msd365fp.manualreview.queues.model.ItemFilter;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueSortSettings;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
@@ -38,7 +36,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ItemServiceTest {
+class ItemServiceTest {
 
     private static final String UNLOCK_TIMEOUT = "PT5M";
     private static final OffsetDateTime ITEM_IMPORT_DATE_TIME = OffsetDateTime.parse("2007-12-03T10:15:30+01:00");
@@ -59,8 +57,6 @@ public class ItemServiceTest {
     private QueueRepository queueRepository;
     @Mock
     private SearchQueryRepository searchQueryRepository;
-    @Mock
-    private DFPExplorerService dfpExplorerService;
 
     @Captor
     private ArgumentCaptor<LockActionType> lockActionTypeCaptor;
@@ -75,23 +71,11 @@ public class ItemServiceTest {
 
     @BeforeEach
     public void setUp() {
-        ModelMapper dfpModelMapper = new DFPModelMapperConfig().dfpModelMapper();
         ModelMapper modelMapper = new ModelMapper();
-        itemService = new ItemService(streamService, itemRepository, queueRepository, searchQueryRepository,
-                dfpExplorerService, modelMapper);
-        itemService.setDfpModelMapper(dfpModelMapper);
+        itemService = new ItemService(
+                streamService, itemRepository, queueRepository, searchQueryRepository, modelMapper);
         itemService.setThisService(itemService);
         itemService.setUnlockTimeout(Duration.parse(UNLOCK_TIMEOUT));
-    }
-
-    @Test
-    @Disabled
-    void enrichItemDoesNotSendEvent() {
-        when(itemRepository.findById(anyString())).thenReturn(Optional.of(mock(Item.class)));
-
-        itemService.enrichItem(TEST_ITEM_ID, mock(ExplorerEntity.class));
-
-        verifyNoInteractions(streamService);
     }
 
     /**

@@ -3,101 +3,29 @@
 $warningFontSize: 14px;
 
 .filters-tab {
+  flex-shrink: 0;
+
+  &__field {
+    margin-bottom: 16px;
+    border-bottom: 1px solid $neutralLight;
+  }
+
+  &__no-further-changes-warning {
+    margin-top: 8px;
     flex-shrink: 0;
 
-    &__filter {
-        border-top: 1px solid $neutralLight;
-        flex-shrink: 0;
+    span {
+      font-size: $warningFontSize;
     }
 
-    &__no-further-changes-warning {
-        margin-top: 8px;
-        flex-shrink: 0;
-
-        span {
-            font-size: $warningFontSize;
-        }
-
-        &-icon {
-            color: $highRiskColor;
-        }
+    &-icon {
+      color: $highRiskColor;
     }
+  }
 
-    &__add-another-condition-delimeter {
-        width: 100%;
-        height: 1px;
-        flex-shrink: 0;
-        border: none;
-        background: $neutralLight;
-    }
-
-    &__add-another-condition-btn {
-        width: 200px;
-        height: 40px;
-        color: $themeDark;
-        margin-bottom: 40px;
-    }
-
-    &__num-range-inputs {
-        display: flex;
-        width: 100%;
-        justify-content: space-between;
-        align-items: center;
-        height: 32px;
-    }
-
-    &__num-range-text-inputs {
-        display: flex;
-        width: 166px;
-        justify-content: space-between;
-        align-items: center;
-
-        input:disabled {
-            cursor: not-allowed;
-        }
-
-        hr {
-            width: 14px;
-            height: 1px;
-            background: $neutralQuaternary;
-            border: none;
-            display: block;
-        }
-    }
-
-    &__num-range-input {
-        border-color: $neutralTertiaryAlt;
-        width: 72px;
-
-        input {
-            text-align: center;
-        }
-    }
-
-    &__num-range-slider {
-        margin-left: 16px;
-        height: 32px;
-        flex-grow: 1;
-    }
-
-    &__validation-errors {
-        margin-top: 5px;
-        color: $highRiskColor;
-    }
-
-    &__validator-error {
-        display: block;
-    }
-
-    &__no-sku-found {
-        display: flex;
-        flex-direction: column;
-        align-content: center;
-        justify-items: center;
-        width: 100%;
-    }
-
-    &__no-sku-found-text {
-        padding: 10px;
-    }
+  &__filters-menu {
+    width: 200px;
+    height: 40px;
+    margin-bottom: 40px;
+  }
 }

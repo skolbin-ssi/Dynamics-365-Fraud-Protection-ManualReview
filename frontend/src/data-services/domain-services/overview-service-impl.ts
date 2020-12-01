@@ -10,19 +10,20 @@ import { OverviewService, RiskScoreOverviewApiParams } from '../interfaces/domai
 import { TYPES } from '../../types';
 import { Logger } from '../../utility-services/logger';
 import { BaseDomainService } from '../base-domain-service';
-import { UserBuilder } from '../../utility-services';
+import { FiltersBuilder, UserBuilder } from '../../utility-services';
 
 export class OverviewServiceImpl extends BaseDomainService implements OverviewService {
     constructor(
         @inject(TYPES.OVERVIEW_API_SERVICE) private readonly overviewApiService: OverviewApiService,
         @inject(TYPES.USER_BUILDER) protected readonly userBuilder: UserBuilder,
-        @inject(TYPES.LOGGER) protected readonly logger: Logger
+        @inject(TYPES.LOGGER) protected readonly logger: Logger,
+        @inject(TYPES.FILTERS_BUILDER) protected readonly filtersBuilder: FiltersBuilder,
     ) {
         super(logger, 'OverviewService');
     }
 
     async getRiskScoreOverview(params: RiskScoreOverviewApiParams) {
-        const dataTransformer = new GetRiskScoreOverviewTransformer(this.userBuilder);
+        const dataTransformer = new GetRiskScoreOverviewTransformer(this.userBuilder, this.filtersBuilder);
         let response;
 
         try {

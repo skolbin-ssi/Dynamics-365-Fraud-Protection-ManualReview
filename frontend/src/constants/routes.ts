@@ -27,6 +27,12 @@ export const ROUTES = {
     ITEM_DETAILS: '/queues/:queueId/item/:itemId',
     ITEM_DETAILS_REVIEW_CONSOLE: '/queues/:queueId/item/:itemId/console',
 
+    SEARCH_NEW: '/search/new',
+    SEARCH_BY_ID: '/search/:searchId',
+    SEARCH_INACTIVE_ITEM_DETAILS: '/search/:searchId/item/:itemId',
+    SEARCH_ITEM_DETAILS: '/search/:searchId/queues/:queueId/item/:itemId',
+    SEARCH_ITEM_DETAILS_REVIEW_CONSOLE: '/search/:searchId/queues/:queueId/item/:itemId/console',
+
     ERROR: '/error/:type',
 
     build: {
@@ -35,12 +41,19 @@ export const ROUTES = {
         reviewConsole: (queueId: string) => `/queues/${queueId}/console`,
         itemDetailsReviewConsole: (queueId: string, itemId: string) => `/queues/${queueId}/item/${itemId}/console`,
         queues: (queueId: string = '') => `/queues/${queueId}`,
+        search: (searchId: string) => `/search/${searchId}`,
+        searchInactiveItemDetails: (searchId: string, itemId: string) => `/search/${searchId}/item/${itemId}`,
+        searchItemDetails:
+            (searchId: string, queueId: string, itemId: string) => `/search/${searchId}/queues/${queueId}/item/${itemId}`,
+        searchItemDetailsReviewConsole:
+            (searchId: string, queueId: string, itemId: string) => `/search/${searchId}/queues/${queueId}/item/${itemId}/console`,
         dashboard: {
             queues: (queueId: string) => `${ROUTES.DASHBOARD_QUEUES_PERFORMANCE}/${queueId}`,
             queue: (queueId: string) => `${ROUTES.DASHBOARD_QUEUES_PERFORMANCE}/${queueId}`,
             analyst: (analystId: string) => `${ROUTES.DASHBOARD_ANALYSTS_PERFORMANCE}/${analystId}`,
             demandByQueue: (queueId: string) => `${ROUTES.DASHBOARD_DEMAND}/${queueId}`,
         },
-        editAlert: (alertId: string) => `/alerts/edit/${alertId}`
+        editAlert: (alertId: string) => `/alerts/edit/${alertId}`,
+        // linkAnalysis: (queueId: string, itemId:string, linkSearchId: string) => `${ROUTES.build.itemDetails(queueId, itemId)}/linkId${linkSearchId}`
     }
 };

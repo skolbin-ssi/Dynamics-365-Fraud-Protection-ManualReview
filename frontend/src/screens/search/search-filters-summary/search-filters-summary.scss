@@ -1,0 +1,8 @@
+@import "../../../styles/variables";
+
+.search-filters-summary {
+  padding: 8px 32px;
+
+  @include filterTileGridContainer();
+  @include headerBoxShadow();
+}

@@ -8,8 +8,9 @@ import {
     AuthenticationService,
     Logger,
     UserBuilder,
-    AzureMapsSearch,
-    LocalStorageService
+    AzureMapsService,
+    LocalStorageService,
+    FiltersBuilder,
 } from '../utility-services';
 import { WindowSizeStore } from '../view-services/misc/window-size-store';
 
@@ -32,8 +33,8 @@ export const registerUtilityServicesTask = {
             .inSingletonScope();
 
         container
-            .bind<AzureMapsSearch>(TYPES.AZURE_MAPS_SEARCH)
-            .to(AzureMapsSearch)
+            .bind<AzureMapsService>(TYPES.AZURE_MAPS_SERVICE)
+            .to(AzureMapsService)
             .inSingletonScope();
 
         container
@@ -44,6 +45,11 @@ export const registerUtilityServicesTask = {
         container
             .bind<UserBuilder>(TYPES.USER_BUILDER)
             .to(UserBuilder);
+
+        container
+            .bind<FiltersBuilder>(TYPES.FILTERS_BUILDER)
+            .to(FiltersBuilder)
+            .inSingletonScope();
 
         container
             .bind<LocalStorageService>(TYPES.LOCAL_STORAGE_SERVICE)

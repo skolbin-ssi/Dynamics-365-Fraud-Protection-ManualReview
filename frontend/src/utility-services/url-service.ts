@@ -21,8 +21,10 @@ interface ReadSearchQueryFields extends ParsedQuery {
     overturnedIds?: string[];
     overturnedRating?: string;
     overturnedAggregation?: string;
-    from?: string;
-    to?: string;
+    from?: string | null;
+    to?: string | null;
+    sortingField?: string,
+    sortingOrder?: string
 }
 
 /**
@@ -34,7 +36,9 @@ export interface PerformanceParsedQueryUrl extends ParsedQuery {
     aggregation: CHART_AGGREGATION_PERIOD,
     overturnedIds: string[],
     overturnedRating: PERFORMANCE_RATING,
-    overturnedAggregation: CHART_AGGREGATION_PERIOD
+    overturnedAggregation: CHART_AGGREGATION_PERIOD,
+    from?: string | null;
+    to?: string | null;
 }
 
 /**
@@ -110,6 +114,40 @@ export function readUrlSearchQueryOptions(search: string, fields: BooleanReadSea
         }
     }
 
+    if (fields.from) {
+        const parsedQuery = queryString
+            .parse(search) as ReadSearchQueryFields;
+
+        if (parsedQuery.from) {
+            searchQueryFields.from = parsedQuery.from;
+        }
+    }
+
+    if (fields.to) {
+        const parsedQuery = queryString
+            .parse(search) as ReadSearchQueryFields;
+
+        if (parsedQuery.to) {
+            searchQueryFields.to = parsedQuery.to;
+        }
+    }
+
+    if (fields.sortingField) {
+        const parsedQuery = queryString
+            .parse(search) as ReadSearchQueryFields;
+        if (parsedQuery.sortingField) {
+            searchQueryFields.sortingField = parsedQuery.sortingField;
+        }
+    }
+
+    if (fields.sortingOrder) {
+        const parsedQuery = queryString
+            .parse(search) as ReadSearchQueryFields;
+        if (parsedQuery.sortingOrder) {
+            searchQueryFields.sortingOrder = parsedQuery.sortingOrder;
+        }
+    }
+
     return searchQueryFields;
 }
 
@@ -131,6 +169,11 @@ export function stringifyIntoUrlQueryString(fields: Partial<ReadSearchQueryField
         result = result.concat(`&${aggregation}`);
     }
 
+    if (fields.from && fields.to) {
+        const range = queryString.stringify({ from: fields.from, to: fields.to });
+        result = result.concat(`&${range}`);
+    }
+
     if (fields.overturnedIds) {
         const overturnedIds = queryString.stringify({ overturnedIds: fields.overturnedIds }, { arrayFormat: 'comma' });
         result = result.concat(`&${overturnedIds}`);
@@ -144,6 +187,16 @@ export function stringifyIntoUrlQueryString(fields: Partial<ReadSearchQueryField
     if (fields.overturnedAggregation) {
         const overturnedAggregation = queryString.stringify({ overturnedAggregation: fields.overturnedAggregation });
         result = result.concat(`&${overturnedAggregation}`);
+    }
+
+    if (fields.sortingField) {
+        const sortingField = queryString.stringify({ sortingField: fields.sortingField });
+        result = result.concat(`&${sortingField}`);
+    }
+
+    if (fields.sortingOrder) {
+        const sortingOrder = queryString.stringify({ sortingOrder: fields.sortingOrder });
+        result = result.concat(`&${sortingOrder}`);
     }
 
     return result

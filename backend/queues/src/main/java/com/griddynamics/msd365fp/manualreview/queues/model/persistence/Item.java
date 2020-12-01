@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.griddynamics.msd365fp.manualreview.model.*;
 import com.griddynamics.msd365fp.manualreview.model.dfp.AssesmentResult;
 import com.griddynamics.msd365fp.manualreview.model.dfp.MainPurchase;
+import com.griddynamics.msd365fp.manualreview.queues.model.BasicItemInfo;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemEvent;
 import com.microsoft.azure.spring.data.cosmosdb.core.mapping.Document;
 import com.microsoft.azure.spring.data.cosmosdb.core.mapping.PartitionKey;
 import lombok.*;
@@ -27,12 +29,15 @@ import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.ITE
 @Builder(toBuilder = true)
 @EqualsAndHashCode(exclude = "_etag")
 @Document(collection = ITEMS_CONTAINER_NAME)
-public class Item implements Serializable {
+public class Item implements BasicItemInfo, Serializable {
     @Id
     @PartitionKey
     private String id;
     private OffsetDateTime imported;
     private OffsetDateTime enriched;
+    private int enrichmentAttempts;
+    private boolean enrichmentFailed;
+    private String enrichmentFailReason;
     @JsonProperty(value = "_ts")
     private OffsetDateTime updated;
 
@@ -59,6 +64,10 @@ public class Item implements Serializable {
 
     @Builder.Default
     private Set<String> reviewers = new HashSet<>();
+
+    @Builder.Default
+    private Set<ItemEvent> events = new HashSet<>();
+
 
     @Builder.Default
     private long ttl = -1;

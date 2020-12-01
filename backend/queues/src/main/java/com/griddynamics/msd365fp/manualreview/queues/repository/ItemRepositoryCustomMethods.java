@@ -50,12 +50,20 @@ public interface ItemRepositoryCustomMethods {
             @Nullable final Boolean locked,
             @Nullable final Boolean held);
 
+    PageableCollection<Item> findUnreportedItems(
+            final int size,
+            @Nullable final String continuationToken);
+
+    PageableCollection<String> findActiveItemIds(
+            final int size,
+            final String continuationToken);
+
     PageableCollection<String> findUnenrichedItemIds(
             final int size,
             final String continuationToken);
 
     PageableCollection<String> findUnenrichedItemIds(
-            final OffsetDateTime updatedUpperBoundary,
+            final OffsetDateTime importedUpperBoundary,
             final int size,
             final String continuationToken);
 
@@ -129,4 +137,14 @@ public interface ItemRepositoryCustomMethods {
             @Nullable Set<String> tags,
             int size,
             @Nullable String continuationToken);
+
+    PageableCollection<BasicItemInfo> findEnrichedItemInfoByIds(
+            @NonNull final Set<String> ids,
+            final int size,
+            @Nullable final String continuationToken);
+
+    PageableCollection<Item> findEnrichedItemsByIds(
+            @NonNull final Set<String> ids,
+            final int size,
+            @Nullable final String continuationToken);
 }

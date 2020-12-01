@@ -12,34 +12,45 @@ import { ItemNoteDTO } from '../../data-services/api-services/models/item-note-d
 import { User } from '../user';
 import { Decision } from './decision';
 import { ItemHold } from './item-hold';
+import { ItemLabel } from './item-label';
 import { Purchase } from './purchase';
 import { Note } from './note';
-import { DEFAULT_TIME_TO_TIMEOUT_COUNT, DEFAULT_TIMEOUT_COUNTDOWN_INTERVAL_MILLISECONDS, } from '../../constants';
+import {
+    DEFAULT_TIME_TO_TIMEOUT_COUNT,
+    DEFAULT_TIMEOUT_COUNTDOWN_INTERVAL_MILLISECONDS,
+    LABEL,
+} from '../../constants';
 import { formatToLocaleDateString } from '../../utils/date';
 
 export enum ITEM_STATUS {
     IN_PROGRESS = 'In Progress',
     AWAITING = 'Awaiting',
-    ON_HOLD = 'On Hold'
+    ON_HOLD = 'On Hold',
+    GOOD = 'Good',
+    BAD = 'Bad',
+    WATCH = 'Watch',
+    ESCALATED = 'Escalated'
 }
 
 export class Item {
     id: string = '';
+
+    active: boolean = true;
 
     @observable
     notes: Note[] = [];
 
     tags: string[] = [];
 
+    queueIds: string[] = [];
+
     decision: Decision | null = null;
 
     purchase: Purchase = new Purchase();
 
+    // An analyst who last updated the item status
     @observable
-    reviewUser: User | null = null;
-
-    @observable
-    holdUser: User | null = null;
+    analyst: User | null = null;
 
     importDate: Date | null = null;
 
@@ -51,16 +62,18 @@ export class Item {
 
     hold: ItemHold | null = null;
 
+    label: ItemLabel | null = null;
+
     @observable
     lockedById: string | null = null;
 
-    // TODO: Fix correct calculation of time left for the item including days and hours,
-    //  implement computed display time left property
     timeLeft: Duration | null = null;
 
-    // TODO: Implement computed display property fot the timeout if that possible
     @observable
     timeout: number | undefined = undefined;
+
+    @observable
+    selectedQueueId: string | undefined;
 
     /**
      * Reference on timeout countdown interval function
@@ -88,6 +101,11 @@ export class Item {
     @action
     setTimeLeft(timeLeft: Duration) {
         this.timeLeft = timeLeft;
+    }
+
+    @action
+    selectQueueId(queueId?: string) {
+        this.selectedQueueId = queueId;
     }
 
     @computed
@@ -131,44 +149,47 @@ export class Item {
     @computed
     get status(): ITEM_STATUS {
         const isInProgress = !!this.lockedDate;
-        const isOnHold = !!this.hold;
+        const isLabeled = !!this.label;
+
+        if (isLabeled && this.label?.value === LABEL.GOOD) {
+            return ITEM_STATUS.GOOD;
+        }
+
+        if (isLabeled && this.label?.value === LABEL.BAD) {
+            return ITEM_STATUS.BAD;
+        }
+
+        if (isLabeled && (this.label?.value === LABEL.WATCH_NA || this.label?.value === LABEL.WATCH_INCONCLUSIVE)) {
+            return ITEM_STATUS.WATCH;
+        }
 
         if (isInProgress) {
             return ITEM_STATUS.IN_PROGRESS;
         }
 
-        if (isOnHold) {
+        if (isLabeled && this.label?.value === LABEL.HOLD) {
             return ITEM_STATUS.ON_HOLD;
+        }
+
+        if (isLabeled && this.label?.value === LABEL.ESCALATE) {
+            return ITEM_STATUS.ESCALATED;
         }
 
         return ITEM_STATUS.AWAITING;
     }
 
     @action
-    setReviewUser(users: User) {
-        this.reviewUser = users;
-    }
-
-    @action
-    setHoldUser(user: User) {
-        this.holdUser = user;
+    setAnalyst(user: User) {
+        this.analyst = user;
     }
 
     @computed
-    get reviewUserAsPersons(): IFacepilePersona[] {
-        if (this.reviewUser) {
+    get analystAsPersons(): IFacepilePersona[] {
+        if (this.analyst) {
             return [{
-                personaName: this.reviewUser.name,
-                imageUrl: this.reviewUser.imageUrl,
-                data: this.reviewUser
-            }];
-        }
-
-        if (this.holdUser) {
-            return [{
-                personaName: this.holdUser.name,
-                imageUrl: this.holdUser.imageUrl,
-                data: this.holdUser
+                personaName: this.analyst.name,
+                imageUrl: this.analyst.imageUrl,
+                data: this.analyst
             }];
         }
 
@@ -178,17 +199,22 @@ export class Item {
     fromDTO(item: ItemDTO) {
         const {
             id,
+            active,
             tags,
             notes,
             decision,
             purchase,
             imported,
             lock,
-            hold
+            hold,
+            queueIds,
+            label,
         } = item;
 
         this.id = id;
+        this.active = active;
         this.tags = tags;
+        this.queueIds = queueIds || [];
         this.notes = this
             .mapNote(notes)
             .sort((note1, note2) => new Date(note2.created as string).getTime() - new Date(note1.created as string).getTime());
@@ -208,6 +234,16 @@ export class Item {
 
         if (this.lockedDate) {
             this.timeout = Item.getCurrentTimeout(this.lockedDate);
+        }
+
+        if (label) {
+            const labelModel = new ItemLabel();
+
+            this.label = labelModel.fromDTO(label);
+        }
+
+        if (this.label?.queueId) {
+            this.queueIds = [this.label.queueId];
         }
 
         return this;

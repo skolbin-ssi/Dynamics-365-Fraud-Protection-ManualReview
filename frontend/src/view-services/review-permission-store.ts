@@ -14,7 +14,8 @@ import { QueueStore } from './queues';
 export enum QUEUE_REVIEW_PROHIBITION_REASONS {
     CANNOT_REVIEW_EMPTY_QUEUE = 'You cannot review an empty queue',
     CANNOT_REVIEW_UNASSIGNED_QUEUE = 'You cannot review a queue you are not assigned to',
-    CANNOT_LOCK_TWO_ITEMS_ON_QUEUE = 'You cannot lock more than one item on a queue'
+    CANNOT_LOCK_TWO_ITEMS_ON_QUEUE = 'You cannot lock more than one item on a queue',
+    CANNOT_REVIEW_ESCALATED_QUEUE_AS_NOT_SUPERVISOR= 'You cannot review escalated items since you are not a supervisor for this queue',
 }
 
 export enum ITEM_REVIEW_PROHIBITION_REASONS {
@@ -58,6 +59,13 @@ export class ReviewPermissionStore {
             return {
                 isAllowed: false,
                 reason: QUEUE_REVIEW_PROHIBITION_REASONS.CANNOT_REVIEW_UNASSIGNED_QUEUE
+            };
+        }
+
+        if (queue.forEscalations && !queue.supervisors.includes(user.id) && !user?.roles.includes(ROLE.ADMIN_MANAGER)) {
+            return {
+                isAllowed: false,
+                reason: QUEUE_REVIEW_PROHIBITION_REASONS.CANNOT_REVIEW_ESCALATED_QUEUE_AS_NOT_SUPERVISOR
             };
         }
 

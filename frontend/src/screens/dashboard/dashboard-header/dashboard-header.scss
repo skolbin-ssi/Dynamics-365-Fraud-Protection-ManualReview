@@ -5,7 +5,7 @@
   align-items: center;
   justify-content: flex-end;
   padding: 0 32px ;
-  box-shadow: inset 0px -1px 0px #{$neutralLight};
+  @include headerBoxShadow();
 
   &--aligned {
     justify-content: space-between;

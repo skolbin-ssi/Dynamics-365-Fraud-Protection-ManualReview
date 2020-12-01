@@ -17,17 +17,18 @@ import com.griddynamics.msd365fp.manualreview.ehub.durable.model.HealthCheckProc
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.scheduler.Schedulers;
+import org.apache.commons.lang3.tuple.Pair;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
 
@@ -41,6 +42,9 @@ public class DurableEventHubProcessorClient<T> {
     public static final int MAX_EHUB_PARTITIONS = 32;
     public static final String MR_HEALTH_CHECK_PREFIX = "{\"mr-eh-health-check\":true,\"checkId\":\"";
     public static final String MR_HEALTH_CHECK_SUFFIX = "\"}";
+    public static final int HEALTH_CHECK_QUEUE_CAPACITY = 100;
+    public static final int HEALTH_CHECK_WORKERS = 3;
+    public static final int HEALTH_CHECK_MAX_BATCH_SIZE = 1;
 
     private final EventHubProperties properties;
     private final String hubName;
@@ -60,32 +64,59 @@ public class DurableEventHubProcessorClient<T> {
     private final Map<String, OffsetDateTime> localCheckpoints = new ConcurrentHashMap<>();
 
     private EventProcessorClient internalClient;
-    private EventHubProducerAsyncClient healthcheckClient;
-    private Counter healthCheckSendingCounter;
-    private Counter healthCheckSendingErrorCounter;
+    private final List<DurableEventHubProducerWorker> healthcheckProducerWorkers = new LinkedList<>();
+    private final LinkedBlockingQueue<Pair<EventData, CompletableFuture<Object>>> healthcheckQueue =
+            new LinkedBlockingQueue<>(HEALTH_CHECK_QUEUE_CAPACITY);
 
+    private final Counter healthcheckOfferingCounter;
+    private final Counter healthcheckSendingCounter;
+    private final Counter healthcheckErrorCounter;
+    private final Timer healthcheckSendingTimer;
 
-    public void sendHealthCheckPing(String id, Runnable callback) {
-        if (healthcheckClient != null) {
-            EventData data = new EventData(MR_HEALTH_CHECK_PREFIX + id + MR_HEALTH_CHECK_SUFFIX);
-            healthcheckClient.send(Set.of(data))
-                    .timeout(properties.getSendingTimeout())
-                    .retry(properties.getSendingRetries())
-                    .doOnSuccess(res -> {
-                        log.debug("Health-check [{}] has been successfully sent.", id);
-                        healthCheckSendingCounter.increment();
-                        callback.run();
-                    })
-                    .doOnError(e -> {
-                        log.warn("Error during health-check [{}] sending.", id, e);
-                        healthCheckSendingErrorCounter.increment();
-                    })
-                    .subscribeOn(Schedulers.elastic())
-                    .subscribe();
-        } else {
-            log.warn("EH healthcheck is called before client initialization");
-        }
+    public DurableEventHubProcessorClient(final EventHubProperties properties,
+                                          final String hubName,
+                                          final ObjectMapper mapper,
+                                          final Class<T> klass,
+                                          final Consumer<T> eventProcessor,
+                                          final Consumer<Throwable> errorProcessor,
+                                          final HealthCheckProcessor healthcheckProcessor,
+                                          final MeterRegistry meterRegistry) {
+        this.properties = properties;
+        this.hubName = hubName;
+        this.mapper = mapper;
+        this.klass = klass;
+        this.eventProcessor = eventProcessor;
+        this.errorProcessor = errorProcessor;
+        this.healthcheckProcessor = healthcheckProcessor;
+        this.meterRegistry = meterRegistry;
 
+        this.healthcheckOfferingCounter = meterRegistry.counter(
+                "event-hub.health-check-offered",
+                Tags.of(HUB_TAG, hubName));
+        this.healthcheckSendingCounter = meterRegistry.counter(
+                "event-hub.health-check-sent",
+                Tags.of(HUB_TAG, hubName));
+        this.healthcheckErrorCounter = meterRegistry.counter(
+                "event-hub.health-check-sendingError",
+                Tags.of(HUB_TAG, hubName));
+        this.healthcheckSendingTimer = meterRegistry.timer(
+                "event-hub.health-check-sendingLatency",
+                Tags.of(HUB_TAG, hubName));
+    }
+
+    public Mono<Void> sendHealthCheckPing(String id) {
+        return Mono.just(new EventData(MR_HEALTH_CHECK_PREFIX + id + MR_HEALTH_CHECK_SUFFIX))
+                .flatMap(data -> {
+                    CompletableFuture<Object> result = new CompletableFuture<>();
+                    if (healthcheckQueue.offer(Pair.of(data, result))) {
+                        healthcheckOfferingCounter.increment();
+                        return Mono.fromFuture(result);
+                    } else {
+                        log.info("A health-check [{}] can't be offered for sending in hub [{}]", id, hubName);
+                        return Mono.empty();
+                    }
+                })
+                .then();
     }
 
     public synchronized void start() {
@@ -121,22 +152,31 @@ public class DurableEventHubProcessorClient<T> {
 
             internalClient = eventProcessorClientBuilder.buildEventProcessorClient();
         }
-        if (healthcheckClient == null) {
-            healthCheckSendingCounter = meterRegistry.counter(
-                    "event-hub.health-check-sending",
-                    Tags.of(HUB_TAG, hubName));
-            healthCheckSendingErrorCounter = meterRegistry.counter(
-                    "event-hub.health-check-sending-error",
-                    Tags.of(HUB_TAG, hubName));
-            healthcheckClient = new EventHubClientBuilder()
-                    .connectionString(
-                            properties.getConnectionString(),
-                            properties.getConsumers().get(hubName).getDestination())
-                    .buildAsyncProducerClient();
+        while (healthcheckProducerWorkers.size() < HEALTH_CHECK_WORKERS) {
+            DurableEventHubProducerWorker worker = new DurableEventHubProducerWorker(
+                    healthcheckQueue,
+                    hubName,
+                    HEALTH_CHECK_MAX_BATCH_SIZE,
+                    Duration.ofSeconds(2),
+                    healthcheckSendingCounter,
+                    healthcheckErrorCounter,
+                    healthcheckSendingTimer,
+                    this::createNewClient);
+            worker.setDaemon(true);
+            worker.start();
+            healthcheckProducerWorkers.add(worker);
         }
 
         log.info("Start EventHub listening for [{}]", hubName);
         internalClient.start();
+    }
+
+    private EventHubProducerAsyncClient createNewClient() {
+        return new EventHubClientBuilder()
+                .connectionString(
+                        properties.getConnectionString(),
+                        properties.getConsumers().get(hubName).getDestination())
+                .buildAsyncProducerClient();
     }
 
     protected void onReceive(EventContext eventContext) {
@@ -159,7 +199,7 @@ public class DurableEventHubProcessorClient<T> {
         processingLagCounters.get(partition).increment(lag);
         if (lag == 0 ||
                 localCheckpoints.get(partition)
-                        .plus(properties.getCheckpointInterval())
+                        .plus(properties.getConsumers().get(hubName).getCheckpointInterval())
                         .isBefore(received)) {
             log.info("Updating checkpoint for partition [{}] in [{}] on sequence number [{}]",
                     partition,
@@ -257,7 +297,7 @@ public class DurableEventHubProcessorClient<T> {
         // prepare local variables
         localCheckpoints.computeIfAbsent(
                 partition,
-                key -> OffsetDateTime.now().minus(properties.getCheckpointInterval()));
+                key -> OffsetDateTime.now().minus(properties.getConsumers().get(hubName).getCheckpointInterval()));
 
         log.info("Started receiving on partition [{}] in [{}]", partition, hubName);
     }

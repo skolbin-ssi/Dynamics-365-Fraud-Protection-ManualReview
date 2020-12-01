@@ -21,9 +21,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -102,6 +105,7 @@ public class StreamService implements HealthCheckProcessor {
             healthCheckRepository.save(hc);
         });
 
+        List<Mono<Void>> sendings = new LinkedList<>();
         processorRegistry.forEach((hub, client) -> {
             for (int i = 0; i < healthCheckBatchSize; i++) {
                 HealthCheck healthCheck = HealthCheck.builder()
@@ -114,20 +118,25 @@ public class StreamService implements HealthCheckProcessor {
                         .type(EVENT_HUB_CONSUMER)
                         .generatedBy(applicationProperties.getInstanceId())
                         .active(true)
-                        .created(OffsetDateTime.now())
                         .ttl(healthCheckTtl.toSeconds())
                         ._etag("new")
                         .build();
-                client.sendHealthCheckPing(healthCheck.getId(), () -> {
-                    try {
-                        healthCheckRepository.save(healthCheck);
-                    } catch (CosmosDBAccessException e) {
-                        log.debug("Receiver already inserted this [{}] health-check entry", healthCheck.getId());
-                    }
-                });
+                sendings.add(client.sendHealthCheckPing(healthCheck.getId())
+                        .doOnSuccess(v -> {
+                            try {
+                                healthCheck.setCreated(OffsetDateTime.now());
+                                healthCheckRepository.save(healthCheck);
+                            } catch (CosmosDBAccessException e) {
+                                log.debug("Receiver already inserted this [{}] health-check entry", healthCheck.getId());
+                            }
+                        }));
                 healthCheckNum++;
             }
         });
+
+        Mono.zipDelayError(sendings, results -> results)
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
         return overdueHealthChecks.isEmpty();
     }
 

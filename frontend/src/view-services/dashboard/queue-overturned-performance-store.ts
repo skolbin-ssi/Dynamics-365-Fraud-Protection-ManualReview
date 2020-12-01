@@ -13,6 +13,7 @@ import { DashboardService, UserService } from '../../data-services/interfaces';
 import { DURATION_PERIOD } from '../../constants';
 import { Report } from '../../models/misc';
 import { QueueStore } from '../queues';
+import { DASHBOARD_REPORTS_NAMES } from '../../constants/dashboard-reports';
 
 export class QueueOverturnedPerformanceStore extends BaseOverturnedPerformanceStore<QueuePerformance> {
     constructor(
@@ -64,22 +65,35 @@ export class QueueOverturnedPerformanceStore extends BaseOverturnedPerformanceSt
     }
 
     /**
-     * Collects all generated CSV reports available for the store
+     * Collects reports for the dashboard
      *
-     * @returns Report[]
+     * @param isPersonal - indicates whether it is personal reports page
      */
-    @computed
-    get reports(): Report[] {
-        const reports = [];
+    reports(isPersonal = false): Report[] {
+        return computed(() => {
+            const { overturnedDecisions, overturnedRate } = this.getReportsNames(isPersonal);
+            return [
+                this.overturnedActionsReport(overturnedDecisions),
+                this.accuracyReport(overturnedRate)
+            ].filter(report => report !== null) as Report[];
+        }).get();
+    }
 
-        if (this.overturnedActionsReport) {
-            reports.push(this.overturnedActionsReport);
+    private getReportsNames(isPersonal: boolean) {
+        const { ANALYST_OVERTURNED_DECISIONS_RATE, ANALYST_OVERTURNED_QUEUE_RATE } = DASHBOARD_REPORTS_NAMES.ANALYST;
+        const { PERSONAL_OVERTURNED_DECISIONS_RATE, PERSONAL_OVERTURNED_QUEUE_RATE } = DASHBOARD_REPORTS_NAMES.PERSONAL_PERFORMANCE;
+
+        let overturnedDecisions = ANALYST_OVERTURNED_DECISIONS_RATE;
+        let overturnedRate = ANALYST_OVERTURNED_QUEUE_RATE;
+
+        if (isPersonal) {
+            overturnedDecisions = PERSONAL_OVERTURNED_DECISIONS_RATE;
+            overturnedRate = PERSONAL_OVERTURNED_QUEUE_RATE;
         }
 
-        if (this.accuracyReport('Queues accuracy')) {
-            reports.push(this.accuracyReport('Queues accuracy')!);
-        }
-
-        return reports;
+        return {
+            overturnedDecisions,
+            overturnedRate
+        };
     }
 }

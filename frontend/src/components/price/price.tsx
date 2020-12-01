@@ -21,6 +21,8 @@ export class Price extends Component<PriceProps, never> {
             signAsSuffix
         } = this.props;
 
+        if (!value) return '$0.00';
+
         const humanValue = value.toFixed(digitsAmount || 2);
 
         if (signAsSuffix) {

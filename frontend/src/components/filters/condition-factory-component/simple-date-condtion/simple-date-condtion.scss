@@ -1,0 +1,12 @@
+@import "../../../../styles/variables";
+
+.simple-date-condition {
+  &__validation-errors {
+    margin-top: 5px;
+    color: $formInvalidColor;
+  }
+
+  &__validator-error {
+    display: block;
+  }
+}

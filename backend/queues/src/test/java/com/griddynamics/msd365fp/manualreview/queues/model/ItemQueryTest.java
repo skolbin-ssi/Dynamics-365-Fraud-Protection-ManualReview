@@ -22,11 +22,14 @@ class ItemQueryTest {
                 .and().active(true)
                 .constructSelect();
         assertEquals(
-                "SELECT i FROM i " +
-                        "JOIN (SELECT VALUE purchaseProductList " +
+                "SELECT VALUE root FROM (" +
+                        "SELECT DISTINCT i FROM i " +
+                        "JOIN (SELECT DISTINCT VALUE purchaseProductList " +
                         "FROM purchaseProductList IN i.purchase.ProductList " +
-                        "WHERE purchaseProductList.Sku IN ('edu', 'sales')) purchaseProductList " +
-                        "WHERE true AND i.active=true",
+                        "WHERE purchaseProductList.Sku IN ('edu', 'sales')" +
+                        ") purchaseProductList " +
+                        "WHERE true AND i.active=true" +
+                        ") AS root ",
                 select);
 
     }
@@ -46,13 +49,15 @@ class ItemQueryTest {
                 .and().active(true)
                 .constructSelect();
         assertEquals(
-                "SELECT i FROM i " +
-                        "JOIN (SELECT VALUE purchaseProductList " +
+                "SELECT VALUE root FROM (" +
+                        "SELECT DISTINCT i FROM i " +
+                        "JOIN (SELECT DISTINCT VALUE purchaseProductList " +
                         "FROM purchaseProductList IN i.purchase.ProductList " +
                         "WHERE purchaseProductList.Sku IN ('edu', 'sales') " +
                         "AND purchaseProductList.Sku IN ('edu', 'dreams')" +
                         ") purchaseProductList " +
-                        "WHERE true AND true AND i.active=true",
+                        "WHERE true AND true AND i.active=true" +
+                        ") AS root ",
                 select);
 
     }
@@ -72,11 +77,15 @@ class ItemQueryTest {
                 .and().active(true)
                 .constructSelect();
         assertEquals(
-                "SELECT i FROM i " +
-                        "JOIN (SELECT VALUE purchaseProductList " +
+                "SELECT VALUE root FROM " +
+                        "(SELECT DISTINCT i FROM i " +
+                        "JOIN (SELECT DISTINCT VALUE purchaseProductList " +
                         "FROM purchaseProductList IN i.purchase.ProductList " +
-                        "WHERE purchaseProductList.Sku IN ('edu', 'sales')) purchaseProductList " +
-                        "WHERE true AND i.decision.riskScore IN ('0', '1') AND i.active=true",
+                        "WHERE purchaseProductList.Sku IN ('edu', 'sales')" +
+                        ") purchaseProductList " +
+                        "WHERE true " +
+                        "AND i.decision.riskScore IN ('0', '1') " +
+                        "AND i.active=true) AS root ",
                 select);
     }
 
@@ -91,7 +100,7 @@ class ItemQueryTest {
                 .and().active(true)
                 .constructSelect();
         assertEquals(
-                "SELECT i FROM i  WHERE i.decision.riskScore IN ('0', '1') AND i.active=true",
+                "SELECT i FROM i WHERE i.decision.riskScore IN ('0', '1') AND i.active=true ",
                 select);
     }
 
@@ -111,7 +120,7 @@ class ItemQueryTest {
                 .constructCount();
         assertEquals(
                 "SELECT VALUE COUNT(1) FROM i " +
-                        "JOIN (SELECT VALUE purchaseProductList " +
+                        "JOIN (SELECT DISTINCT VALUE purchaseProductList " +
                         "FROM purchaseProductList IN i.purchase.ProductList " +
                         "WHERE purchaseProductList.Sku IN ('edu', 'sales')) purchaseProductList " +
                         "WHERE true AND i.decision.riskScore IN ('0', '1') AND i.active=true",

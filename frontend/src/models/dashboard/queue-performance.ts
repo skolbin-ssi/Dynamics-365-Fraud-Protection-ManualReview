@@ -29,7 +29,8 @@ export class QueuePerformance extends EntityPerformance {
         return Object.entries(this.data).map(([key, value]) => ({
             x: new Date(key),
             y: (value as any as PerformanceMetrics).reviewed, // please @see https://github.com/microsoft/TypeScript/issues/35101,
-            name: this.name
+            name: this.name,
+            entityId: this.id
         }));
     }
 

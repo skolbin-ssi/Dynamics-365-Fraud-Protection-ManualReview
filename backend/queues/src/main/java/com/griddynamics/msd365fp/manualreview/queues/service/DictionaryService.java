@@ -3,6 +3,7 @@
 
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
+import com.griddynamics.msd365fp.manualreview.cosmos.utilities.IdUtility;
 import com.griddynamics.msd365fp.manualreview.queues.model.DictionaryType;
 import com.griddynamics.msd365fp.manualreview.queues.model.dto.DictionaryValueDTO;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.DictionaryEntity;
@@ -10,11 +11,10 @@ import com.griddynamics.msd365fp.manualreview.queues.repository.DictionaryReposi
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -55,7 +55,11 @@ public class DictionaryService {
         DictionaryEntity dictionaryEntity = new DictionaryEntity();
         dictionaryEntity.setType(type);
         dictionaryEntity.setValue(valueDto.getValue());
-        dictionaryEntity.setId(String.format("%s:%s", type, valueDto.getValue()));
+        dictionaryEntity.setId(
+                IdUtility.encodeRestrictedChars(
+                        String.format("%s:%s", type, valueDto.getValue())
+                )
+        );
         dictionaryEntity.setTtl(type.getField() != null ? dictionaryTtl.toSeconds() : -1);
         dictRepository.save(dictionaryEntity);
         log.info("Dictionary entity was created: [{}]", dictionaryEntity);
@@ -80,11 +84,12 @@ public class DictionaryService {
                 .collect(Collectors.toMap(DictionaryEntity::getValue, entity -> entity));
 
         valuesFromData.stream()
+                .filter(Objects::nonNull)
                 .filter(value -> dictEntities.get(value) == null || dictEntities.get(value).getConfirmed() == null)
                 .forEach(value -> {
                     DictionaryEntity toSave = null;
                     toSave = dictEntities.getOrDefault(value, DictionaryEntity.builder()
-                            .id(String.format("%s:%s", type, URLEncoder.encode(value, StandardCharsets.UTF_8).replace('%','.')))
+                            .id(String.format("%s:%s", type, IdUtility.encodeRestrictedChars(value)))
                             .type(type)
                             .value(value)
                             .build());

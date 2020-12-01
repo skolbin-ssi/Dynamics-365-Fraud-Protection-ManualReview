@@ -20,7 +20,7 @@
         },
         "guid": {
             "type": "string",
-            "defaultValue": "[guid(resourceGroup().id)]",
+            "defaultValue": "[guid(parameters('principalId'))]",
             "metadata": {
                 "description": "Input string for new GUID associated with assigning built in role types"
             }
@@ -49,7 +49,7 @@
             "properties": {
                 "roleDefinitionId": "[variables('Azure Maps Data Reader')]",
                 "principalId": "[parameters('principalId')]",
-                "principalType": "Group"
+                "principalType": "ServicePrincipal"
             }
         }
     ],

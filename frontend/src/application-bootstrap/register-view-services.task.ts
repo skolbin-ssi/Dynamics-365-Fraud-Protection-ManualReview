@@ -15,15 +15,25 @@ import {
     AppStore,
     QueuePerformanceStore,
     LockedItemsStore,
-    AnalystOverturnedPerformanceStore, AlertsStore, AlertsMutationStore, ReportsModalStore
+    AnalystOverturnedPerformanceStore,
+    AlertsStore,
+    AlertsMutationStore,
+    ReportsModalStore,
+    LinkAnalysisStore,
+    LinkAnalysisDFPItemsStore,
+    LinkAnalysisMRItemsStore
 } from '../view-services';
 import { QueueMutationStore, QueueMutationModalStore } from '../view-services/essence-mutation-services';
 import { ReviewPermissionStore } from '../view-services/review-permission-store';
 import { DashboardDemandSupplyScreenStore } from '../view-services/dashboard/dashboard-demand-supply-screen-store';
 import { AnalystsPerformanceStore } from '../view-services/dashboard/analysts-performance-store';
-import { AnalystPerformanceStore } from '../view-services/dashboard/analyst-performance-store';
-import { QueueOverturnedPerformanceStore } from '../view-services/dashboard/queue-overturned-performance-store';
+import {
+    QueueOverturnedPerformanceStore,
+    AnalystPerformanceStore
+} from '../view-services/dashboard';
 import { DemandQueuePerformanceStore } from '../view-services/dashboard/demand-queue-performance-store';
+import { FiltersStore } from '../view-services/essence-mutation-services/filters-store';
+import { SearchScreenStore } from '../view-services/search';
 
 export const registerViewServicesTask = {
     execute: async (logger: Logger, container: Container) => {
@@ -88,6 +98,27 @@ export const registerViewServicesTask = {
         container
             .bind<AlertsMutationStore>(TYPES.ALERTS_MUTATION_STORE)
             .to(AlertsMutationStore);
+
+        container
+            .bind<SearchScreenStore>(TYPES.SEARCH_SCREEN_STORE)
+            .to(SearchScreenStore)
+            .inSingletonScope();
+
+        container
+            .bind<FiltersStore>(TYPES.FILTERS_STORE)
+            .to(FiltersStore);
+
+        container
+            .bind<LinkAnalysisStore>(TYPES.LINK_ANALYSIS_STORE)
+            .to(LinkAnalysisStore);
+
+        container
+            .bind<LinkAnalysisDFPItemsStore>(TYPES.LINK_ANALYSIS_DFP_ITEMS_STORE)
+            .to(LinkAnalysisDFPItemsStore);
+
+        container
+            .bind<LinkAnalysisMRItemsStore>(TYPES.LINK_ANALYSIS_MR_ITEMS_STORE)
+            .to(LinkAnalysisMRItemsStore);
 
         //  ____  DASHBOARD STORES ____
 

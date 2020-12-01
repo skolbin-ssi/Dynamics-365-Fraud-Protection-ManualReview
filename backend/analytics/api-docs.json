@@ -5463,6 +5463,14 @@
           "badOverturned" : {
             "type" : "integer",
             "format" : "int32"
+          },
+          "goodInBatch" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "badInBatch" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         }
       },
@@ -5793,7 +5801,54 @@
             "type" : "string",
             "format" : "date-time"
           },
-          "failedStatusMessage" : {
+          "currentRun" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "previousSuccessfulRun" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "previousSuccessfulExecutionTime" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "format" : "int64"
+              },
+              "negative" : {
+                "type" : "boolean"
+              },
+              "zero" : {
+                "type" : "boolean"
+              },
+              "nano" : {
+                "type" : "integer",
+                "format" : "int32"
+              },
+              "units" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "durationEstimated" : {
+                      "type" : "boolean"
+                    },
+                    "dateBased" : {
+                      "type" : "boolean"
+                    },
+                    "timeBased" : {
+                      "type" : "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "lastFailedRunMessage" : {
+            "type" : "string"
+          },
+          "instanceId" : {
             "type" : "string"
           },
           "get_etag" : {
@@ -5834,15 +5889,15 @@
                 "type" : "integer",
                 "format" : "int64"
               },
+              "negative" : {
+                "type" : "boolean"
+              },
               "zero" : {
                 "type" : "boolean"
               },
               "nano" : {
                 "type" : "integer",
                 "format" : "int32"
-              },
-              "negative" : {
-                "type" : "boolean"
               },
               "units" : {
                 "type" : "array",

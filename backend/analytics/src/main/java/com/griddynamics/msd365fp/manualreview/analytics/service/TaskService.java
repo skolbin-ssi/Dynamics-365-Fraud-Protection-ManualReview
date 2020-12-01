@@ -27,6 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.ELDEST_APPLICATION_DATE;
 import static com.griddynamics.msd365fp.manualreview.analytics.config.Constants.INCORRECT_CONFIG_STATUS;
 import static com.griddynamics.msd365fp.manualreview.analytics.config.ScheduledJobsConfig.*;
 import static com.griddynamics.msd365fp.manualreview.model.TaskStatus.READY;
@@ -96,7 +97,7 @@ public class TaskService {
         allTasks.forEach(task -> {
             if (!READY.equals(task.getStatus())) {
                 task.setStatus(READY);
-                task.setFailedStatusMessage("Restored manually");
+                task.setLastFailedRunMessage("Restored manually");
                 taskRepository.save(task);
             }
         });
@@ -148,43 +149,53 @@ public class TaskService {
 
                     // Restore task if it's stuck
                     if (task != null && !taskLaunched) {
-                        restoreTaskIfStuck(task, taskProperties);
+                        processTaskFreezes(task, taskProperties);
                     }
                 });
     }
 
     private boolean isTaskReadyForExecutionNow(Task task, ApplicationProperties.TaskProperties taskProperties) {
-        return task.getPreviousRun() == null ||
-                task.getPreviousRun().plus(taskProperties.getDelay()).isBefore(OffsetDateTime.now());
+        return READY.equals(task.getStatus()) &&
+                (task.getPreviousRun() == null ||
+                        task.getPreviousRun().plus(taskProperties.getDelay()).isBefore(OffsetDateTime.now()));
     }
 
     @SuppressWarnings("java:S1854")
-    private void restoreTaskIfStuck(Task task, ApplicationProperties.TaskProperties taskProperties) {
-        Duration timeAfterPreviousRun;
-        if (task.getPreviousRun() != null) {
-            timeAfterPreviousRun = Duration.between(
-                    task.getPreviousRun(), OffsetDateTime.now());
-        } else {
-            timeAfterPreviousRun = Duration.between(OffsetDateTime.MIN, OffsetDateTime.now());
-        }
+    private void processTaskFreezes(Task task, ApplicationProperties.TaskProperties taskProperties) {
         Duration timeout = Objects.requireNonNullElse(taskProperties.getTimeout(), taskProperties.getDelay());
-        Duration acceptableDelayBeforeWarning = Duration.ofSeconds(
-                (long) (timeout.toSeconds() * applicationProperties.getTaskWarningTimeoutMultiplier()));
-        Duration acceptableDelayBeforeReset = Duration.ofSeconds(
-                (long) (timeout.toSeconds() * applicationProperties.getTaskResetTimeoutMultiplier()));
-        if (timeAfterPreviousRun.compareTo(acceptableDelayBeforeWarning) > 0) {
-            log.warn("Task [{}] is idle for too long. Last execution was [{}] minutes ago with status message: [{}]",
-                    task.getId(), timeAfterPreviousRun.toMinutes(), task.getFailedStatusMessage());
+        OffsetDateTime previousSuccessfulRun = Objects.requireNonNullElse(task.getPreviousSuccessfulRun(), ELDEST_APPLICATION_DATE);
+        OffsetDateTime previousRun = Objects.requireNonNullElse(task.getPreviousRun(), ELDEST_APPLICATION_DATE);
+        OffsetDateTime currentRun = Objects.requireNonNullElse(task.getCurrentRun(), ELDEST_APPLICATION_DATE);
+        OffsetDateTime now = OffsetDateTime.now();
+
+        Duration runWithoutSuccess = Duration.between(previousSuccessfulRun, now);
+        Duration acceptableDelayWithoutSuccessfulRuns = Duration.ofSeconds(
+                (long) (timeout.toSeconds() * applicationProperties.getTaskSuccessfulRunsTimeoutMultiplier()));
+        if (previousSuccessfulRun.isBefore(previousRun) &&
+                runWithoutSuccess.compareTo(acceptableDelayWithoutSuccessfulRuns) > 0) {
+            log.warn("Background task [{}] issue. No successful executions during [{}] minutes. Last Fail reason: [{}].",
+                    task.getId(), runWithoutSuccess.toMinutes(), task.getLastFailedRunMessage());
         }
-        if (!READY.equals(task.getStatus()) && timeAfterPreviousRun.compareTo(acceptableDelayBeforeReset) > 0) {
-            try {
-                log.info("Start [{}] task restore", task.getId());
-                task.setStatus(READY);
-                task.setFailedStatusMessage("Restored after long downtime");
-                taskRepository.save(task);
-                log.info("Task [{}] has been restored", task.getId());
-            } catch (CosmosDBAccessException e) {
-                log.warn("Task [{}] recovering ended with a conflict: {}", task.getId(), e.getMessage());
+        if (!READY.equals(task.getStatus())) {
+            Duration currentRunDuration = Duration.between(currentRun, now);
+            Duration acceptableDelayBeforeWarning = Duration.ofSeconds(
+                    (long) (timeout.toSeconds() * applicationProperties.getTaskWarningTimeoutMultiplier()));
+            Duration acceptableDelayBeforeReset = Duration.ofSeconds(
+                    (long) (timeout.toSeconds() * applicationProperties.getTaskResetTimeoutMultiplier()));
+            if (currentRunDuration.compareTo(acceptableDelayBeforeWarning) > 0) {
+                log.warn("Background task [{}] issue. Idle for too long. Last execution was [{}] minutes ago with status message: [{}].",
+                        task.getId(), currentRunDuration.toMinutes(), task.getLastFailedRunMessage());
+            }
+            if (currentRunDuration.compareTo(acceptableDelayBeforeReset) > 0) {
+                try {
+                    log.info("Start [{}] task restore", task.getId());
+                    task.setStatus(READY);
+                    task.setLastFailedRunMessage("Restored after long downtime");
+                    taskRepository.save(task);
+                    log.info("Task [{}] has been restored", task.getId());
+                } catch (CosmosDBAccessException e) {
+                    log.warn("Task [{}] recovering ended with a conflict: {}", task.getId(), e.getMessage());
+                }
             }
         }
     }
@@ -195,7 +206,7 @@ public class TaskService {
             taskRepository.save(Task.builder()
                     .id(taskName)
                     ._etag(taskName)
-                    .previousRun(OffsetDateTime.now().minus(properties.getDelay()))
+                    .previousRun(ELDEST_APPLICATION_DATE)
                     .status(READY)
                     .build());
             log.info("Task [{}] has been initialized successfully.", taskName);
@@ -225,7 +236,7 @@ public class TaskService {
      * have to be saved to the database with updated {@link Task#getStatus()}.
      * </p>
      * In case task execution failed with an exception,
-     * {@link Task#getFailedStatusMessage()} is set to
+     * {@link Task#getLastFailedRunMessage()} is set to
      * {@link Exception#getMessage()} and new state saved into the database.
      *
      * @param task which should represent a lock object
@@ -234,10 +245,6 @@ public class TaskService {
      */
     @SuppressWarnings("java:S2326")
     private <T, E extends Exception> boolean executeTask(Task task) {
-        ApplicationProperties.TaskProperties taskProperties =
-                applicationProperties.getTasks().get(task.getId());
-        TaskExecution<Object, Exception> taskExecution = taskExecutions.get(task.getId());
-
         // check possibility to execute
         if (!READY.equals(task.getStatus())) {
             return false;
@@ -246,8 +253,13 @@ public class TaskService {
         // acquire a lock
         OffsetDateTime startTime = OffsetDateTime.now();
         task.setStatus(RUNNING);
-        if (task.getPreviousRun() == null){
-            task.setPreviousRun(startTime);
+        task.setInstanceId(applicationProperties.getInstanceId());
+        task.setCurrentRun(startTime);
+        if (task.getPreviousRun() == null) {
+            task.setPreviousRun(ELDEST_APPLICATION_DATE);
+        }
+        if (task.getPreviousSuccessfulRun() == null) {
+            task.setPreviousSuccessfulRun(ELDEST_APPLICATION_DATE);
         }
         Task runningTask;
         try {
@@ -265,6 +277,9 @@ public class TaskService {
         log.info("Task [{}] started its execution.", runningTask.getId());
 
         // launch execution
+        ApplicationProperties.TaskProperties taskProperties =
+                applicationProperties.getTasks().get(task.getId());
+        TaskExecution<Object, Exception> taskExecution = taskExecutions.get(task.getId());
         CompletableFuture
                 .supplyAsync(() -> {
                     try {
@@ -277,18 +292,26 @@ public class TaskService {
                         Objects.requireNonNullElse(taskProperties.getTimeout(), taskProperties.getDelay()).toMillis(),
                         TimeUnit.MILLISECONDS)
                 .whenComplete((result, exception) -> {
+                    Duration duration = Duration.between(startTime, OffsetDateTime.now());
                     runningTask.setStatus(READY);
                     runningTask.setPreviousRun(startTime);
                     if (exception != null) {
-                        log.warn("Task [{}] finished its execution with an exception.",
-                                runningTask.getId(), exception);
-                        runningTask.setFailedStatusMessage(exception.getMessage());
+                        log.warn("Task [{}] finished its execution with an exception in [{}].",
+                                runningTask.getId(), duration.toString());
+                        log.warn("Task [{}] exception", runningTask.getId(), exception);
+                        runningTask.setLastFailedRunMessage(exception.getMessage());
                         taskRepository.save(runningTask);
-                    } else if (result.isEmpty()) {
-                        log.info("Task [{}] finished its execution with empty result.", runningTask.getId());
                     } else {
-                        log.info("Task [{}] finished its execution successfully. Result: [{}]",
-                                runningTask.getId(), result.get());
+                        runningTask.setPreviousSuccessfulRun(startTime);
+                        runningTask.setPreviousSuccessfulExecutionTime(duration);
+
+                        if (result.isEmpty()) {
+                            log.info("Task [{}] finished its execution with empty result in [{}].",
+                                    runningTask.getId(), duration);
+                        } else {
+                            log.info("Task [{}] finished its execution successfully in [{}]. Result: [{}]",
+                                    runningTask.getId(), duration, result.get());
+                        }
                     }
                     taskRepository.save(runningTask);
                 });

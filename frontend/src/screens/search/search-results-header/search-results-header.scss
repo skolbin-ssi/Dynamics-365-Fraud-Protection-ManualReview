@@ -1,0 +1,61 @@
+@import "../../../styles/variables";
+
+.search-results-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 0;
+  line-height: 24px;
+
+  &__title {
+    font-weight: 600;
+    color: $neutralPrimary;
+  }
+
+  &__count {
+    font-weight: 300;
+    color: $neutralPrimary;
+  }
+
+  &__sorting {
+    display: flex;
+  }
+
+  &__sort-field {
+    display: flex;
+    margin-right: 20px;
+    .ms-Label {
+      padding: 3px 0;
+      font-weight: 400;
+      color: $neutralSecondary;
+    }
+    .ms-Dropdown {
+      .ms-Dropdown-title {
+        border-style: none;
+        background-color: $neutralLighterAlt;
+      }
+
+      &:hover {
+        .ms-Dropdown-title {
+          background-color: $neutralLight;
+        }
+      }
+
+      &:focus::after {
+        border-style: none;
+      }
+    }
+  }
+
+  &__sort-order {
+    .ms-Pivot-link {
+      height: 100%;
+      line-height: 32px;
+      background-color: $neutralLighterAlt;
+
+      &.is-selected, &:hover {
+        background-color: $neutralLight;
+        color: $neutralDark;
+      }
+    }
+   }
+}

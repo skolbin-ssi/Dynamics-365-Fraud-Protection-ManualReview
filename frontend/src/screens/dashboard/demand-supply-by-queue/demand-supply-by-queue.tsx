@@ -679,8 +679,11 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
     }
 
     renderGenerateReportButton() {
+        const { isGenerateReportsButtonDisabled } = this.demandQueuePerformanceStore;
+
         return (
             <DefaultButton
+                disabled={isGenerateReportsButtonDisabled}
                 className={`${CN}__generate-reports-button`}
                 text="Generate reports"
                 onClick={this.handleGenerateReportsButtonClick}

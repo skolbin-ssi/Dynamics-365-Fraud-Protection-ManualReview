@@ -1,0 +1,175 @@
+/*!
+ * Copyright (c) Microsoft Corporation.
+ * Licensed under the MIT license.
+ */
+@import "../../../../../styles/variables";
+
+.link-analysis {
+  &__analysis-fields {
+    position: relative;
+  }
+
+  &__results-header {
+    display: flex;
+    align-items: center;
+
+    padding: 0 16px;
+    height: 48px;
+  }
+
+  &__header-title {
+    margin-right: 35px;
+
+    font-size: 18px;
+    font-weight: 600;
+    color: $neutralPrimary;
+  }
+
+  &__analysis-fields,
+  &__results-header {
+    margin-bottom: 20px;
+  }
+
+  &__apply-decisions-btn {
+    height: 35px;
+    background: $neutralLighter;
+    color: $themeDark;
+
+    &--disabled {
+      color: $neutralTertiaryAlt;
+    }
+
+    &-good {
+      color: $goodColor;
+    }
+
+    &-bad {
+      color: $badColor;
+    }
+  }
+
+  &__refresh-button {
+    position: absolute;
+    top: 8px;
+    right: 16px;
+
+    background: transparent;
+    min-height: 30px;
+  }
+
+  &__fields-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+  }
+
+  .queues-list-expandable-group {
+    background: $white;
+
+    &--collapsed {
+      background: $white;
+    }
+
+    &__content {
+      &--expanded {
+        max-height: 100%;
+      }
+    }
+  }
+
+  &__center-aligned {
+    width: 100%;
+    height: 100%;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__modal {
+    width: 640px;
+    padding: 20px;
+
+    &-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      margin-bottom: 20px;
+    }
+
+    &-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    &-actions {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-end;
+
+      button:first-child {
+        margin-right: 8px;
+      }
+    }
+
+    &-sub-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    &-action-error {
+      margin-right: 30px;
+    }
+
+    &-action-error,
+    &-action-success {
+      display: flex;
+      align-items: center;
+    }
+
+    &-error-icon,
+    &-success-icon {
+      display: flex;
+      align-items: center;
+
+      margin-right: 8px;
+    }
+  }
+
+  &__error-icon {
+    color: $badColor;
+  }
+
+  &__success-icon {
+    color: $goodColor;
+  }
+
+  &__center-aligned {
+    width: 100%;
+    height: 300px;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__warning-message {
+    width: auto;
+    color: $neutralPrimary;
+    padding: 7px;
+    margin-bottom: 20px;
+
+    .ms-MessageBar-innerText  {
+      font-size: $warningFontSize;
+      line-height: 20px;
+    }
+  }
+
+  &__warning-message-icon {
+    color: $highRiskColor;
+  }
+
+}

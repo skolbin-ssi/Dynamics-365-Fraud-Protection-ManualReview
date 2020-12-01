@@ -12,6 +12,7 @@ import { AnalystPerformance } from '../../models/dashboard';
 import { DURATION_PERIOD } from '../../constants';
 import { DashboardService, UserService } from '../../data-services/interfaces';
 import { Report } from '../../models/misc';
+import { DASHBOARD_REPORTS_NAMES } from '../../constants/dashboard-reports';
 
 export class AnalystOverturnedPerformanceStore extends BaseOverturnedPerformanceStore<AnalystPerformance> {
     constructor(
@@ -56,16 +57,11 @@ export class AnalystOverturnedPerformanceStore extends BaseOverturnedPerformance
 
     @computed
     get reports(): Report[] {
-        const reports = [];
+        const { QUEUE_OVERTURNED_DECISIONS_RATE, QUEUE_ANALYSTS_ACCURACY } = DASHBOARD_REPORTS_NAMES.QUEUE;
 
-        if (this.overturnedActionsReport) {
-            reports.push(this.overturnedActionsReport);
-        }
-
-        if (this.accuracyReport('Analysts accuracy')) {
-            reports.push(this.accuracyReport('Analysts accuracy')!);
-        }
-
-        return reports;
+        return [
+            this.overturnedActionsReport(QUEUE_OVERTURNED_DECISIONS_RATE),
+            this.accuracyReport(QUEUE_ANALYSTS_ACCURACY)
+        ].filter(report => report !== null) as Report[];
     }
 }

@@ -36,6 +36,14 @@ export class ProcessingTimeMetric implements ProcessingTimeMetricDto {
         };
     }
 
+    @computed
+    get reportSummary() {
+        return [
+            this.waistedTime,
+            this.getTimeToMakeDecision
+        ];
+    }
+
     private getDurationString(duration: Duration) {
         if (!duration) {
             return '';

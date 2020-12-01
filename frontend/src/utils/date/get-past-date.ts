@@ -1,13 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import moment from 'moment';
 /**
- * Returns past date
- * @param days - number of days to extract from today
+ * Returns the past date in the date range that includes today
+ * @param days - number of days in the range
  */
-export function getPastDate(days: number) {
-    // set hours to the beginning of the day
-    const beginDate = new Date(new Date().setHours(0, 0, 0, 0));
+export function getPastDate(days: number): Date | undefined {
+    if (!Number.isFinite(days) || days < 1) return undefined;
 
-    return new Date(beginDate.getTime() - (days * 24 * 60 * 60 * 1000));
+    // We need to subtract 1 day less to receive the correct date
+    return moment().startOf('day').subtract(days - 1, 'day').toDate();
 }

@@ -66,6 +66,14 @@ public class PublicItemLabelingMetricService {
             mapOverturnedDecisions(bucket, totalResult);
         });
 
+        List<ItemLabelingBucket> batchDBResult = labelingClient.getBatchLabelingSummary(
+                from,
+                to,
+                analystIds);
+        dbResult.forEach(bucket -> {
+            mapBatchDecisions(bucket, totalResult);
+        });
+
         calculateDerivedItemLabelingMetrics(totalResult);
 
         return totalResult;
@@ -324,6 +332,19 @@ public class PublicItemLabelingMetricService {
                 break;
             default:
                 performance.setOther(performance.getOther() + bucket.getCnt());
+        }
+    }
+
+    private void mapBatchDecisions(ItemLabelingBucket bucket, ItemLabelingMetricDTO performance) {
+        switch (bucket.getLabel()) {
+            case GOOD:
+                performance.setGoodInBatch(performance.getGoodInBatch() + bucket.getCnt());
+                break;
+            case BAD:
+                performance.setBadInBatch(performance.getBadInBatch() + bucket.getCnt());
+                break;
+            default:
+                break;
         }
     }
 

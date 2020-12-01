@@ -1,0 +1,124 @@
+/*!
+ * Copyright (c) Microsoft Corporation.
+ * Licensed under the MIT license.
+ */
+@import "../../../../../../styles/variables";
+
+.results-data-table {
+  $root: &;
+
+  height: 300px;
+  overflow-y: auto;
+
+  &__error-icon {
+    color: $badColor;
+  }
+
+  &__success-icon {
+    color: $goodColor;
+  }
+
+
+  &__row {
+    display: flex;
+    align-items: center;
+    padding: 14px;
+
+    @include headerBoxShadow();
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+
+    @include headerBoxShadow();
+  }
+
+  &__heading {
+    padding: 14px;
+  }
+
+  &__row-wrap {
+    min-width: 250px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__header {
+    font-weight: 600;
+  }
+
+
+  &__sort-column {
+    min-width: 300px;
+
+    display: flex;
+    align-items: center;
+
+    & div:first-child {
+      margin-right: 8px;
+    }
+  }
+
+
+  &__row-icon {
+    display: flex;
+    margin-right: 15px;
+
+    font-size: 16px;
+  }
+
+
+  &__message {
+    min-width: 270px;
+    max-width: 270px;
+    font-size: 12px;
+    padding-right: 15px;
+
+    @include trimText();
+
+    &-error {
+      color: $badColor;
+    }
+
+    &-success {
+      color: $goodColor;
+    }
+  }
+
+  &__result-item-id-cell {
+    display: flex;
+    align-items: center;
+    line-height: 24px;
+    cursor: pointer;
+    font-size: 12px;
+
+    color: $colorReleased;
+
+    &:hover {
+      #{$root}__copy-button {
+        display: inline-block;
+      }
+    }
+  }
+
+  &__result-item-id {
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__copy-button {
+    font-size: 12px;
+    margin-left: 10px;
+    display: none;
+    width: 20px;
+    height: 20px;
+    color: $gray;
+    text-decoration: none;
+  }
+}

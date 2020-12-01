@@ -7,10 +7,17 @@ package com.griddynamics.msd365fp.manualreview.analytics.config;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @SuppressWarnings("java:S2386")
 public class Constants {
+
+    public static final OffsetDateTime ELDEST_APPLICATION_DATE =
+            OffsetDateTime.ofInstant(Instant.ofEpochMilli(0), ZoneId.systemDefault());
 
     public static final String DEFAULT_PAGE_REQUEST_SIZE_STR = "1000";
     public static final int DEFAULT_PAGE_REQUEST_SIZE = 1000;

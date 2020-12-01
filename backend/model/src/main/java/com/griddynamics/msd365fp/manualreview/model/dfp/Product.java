@@ -3,19 +3,19 @@
 
 package com.griddynamics.msd365fp.manualreview.model.dfp;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.*;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class Product implements Serializable {
@@ -43,4 +43,14 @@ public class Product implements Serializable {
     private BigDecimal quantity;
     private Boolean isPreorder;
     private String shippingMethod;
+
+    private Map<String, String> additionalParams = new HashMap<>();
+
+    @JsonAnySetter
+    public void setAdditionalParam(String name, String value) {
+        additionalParams.put(name, value);
+    }
+    public void setAdditionalParams(Map<String, String> map) {
+        additionalParams.putAll(map);
+    }
 }

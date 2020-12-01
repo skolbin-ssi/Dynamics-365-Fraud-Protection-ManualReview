@@ -4,12 +4,21 @@
 import { inject, injectable } from 'inversify';
 import { action, computed, observable } from 'mobx';
 
+import {
+    calculateDateRange,
+    getEndOfDate,
+    getPastDate,
+    getStartOfDate,
+    isValidDateString,
+} from '../../utils/date';
+import { DASHBOARD_MANAGEMENT, DATE_RANGE, DATE_RANGE_DAYS } from '../../constants';
+import { CurrentUserStore } from '../current-user-store';
+import { PerformanceParsedQueryUrl } from '../../utility-services';
+
 import { TYPES } from '../../types';
 import { QueueStore } from '../queues';
-import { CollectedInfoService, QueueService, UserService } from '../../data-services/interfaces';
 import { User } from '../../models/user';
-import { CurrentUserStore } from '../current-user-store';
-import { DASHBOARD_MANAGEMENT } from '../../constants';
+import { CollectedInfoService, QueueService, UserService } from '../../data-services/interfaces';
 
 @injectable()
 export class DashboardScreenStore {
@@ -18,6 +27,8 @@ export class DashboardScreenStore {
     @observable fromDate: Date | null = null;
 
     @observable toDate: Date | null = null;
+
+    @observable dateRange: DATE_RANGE = DATE_RANGE.SIX_WEEKS;
 
     constructor(
         @inject(TYPES.USER_SERVICE)
@@ -84,12 +95,44 @@ export class DashboardScreenStore {
     }
 
     @action
+    setDateRange(range: DATE_RANGE) {
+        this.dateRange = range;
+    }
+
+    @action
     fetchCollectedUsersInfo() {
         const canUserAccessDashboards = this.currentUserStore
             .checkUserCan(DASHBOARD_MANAGEMENT.ACCESS);
 
         if (canUserAccessDashboards) {
             this.collectedInfoService.getCollectedInfoUsersAndCache();
+        }
+    }
+
+    /**
+     *  Set initial values for the store, when page has mounted
+     *  and URL parameters are in the URL
+     *
+     * @param parsedQuery - parsed URL params
+     */
+    @action
+    setParsedUrlParams(parsedQuery: Pick<PerformanceParsedQueryUrl, 'from' | 'to'>) {
+        const { from, to } = parsedQuery;
+
+        if (from && isValidDateString(from) && to && isValidDateString(to)) {
+            const fromDate = getStartOfDate(new Date(from));
+            const toDate = getEndOfDate(new Date(to));
+
+            this.setFromDate(fromDate);
+            this.setToDate(toDate);
+            this.setDateRange(calculateDateRange(fromDate, toDate));
+        } else {
+            const pastDate = getPastDate(DATE_RANGE_DAYS[DATE_RANGE.SIX_WEEKS]);
+            const nowDate = getEndOfDate(new Date());
+
+            this.setFromDate(pastDate!);
+            this.setToDate(nowDate);
+            this.setDateRange(DATE_RANGE.SIX_WEEKS);
         }
     }
 }

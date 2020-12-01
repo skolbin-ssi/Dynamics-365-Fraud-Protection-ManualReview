@@ -14,8 +14,6 @@ import { ShimmeredDetailsList } from '@fluentui/react/lib/ShimmeredDetailsList';
 
 import { AnalystPerformance, BasicEntityPerformance } from '../../../models/dashboard';
 import { DEFAULT_DATA_LIST_SHIMMER_LINES_NUMBER } from '../../../constants';
-
-import { User } from '../../../models/user';
 import './data-table-compact.scss';
 
 const CN = 'data-table-compact';
@@ -118,7 +116,9 @@ export class DataTableCompact<T extends BasicEntityPerformance> extends Componen
         }
     ];
 
-    renderUserRow(user: User | null) {
+    renderUserRow(entity: BasicEntityPerformance) {
+        const user = (entity as AnalystPerformance).analyst;
+
         if (user) {
             return (
                 <Persona
@@ -133,7 +133,13 @@ export class DataTableCompact<T extends BasicEntityPerformance> extends Componen
             );
         }
 
-        return null;
+        return (
+            <Persona
+                text={`${entity.id}`}
+                size={PersonaSize.size28}
+                className={`${CN}__analyst`}
+            />
+        );
     }
 
     @autoBind
@@ -160,7 +166,7 @@ export class DataTableCompact<T extends BasicEntityPerformance> extends Componen
                 />
 
                 {isAnalystTable
-                    ? this.renderUserRow((entity as AnalystPerformance).analyst)
+                    ? this.renderUserRow(entity)
                     : (
                         /* eslint-disable-next-line jsx-a11y/click-events-have-key-events */
                         <div
@@ -175,7 +181,7 @@ export class DataTableCompact<T extends BasicEntityPerformance> extends Componen
                                     { [`${CN}__clickable-row`]: !!onRowClick }
                                 )}
                             >
-                                {entity.name}
+                                {entity.name || entity.id}
                             </Text>
                         </div>
                     )}

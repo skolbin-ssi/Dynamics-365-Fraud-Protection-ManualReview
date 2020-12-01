@@ -3,6 +3,8 @@
 
 package com.griddynamics.msd365fp.manualreview.model.event;
 
-public interface Event {
+import java.io.Serializable;
+
+public interface Event extends Serializable {
     String getId();
 }

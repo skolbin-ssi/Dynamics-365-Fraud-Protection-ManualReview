@@ -79,5 +79,5 @@ export interface BasicEntityPerformance {
 
     totalReviewedEntityReport: {} | null
 
-    entityPerformanceReport: {} | null
+    fullEntityReport: {} | null
 }

@@ -1,0 +1,15 @@
+@import '../../../../../styles/variables';
+
+.velocities {
+  .ms-DetailsHeader {
+    background-color: $mainPageBackground;
+    padding-top: 1px;
+  }
+  &__category {
+    color: $neutralDark;
+  }
+
+  &__value {
+    color: $colorReleased;
+  }
+}

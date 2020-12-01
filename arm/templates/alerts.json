@@ -202,8 +202,8 @@
         ],
         "metricalertExceptionsName": "[concat(parameters('prefix'),'-server-exceptions-alert')]",
         "metricalertExceptionsSecondaryName": "[concat(parameters('prefix'),'-secondary-server-exceptions-alert')]",
-        "scheduledqueryrulesTaskIdleTooLongName": "[concat(parameters('prefix'),'-task-idle-too-long-alert')]",
-        "scheduledqueryrulesTaskIdleTooLongSecondaryName": "[concat(parameters('prefix'),'-secondary-task-idle-too-long-alert')]",
+        "scheduledqueryrulesTaskIdleTooLongName": "[concat(parameters('prefix'),'-background-task-alert')]",
+        "scheduledqueryrulesTaskIdleTooLongSecondaryName": "[concat(parameters('prefix'),'-secondary-background-task-alert')]",
         "metricalertNoIncomingEventsDfphubName": "[concat(parameters('prefix'),'-no-incomeing-events-dfp-hub-alert')]",
         "metricalertNoIncomingEventsDfphubSecondaryName": "[concat(parameters('prefix'),'-secondary-no-incomeing-events-dfp-hub-alert')]",
         "metricalertTraceWarnSeverityName": "[concat(parameters('prefix'),'-trace-severity-warn-alert')]",
@@ -508,10 +508,10 @@
                 "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
             ],
             "properties": {
-                "description": "Backend Java application task idle for too long time",
+                "description": "Backend Java application task has issues",
                 "enabled": "true",
                 "source": {
-                    "query": "traces\n| where message matches regex \"Task \\\\[.*\\\\] is idle for too long. Last execution was \\\\[.*\\\\] minutes ago with status message: \\\\[.*\\\\]\"\n| project taskname=extract(\"Task \\\\[(.*)\\\\] is idle for too long. Last execution was \\\\[.*\\\\] minutes ago with status message: \\\\[.*\\\\]\", 1, message),timestamp\n| summarize AggregatedValue = count() by bin(timestamp, 5m),taskname\n",
+                    "query": "traces\n| where message matches regex \"Background task \\\\[.*\\\\] issue.*\"\n| project taskname=extract(\"Background task \\\\[(.*)\\\\] issue.*\", 1, message),timestamp\n| summarize AggregatedValue = count() by bin(timestamp, 5m),taskname\n",
                     "authorizedResources": [],
                     "dataSourceId": "[resourceId('microsoft.insights/components', parameters('appInsightName'))]",
                     "queryType": "ResultCount"
@@ -550,10 +550,10 @@
                 "[resourceId('microsoft.insights/actionGroups',parameters('actionGroupName'))]"
             ],
             "properties": {
-                "description": "Backend Java application task idle for too long time",
+                "description": "Backend Java application task has issues",
                 "enabled": "true",
                 "source": {
-                    "query": "traces\n| where message matches regex \"Task \\\\[.*\\\\] is idle for too long. Last execution was \\\\[.*\\\\] minutes ago with status message: \\\\[.*\\\\]\"\n| project taskname=extract(\"Task \\\\[(.*)\\\\] is idle for too long. Last execution was \\\\[.*\\\\] minutes ago with status message: \\\\[.*\\\\]\", 1, message),timestamp\n| summarize AggregatedValue = count() by bin(timestamp, 5m),taskname\n",
+                    "query": "traces\n| where message matches regex \"Background task \\\\[.*\\\\] issue.*\"\n| project taskname=extract(\"Background task \\\\[(.*)\\\\] issue.*\", 1, message),timestamp\n| summarize AggregatedValue = count() by bin(timestamp, 5m),taskname\n",
                     "authorizedResources": [],
                     "dataSourceId": "[resourceId('microsoft.insights/components', parameters('appInsightSecondaryName'))]",
                     "queryType": "ResultCount"

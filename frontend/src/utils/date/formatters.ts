@@ -9,12 +9,16 @@ const LOCAL_TIME_STRING_FORMAT = 'h:mm:ss A';
 const LOCAL_STRING_FORMAT = `${LOCAL_DATE_STRING_FORMAT}, ${LOCAL_TIME_STRING_FORMAT}`;
 const LOCAL_STRING_FORMAT_WITH_TIMEZONE = `${LOCAL_DATE_STRING_FORMAT}, ${LOCAL_TIME_STRING_FORMAT} Z`;
 
+export const isValidDateString = (dateString: string): boolean => moment(dateString).isValid();
+
 /**
  * Formats any MomentInput to a string e.g.: January 2, 2020;
  * @param date - MomentInput
  * @return - string
  */
 export const formatDateToFullMonthDayYear = (date: MomentInput): string => moment(date).format('MMMM D, YYYY');
+
+export const formatDateToFullMMDDYYYY = (date: MomentInput): string => moment(date).format('YYYYMMDD');
 
 /**
  * Converts ISO DateTime string to local date string
@@ -58,6 +62,23 @@ export function formatToLocaleMonthDayFormat(dateString: string): string {
     }
 
     return dateMoment.format('MM/DD');
+}
+
+/**
+ * Format any MomentInput to a date object in a default moment format (ISO 8601 with local time zone)
+ * e.g.: 2020-09-08T12:15:30+03:00 => Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time)
+ *
+ * @param date - MomentInput
+ * @returns date - JS Date object with a time
+ */
+export function formatDateStringToJSDate(date: MomentInput) {
+    const dateMoment = moment(date);
+
+    if (!dateMoment.isValid()) {
+        return undefined;
+    }
+
+    return moment(date, moment.defaultFormat).toDate();
 }
 
 /**
@@ -204,4 +225,23 @@ export function formatTodddMMMDDYYYY(date: MomentInput): string {
  */
 export function formatToISOStringWithLocalTimeZone(date: MomentInput): string {
     return moment(date).format();
+}
+
+/**
+ * If date is valid formats MomentInput to a M-D-YYYY string format,
+ * otherwise it returns a passed placeholder
+ * e.g.: Tue Sep 08 2020 12:15:30 GMT+0300 (Eastern European Summer Time) ==> 9-8-2020
+ *
+ * @param date - MomentInput
+ * @param placeholder - string | null
+ * @return - string | null
+ */
+export function formatToQueryDateString(date: MomentInput, placeholder: string | null): string | null {
+    const dateMoment = moment(date);
+
+    if (!dateMoment.isValid()) {
+        return placeholder;
+    }
+
+    return dateMoment.format('M-D-YYYY');
 }

@@ -13,9 +13,10 @@ import { TYPES } from '../../types';
 import { ReportsModalStore } from '../../view-services';
 import ExcelIconSVG from '../../assets/excel-icon.svg';
 import { Report } from '../../models/misc';
-import { formatTodddMMMDDYYYY, getClientTimeZoneString } from '../../utils/date';
+import { formatTodddMMMDDYYYY, getClientTimeZoneString, formatDateToFullMMDDYYYY } from '../../utils/date';
 
 import './report-modal.scss';
+import { capitalize } from '../../utils/text';
 
 const CN = 'reports-modal';
 
@@ -29,9 +30,12 @@ export class ReportsModal extends Component<ReportsModalProps, never> {
     @resolve(TYPES.REPORTS_MODAL_STORE)
     private readonly reportsModalStore!: ReportsModalStore;
 
-    private static renderReportItem(report: Report) {
+    private renderReportItem(report: Report) {
+        const { fromDate, toDate } = this.props;
         const { name, data } = report;
-        const fileName = name.toLowerCase().replace(/ /g, '-');
+        const selectedPeriod = `${formatDateToFullMMDDYYYY(fromDate)}-${formatDateToFullMMDDYYYY(toDate)}`;
+
+        const fileName = `${capitalize(name)} ${selectedPeriod}`;
 
         return (
             <div key={name} className={`${CN}__table-item`}>
@@ -54,7 +58,7 @@ export class ReportsModal extends Component<ReportsModalProps, never> {
 
         return (
             <div className={`${CN}__reports-table`}>
-                {reports.map(report => ReportsModal.renderReportItem(report))}
+                {reports.map(report => this.renderReportItem(report))}
             </div>
         );
     }

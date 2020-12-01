@@ -18,14 +18,12 @@ import { BasicEntityPerformance } from '../../models/dashboard';
 import { TYPES } from '../../types';
 import { DashboardScreenStore } from './dashboard-screen-store';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
-import { convertToCSVString, UnparseTypes } from '../../utility-services/convert-service';
 import { Report } from '../../models/misc';
 import {
     getDatesBetween,
     isoStringToDateString,
     formatToISOStringWithLocalTimeZone,
 } from '../../utils/date';
-import { formatMetricToPercentageString } from '../../utils/text';
 import { CSVReportBuilder } from '../../utility-services';
 
 export interface UpdateQuerySearchReactionParams {
@@ -43,6 +41,13 @@ export interface UpdateQuerySearchReactionParams {
      * aggregation - chart aggregation period
      */
     aggregation: CHART_AGGREGATION_PERIOD,
+
+    /**
+     * from, to - date range
+     */
+    from: Date | null,
+
+    to: Date | null,
 }
 
 @injectable()
@@ -56,7 +61,7 @@ export class BasePerformanceStore<T extends BasicEntityPerformance> {
     @observable urlSelectedIds: string[] = [];
 
     @observable
-    protected CSVReportBuilder = new CSVReportBuilder();
+    protected csvReportBuilder = new CSVReportBuilder();
 
     /**
      * aggregation - indicates by what time period to aggregate queue performance statistics
@@ -131,6 +136,8 @@ export class BasePerformanceStore<T extends BasicEntityPerformance> {
             ids: this.urlSelectedIds,
             rating: this.rating,
             aggregation: this.aggregation,
+            to: this.toDate,
+            from: this.fromDate,
         }), callback);
     }
 
@@ -254,8 +261,6 @@ export class BasePerformanceStore<T extends BasicEntityPerformance> {
         return false;
     }
 
-    // TODO: Confirm if the substitution chart data is required to be displayed
-    //  in case when data for requested period (from, to) is not available
     @computed
     protected get getSubstitutionLineChartData() {
         if (this.performanceData && !this.performanceData.length) {
@@ -267,38 +272,6 @@ export class BasePerformanceStore<T extends BasicEntityPerformance> {
         }
 
         return [];
-    }
-
-    @computed
-    private get getSubstitutionLineChartDatum() {
-        if (this.dashboardScreenStore.fromDate && this.dashboardScreenStore.toDate) {
-            const substitutionDates: Date[] = getDatesBetween(
-                this.dashboardScreenStore.fromDate,
-                this.dashboardScreenStore.toDate,
-                this.aggregation
-            );
-
-            return substitutionDates.map((date: Date) => ({
-                y: 0,
-                x: isoStringToDateString(date.toISOString()),
-            }));
-        }
-
-        return [] as Datum[];
-    }
-
-    /**
-     * Add selected id to the urlSelectedIds array
-     * @param id
-     */
-    @action
-    private addSelectedIds(id: string) {
-        this.setUrlSelectedIds([...this.urlSelectedIds, id]);
-    }
-
-    @action
-    private removeSelectedId(id: string) {
-        this.setUrlSelectedIds(this.urlSelectedIds.filter(selectedId => selectedId !== id));
     }
 
     @action
@@ -333,9 +306,7 @@ export class BasePerformanceStore<T extends BasicEntityPerformance> {
         this.aggregation = aggregation;
     }
 
-    /**
-     *   ___ REPORTS GENERATION METHODS ___
-     */
+    /** ___ START REPORTS GENERATION METHODS ___ */
 
     /**
      * Boxed computed expresion function
@@ -346,10 +317,11 @@ export class BasePerformanceStore<T extends BasicEntityPerformance> {
         return computed(() => {
             if (this.getPerformanceData?.length) {
                 const reportRawData: Array<any> = this.getPerformanceData
-                    .map(performanceDatum => performanceDatum.entityPerformanceReport)
+                    .filter(datum => datum.isChecked)
+                    .map(performanceDatum => performanceDatum.fullEntityReport)
                     .filter(report => report !== null);
 
-                return BasePerformanceStore.buildReport(name, reportRawData);
+                return this.csvReportBuilder.buildReport(name, reportRawData);
             }
 
             return null;
@@ -357,51 +329,79 @@ export class BasePerformanceStore<T extends BasicEntityPerformance> {
     }
 
     /**
-     * Builds full report for the page including in-tune rate percentage
+     * Returns performance report for total reviewed orders
+     *
      * @param name - report name
-     * @see https://mobx.js.org/refguide/computed-decorator.html#computedexpression-as-function
+     */
+    protected totalReviewdStats(name: string): Report | null {
+        return computed(() => {
+            if (this.getPerformanceData?.length) {
+                const reportRawData: Array<any> = this.getPerformanceData
+                    .filter(performanceDatum => performanceDatum.isChecked)
+                    .map(entity => entity.totalReviewedEntityReport)
+                    .filter(report => report !== null);
+
+                return this.csvReportBuilder.buildReport(name, reportRawData);
+            }
+
+            return null;
+        }).get();
+    }
+
+    /**
+     * Returns full performance report.
+     * Builds full report for the page including in-tune rate percentage.
+     *
+     * @param name - report name
      */
     protected fullPerformanceReport(name: string): Report | null {
         return computed(() => {
             if (this.getPerformanceData?.length) {
-                const reportRawData: Array<any> = this.getPerformanceData.map(performanceDatum => ({
-                    ...performanceDatum.entityPerformanceReport,
-                    'bad decision rate': formatMetricToPercentageString(performanceDatum.badDecisionsRatio)
-                })).filter(report => report !== null);
+                const reportRawData: Array<Object> = this.getPerformanceData
+                    .filter(performanceDatum => performanceDatum.isChecked)
+                    .map(performanceDatum => ({
+                        ...performanceDatum.fullEntityReport,
+                        'bad decision rate, %': performanceDatum.badDecisionsRatio
+                    }));
 
-                return BasePerformanceStore.buildReport(name, reportRawData);
+                return this.csvReportBuilder.buildReport(name, reportRawData);
             }
 
             return null;
         }).get();
     }
 
-    @computed
-    protected get totalReviewedReport(): Report | null {
-        if (this.getPerformanceData?.length) {
-            const REPORT_NAME = 'Total review orders';
-
-            const reportRawData: Array<any> = this.getPerformanceData
-                .map(entity => entity.totalReviewedEntityReport)
-                .filter(report => report !== null);
-
-            return BasePerformanceStore.buildReport(REPORT_NAME, reportRawData);
-        }
-
-        return null;
-    }
+    /** ___ END REPORTS GENERATION METHODS ___ */
 
     /**
-     * Creates report item object
-     *
-     * @param name - name of the report to be displayed
-     * @param rawData - raw report data
-     * @returns Report - object that represents report
+     * Add selected id to the urlSelectedIds array
+     * @param id
      */
-    static buildReport(name: string, rawData: UnparseTypes): Report {
-        return {
-            name,
-            data: convertToCSVString(rawData)
-        };
+    @action
+    private addSelectedIds(id: string) {
+        this.setUrlSelectedIds([...this.urlSelectedIds, id]);
+    }
+
+    @action
+    private removeSelectedId(id: string) {
+        this.setUrlSelectedIds(this.urlSelectedIds.filter(selectedId => selectedId !== id));
+    }
+
+    @computed
+    private get getSubstitutionLineChartDatum() {
+        if (this.dashboardScreenStore.fromDate && this.dashboardScreenStore.toDate) {
+            const substitutionDates: Date[] = getDatesBetween(
+                this.dashboardScreenStore.fromDate,
+                this.dashboardScreenStore.toDate,
+                this.aggregation
+            );
+
+            return substitutionDates.map((date: Date) => ({
+                y: 0,
+                x: isoStringToDateString(date.toISOString()),
+            }));
+        }
+
+        return [] as Datum[];
     }
 }

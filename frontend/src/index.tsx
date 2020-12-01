@@ -8,6 +8,7 @@ import { Container } from 'inversify';
 import { ConsoleLogger } from './utility-services';
 import { TaskQueue } from './utils/patterns';
 import {
+    loadStaticData,
     loadUsersTask,
     registerConfigurationTask,
     registerDataServicesTask,
@@ -32,6 +33,7 @@ appBootstrap
         registerUtilityServicesTask,
         registerViewServicesTask,
         loadUsersTask,
+        loadStaticData,
         renderTask
     ]);
 

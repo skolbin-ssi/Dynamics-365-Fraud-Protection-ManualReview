@@ -12,6 +12,7 @@ import { PreviousPurchase } from './previous-purchase';
 import { Product } from './product';
 import { PurchaseUser } from './purchase-user';
 import { BankEvent } from './bank-event';
+import { CalculatedFields } from './calculated-fields';
 
 export class Purchase extends BaseModel {
     purchaseId: string = '';
@@ -44,7 +45,7 @@ export class Purchase extends BaseModel {
 
     productList: Product[] = [];
 
-    bankEventList: BankEvent[] = [];
+    bankEventsList: BankEvent[] = [];
 
     addressList: Address[] = [];
 
@@ -56,6 +57,10 @@ export class Purchase extends BaseModel {
     rawPurchase: PurchaseDTO | null = null;
 
     previousPurchaseList: PreviousPurchase[] = [];
+
+    calculatedFields: CalculatedFields = new CalculatedFields();
+
+    customData: { key: string, value: string }[] = [];
 
     fromDTO(purchase: PurchaseDTO) {
         const {
@@ -77,9 +82,10 @@ export class Purchase extends BaseModel {
             ProductList: productList,
             // AdditionalInfo,
             AddressList: addressList,
-            BankEventList: bankEventList,
-            // CustomData,
-            PreviousPurchaseList: previousPurchaseList
+            BankEventsList: bankEventsList,
+            CustomData: customData,
+            PreviousPurchaseList: previousPurchaseList,
+            CalculatedFields: calculatedFields,
         } = purchase;
 
         this.rawPurchase = purchase;
@@ -118,8 +124,8 @@ export class Purchase extends BaseModel {
             });
         }
 
-        if (Array.isArray(bankEventList)) {
-            this.bankEventList = bankEventList.map<BankEvent>(bankEvent => {
+        if (Array.isArray(bankEventsList)) {
+            this.bankEventsList = bankEventsList.map<BankEvent>(bankEvent => {
                 const bankEventModel = new BankEvent();
                 return bankEventModel.fromDTO(bankEvent);
             });
@@ -137,6 +143,14 @@ export class Purchase extends BaseModel {
                 const ppModel = new PreviousPurchase();
                 return ppModel.fromDTO(pp);
             });
+        }
+
+        if (calculatedFields) {
+            this.calculatedFields.fromDTO(calculatedFields);
+        }
+
+        if (customData) {
+            this.customData = Object.entries(customData).map(([key, value]) => ({ key, value }));
         }
 
         return this;

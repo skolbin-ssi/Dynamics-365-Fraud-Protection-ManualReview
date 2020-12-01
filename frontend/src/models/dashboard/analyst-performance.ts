@@ -38,6 +38,7 @@ export class AnalystPerformance extends EntityPerformance {
             x: new Date(key),
             y: (value as any as PerformanceMetrics).reviewed, // please @see https://github.com/microsoft/TypeScript/issues/35101,
             name: this.name,
+            entityId: this.id,
             user: this.analyst
         }));
     }

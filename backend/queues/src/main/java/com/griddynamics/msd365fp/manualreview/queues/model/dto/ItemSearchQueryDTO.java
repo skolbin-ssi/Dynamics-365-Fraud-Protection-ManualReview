@@ -8,6 +8,7 @@ import com.griddynamics.msd365fp.manualreview.queues.model.ItemFilter;
 import com.griddynamics.msd365fp.manualreview.queues.validation.FieldConditionCombination;
 import lombok.Data;
 
+import javax.validation.Valid;
 import java.util.Set;
 
 @Data
@@ -16,7 +17,7 @@ public class ItemSearchQueryDTO {
     private Boolean active;
     private Set<String> queueIds;
     private boolean residual = false;
-    private Set<@FieldConditionCombination ItemFilter> itemFilters;
+    private Set<@FieldConditionCombination @Valid ItemFilter> itemFilters;
     private Set<String> lockOwnerIds;
     private Set<String> holdOwnerIds;
     private Set<Label> labels;

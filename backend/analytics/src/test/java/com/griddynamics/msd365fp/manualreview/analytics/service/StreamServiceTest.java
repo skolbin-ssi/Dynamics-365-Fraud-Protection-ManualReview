@@ -4,6 +4,7 @@
 package com.griddynamics.msd365fp.manualreview.analytics.service;
 
 import com.griddynamics.msd365fp.manualreview.analytics.config.ModelMapperConfig;
+import com.griddynamics.msd365fp.manualreview.analytics.config.properties.ApplicationProperties;
 import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.*;
 import com.griddynamics.msd365fp.manualreview.analytics.repository.*;
 import com.griddynamics.msd365fp.manualreview.model.Label;
@@ -52,6 +53,10 @@ class StreamServiceTest {
     ItemPlacementActivityRepository itemPlacementActivityRepository;
     @Mock
     QueueSizeCalculationActivityRepository queueSizeCalculationActivityRepository;
+    @Mock
+    HealthCheckRepository healthCheckRepository;
+    @Mock
+    ApplicationProperties applicationProperties;
 
     @Captor
     private ArgumentCaptor<Iterable<ItemPlacementActivityEntity>> placementCaptor;
@@ -73,7 +78,7 @@ class StreamServiceTest {
         ModelMapper modelMapper = new ModelMapperConfig().modelMapper();
         this.streamService = new StreamService(resolutionRepository, itemLockActivityRepository,
                 collectedQueueInfoRepository, queueSizeCalculationActivityRepository, performanceRepository,
-                itemPlacementActivityRepository, modelMapper);
+                itemPlacementActivityRepository, healthCheckRepository, applicationProperties, modelMapper);
     }
 
     /**

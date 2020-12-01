@@ -8,11 +8,12 @@ import {
 import { CollectedInfoService, QueueService } from '../../data-services';
 import { Item, Queue } from '../../models';
 import { TYPES } from '../../types';
-import { getCurrentTimeDiff, getProcessingDeadlineValues } from '../../utils';
+import { ItemsLoadable } from '../misc/items-loadable';
+import { calculateDaysLeft, getProcessingDeadlineValues } from '../../utils';
 import { QUEUE_VIEW_TYPE } from '../../constants';
 
 @injectable()
-export class QueueStore {
+export class QueueStore implements ItemsLoadable<Item> {
     /**
      * Queues list
      */
@@ -44,9 +45,9 @@ export class QueueStore {
     @observable selectedQueueId: string | null = null;
 
     /**
-     * Indication that queue details are loading
+     * Indication that at least first page of items was already loaded
      */
-    @observable loadingQueueDetails = false;
+    @observable wasFirstPageLoaded = false;
 
     /**
      * Indication that more queue items are loading
@@ -56,12 +57,12 @@ export class QueueStore {
     /**
      * Items in selected Queue
      */
-    @observable selectedQueueItems: Item[] = [];
+    @observable items: Item[] = [];
 
     /**
      * Sets if there are more items to load in selected queue
      */
-    @observable selectedQueueCanLoadMore: boolean = false;
+    @observable canLoadMore: boolean = false;
 
     /**
      * Items in selected Queue
@@ -71,6 +72,9 @@ export class QueueStore {
     private regularQueuesMap = new Map<string, Queue>();
 
     private historicalQueuesMap = new Map<string, Queue>();
+
+    // For caching days left before the deadline values
+    private daysLeftMap: Map<string, number> = new Map();
 
     constructor(
         @inject(TYPES.QUEUE_SERVICE) private queueService: QueueService,
@@ -174,17 +178,17 @@ export class QueueStore {
         if (loadMore) {
             this.loadingMoreItems = true;
         } else {
-            this.loadingQueueDetails = true;
+            this.wasFirstPageLoaded = false;
         }
 
         try {
             const { data, canLoadMore } = await this.queueService.getQueueItems('QueueStore.getQueueItems', queueId, loadMore);
-            this.selectedQueueItems = loadMore ? [...this.selectedQueueItems, ...data] : data;
-            this.selectedQueueCanLoadMore = canLoadMore;
-            this.loadingQueueDetails = false;
+            this.items = loadMore ? [...this.items, ...data] : data;
+            this.canLoadMore = canLoadMore;
+            this.wasFirstPageLoaded = true;
             this.loadingMoreItems = false;
         } catch (e) {
-            this.loadingQueueDetails = false;
+            this.wasFirstPageLoaded = true;
             this.loadingMoreItems = false;
             throw e;
         }
@@ -220,15 +224,15 @@ export class QueueStore {
         this.selectedQueueId = queue.viewId;
 
         // default queue details
-        this.selectedQueueItems = [];
-        this.selectedQueueCanLoadMore = false;
+        this.items = [];
+        this.canLoadMore = false;
     }
 
     @action
     clearSelectedQueueData() {
         this.selectedQueueId = null;
-        this.selectedQueueItems = [];
-        this.selectedQueueCanLoadMore = false;
+        this.items = [];
+        this.canLoadMore = false;
     }
 
     @action
@@ -244,6 +248,8 @@ export class QueueStore {
             const [firstQueue] = this.queues;
             queueToSelect = firstQueue;
         }
+
+        this.selectedQueueId = queueToSelect.viewId;
 
         return queueToSelect;
     }
@@ -280,15 +286,17 @@ export class QueueStore {
         ];
     }
 
-    getTimeLeft(importDateTime: Date) {
-        const { days: currentDiffDays } = getCurrentTimeDiff(importDateTime);
+    getDaysLeft(item: Item, queue?: Queue): number | null {
+        if (!item.importDate || !queue?.processingDeadline) return null;
 
-        if (this.processingDeadline) {
-            const { days: processingDeadlineDays } = this.processingDeadline;
-            return processingDeadlineDays - currentDiffDays;
-        }
+        const key = `${item.importDate.toISOString()}-${queue.processingDeadline}`;
+        const cachedResult = this.daysLeftMap.get(key);
+        if (cachedResult) return cachedResult;
 
-        return null;
+        const result: number = calculateDaysLeft(item.importDate, queue.processingDeadline);
+        this.daysLeftMap.set(key, result);
+
+        return result;
     }
 
     getQueueById(queueId: string) {

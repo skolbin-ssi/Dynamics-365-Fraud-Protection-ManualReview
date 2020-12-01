@@ -1,10 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { LABEL } from '../../constants';
+import { DEFAULT_QUEUE_ITEMS_PER_PAGE, LABEL } from '../../constants';
 import { ApiServiceResponse } from '../base-api-service';
-import { GetItemResponse, GetLockedItemsResponse } from '../api-services/item-api-service/api-models';
+import {
+    GetItemResponse, GetLinkAnalysisDfpItemsResponse, GetLinkAnalysisMrItemsResponse,
+    GetLockedItemsResponse, PatchBatchLabelItemsResponse,
+    PostLinkAnalysisResponse
+} from '../api-services/item-api-service/api-models';
 import { DeleteItemLockResponse } from '../api-services/item-api-service/api-models/delete-item-lock-response';
+import { PostLinkAnalysisBody } from '../../models/item/link-analysis';
+import { BatchItemsLabelApiParams } from './item-service';
 
 export interface ItemApiService {
     /**
@@ -31,6 +37,12 @@ export interface ItemApiService {
     patchItemLabel(id: string, label: LABEL, queueId?: string): Promise<ApiServiceResponse<never>>;
 
     /**
+     * Batch label items
+     * @param params
+     */
+    patchBatchLabel(params: BatchItemsLabelApiParams): Promise<ApiServiceResponse<PatchBatchLabelItemsResponse>>
+
+    /**
      * Apply note to the item
      * @param id
      * @param note
@@ -49,4 +61,25 @@ export interface ItemApiService {
      * Items locked on user
      */
     getLockedItems(): Promise<ApiServiceResponse<GetLockedItemsResponse>>;
+
+    /**
+     * Initiate link analysis for particular item
+     */
+    postLinkAnalysis(postLinkAnalysisBody: PostLinkAnalysisBody): Promise<ApiServiceResponse<PostLinkAnalysisResponse>>;
+
+    /**
+     * Get items form MR linked to the current item
+     * @param id - search id
+     * @param size - amount of items to load
+     * @param continuationToken - unique id that will be same for first and subsequent calls
+     */
+    getLinkAnalysisMrItems(id: string, size: number, continuationToken?: string | null): Promise<ApiServiceResponse<GetLinkAnalysisMrItemsResponse>>;
+
+    /**
+     * Get items form MR linked to the current item
+     * @param id - search id
+     * @param size - amount of items to load
+     * @param continuationToken - unique id that will be same for first and subsequent calls
+     */
+    getLinkAnalysisDfpItems(id: string, size: number, continuationToken?: string | null): Promise<ApiServiceResponse<GetLinkAnalysisDfpItemsResponse>>;
 }

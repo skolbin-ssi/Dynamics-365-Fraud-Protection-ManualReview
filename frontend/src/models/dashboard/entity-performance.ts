@@ -9,8 +9,8 @@ import { PerformanceMetrics } from './performance-metrics';
 import { PeriodPerformanceMetrics } from '../../data-services/api-services/models/dashboard';
 import { BasicEntityPerformance } from './basic-entity-performance';
 import { calculatePercentageRatio } from '../../utils/math';
-import { formatMetricToPercentageString } from '../../utils/text';
-import { OVERTURNED_DECISIONS_CHART_KEYS, OVERTURNED_DECISIONS_REPORT_KEYS } from '../../constants';
+import { OVERTURNED_DECISIONS_CHART_KEYS } from '../../constants';
+import { OVERTURNED_DECISIONS_REPORT_KEYS } from '../../constants/dashboard-reports';
 
 export abstract class EntityPerformance implements BasicEntityPerformance {
     /**
@@ -82,76 +82,6 @@ export abstract class EntityPerformance implements BasicEntityPerformance {
     }
 
     @computed
-    private get decisions() {
-        return {
-            goodApplied: this.goodApplied,
-            overturnedGood: this.goodOverturned,
-            goodOverturnRate: this.goodOverturnRate,
-            badApplied: this.badApplied,
-            overturnedBad: this.badOverturned,
-            badOverturnRate: this.badOverturnRate,
-            averageOverturnRate: this.averageOverturnRate,
-        };
-    }
-
-    // TODO: Refactor this to using Object.keys, or Array.reduce
-    @computed
-    get accuracyReport() {
-        return {
-            name: this.name,
-            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.GOOD_DECISIONS]]:
-                this.decisions.goodApplied,
-            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.OVERTURNED_GOOD_DECISIONS]]:
-                this.decisions.overturnedGood,
-            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.GOOD_DECISION_OVERTURN_RATE]]:
-                formatMetricToPercentageString(this.decisions.goodOverturnRate),
-            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.BAD_DECISIONS]]:
-            this.decisions.badApplied,
-            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.OVERTURNED_BAD_DECISIONS]]:
-            this.decisions.overturnedBad,
-            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.BAD_DECISION_OVERTURN_RATE]]:
-                formatMetricToPercentageString(this.decisions.badOverturnRate),
-            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.AVERAGE_OVERTURN_RATE]]:
-                formatMetricToPercentageString(this.decisions.averageOverturnRate),
-        };
-    }
-
-    /**
-     * Returns individual report item for an entity by reviewed count
-     */
-    @computed
-    get totalReviewedEntityReport() {
-        if (this.name && this.data) {
-            const result = Object.keys(this.data).reduce((acc, date) => ({
-                ...acc,
-                [date]: this.data[date].reviewed
-            }), {});
-
-            return {
-                name: this.name,
-                ...result
-            };
-        }
-
-        return null;
-    }
-
-    @computed
-    get entityPerformanceReport() {
-        if (this.name && this.total) {
-            return {
-                name: this.name,
-                reviewed: this.total.reviewed,
-                good: this.total.good,
-                watched: this.total.watched,
-                bad: this.total.bad
-            };
-        }
-
-        return null;
-    }
-
-    @computed
     get goodApplied() {
         return this.total.good + this.total.watched;
     }
@@ -187,5 +117,81 @@ export abstract class EntityPerformance implements BasicEntityPerformance {
         const denominator = this.goodApplied + this.badApplied;
 
         return calculatePercentageRatio(numerator, denominator, 2);
+    }
+
+    /** ___ START REPORTS GENERATION METHODS ___ */
+
+    @computed
+    get accuracyReport() {
+        return {
+            name: this.name,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.GOOD_DECISIONS]]:
+            this.decisions.goodApplied,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.OVERTURNED_GOOD_DECISIONS]]:
+            this.decisions.overturnedGood,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.GOOD_DECISION_OVERTURN_RATE]]:
+            this.decisions.goodOverturnRate,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.BAD_DECISIONS]]:
+            this.decisions.badApplied,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.OVERTURNED_BAD_DECISIONS]]:
+            this.decisions.overturnedBad,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.BAD_DECISION_OVERTURN_RATE]]:
+            this.decisions.badOverturnRate,
+            [OVERTURNED_DECISIONS_REPORT_KEYS[OVERTURNED_DECISIONS_CHART_KEYS.AVERAGE_OVERTURN_RATE]]:
+            this.decisions.averageOverturnRate
+        };
+    }
+
+    /**
+     * Returns individual report item for an entity by reviewed count
+     */
+    @computed
+    get totalReviewedEntityReport() {
+        if (this.name && this.data) {
+            const result = Object.keys(this.data).reduce((acc, date) => ({
+                ...acc,
+                [date]: this.data[date].reviewed
+            }), {});
+
+            return {
+                name: this.name,
+                ...result
+            };
+        }
+
+        return null;
+    }
+
+    @computed
+    get fullEntityReport() {
+        if (this.name && this.total) {
+            return {
+                name: this.name,
+                reviewed: this.total.reviewed,
+                good: this.total.good,
+                'good, %': this.goodDecisionsRatio,
+                watched: this.total.watched,
+                'watched, %': this.watchDecisionsRatio,
+                bad: this.total.bad,
+                'bad, %': this.badDecisionsRatio
+            };
+        }
+
+        return null;
+    }
+
+    /** ___ END REPORTS GENERATION METHODS ___ */
+
+    @computed
+    private get decisions() {
+        return {
+            goodApplied: this.goodApplied,
+            overturnedGood: this.goodOverturned,
+            goodOverturnRate: this.goodOverturnRate,
+            badApplied: this.badApplied,
+            overturnedBad: this.badOverturned,
+            badOverturnRate: this.badOverturnRate,
+            averageOverturnRate: this.averageOverturnRate,
+        };
     }
 }

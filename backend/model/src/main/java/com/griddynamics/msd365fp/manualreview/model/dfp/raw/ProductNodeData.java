@@ -20,6 +20,8 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @JsonNaming(PropertyNamingStrategy.UpperCamelCaseStrategy.class)
 public class ProductNodeData extends NodeData {
+    public static final String NODE_NAME = "Product";
+
     private String productId;
     private String productName;
     private String type;

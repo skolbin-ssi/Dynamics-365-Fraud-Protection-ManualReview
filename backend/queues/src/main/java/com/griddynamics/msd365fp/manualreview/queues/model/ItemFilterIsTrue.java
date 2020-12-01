@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -14,6 +16,6 @@ import java.util.List;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class ItemFilterIsTrue extends ItemFilter {
-    @Size(max = 0, message = "there should not be any arguments for IS_TRUE filter")
-    private List<String> values;
+    @Size(min = 1, max = 1, message = "there should be exactly one argument for IS_TRUE filter")
+    private List<@NotBlank @Pattern(regexp = "true|false", flags = {Pattern.Flag.CASE_INSENSITIVE}) String> values;
 }

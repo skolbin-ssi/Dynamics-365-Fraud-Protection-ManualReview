@@ -9,8 +9,9 @@ export interface KeyValueItem {
     className?: string;
     contentClassName?: string;
     isPrice?: boolean;
+    valueToCopy?: string;
 }
 
-export const valuePlaceholder = (CN: string) => (
-    <span className={`${CN}__pl`}>N/A</span>
+export const valuePlaceholder = () => (
+    <span className="placeholder">N/A</span>
 );

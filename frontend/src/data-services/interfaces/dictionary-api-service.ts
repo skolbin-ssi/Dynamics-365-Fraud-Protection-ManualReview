@@ -5,7 +5,7 @@ import { DICTIONARY_TYPE } from '../../constants';
 import { ApiServiceResponse } from '../base-api-service';
 
 export interface DictionaryApiService {
-    getDictionaryValues(type: DICTIONARY_TYPE, query: string): Promise<ApiServiceResponse<string[]>>;
+    getDictionaryValues(type: DICTIONARY_TYPE | string, query: string): Promise<ApiServiceResponse<string[]>>;
 
-    postDictionaryValues(type: DICTIONARY_TYPE, value: string): Promise<ApiServiceResponse<void>>;
+    postDictionaryValues(type: DICTIONARY_TYPE | string, value: string): Promise<ApiServiceResponse<void>>;
 }

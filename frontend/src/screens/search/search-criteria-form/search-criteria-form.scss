@@ -1,0 +1,68 @@
+@import "../../../styles/variables";
+
+.search-criteria-form {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 8px 32px;
+  @include headerBoxShadow();
+
+  &__search-field {
+    width: 517px;
+    margin-right: 10px;
+
+    .ms-TextField-fieldGroup,
+    .ms-TextField-field {
+      cursor: pointer;
+      color: $colorReleased;
+    }
+
+    &__icon {
+      line-height: 30px;
+      font-size: 12px;
+      margin: 0 8px;
+      cursor: pointer;
+      color: $colorReleased;
+    }
+  }
+
+  &__button {
+    margin: 0 5px;
+  }
+
+  &__filters-menu {
+    min-width: 80px;
+    height: 32px;
+  }
+
+  &__expandable-aria {
+    padding: 16px;
+    border: none;
+    border-radius: 2px;
+    background-color: $white;
+    box-shadow: 0 0.6px 1.8px rgba(0, 0, 0, 0.1), 0 3.2px 7.2px rgba(0, 0, 0, 0.13);
+  }
+
+  &__field {
+    display: flex;
+    padding: 5px 0;
+    .ms-Label {
+      width: 110px;
+      margin-right: 5px;
+      font-weight: 600;
+      color: $neutralDark;
+    }
+
+    .ms-TextField-wrapper {
+      display: flex;
+    }
+
+    .ms-Dropdown,
+    .ms-TextField-field,
+    .ms-Suggestions,
+    .unique-tag-picker__picker,
+    .user-picker__picker {
+      width: 367px;
+    }
+  }
+}

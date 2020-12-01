@@ -22,20 +22,17 @@ export class GetQueueItemsTransformer implements DataTransformer {
         const itemModel = new Item();
         const populatedItem = itemModel.fromDTO(item);
 
-        if (populatedItem.lockedById) {
-            const user = this.userBuilder.buildById(populatedItem.lockedById);
+        let analyst;
 
-            if (user) {
-                populatedItem.setReviewUser(user);
-            }
+        if (populatedItem.label?.authorId) {
+            analyst = this.userBuilder.buildById(populatedItem.label.authorId);
+        }
+        if (populatedItem.lockedById) {
+            analyst = this.userBuilder.buildById(populatedItem.lockedById);
         }
 
-        if (populatedItem.hold && populatedItem.hold.ownerId) {
-            const user = this.userBuilder.buildById(populatedItem.hold.ownerId);
-
-            if (user) {
-                populatedItem.setHoldUser(user);
-            }
+        if (analyst) {
+            populatedItem.setAnalyst(analyst);
         }
 
         if (populatedItem.notes?.length) {

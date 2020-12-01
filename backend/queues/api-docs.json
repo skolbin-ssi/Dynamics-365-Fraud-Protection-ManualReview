@@ -28,6 +28,9 @@
     "name" : "overview",
     "description" : "API for retrieving overviews."
   }, {
+    "name" : "maps",
+    "description" : "The Maps API"
+  }, {
     "name" : "items",
     "description" : "The Item API for observing and processing orders."
   }, {
@@ -307,7 +310,7 @@
     "/" : {
       "get" : {
         "tags" : [ "health-controller" ],
-        "operationId" : "getHealth",
+        "operationId" : "getHealth_1",
         "responses" : {
           "204" : {
             "description" : "No Content"
@@ -422,7 +425,7 @@
       },
       "head" : {
         "tags" : [ "health-controller" ],
-        "operationId" : "getHealth_1",
+        "operationId" : "getHealth",
         "responses" : {
           "204" : {
             "description" : "No Content"
@@ -1074,6 +1077,145 @@
         } ]
       }
     },
+    "/api/items/batch/label" : {
+      "patch" : {
+        "tags" : [ "items" ],
+        "summary" : "Set the label and release all items",
+        "operationId" : "batchLabelItem",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/BatchLabelDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "properties" : {
+                    "empty" : {
+                      "type" : "boolean"
+                    }
+                  },
+                  "items" : {
+                    "$ref" : "#/components/schemas/LabelResult"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
     "/api/items/{id}/note" : {
       "put" : {
         "tags" : [ "items" ],
@@ -1651,7 +1793,7 @@
           "schema" : {
             "type" : "string",
             "default" : "IMPORT_DATE",
-            "enum" : [ "ID", "IMPORT_DATE", "ACTIVE", "QUEUE_IDS", "LABEL_VALUE", "TAGS", "LOCK_OWNER_ID", "HOLD_OWNER_ID", "LABEL_AUTHOR_ID", "LABEL_QUEUE_ID", "SCORE", "TOTAL_AMOUNT", "PRODUCT_SKU", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "USER_COUNTRY", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "AGGREGATED_EMAIL_DOMAIN", "AGGREGATED_EMAIL_CONFIRMED", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PAYMENT_GATEWAY", "BANK_RESPONSE_CODE", "AUTH_RESULT_CODE", "APPROVE_RESULT_CODE", "DECLINE_RESULT_CODE", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT" ]
+            "enum" : [ "ID", "IMPORT_DATE", "ACTIVE", "QUEUE_IDS", "LABEL_VALUE", "TAGS", "LOCK_OWNER_ID", "HOLD_OWNER_ID", "LABEL_AUTHOR_ID", "LABEL_QUEUE_ID", "SCORE", "TOTAL_AMOUNT", "PRODUCT_SKU", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "USER_COUNTRY", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "AGGREGATED_EMAIL_DOMAIN", "AGGREGATED_EMAIL_CONFIRMED", "EMAIL_DOMAIN_DISPOSABLE", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PAYMENT_GATEWAY", "BANK_EVENT_RESULT_CODE", "AUTH_BANK_EVENT_RESULT_CODE", "APPROVE_BANK_EVENT_RESULT_CODE", "DECLINE_BANK_EVENT_RESULT_CODE", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "DEVICE_CONTEXT_ID", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "DISTANCE_TO_PREVIOUS_TRANSACTION_IP", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_UNIQUE_IP_COUNTRIES", "LAST_DAY_UNIQUE_IP_COUNTRIES", "LAST_WEEK_UNIQUE_IP_COUNTRIES" ]
           }
         }, {
           "name" : "sortingOrder",
@@ -1791,6 +1933,725 @@
                   "items" : {
                     "$ref" : "#/components/schemas/ItemDTO"
                   }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/link-analysis" : {
+      "post" : {
+        "tags" : [ "items" ],
+        "summary" : "Initiate link analysis for particular item",
+        "operationId" : "initLinkAnalysis",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LinkAnalysisCreationDTO"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LinkAnalysisDTO"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/link-analysis/{id}" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "Initiate link analysis for particular item",
+        "operationId" : "getLinkAnalysisInfo",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LinkAnalysisDTO"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/link-analysis/{id}/mr-items" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "Get items form MR linked to the current item",
+        "operationId" : "getMRLinks",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "size of a page",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 20
+          }
+        }, {
+          "name" : "continuation",
+          "in" : "query",
+          "description" : "continuation token from previous request",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "required" : [ "empty", "size" ],
+                  "type" : "array",
+                  "properties" : {
+                    "continuationToken" : {
+                      "type" : "string"
+                    },
+                    "size" : {
+                      "type" : "integer",
+                      "format" : "int32"
+                    },
+                    "empty" : {
+                      "type" : "boolean"
+                    },
+                    "values" : {
+                      "type" : "array",
+                      "items" : {
+                        "$ref" : "#/components/schemas/LAItemDTO"
+                      }
+                    }
+                  },
+                  "items" : {
+                    "$ref" : "#/components/schemas/LAItemDTO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/items/link-analysis/{id}/dfp-items" : {
+      "get" : {
+        "tags" : [ "items" ],
+        "summary" : "Get items form MR linked to the current item",
+        "operationId" : "getDFPLinks",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "size",
+          "in" : "query",
+          "description" : "size of a page",
+          "required" : false,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32",
+            "default" : 20
+          }
+        }, {
+          "name" : "continuation",
+          "in" : "query",
+          "description" : "continuation token from previous request",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "required" : [ "empty", "size" ],
+                  "type" : "array",
+                  "properties" : {
+                    "continuationToken" : {
+                      "type" : "string"
+                    },
+                    "size" : {
+                      "type" : "integer",
+                      "format" : "int32"
+                    },
+                    "empty" : {
+                      "type" : "boolean"
+                    },
+                    "values" : {
+                      "type" : "array",
+                      "items" : {
+                        "$ref" : "#/components/schemas/DFPItemDTO"
+                      }
+                    }
+                  },
+                  "items" : {
+                    "$ref" : "#/components/schemas/DFPItemDTO"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/maps/token/read" : {
+      "get" : {
+        "tags" : [ "maps" ],
+        "summary" : "Get token for read-only map access",
+        "operationId" : "getReadToken",
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MapTokenDTO"
                 }
               }
             }
@@ -4942,11 +5803,133 @@
         } ]
       }
     },
-    "/api/testing/items/duplicate/queue/{queueId}" : {
+    "/api/testing/items/{id}/enrichment" : {
       "post" : {
         "tags" : [ "testing" ],
-        "summary" : "Duplicate all items in the queue",
-        "operationId" : "duplicateItems",
+        "summary" : "Trigger forced item enrichment",
+        "operationId" : "enrichItemById",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/testing/queue/{queueId}/score/randomize" : {
+      "post" : {
+        "tags" : [ "testing" ],
+        "summary" : "Randomize scores for items in a queue",
+        "operationId" : "randomizeScore",
         "parameters" : [ {
           "name" : "queueId",
           "in" : "path",
@@ -5075,7 +6058,7 @@
           "required" : true,
           "schema" : {
             "type" : "string",
-            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE", "AGGREGATED_EMAIL_CONFIRMED", "AGGREGATED_EMAIL_DOMAIN", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "PAYMENT_GATEWAY", "BANK_RESPONSE_CODE", "AUTH_RESULT_CODE", "APPROVE_RESULT_CODE", "DECLINE_RESULT_CODE", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI" ]
+            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE", "AGGREGATED_EMAIL_CONFIRMED", "EMAIL_DOMAIN_DISPOSABLE", "AGGREGATED_EMAIL_DOMAIN", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "PAYMENT_GATEWAY", "BANK_EVENT_RESULT_CODE", "AUTH_BANK_EVENT_RESULT_CODE", "APPROVE_BANK_EVENT_RESULT_CODE", "DECLINE_BANK_EVENT_RESULT_CODE", "DEVICE_CONTEXT_ID", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "DISTANCE_TO_PREVIOUS_TRANSACTION_IP", "LAST_HOUR_UNIQUE_IP_COUNTRIES", "LAST_DAY_UNIQUE_IP_COUNTRIES", "LAST_WEEK_UNIQUE_IP_COUNTRIES", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI" ]
           }
         } ],
         "responses" : {
@@ -5198,11 +6181,137 @@
         } ]
       }
     },
+    "/api/testing/events/bunch/{topic}" : {
+      "post" : {
+        "tags" : [ "testing" ],
+        "summary" : "Send bunch of dummy events to EventHub topics",
+        "operationId" : "sendEvent",
+        "parameters" : [ {
+          "name" : "topic",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK"
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
     "/api/testing/events/{topic}" : {
       "post" : {
         "tags" : [ "testing" ],
         "summary" : "Send custom event to EventHub",
-        "operationId" : "sendEvent",
+        "operationId" : "sendEvent_1",
         "parameters" : [ {
           "name" : "topic",
           "in" : "path",
@@ -5215,7 +6324,18 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/Event"
+                "type" : "object",
+                "properties" : {
+                  "id" : {
+                    "type" : "string"
+                  },
+                  "empty" : {
+                    "type" : "boolean"
+                  }
+                },
+                "additionalProperties" : {
+                  "type" : "object"
+                }
               }
             }
           },
@@ -5456,6 +6576,130 @@
                     "items" : {
                       "type" : "object"
                     }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "mr_user_auth" : [ ]
+        } ]
+      }
+    },
+    "/api/testing/check-email-domains" : {
+      "post" : {
+        "tags" : [ "testing" ],
+        "summary" : "Check disposable email domains for all the items",
+        "operationId" : "checkEmailDomains",
+        "responses" : {
+          "204" : {
+            "description" : "No Content"
+          },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "403" : {
+            "description" : "Forbidden",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "422" : {
+            "description" : "Unprocessable Entity",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Conflict",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "429" : {
+            "description" : "Too Many Requests",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorDTO"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "500" : {
+            "description" : "Internal Server Error",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "oneOf" : [ {
+                    "$ref" : "#/components/schemas/ErrorDTO"
+                  }, {
+                    "type" : "object"
+                  } ]
+                }
+              }
+            }
+          },
+          "200" : {
+            "description" : "OK",
+            "content" : {
+              "*/*" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DisposabilityCheck"
                   }
                 }
               }
@@ -5932,9 +7176,6 @@
           },
           "Country" : {
             "type" : "string"
-          },
-          "CountryRegion" : {
-            "type" : "string"
           }
         }
       },
@@ -5959,6 +7200,10 @@
           },
           "PaymentProcessor" : {
             "type" : "string"
+          },
+          "BankEventTimestampEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
           },
           "MRN" : {
             "type" : "string"
@@ -5998,13 +7243,16 @@
               "type" : "string"
             }
           },
+          "distanceToPreviousTransactionIP" : {
+            "type" : "number"
+          },
           "accountAgeInDays" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int64"
           },
           "activityAgeInDays" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int64"
           },
           "firstTransactionDateTime" : {
             "type" : "string",
@@ -6016,152 +7264,72 @@
           "aggregatedEmailDomain" : {
             "type" : "string"
           },
-          "authResultCodes" : {
+          "disposableEmailDomain" : {
+            "type" : "boolean"
+          },
+          "disposabilityChecks" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DisposabilityCheckServiceResponse"
+            }
+          },
+          "authBankEventResultCodes" : {
             "type" : "array",
             "items" : {
               "type" : "string"
             }
           },
-          "approveResultCodes" : {
+          "approveBankEventResultCodes" : {
             "type" : "array",
             "items" : {
               "type" : "string"
             }
           },
-          "declineResultCodes" : {
+          "declineBankEventResultCodes" : {
             "type" : "array",
             "items" : {
               "type" : "string"
             }
           },
-          "lastHourTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
+          "transactionCount" : {
+            "$ref" : "#/components/schemas/VelocityLong"
           },
-          "lastDayTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
+          "transactionAmount" : {
+            "$ref" : "#/components/schemas/VelocityBigDecimal"
           },
-          "lastWeekTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
+          "rejectedTransactionCount" : {
+            "$ref" : "#/components/schemas/VelocityLong"
           },
-          "lastHourTransactionAmount" : {
-            "type" : "number"
+          "rejectedTransactionAmount" : {
+            "$ref" : "#/components/schemas/VelocityBigDecimal"
           },
-          "lastDayTransactionAmount" : {
-            "type" : "number"
+          "failedTransactionCount" : {
+            "$ref" : "#/components/schemas/VelocityLong"
           },
-          "lastWeekTransactionAmount" : {
-            "type" : "number"
+          "failedTransactionAmount" : {
+            "$ref" : "#/components/schemas/VelocityBigDecimal"
           },
-          "lastHourRejectedTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
+          "successfulTransactionCount" : {
+            "$ref" : "#/components/schemas/VelocityLong"
           },
-          "lastDayRejectedTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
+          "successfulTransactionAmount" : {
+            "$ref" : "#/components/schemas/VelocityBigDecimal"
           },
-          "lastWeekRejectedTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
+          "currentPaymentInstrumentTransactionCount" : {
+            "$ref" : "#/components/schemas/VelocityLong"
           },
-          "lastHourRejectedTransactionAmount" : {
-            "type" : "number"
+          "currentPaymentInstrumentTransactionAmount" : {
+            "$ref" : "#/components/schemas/VelocityBigDecimal"
           },
-          "lastDayRejectedTransactionAmount" : {
-            "type" : "number"
+          "uniquePaymentInstrumentCount" : {
+            "$ref" : "#/components/schemas/VelocityLong"
           },
-          "lastWeekRejectedTransactionAmount" : {
-            "type" : "number"
+          "uniqueIPCountries" : {
+            "$ref" : "#/components/schemas/VelocityLong"
           },
-          "lastHourFailedTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastDayFailedTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastWeekFailedTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastHourFailedTransactionAmount" : {
-            "type" : "number"
-          },
-          "lastDayFailedTransactionAmount" : {
-            "type" : "number"
-          },
-          "lastWeekFailedTransactionAmount" : {
-            "type" : "number"
-          },
-          "lastHourSuccessfulTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastDaySuccessfulTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastWeekSuccessfulTransactionCount" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastHourSuccessfulTransactionAmount" : {
-            "type" : "number"
-          },
-          "lastDaySuccessfulTransactionAmount" : {
-            "type" : "number"
-          },
-          "lastWeekSuccessfulTransactionAmount" : {
-            "type" : "number"
-          },
-          "lastHourUniquePaymentInstrumentCount" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastDayUniquePaymentInstrumentCount" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastWeekUniquePaymentInstrumentCount" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastHourTransactionCountWithCurrentPaymentInstrument" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastDayTransactionCountWithCurrentPaymentInstrument" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastWeekTransactionCountWithCurrentPaymentInstrument" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastHourTransactionAmountWithCurrentPaymentInstrument" : {
-            "type" : "number"
-          },
-          "lastDayTransactionAmountWithCurrentPaymentInstrument" : {
-            "type" : "number"
-          },
-          "lastWeekTransactionAmountWithCurrentPaymentInstrument" : {
-            "type" : "number"
-          },
-          "lastHourUniqueIPCountries" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastDayUniqueIPCountries" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "lastWeekUniqueIPCountries" : {
-            "type" : "integer",
-            "format" : "int32"
+          "firstTransactionDateTimeEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
           }
         }
       },
@@ -6187,6 +7355,9 @@
             "type" : "string"
           },
           "DeviceContextDC" : {
+            "type" : "string"
+          },
+          "MerchantFuzzyDeviceId" : {
             "type" : "string"
           },
           "ExternalDeviceId" : {
@@ -6223,6 +7394,10 @@
             "type" : "string",
             "format" : "date-time"
           },
+          "MerchantLocalDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
           "OS" : {
             "type" : "string"
           },
@@ -6243,6 +7418,28 @@
           },
           "IPState" : {
             "type" : "string"
+          }
+        }
+      },
+      "DisposabilityCheckServiceResponse" : {
+        "type" : "object",
+        "properties" : {
+          "disposable" : {
+            "type" : "boolean"
+          },
+          "resource" : {
+            "type" : "string"
+          },
+          "checked" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "rawResponse" : {
+            "type" : "string"
+          },
+          "checkedEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
           }
         }
       },
@@ -6447,9 +7644,6 @@
           "HashedEvaluationId" : {
             "type" : "string"
           },
-          "User" : {
-            "$ref" : "#/components/schemas/User"
-          },
           "DeviceContext" : {
             "$ref" : "#/components/schemas/DeviceContext"
           },
@@ -6465,16 +7659,19 @@
               "$ref" : "#/components/schemas/PaymentInstrument"
             }
           },
-          "ProductList" : {
-            "type" : "array",
-            "items" : {
-              "$ref" : "#/components/schemas/Product"
-            }
-          },
           "BankEventsList" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/BankEvent"
+            }
+          },
+          "User" : {
+            "$ref" : "#/components/schemas/User"
+          },
+          "ProductList" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Product"
             }
           },
           "CustomData" : {
@@ -6500,6 +7697,14 @@
           },
           "CalculatedFields" : {
             "$ref" : "#/components/schemas/CalculatedFields"
+          },
+          "CustomerLocalDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "MerchantLocalDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
           }
         }
       },
@@ -6566,6 +7771,18 @@
             "type" : "string",
             "format" : "date-time"
           },
+          "MerchantLocalDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "CreationDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "UpdateDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
           "BIN" : {
             "type" : "string"
           },
@@ -6621,19 +7838,6 @@
           "HashedEvaluationId" : {
             "type" : "string"
           },
-          "RiskScore" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "ReasonCodes" : {
-            "type" : "string"
-          },
-          "PolicyApplied" : {
-            "type" : "string"
-          },
-          "LastMerchantStatus" : {
-            "type" : "string"
-          },
           "DeviceContext" : {
             "$ref" : "#/components/schemas/DeviceContext"
           },
@@ -6654,6 +7858,52 @@
             "items" : {
               "$ref" : "#/components/schemas/BankEvent"
             }
+          },
+          "RiskScore" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "ReasonCodes" : {
+            "type" : "string"
+          },
+          "PolicyApplied" : {
+            "type" : "string"
+          },
+          "LastMerchantStatus" : {
+            "type" : "string"
+          },
+          "LastMerchantStatusReason" : {
+            "type" : "string"
+          },
+          "LastMerchantStatusDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "LastBankEventStatus" : {
+            "type" : "string"
+          },
+          "LastBankEventResponseCode" : {
+            "type" : "string"
+          },
+          "LastBankEventDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "LastMerchantStatusDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "LastBankEventDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "CustomerLocalDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "MerchantLocalDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
           }
         }
       },
@@ -6844,6 +8094,61 @@
           "MerchantLocalDate" : {
             "type" : "string",
             "format" : "date-time"
+          },
+          "MerchantLocalDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "CreationDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "UpdateDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "EmailValidatedDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "PhoneNumberValidatedDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "MeasuresIngestionDateTimeUTCEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        }
+      },
+      "VelocityBigDecimal" : {
+        "type" : "object",
+        "properties" : {
+          "hour" : {
+            "type" : "number"
+          },
+          "day" : {
+            "type" : "number"
+          },
+          "week" : {
+            "type" : "number"
+          }
+        }
+      },
+      "VelocityLong" : {
+        "type" : "object",
+        "properties" : {
+          "hour" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "day" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "week" : {
+            "type" : "integer",
+            "format" : "int64"
           }
         }
       },
@@ -6854,6 +8159,37 @@
           "label" : {
             "type" : "string",
             "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
+          }
+        }
+      },
+      "BatchLabelDTO" : {
+        "required" : [ "itemIds", "label" ],
+        "type" : "object",
+        "properties" : {
+          "label" : {
+            "type" : "string",
+            "enum" : [ "GOOD", "BAD", "HOLD", "ESCALATE", "WATCH_NA", "WATCH_INCONCLUSIVE" ]
+          },
+          "itemIds" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
+      "LabelResult" : {
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "string"
+          },
+          "success" : {
+            "type" : "boolean"
+          },
+          "reason" : {
+            "type" : "string"
           }
         }
       },
@@ -6885,11 +8221,11 @@
         "properties" : {
           "field" : {
             "type" : "string",
-            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE", "AGGREGATED_EMAIL_CONFIRMED", "AGGREGATED_EMAIL_DOMAIN", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "PAYMENT_GATEWAY", "BANK_RESPONSE_CODE", "AUTH_RESULT_CODE", "APPROVE_RESULT_CODE", "DECLINE_RESULT_CODE", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI" ]
+            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE", "AGGREGATED_EMAIL_CONFIRMED", "EMAIL_DOMAIN_DISPOSABLE", "AGGREGATED_EMAIL_DOMAIN", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "PAYMENT_GATEWAY", "BANK_EVENT_RESULT_CODE", "AUTH_BANK_EVENT_RESULT_CODE", "APPROVE_BANK_EVENT_RESULT_CODE", "DECLINE_BANK_EVENT_RESULT_CODE", "DEVICE_CONTEXT_ID", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "DISTANCE_TO_PREVIOUS_TRANSACTION_IP", "LAST_HOUR_UNIQUE_IP_COUNTRIES", "LAST_DAY_UNIQUE_IP_COUNTRIES", "LAST_WEEK_UNIQUE_IP_COUNTRIES", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI" ]
           },
           "condition" : {
             "type" : "string",
-            "enum" : [ "IN", "CONTAINS", "REGEXP", "IS_TRUE", "BETWEEN", "BETWEEN_ALPH", "BETWEEN_DATE", "EQUAL", "EQUAL_ALPH", "GREATER", "GREATER_ALPH", "GREATER_DATE", "LESS", "LESS_ALPH", "LESS_DATE", "GREATER_OR_EQUAL", "GREATER_OR_EQUAL_ALPH", "GREATER_OR_EQUAL_DATE", "LESS_OR_EQUAL", "LESS_OR_EQUAL_ALPH", "LESS_OR_EQUAL_DATE" ]
+            "enum" : [ "IN", "CONTAINS", "REGEXP", "IS_TRUE", "BETWEEN", "BETWEEN_ALPH", "BETWEEN_DATE", "NOT_BETWEEN", "NOT_BETWEEN_ALPH", "NOT_BETWEEN_DATE", "EQUAL", "EQUAL_ALPH", "NOT_EQUAL", "NOT_EQUAL_ALPH", "GREATER", "GREATER_ALPH", "GREATER_DATE", "LESS", "LESS_ALPH", "LESS_DATE", "GREATER_OR_EQUAL", "GREATER_OR_EQUAL_ALPH", "GREATER_OR_EQUAL_DATE", "LESS_OR_EQUAL", "LESS_OR_EQUAL_ALPH", "LESS_OR_EQUAL_DATE" ]
           },
           "values" : {
             "type" : "array",
@@ -6967,6 +8303,224 @@
             "items" : {
               "type" : "string"
             }
+          }
+        }
+      },
+      "LinkAnalysisCreationDTO" : {
+        "required" : [ "itemId" ],
+        "type" : "object",
+        "properties" : {
+          "itemId" : {
+            "type" : "string"
+          },
+          "queueId" : {
+            "type" : "string"
+          },
+          "fields" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "CREATION_DATE", "DISCOVERED_IP_ADDRESS", "MERCHANT_FUZZY_DEVICE_ID", "MERCHANT_PAYMENT_INSTRUMENT_ID", "EMAIL", "BIN", "HOLDER_NAME", "ZIPCODE" ]
+            }
+          }
+        }
+      },
+      "FieldLinks" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "enum" : [ "CREATION_DATE", "DISCOVERED_IP_ADDRESS", "MERCHANT_FUZZY_DEVICE_ID", "MERCHANT_PAYMENT_INSTRUMENT_ID", "EMAIL", "BIN", "HOLDER_NAME", "ZIPCODE" ]
+          },
+          "value" : {
+            "type" : "string"
+          },
+          "purchaseCounts" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }
+      },
+      "LinkAnalysisDTO" : {
+        "required" : [ "id" ],
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          },
+          "found" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "foundInMR" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "analysisFields" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "enum" : [ "CREATION_DATE", "DISCOVERED_IP_ADDRESS", "MERCHANT_FUZZY_DEVICE_ID", "MERCHANT_PAYMENT_INSTRUMENT_ID", "EMAIL", "BIN", "HOLDER_NAME", "ZIPCODE" ]
+            }
+          },
+          "fields" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/FieldLinks"
+            }
+          }
+        }
+      },
+      "LAItemDTO" : {
+        "required" : [ "item" ],
+        "type" : "object",
+        "properties" : {
+          "item" : {
+            "$ref" : "#/components/schemas/ItemDTO"
+          },
+          "availableForLabeling" : {
+            "type" : "boolean"
+          },
+          "userRestricted" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "DFPItemDTO" : {
+        "type" : "object",
+        "properties" : {
+          "purchaseId" : {
+            "type" : "string"
+          },
+          "merchantLocalDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "totalAmount" : {
+            "type" : "number"
+          },
+          "totalAmountInUSD" : {
+            "type" : "number"
+          },
+          "salesTax" : {
+            "type" : "number"
+          },
+          "salesTaxInUSD" : {
+            "type" : "number"
+          },
+          "currency" : {
+            "type" : "string"
+          },
+          "riskScore" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "merchantRuleDecision" : {
+            "type" : "string"
+          },
+          "reasonCodes" : {
+            "type" : "string"
+          },
+          "user" : {
+            "$ref" : "#/components/schemas/LAUser"
+          },
+          "deviceContext" : {
+            "$ref" : "#/components/schemas/LADeviceContext"
+          },
+          "userRestricted" : {
+            "type" : "boolean"
+          }
+        }
+      },
+      "LADeviceContext" : {
+        "type" : "object",
+        "properties" : {
+          "ipAdress" : {
+            "type" : "string"
+          }
+        }
+      },
+      "LAUser" : {
+        "type" : "object",
+        "properties" : {
+          "email" : {
+            "type" : "string"
+          },
+          "userId" : {
+            "type" : "string"
+          }
+        }
+      },
+      "MapTokenDTO" : {
+        "required" : [ "expiresAt", "expiresIn", "token", "tokenType" ],
+        "type" : "object",
+        "properties" : {
+          "token" : {
+            "type" : "string"
+          },
+          "expiresIn" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "format" : "int64"
+              },
+              "units" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "duration" : {
+                      "type" : "object",
+                      "properties" : {
+                        "seconds" : {
+                          "type" : "integer",
+                          "format" : "int64"
+                        },
+                        "nano" : {
+                          "type" : "integer",
+                          "format" : "int32"
+                        },
+                        "negative" : {
+                          "type" : "boolean"
+                        },
+                        "zero" : {
+                          "type" : "boolean"
+                        }
+                      }
+                    },
+                    "durationEstimated" : {
+                      "type" : "boolean"
+                    },
+                    "dateBased" : {
+                      "type" : "boolean"
+                    },
+                    "timeBased" : {
+                      "type" : "boolean"
+                    }
+                  }
+                }
+              },
+              "nano" : {
+                "type" : "integer",
+                "format" : "int32"
+              },
+              "negative" : {
+                "type" : "boolean"
+              },
+              "zero" : {
+                "type" : "boolean"
+              }
+            }
+          },
+          "expiresAt" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "tokenType" : {
+            "type" : "string"
           }
         }
       },
@@ -7220,6 +8774,14 @@
           }
         }
       },
+      "Event" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "string"
+          }
+        }
+      },
       "Item" : {
         "type" : "object",
         "properties" : {
@@ -7233,6 +8795,16 @@
           "enriched" : {
             "type" : "string",
             "format" : "date-time"
+          },
+          "enrichmentAttempts" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "enrichmentFailed" : {
+            "type" : "boolean"
+          },
+          "enrichmentFailReason" : {
+            "type" : "string"
           },
           "active" : {
             "type" : "boolean"
@@ -7286,6 +8858,13 @@
               "type" : "string"
             }
           },
+          "events" : {
+            "uniqueItems" : true,
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/ItemEvent"
+            }
+          },
           "ttl" : {
             "type" : "integer",
             "format" : "int64"
@@ -7299,6 +8878,17 @@
           }
         }
       },
+      "ItemEvent" : {
+        "type" : "object",
+        "properties" : {
+          "event" : {
+            "$ref" : "#/components/schemas/Event"
+          },
+          "sendingId" : {
+            "type" : "string"
+          }
+        }
+      },
       "PurchaseStatus" : {
         "type" : "object",
         "properties" : {
@@ -7309,10 +8899,15 @@
             "type" : "string"
           },
           "StatusDate" : {
-            "type" : "string"
+            "type" : "string",
+            "format" : "date-time"
           },
           "Reason" : {
             "type" : "string"
+          },
+          "StatusDateEpochSeconds" : {
+            "type" : "string",
+            "format" : "date-time"
           }
         }
       },
@@ -7355,7 +8950,7 @@
         "properties" : {
           "id" : {
             "type" : "string",
-            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE", "AGGREGATED_EMAIL_CONFIRMED", "AGGREGATED_EMAIL_DOMAIN", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "PAYMENT_GATEWAY", "BANK_RESPONSE_CODE", "AUTH_RESULT_CODE", "APPROVE_RESULT_CODE", "DECLINE_RESULT_CODE", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI" ]
+            "enum" : [ "IMPORT_DATE", "TOTAL_AMOUNT", "USER_COUNTRY", "PRODUCT_SKU", "SCORE", "AGGREGATED_EMAIL_CONFIRMED", "EMAIL_DOMAIN_DISPOSABLE", "AGGREGATED_EMAIL_DOMAIN", "ACCOUNT_AGE", "CUSTOM_ACCOUNT_AGE_BUCKET", "AGE_OF_FIRST_KNOWN_TRANSACTION", "AUTHENTICATION_PROVIDER", "PRODUCT_CATEGORY", "PRODUCT_TYPE", "CUSTOM_PRODUCT_FAMILIES", "MERCHANT_PAYMENT_INSTRUMENT_ID", "CUSTOM_CC_HASH", "PI_BIN", "PI_COUNTRY", "PI_ZIP", "PI_ADDRESS", "BILLING_COUNTRY_MATCHES_SHIPPING_COUNTRY", "BILLING_COUNTRY_MATCHES_IP_COUNTRY", "PAYMENT_GATEWAY", "BANK_EVENT_RESULT_CODE", "AUTH_BANK_EVENT_RESULT_CODE", "APPROVE_BANK_EVENT_RESULT_CODE", "DECLINE_BANK_EVENT_RESULT_CODE", "DEVICE_CONTEXT_ID", "EXTERNAL_DEVICE_ID", "DEVICE_CONTEXT_USER_AGENT", "IP_COUNTRY", "IP_COUNTRY_MATCHES_SHIPPING_COUNTRY", "DISTANCE_TO_PREVIOUS_TRANSACTION_IP", "LAST_HOUR_UNIQUE_IP_COUNTRIES", "LAST_DAY_UNIQUE_IP_COUNTRIES", "LAST_WEEK_UNIQUE_IP_COUNTRIES", "CUSTOM_CONNECTION_COUNT_BUCKET", "TOTAL_TRANSACTION_AMOUNT", "TOTAL_TRANSACTION_COUNT", "LAST_30DAYS_TRANSACTION_AMOUNT", "LAST_30DAYS_TRANSACTION_COUNT", "CUSTOM_LAST6MONTHS_INVITATIONS_SENT", "CUSTOM_LAST_DAY_CARD_USAGE_COUNT", "LAST_HOUR_TRANSACTION_COUNT", "LAST_DAY_TRANSACTION_COUNT", "LAST_WEEK_TRANSACTION_COUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT", "LAST_HOUR_REJECTED_TRANSACTION_COUNT", "LAST_DAY_REJECTED_TRANSACTION_COUNT", "LAST_WEEK_REJECTED_TRANSACTION_COUNT", "LAST_HOUR_FAILED_TRANSACTION_COUNT", "LAST_DAY_FAILED_TRANSACTION_COUNT", "LAST_WEEK_FAILED_TRANSACTION_COUNT", "LAST_HOUR_TRANSACTION_AMOUNT", "LAST_DAY_TRANSACTION_AMOUNT", "LAST_WEEK_TRANSACTION_AMOUNT", "LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_DAY_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_WEEK_SUCCESSFUL_TRANSACTION_AMOUNT", "LAST_HOUR_REJECTED_TRANSACTION_AMOUNT", "LAST_DAY_REJECTED_TRANSACTION_AMOUNT", "LAST_WEEK_REJECTED_TRANSACTION_AMOUNT", "LAST_HOUR_FAILED_TRANSACTION_AMOUNT", "LAST_DAY_FAILED_TRANSACTION_AMOUNT", "LAST_WEEK_FAILED_TRANSACTION_AMOUNT", "LAST_HOUR_UNIQUE_PI", "LAST_DAY_UNIQUE_PI", "LAST_WEEK_UNIQUE_PI", "LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_COUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI", "LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_DAY_TRANSACTION_AMOUNT_CURRENT_PI", "LAST_WEEK_TRANSACTION_AMOUNT_CURRENT_PI" ]
           },
           "category" : {
             "type" : "string"
@@ -7368,7 +8963,7 @@
             "type" : "array",
             "items" : {
               "type" : "string",
-              "enum" : [ "IN", "CONTAINS", "REGEXP", "IS_TRUE", "BETWEEN", "BETWEEN_ALPH", "BETWEEN_DATE", "EQUAL", "EQUAL_ALPH", "GREATER", "GREATER_ALPH", "GREATER_DATE", "LESS", "LESS_ALPH", "LESS_DATE", "GREATER_OR_EQUAL", "GREATER_OR_EQUAL_ALPH", "GREATER_OR_EQUAL_DATE", "LESS_OR_EQUAL", "LESS_OR_EQUAL_ALPH", "LESS_OR_EQUAL_DATE" ]
+              "enum" : [ "IN", "CONTAINS", "REGEXP", "IS_TRUE", "BETWEEN", "BETWEEN_ALPH", "BETWEEN_DATE", "NOT_BETWEEN", "NOT_BETWEEN_ALPH", "NOT_BETWEEN_DATE", "EQUAL", "EQUAL_ALPH", "NOT_EQUAL", "NOT_EQUAL_ALPH", "GREATER", "GREATER_ALPH", "GREATER_DATE", "LESS", "LESS_ALPH", "LESS_DATE", "GREATER_OR_EQUAL", "GREATER_OR_EQUAL_ALPH", "GREATER_OR_EQUAL_DATE", "LESS_OR_EQUAL", "LESS_OR_EQUAL_ALPH", "LESS_OR_EQUAL_DATE" ]
             }
           },
           "lowerBound" : {
@@ -7392,17 +8987,64 @@
             "type" : "string",
             "enum" : [ "READY", "RUNNING" ]
           },
+          "previousRun" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "currentRun" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "previousSuccessfulRun" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "previousSuccessfulExecutionTime" : {
+            "type" : "object",
+            "properties" : {
+              "seconds" : {
+                "type" : "integer",
+                "format" : "int64"
+              },
+              "units" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object",
+                  "properties" : {
+                    "durationEstimated" : {
+                      "type" : "boolean"
+                    },
+                    "dateBased" : {
+                      "type" : "boolean"
+                    },
+                    "timeBased" : {
+                      "type" : "boolean"
+                    }
+                  }
+                }
+              },
+              "nano" : {
+                "type" : "integer",
+                "format" : "int32"
+              },
+              "negative" : {
+                "type" : "boolean"
+              },
+              "zero" : {
+                "type" : "boolean"
+              }
+            }
+          },
           "variables" : {
             "type" : "object",
             "additionalProperties" : {
               "type" : "string"
             }
           },
-          "previousRun" : {
-            "type" : "string",
-            "format" : "date-time"
+          "lastFailedRunMessage" : {
+            "type" : "string"
           },
-          "failedStatusMessage" : {
+          "instanceId" : {
             "type" : "string"
           },
           "get_etag" : {
@@ -7410,11 +9052,17 @@
           }
         }
       },
-      "Event" : {
+      "DisposabilityCheck" : {
         "type" : "object",
         "properties" : {
-          "id" : {
-            "type" : "string"
+          "disposable" : {
+            "type" : "boolean"
+          },
+          "disposabilityResponses" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/DisposabilityCheckServiceResponse"
+            }
           }
         }
       },

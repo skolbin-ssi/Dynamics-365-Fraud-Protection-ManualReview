@@ -203,7 +203,7 @@ export class QueueTiles extends Component<QueueTilesComponentProps, never> {
             queueStore,
             activeTilesQueueList,
             queuesSupervisedByCurrentUser,
-            allQueuesAssignedToCurrentUser
+            queuesAssignedToCurrentUser
         } = this.queuesScreenStore;
         const {
             queues,
@@ -226,10 +226,10 @@ export class QueueTiles extends Component<QueueTilesComponentProps, never> {
             );
         }
 
-        if (allQueuesAssignedToCurrentUser && activeTilesQueueList === QUEUE_LIST_TYPE.ASSIGNED) {
+        if (queuesAssignedToCurrentUser && activeTilesQueueList === QUEUE_LIST_TYPE.ASSIGNED) {
             return (
                 <div className={`${CN}__queues`}>
-                    {allQueuesAssignedToCurrentUser.map(this.renderTile)}
+                    {queuesAssignedToCurrentUser.map(this.renderTile)}
                 </div>
             );
         }

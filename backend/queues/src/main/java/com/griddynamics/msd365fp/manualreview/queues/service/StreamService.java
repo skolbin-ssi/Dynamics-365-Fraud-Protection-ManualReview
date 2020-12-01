@@ -29,13 +29,12 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.DEFAULT_QUEUE_PAGE_SIZE;
@@ -115,6 +114,7 @@ public class StreamService implements HealthCheckProcessor {
             healthCheckRepository.save(hc);
         });
 
+        List<Mono<Void>> sendings = new LinkedList<>();
         processorRegistry.forEach((hub, client) -> {
             for (int i = 0; i < healthCheckBatchSize; i++) {
                 HealthCheck healthCheck = HealthCheck.builder()
@@ -127,20 +127,24 @@ public class StreamService implements HealthCheckProcessor {
                         .type(EVENT_HUB_CONSUMER)
                         .generatedBy(applicationProperties.getInstanceId())
                         .active(true)
-                        .created(OffsetDateTime.now())
                         .ttl(healthCheckTtl.toSeconds())
                         ._etag("new")
                         .build();
-                client.sendHealthCheckPing(healthCheck.getId(), () -> {
-                    try {
-                        healthCheckRepository.save(healthCheck);
-                    } catch (CosmosDBAccessException e) {
-                        log.debug("Receiver already inserted this [{}] health-check entry", healthCheck.getId());
-                    }
-                });
+                sendings.add(client.sendHealthCheckPing(healthCheck.getId())
+                        .doOnSuccess(v -> {
+                            try {
+                                healthCheck.setCreated(OffsetDateTime.now());
+                                healthCheckRepository.save(healthCheck);
+                            } catch (CosmosDBAccessException e) {
+                                log.debug("Receiver already inserted this [{}] health-check entry", healthCheck.getId());
+                            }
+                        }));
                 healthCheckNum++;
             }
         });
+        Mono.zipDelayError(sendings, results -> results)
+                .subscribeOn(Schedulers.boundedElastic())
+                .subscribe();
         return overdueHealthChecks.isEmpty();
     }
 
@@ -151,15 +155,11 @@ public class StreamService implements HealthCheckProcessor {
      * @param channel the name of producer
      * @return true when event was successfully sent
      */
-    public <T extends Event> boolean sendEvent(T event, String channel) {
+    public <T extends Event> Mono<Void> sendEvent(T event, String channel) {
         log.info("Sending event to [{}] with body: [{}]", channel, event);
-        boolean success = producerRegistry.get(channel).send(event);
-        if (success) {
-            log.info("Event [{}] sending has been started successfully.", event.getId());
-        } else {
-            log.warn("Event [{}] has not been sent: [{}]", event.getId(), event);
-        }
-        return success;
+        return producerRegistry.get(channel).send(event)
+                .doOnSuccess(v -> log.info("Event [{}] sending has been started successfully.", event.getId()))
+                .doOnError(v -> log.error("Event [{}] has not been sent: [{}]", event.getId(), event));
     }
 
     /**
@@ -174,7 +174,9 @@ public class StreamService implements HealthCheckProcessor {
             if (CollectionUtils.isEmpty(newIds)) {
                 newIds = getActiveResidualQueues().stream().map(Queue::getId).collect(Collectors.toSet());
             }
-            sendItemAssignmentEvent(item, newIds, Set.of());
+            sendItemAssignmentEvent(item, newIds, Set.of())
+                    .subscribeOn(Schedulers.elastic())
+                    .subscribe();
         } catch (BusyException e) {
             log.error("Event [{}] for item [{}] wasn't sent due to database overload",
                     ItemAssignmentEvent.class, item.getId());
@@ -198,21 +200,23 @@ public class StreamService implements HealthCheckProcessor {
             if (CollectionUtils.isEmpty(oldIds)) {
                 oldIds = getActiveResidualQueues().stream().map(Queue::getId).collect(Collectors.toSet());
             }
-            sendItemAssignmentEvent(item, newIds, oldIds);
+            sendItemAssignmentEvent(item, newIds, oldIds)
+                    .subscribeOn(Schedulers.elastic())
+                    .subscribe();
         } catch (BusyException e) {
             log.error("Event [{}] for item [{}] wasn't sent due to database overload",
                     ItemAssignmentEvent.class, item.getId());
         }
     }
 
-    private void sendItemAssignmentEvent(final Item item, final Set<String> newIds, final Set<String> oldIds) {
+    private Mono<Void> sendItemAssignmentEvent(final Item item, final Set<String> newIds, final Set<String> oldIds) {
         ItemAssignmentEvent event = ItemAssignmentEvent.builder()
                 .id(item.getId())
                 .newQueueIds(newIds)
                 .oldQueueIds(oldIds)
                 .actioned(OffsetDateTime.now())
                 .build();
-        sendEvent(event, ITEM_ASSIGNMENT_EVENT_HUB);
+        return sendEvent(event, ITEM_ASSIGNMENT_EVENT_HUB);
     }
 
     public void sendItemLockEvent(Item item, ItemLock prevLock, LockActionType actionType) {
@@ -232,17 +236,23 @@ public class StreamService implements HealthCheckProcessor {
             event.setOwnerId(item.getLock().getOwnerId());
             event.setLocked(item.getLock().getLocked());
         }
-        sendEvent(event, ITEM_LOCK_EVENT_HUB);
+        sendEvent(event, ITEM_LOCK_EVENT_HUB)
+                .subscribeOn(Schedulers.elastic())
+                .subscribe();
     }
 
-    public boolean sendQueueSizeEvent(Queue queue) {
+    public void sendQueueSizeEvent(Queue queue) {
         QueueSizeUpdateEvent event = modelMapper.map(queue, QueueSizeUpdateEvent.class);
-        return sendEvent(event, QUEUE_SIZE_EVENT_HUB);
+        sendEvent(event, QUEUE_SIZE_EVENT_HUB)
+                .subscribeOn(Schedulers.elastic())
+                .subscribe();
     }
 
-    public boolean sendOverallSizeEvent(int size) {
+    public void sendOverallSizeEvent(int size) {
         OverallSizeUpdateEvent event = new OverallSizeUpdateEvent(size, OffsetDateTime.now());
-        return sendEvent(event, OVERALL_SIZE_EVENT_HUB);
+        sendEvent(event, OVERALL_SIZE_EVENT_HUB)
+                .subscribeOn(Schedulers.elastic())
+                .subscribe();
     }
 
     public void sendItemLabelEvent(final Item item, final Item oldItem) {
@@ -250,20 +260,30 @@ public class StreamService implements HealthCheckProcessor {
                 .id(item.getId())
                 .label(item.getLabel())
                 .assesmentResult(item.getAssessmentResult())
-                .decisionApplyingDuration(
+                .decisionApplyingDuration(oldItem.getLock() == null || oldItem.getLock().getLocked() == null ? Duration.ZERO :
                         Duration.between(oldItem.getLock().getLocked(), item.getLabel().getLabeled()))
                 .build();
-        sendEvent(event, ITEM_LABEL_EVENT_HUB);
+        sendEvent(event, ITEM_LABEL_EVENT_HUB)
+                .subscribeOn(Schedulers.elastic())
+                .subscribe();
     }
 
-    public void sendItemResolvedEvent(final Item item) {
-        ItemResolutionEvent event = modelMapper.map(item, ItemResolutionEvent.class);
-        sendEvent(event, ITEM_RESOLUTION_EVENT_HUB);
+
+    public ItemResolutionEvent createItemResolvedEvent(final Item item) {
+        ItemResolutionEvent res = modelMapper.map(item, ItemResolutionEvent.class);
+        res.setId(item.getId() + "-" + item.getLabel().getLabeled());
+        return modelMapper.map(item, ItemResolutionEvent.class);
+    }
+
+    public Mono<Void> sendItemResolvedEvent(final Event event) {
+        return sendEvent(event, ITEM_RESOLUTION_EVENT_HUB);
     }
 
     public void sendQueueUpdateEvent(final Queue queue) {
         QueueUpdateEvent event = modelMapper.map(queue, QueueUpdateEvent.class);
-        sendEvent(event, QUEUE_UPDATE_EVENT_HUB);
+        sendEvent(event, QUEUE_UPDATE_EVENT_HUB)
+                .subscribeOn(Schedulers.elastic())
+                .subscribe();
     }
 
     //TODO: caching

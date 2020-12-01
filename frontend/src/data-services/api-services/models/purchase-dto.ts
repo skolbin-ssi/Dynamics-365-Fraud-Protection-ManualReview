@@ -8,6 +8,7 @@ import { PreviousPurchaseDTO } from './previous-purchase-dto';
 import { ProductDTO } from './product-dto';
 import { PurchaseUserDTO } from './user-dto';
 import { BankEventDTO } from './bank-event-dto';
+import { CalculatedFieldsDTO } from './calculated-fields-dto';
 
 export interface PurchaseDTO {
     PurchaseId: string;
@@ -27,10 +28,11 @@ export interface PurchaseDTO {
     ProductList: ProductDTO[];
     AdditionalInfo: any;
     AddressList: AddressDTO[];
-    BankEventList: BankEventDTO[];
+    BankEventsList: BankEventDTO[];
     CurrencyConversionFactor: number;
-    CustomData: any;
+    CustomData: Record<string, string>;
     SalesTaxInUSD: number;
     TotalAmountInUSD: number;
-    PreviousPurchaseList: PreviousPurchaseDTO[]
+    PreviousPurchaseList: PreviousPurchaseDTO[];
+    CalculatedFields: CalculatedFieldsDTO;
 }

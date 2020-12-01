@@ -7,7 +7,7 @@ object OpenQueuesViewWithFrontend {
   val sharepointUrl = "https://static2.sharepointonline.com/files/fabric/assets/fonts/segoeui-westeuropean"
   val akamaihdUrl = "https://spoprod-a.akamaihd.net/files/fabric/assets/icons"
 
-  val action =
+  val action = {
     exec(
       http("queues")
         .get("/queues")
@@ -26,13 +26,13 @@ object OpenQueuesViewWithFrontend {
     )
       .foreach(session => session("jsPaths").as[Seq[String]], "jsPath") {
         exec(
-          http("Request ${jsPath}")
+          http("Request jsPath")
             .get("${jsPath}")
         )
       }
       .foreach(session => session("cssPaths").as[Seq[String]], "cssPath") {
         exec(
-          http("Request ${cssPath}")
+          http("Request cssPath")
             .get("${cssPath}")
         )
       }
@@ -40,13 +40,13 @@ object OpenQueuesViewWithFrontend {
         http("config.json")
           .get("/config.json"))
       .exec(
-        http("segoeui-regular.woff2")
+        http("Get fonts")
           .get(sharepointUrl + "/segoeui-regular.woff2"))
       .exec(
-        http("segoeui-semibold.woff2")
+        http("Get fonts")
           .get(sharepointUrl + "/segoeui-semibold.woff2"))
       .exec(
-        http("segoeui-bold.woff2")
+        http("Get fonts")
           .get(sharepointUrl + "/segoeui-bold.woff2"))
       .exec(http("/api/users/me")
         .get("/api/users/me"))
@@ -54,22 +54,22 @@ object OpenQueuesViewWithFrontend {
         http("/api/users")
           .get("/api/users"))
       .exec(
-        http("request_9")
+        http("fabric-icons")
           .get(akamaihdUrl + "/fabric-icons-6-ef6fd590.woff"))
       .exec(
-        http("request_10")
+        http("fabric-icons")
           .get(akamaihdUrl + "/fabric-icons-a13498cf.woff"))
       .exec(
-        http("request_11")
+        http("fabric-icons")
           .get(akamaihdUrl + "/fabric-icons-5-f95ba260.woff"))
       .exec(
-        http("request_12")
+        http("fabric-icons")
           .get(akamaihdUrl + "/fabric-icons-10-c4ded8e4.woff"))
       .exec(
-        http("request_13")
+        http("fabric-icons")
           .get(akamaihdUrl + "/fabric-icons-17-0c4ed701.woff"))
       .exec(
-        http("request_14")
+        http("fabric-icons")
           .get(akamaihdUrl + "/fabric-icons-1-4d521695.woff"))
       .exec(
         http("/api/settings/review-console-links")
@@ -103,18 +103,19 @@ object OpenQueuesViewWithFrontend {
         .get("/api/queues?viewType=ESCALATION"))
       .foreach(session => session("regularReviewers").as[Seq[Any]], "reviewer") {
         exec(
-          http("Request photo: /api/users/${reviewer}/photo")
+          http("Request photo")
             .get("/api/users/${reviewer}/photo")
         )
       }
-      .foreach(session => session("regularSupervisors").as[Seq[Any]], "reviewer") {
+      .foreach(session => session("regularSupervisors").as[Seq[Any]], "supervisor") {
         exec(
-          http("Request photo: /api/users/${reviewer}/photo")
-            .get("/api/users/${reviewer}/photo")
+          http("Request photo")
+            .get("/api/users/${supervisor}/photo")
         )
       }
       .exec(http(
         "/api/items/locked")
         .get("/api/items/locked")
       )
+  }
 }

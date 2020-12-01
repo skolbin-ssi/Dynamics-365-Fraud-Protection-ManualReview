@@ -10,7 +10,12 @@ import { disposeOnUnmount, observer } from 'mobx-react';
 
 import { EntityHeader } from '../entity-header';
 
-import { ReportsModalStore, UpdateQuerySearchReactionParams } from '../../../view-services';
+import {
+    AnalystPerformanceStore,
+    QueueOverturnedPerformanceStore,
+    ReportsModalStore,
+    UpdateQuerySearchReactionParams,
+} from '../../../view-services';
 import {
     CHART_AGGREGATION_PERIOD,
     PERFORMANCE_RATING,
@@ -18,17 +23,14 @@ import {
 } from '../../../constants';
 import { TYPES } from '../../../types';
 
-import './analyst-performance.scss';
-import { AnalystPerformanceStore } from '../../../view-services/dashboard/analyst-performance-store';
-import { QueueOverturnedPerformanceStore } from '../../../view-services/dashboard/queue-overturned-performance-store';
 import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
+import { formatToQueryDateString } from '../../../utils/date';
 import { TotalReview } from './total-review';
 import { PerformanceOverview } from './performance-overview';
 import { OverturnedPerformance } from '../overturned-performance';
 import { QueuePerformance } from '../../../models/dashboard';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CN = 'analyst-performance';
+import './analyst-performance.scss';
 
 export interface AnalystPerformanceRouterParams {
     analystId: string
@@ -123,7 +125,9 @@ export class AnalystPerformance extends Component<AnalystPerformanceProps, any> 
     }
 
     @autoBind
-    updateQueueUrlQuerySearch({ ids, rating, aggregation }: UpdateQuerySearchReactionParams) {
+    updateQueueUrlQuerySearch({
+        ids, rating, aggregation, from, to,
+    }: UpdateQuerySearchReactionParams) {
         const { location: { search } } = this.props;
         const { analystId } = this.analystPerformanceStore;
         const searchPart = readUrlSearchQueryOptions(search, {
@@ -138,7 +142,9 @@ export class AnalystPerformance extends Component<AnalystPerformanceProps, any> 
             aggregation,
             overturnedIds: searchPart.overturnedIds,
             overturnedRating: searchPart.overturnedRating,
-            overturnedAggregation: searchPart.aggregation
+            overturnedAggregation: searchPart.aggregation,
+            from: formatToQueryDateString(from, null),
+            to: formatToQueryDateString(to, null),
         });
 
         this.history.replace(`${ROUTES.build.dashboard.analyst(analystId)}?${stringifiedFields}`);
@@ -146,7 +152,9 @@ export class AnalystPerformance extends Component<AnalystPerformanceProps, any> 
     }
 
     @autoBind
-    updateOverturnedUrlQuerySearch({ ids, rating, aggregation }: UpdateQuerySearchReactionParams) {
+    updateOverturnedUrlQuerySearch({
+        ids, rating, aggregation, from, to,
+    }: UpdateQuerySearchReactionParams) {
         const { location: { search } } = this.props;
         const { analystId } = this.analystPerformanceStore;
 
@@ -158,7 +166,9 @@ export class AnalystPerformance extends Component<AnalystPerformanceProps, any> 
             aggregation: searchPart.aggregation,
             overturnedIds: ids,
             overturnedRating: rating,
-            overturnedAggregation: aggregation
+            overturnedAggregation: aggregation,
+            from: formatToQueryDateString(from, null),
+            to: formatToQueryDateString(to, null),
         });
 
         this.history.replace(`${ROUTES.build.dashboard.analyst(analystId)}?${strigifiedFields}`);
@@ -168,16 +178,20 @@ export class AnalystPerformance extends Component<AnalystPerformanceProps, any> 
 
     @autoBind
     handleGenerateReportsButtonClick() {
-        const { reports: analystPerformanceReports } = this.analystPerformanceStore;
-        const { reports: overturnedPerformanceReports } = this.overturnedPerformanceStore;
+        const analystPerformanceReports = this.analystPerformanceStore.reports();
+        const overturnedPerformanceReports = this.overturnedPerformanceStore.reports();
 
         this.reportsModalStore.showReportsModal([...analystPerformanceReports, ...overturnedPerformanceReports]);
     }
 
     render() {
+        const { isGenerateButtonsDisabled } = this.analystPerformanceStore;
+        const { isDataLoading } = this.overturnedPerformanceStore;
+
         return (
             <>
                 <EntityHeader
+                    isGenerateReportButtonDisabled={isGenerateButtonsDisabled || isDataLoading}
                     handleGenerateReportsButtonClick={this.handleGenerateReportsButtonClick}
                     analystPerformanceStore={this.analystPerformanceStore}
                 />

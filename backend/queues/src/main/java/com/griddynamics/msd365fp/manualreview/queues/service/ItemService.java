@@ -3,21 +3,21 @@
 
 package com.griddynamics.msd365fp.manualreview.queues.service;
 
+import com.griddynamics.msd365fp.manualreview.cosmos.utilities.IdUtility;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
 import com.griddynamics.msd365fp.manualreview.model.ItemLabel;
 import com.griddynamics.msd365fp.manualreview.model.ItemLock;
 import com.griddynamics.msd365fp.manualreview.model.ItemNote;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
-import com.griddynamics.msd365fp.manualreview.model.dfp.raw.ExplorerEntity;
-import com.griddynamics.msd365fp.manualreview.model.dfp.raw.PaymentInstrumentNodeData;
-import com.griddynamics.msd365fp.manualreview.model.dfp.raw.UserNodeData;
+import com.griddynamics.msd365fp.manualreview.model.event.Event;
 import com.griddynamics.msd365fp.manualreview.model.event.dfp.PurchaseEventBatch;
+import com.griddynamics.msd365fp.manualreview.model.event.internal.ItemResolutionEvent;
 import com.griddynamics.msd365fp.manualreview.model.event.type.LockActionType;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
 import com.griddynamics.msd365fp.manualreview.queues.model.ItemDataField;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemEvent;
 import com.griddynamics.msd365fp.manualreview.queues.model.dto.ItemDTO;
-import com.griddynamics.msd365fp.manualreview.queues.model.dto.ItemSearchQueryDTO;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Queue;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.SearchQuery;
@@ -30,15 +30,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -55,83 +57,41 @@ public class ItemService {
     private final StreamService streamService;
     private final ItemRepository itemRepository;
     private final QueueRepository queueRepository;
-    private final SearchQueryRepository searchQueryRepository ;
-    private final DFPExplorerService dfpExplorerService;
+    private final SearchQueryRepository searchQueryRepository;
     private final ModelMapper modelMapper;
 
     @Setter(onMethod = @__({@Autowired}))
     private ItemService thisService;
-    @Setter(onMethod = @__({@Autowired, @Qualifier("dfpModelMapper")}))
-    private ModelMapper dfpModelMapper;
     @Setter(onMethod = @__({@Value("${mr.items.unlock-timeout}")}))
     private Duration unlockTimeout;
-    @Setter(onMethod = @__({@Value("${mr.tasks.item-enrichment-task.enrichment-delay}")}))
-    private Duration enrichmentDelay;
 
     public void saveEmptyItem(PurchaseEventBatch eventBatch) {
         eventBatch.forEach(event -> {
-            String id = event.getEventId();
-            log.info("Event [{}] has been received from the DFP rule [{}].", id, event.getRuleName());
+            String purchaseId = event.getEventId();
+            String itemId = IdUtility.encodeRestrictedChars(purchaseId);
+            log.info("Event [{}] has been received from the DFP rule [{}].", purchaseId, event.getRuleName());
 
             if ("purchase".equalsIgnoreCase(event.getEventType())) {
                 // Create and save the item
                 Item item = Item.builder()
-                        .id(id)
+                        .id(itemId)
                         .active(false)
                         .imported(OffsetDateTime.now())
-                        ._etag(id)
+                        ._etag(UUID.randomUUID().toString())
                         .build();
                 try {
                     itemRepository.save(item);
-                    log.info("Item [{}] has been saved to the storage.", id);
+                    log.info("Item [{}] has been saved to the storage.", itemId);
                 } catch (CosmosDBAccessException e) {
-                    log.info("Item [{}] has not been saved to the storage because it's already exist.", id);
+                    log.info("Item [{}] has not been saved to the storage because it's already exist.", itemId);
                 } catch (Exception e) {
-                    log.warn("Item [{}] has not been saved to the storage: {}", id, e.getMessage());
+                    log.warn("Item [{}] has not been saved to the storage: {}", itemId, e.getMessage());
                 }
             } else {
-                log.info("The event type of [{}] is [{}]. The event has been ignored.", id, event.getEventType());
+                log.info("The event type of [{}] is [{}]. The event has been ignored.", purchaseId, event.getEventType());
             }
         });
     }
-
-    public boolean enrichAllPoorItems(boolean forceEnrichment) throws BusyException {
-        PageProcessingUtility.executeForAllPages(
-                continuationToken -> {
-                    PageableCollection<String> unenrichedItemIds;
-                    if (forceEnrichment) {
-                        unenrichedItemIds = itemRepository.findUnenrichedItemIds(DEFAULT_ITEM_PAGE_SIZE, continuationToken);
-                    } else {
-                        OffsetDateTime updatedUpperBoundary = OffsetDateTime.now().minus(enrichmentDelay);
-                        unenrichedItemIds = itemRepository.findUnenrichedItemIds(
-                                updatedUpperBoundary, DEFAULT_ITEM_PAGE_SIZE, continuationToken);
-                    }
-                    return unenrichedItemIds;
-                },
-                itemCollection -> {
-                    log.info("Trying to enrich items with IDs: [{}]", itemCollection.getValues());
-                    itemCollection.getValues().parallelStream().forEach(this::enrichItem);
-                });
-        return true;
-    }
-
-    @Retry(name = "cosmosOptimisticUpdate")
-    protected void enrichItem(String itemId, ExplorerEntity entity) {
-        log.info("Attempting to enrich item [{}].", itemId);
-        Optional<Item> itemFromDB = itemRepository.findById(itemId);
-        if (itemFromDB.isPresent()) {
-            Item item = itemFromDB.get();
-            dfpModelMapper.map(entity, item);
-            item.setActive(true);
-            item.setEnriched(OffsetDateTime.now());
-            itemRepository.save(item);
-            streamService.sendItemAssignmentEvent(item);
-            log.info("Item [{}] has been successfully enriched in the database.", item.getId());
-        } else {
-            log.warn("Failed to enrich item [{}]. It's not presented in the database.", itemId);
-        }
-    }
-
 
     @Retry(name = "cosmosOptimisticUpdate")
     protected Optional<Item> unlockItem(final String itemId, LockActionType actionType) {
@@ -339,6 +299,46 @@ public class ItemService {
     }
 
     /**
+     * Initializes resolution sending.
+     *
+     * @return list of initialized sents
+     */
+    public boolean sendResolutions() throws BusyException {
+        log.info("Start resolution sending.");
+        PageProcessingUtility.executeForAllPages(
+                continuation -> itemRepository.findUnreportedItems(
+                        DEFAULT_ITEM_PAGE_SIZE,
+                        continuation),
+                itemCollection -> {
+                    Set<ImmutablePair<String, ItemEvent>> eventCollection = itemCollection.stream()
+                            .flatMap(item -> item.getEvents().stream()
+                                    .filter(event -> ItemResolutionEvent.class.equals(event.getKlass()))
+                                    .map(event -> new ImmutablePair<>(item.getId(), event)))
+                            .collect(Collectors.toSet());
+                    log.info("Start resolution sending for [{}].", eventCollection);
+                    Set<Mono<Void>> executions = eventCollection.stream()
+                            .map(eventTuple -> streamService.sendItemResolvedEvent(eventTuple.getRight().getEvent())
+                                    .doOnSuccess(v -> thisService.deleteEventFromItem(eventTuple.left, eventTuple.right.getSendingId())))
+                            .collect(Collectors.toSet());
+                    Mono.zipDelayError(executions, r -> r)
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe();
+                });
+        return true;
+    }
+
+    @Retry(name = "cosmosOptimisticUpdate")
+    protected void deleteEventFromItem(String itemId, String sendingId) {
+        Optional<Item> itemOptional = itemRepository.findById(itemId);
+        itemOptional.ifPresent(item -> {
+            if (item.getEvents().removeIf(event -> sendingId.equals(event.getSendingId()))) {
+                itemRepository.save(item);
+                log.info("Event [{}] were reported from item [{}].", sendingId, itemId);
+            }
+        });
+    }
+
+    /**
      * Unlocks all items with expired lock timestamps.
      *
      * @return list of unlocked items
@@ -397,18 +397,4 @@ public class ItemService {
                 queriedItems.getContinuationToken());
     }
 
-    private void enrichItem(String itemId) {
-        List<ExplorerEntity> additionalEntities = new LinkedList<>();
-        ExplorerEntity entity = dfpExplorerService.explorePurchase(itemId);
-        additionalEntities.addAll(entity.getNodes().stream()
-                .filter(n -> n.getData() instanceof PaymentInstrumentNodeData)
-                .map(n -> dfpExplorerService.explorePaymentInstrument(n.getId()))
-                .collect(Collectors.toList()));
-        additionalEntities.addAll(entity.getNodes().stream()
-                .filter(n -> n.getData() instanceof UserNodeData)
-                .map(n -> dfpExplorerService.exploreUser(n.getId()))
-                .collect(Collectors.toList()));
-        additionalEntities.forEach(entity::extend);
-        thisService.enrichItem(itemId, entity);
-    }
 }

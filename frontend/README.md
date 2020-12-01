@@ -10,18 +10,18 @@ Tools that have to be installed in your local environment.
 - `yarn` 1.22.0
 
 #### Quick Start
-For quick project setup in development mode, you can execute the following commands. 
-
-> NOTE:
-> In order to access local Back End runtime instead of Cloud deployed version
-> you need to specify API_BASE_URL environment variable for instance in .env file
-> dev URL is used by default, find details in `./src/setupProxy.js`
-
-```sh
-> cd ./msd365fp-manual-review/frontend
-> yarn
-> yarn start
-```
+For quick project setup in development mode, you need:
+   1. Specify several environment variables for instance in .env file (See [sample.env](./sample.env) as example)
+      - API_BASE_URL - base Backend URL you want the frontend to communicate with, used in [setupProxy.js](./src/setupProxy.js)
+      - LOG_LEVEL - can be error | warn | info | debug | trace, debug is used by default in [development-configuration.ts](./src/utility-services/configuration/development-configuration.ts)
+      - CLIENT_ID, TENANT, MAP_CLIENT_ID, TOKEN_PERSIST_KEY, NONCE_PERSIST_KEY - are used in [development-configuration.ts](./src/utility-services/configuration/development-configuration.ts)
+      
+   2. Execute the following commands.
+        ```sh
+        > cd ./msd365fp-manual-review/frontend
+        > yarn
+        > yarn start
+        ```
 
 #### Deployment
 In order to perform deployment refer to [deployment guide](../arm/README.md) 
@@ -53,6 +53,5 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-## Microsoft Open Source code of conduct
-
-For additional information, see the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct).
+## Contribution
+Find detailed information in the [Contribution guide](./CONTRIBUTION.md).

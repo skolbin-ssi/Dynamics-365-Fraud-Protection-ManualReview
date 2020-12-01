@@ -21,7 +21,7 @@ import { ApiServiceError } from '../../data-services/base-api-service';
 import { MrUserError } from '../../models/exceptions';
 import { Item } from '../../models';
 import { TYPES } from '../../types';
-import { CurrentUserStore, LockedItemsStore } from '../../view-services';
+import { CurrentUserStore, ITEM_DETAILS_MODE, LockedItemsStore } from '../../view-services';
 import { ReviewConsoleScreenStore } from '../../view-services/review-console';
 import {
     ITEM_REVIEW_PROHIBITION_REASONS,
@@ -42,6 +42,7 @@ export const CN = 'review-console';
 export interface ReviewConsoleRouteParams {
     queueId?: string;
     itemId?: string;
+    searchId?: string;
 }
 
 interface ReviewConsoleState {
@@ -83,10 +84,10 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     async componentDidMount() {
         const { match } = this.props;
         const { params, path } = match;
-        const { queueId, itemId } = params;
+        const { queueId, itemId, searchId } = params;
 
-        if (itemId) {
-            this.reviewConsoleScreenStore.getItem(itemId, queueId!);
+        if (itemId && queueId) {
+            this.reviewConsoleScreenStore.getItem(itemId, queueId);
         }
 
         if (queueId && path === ROUTES.REVIEW_CONSOLE) {
@@ -98,6 +99,15 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
 
         if (queueId) {
             this.reviewConsoleScreenStore.getQueueData(queueId);
+        }
+
+        if (searchId) {
+            this.reviewConsoleScreenStore.setSearchId(searchId);
+        }
+
+        if (itemId && path === ROUTES.SEARCH_INACTIVE_ITEM_DETAILS) {
+            await this.reviewConsoleScreenStore.getItem(itemId);
+            await this.reviewConsoleScreenStore.getQueueData(this.reviewConsoleScreenStore.reviewItem?.label?.queueId);
         }
 
         if (!this.lockedItemsStore.lockedItems) {
@@ -116,13 +126,16 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     }
 
     @autoBind
-    handleBackToQueuesClick() {
-        const { queue } = this.reviewConsoleScreenStore;
+    handleBackButtonClick() {
+        const { queue, searchId } = this.reviewConsoleScreenStore;
 
         this.reviewConsoleScreenStore.clearQueueData();
+        this.reviewConsoleScreenStore.setSearchId('');
 
-        if (queue) {
-            this.goBackToQueueList(queue.viewId);
+        if (searchId) {
+            this.goBackToSearch(searchId);
+        } else {
+            this.goBackToQueueList(queue?.viewId);
         }
     }
 
@@ -132,10 +145,17 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         });
     }
 
+    goBackToSearch(searchId: string = '') {
+        this.history.push({
+            pathname: ROUTES.build.search(searchId)
+        });
+    }
+
     replaceHistory(queueId: string) {
         const { reviewItem } = this.reviewConsoleScreenStore;
 
         if (reviewItem) {
+            this.reviewConsoleScreenStore.clearSearchId();
             this.history.replace(
                 `${ROUTES.build.reviewConsole(queueId)}?itemId=${reviewItem.id}`
             );
@@ -188,6 +208,7 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         }
 
         if (queueId && itemId) {
+            this.reviewConsoleScreenStore.clearSearchId();
             this.history.push(ROUTES.build.itemDetailsReviewConsole(queueId, itemId));
         }
     }
@@ -219,7 +240,19 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     }
 
     @autoBind
+    navigateBackToQueueOrdersPage() {
+        const { match: { params: { queueId } } } = this.props;
+
+        if (queueId) {
+            this.history.push({
+                pathname: ROUTES.build.queues(queueId)
+            });
+        }
+    }
+
+    @autoBind
     updateReviewConsoleHistoryPath(queueId: string, itemId: string) {
+        this.reviewConsoleScreenStore.clearSearchId();
         this.history.push({
             pathname: ROUTES.build.itemDetailsReviewConsole(queueId, itemId)
         });
@@ -236,12 +269,18 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
 
     @autoBind
     handleGoToLockedItemClick(queueViewId: string, itemId: string) {
+        this.reviewConsoleScreenStore.clearSearchId();
         this.history.push({ pathname: ROUTES.build.itemDetailsReviewConsole(queueViewId, itemId) });
         this.reviewConsoleScreenStore.getItem(itemId, queueViewId);
 
         if (queueViewId !== this.reviewConsoleScreenStore.queue?.viewId) {
             this.reviewConsoleScreenStore.getQueueData(queueViewId);
         }
+    }
+
+    @autoBind
+    handleTabChangeMode(mode: ITEM_DETAILS_MODE) {
+        this.reviewConsoleScreenStore.setOpenDetailsTab(mode);
     }
 
     static renderReviewConsolePanelSpinner() {
@@ -278,10 +317,10 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
     @autoBind
     renderStartReviewPanel() {
         const { queue, reviewItem } = this.reviewConsoleScreenStore;
-        const permission = queue && this.reviewPermissionStore.queueReviewPermissions?.get(queue.viewId);
+        const queueReviewPermission = queue && this.reviewPermissionStore.queueReviewPermissions?.get(queue?.viewId);
         const itemReviewPermission = this.reviewPermissionStore.itemReviewPermissions(reviewItem, queue);
-        const isReviewAllowed = (permission ? permission.isAllowed : true) && itemReviewPermission.isAllowed;
-        let reasonToPreventReview: JSX.Element | string = permission?.reason || itemReviewPermission?.reason || '';
+        const isReviewAllowed = (queueReviewPermission ? queueReviewPermission.isAllowed : true) && itemReviewPermission.isAllowed;
+        let reasonToPreventReview: JSX.Element | string = queueReviewPermission?.reason || itemReviewPermission?.reason || '';
 
         if (reasonToPreventReview === QUEUE_REVIEW_PROHIBITION_REASONS.CANNOT_LOCK_TWO_ITEMS_ON_QUEUE) {
             const lockedItemOnQueue = this.lockedItemsStore.lockedItems!
@@ -344,14 +383,11 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
             );
         }
 
-        if (!queue) {
-            return null;
-        }
-
         return (
             <StartReviewPanel
                 onStartReviewCallback={this.startReviewProcess}
-                isItemReviewLocked={queue.sortingLocked && !this.isItemHeldByCurrentUser(reviewItem)}
+                isItemReviewLocked={!!queue?.sortingLocked && !this.isItemHeldByCurrentUser(reviewItem)}
+                isActiveItem={reviewItem?.active}
                 notes={reviewItem?.notes || []}
                 isReviewAllowed={isReviewAllowed}
                 reasonToPreventReview={reasonToPreventReview}
@@ -376,13 +412,21 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
                 <Switch>
                     <Route
                         exact
-                        path={ROUTES.ITEM_DETAILS}
+                        path={[
+                            ROUTES.ITEM_DETAILS,
+                            ROUTES.SEARCH_ITEM_DETAILS,
+                            ROUTES.SEARCH_INACTIVE_ITEM_DETAILS,
+                        ]}
                         render={() => (loadingQueueData || loadingReviewItem
                             ? ReviewConsole.renderReviewConsolePanelSpinner()
                             : this.renderStartReviewPanel())}
                     />
                     <Route
-                        path={[ROUTES.ITEM_DETAILS_REVIEW_CONSOLE, ROUTES.REVIEW_CONSOLE]}
+                        path={[
+                            ROUTES.REVIEW_CONSOLE,
+                            ROUTES.ITEM_DETAILS_REVIEW_CONSOLE,
+                            ROUTES.SEARCH_ITEM_DETAILS_REVIEW_CONSOLE
+                        ]}
                         render={() => this.renderReviewActionsPanel(blockActionButtons)}
                     />
                 </Switch>
@@ -392,7 +436,6 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
 
     renderGetItemError(error: ApiServiceError | MrUserError) {
         const errorMessage: string = (error as any).displayMessage || (error as ApiServiceError).response!.data.details;
-        // TODO: find a better way to determine the error type
         if (errorMessage.includes('All of the items in this queue are locked')) {
             return this.renderAllDoneModal();
         }
@@ -476,14 +519,31 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
             loadingReviewItemError,
             loadingReviewItem,
             queue,
-            externalLinksMap
+            externalLinksMap,
+            searchId,
         } = this.reviewConsoleScreenStore;
+
+        // Fallback for the deleted queueus
+        const selectedQueue = queue || {
+            queueId: reviewItem?.label?.queueId,
+            viewId: reviewItem?.label?.queueId,
+            shortId: reviewItem?.label?.queueId?.substr(0, 8),
+            name: 'Deleted queue',
+            created: '',
+        };
 
         return (
             <div className={CN}>
-                <ConsoleHeader queue={queue} onClickCallback={this.handleBackToQueuesClick} />
+                <ConsoleHeader
+                    queue={selectedQueue}
+                    onClickCallback={this.handleBackButtonClick}
+                    inactiveItem={reviewItem?.active === false}
+                    backButtonHint={searchId ? 'Back to search' : 'Back to queues'}
+                />
                 <ItemDetails
-                    handleBackToQueuesClickCallback={this.handleBackToQueuesClick}
+                    onTabChange={this.handleTabChangeMode}
+                    onProcessNext={this.navigateBackToQueueOrdersPage}
+                    handleBackToQueuesClickCallback={this.handleBackButtonClick}
                     reviewItem={reviewItem}
                     loadingReviewItem={loadingReviewItem}
                     externalLinksMap={externalLinksMap}

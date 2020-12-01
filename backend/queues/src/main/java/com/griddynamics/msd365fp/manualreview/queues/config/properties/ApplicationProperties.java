@@ -23,6 +23,7 @@ public class ApplicationProperties {
     private final Map<String, TaskProperties> tasks;
     private final double taskResetTimeoutMultiplier;
     private final double taskWarningTimeoutMultiplier;
+    private final double taskSuccessfulRunsTimeoutMultiplier;
     private final TaskExecutor taskExecutor;
 
     @AllArgsConstructor

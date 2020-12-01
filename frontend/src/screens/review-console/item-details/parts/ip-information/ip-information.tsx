@@ -18,13 +18,18 @@ export class IPInformation extends BaseTileRenderer<IpInformationProps, never> {
     renderInfo() {
         const { item } = this.props;
 
-        const { deviceContext } = item.purchase;
+        const { deviceContext, calculatedFields } = item.purchase;
 
         const renderingConfig: KeyValueItem[] = [
-            { key: 'IP (routing type)', value: deviceContext.ipAddress },
+            { key: 'IP (routing type)', value: deviceContext.ipAddress, valueToCopy: deviceContext.ipAddress },
             { key: 'Routing type', value: deviceContext.routingType },
-            { key: 'Connection type', value: deviceContext.connectionType }
-
+            { key: 'Connection type', value: deviceContext.connectionType },
+            {
+                key: 'Distance to IP in previous transaction',
+                value: typeof calculatedFields.distanceToPreviousTransactionIP === 'number'
+                    ? `${calculatedFields.distanceToPreviousTransactionIP} mi`
+                    : calculatedFields.distanceToPreviousTransactionIP,
+            },
         ];
 
         return this.renderKeyValueConfig(renderingConfig, CN);

@@ -11,10 +11,11 @@ import {
     SORTING_FIELD,
     SORTING_ORDER
 } from '../constants';
-import { ItemFilterDTO, QueueViewDTO } from '../data-services/api-services/models';
-import { Filter } from './filter';
+import { QueueViewDTO } from '../data-services/api-services/models';
 import { User } from './user';
 import { CollectedQueueInfoDto } from '../data-services/api-services/models/collected-info/collecte-queue-info';
+import { FilterField } from './filter/filter-field';
+import { FilterConditionDto } from '../data-services/api-services/models/settings/filter-condition-dto';
 
 export class Queue {
     /**
@@ -62,7 +63,7 @@ export class Queue {
 
     sortingLocked: boolean = false;
 
-    filters: Filter[] = [];
+    filters: FilterField[] = [];
 
     color?: string;
 
@@ -144,15 +145,9 @@ export class Queue {
             sorting: { field: sortBy, order: sortDirection, locked: sortingLocked },
             created,
             processingDeadline,
-            filters,
             residual,
             views
         } = queue;
-
-        const filterModels = filters
-            .map(filter => new Filter().fromDTO(filter))
-            // filtering of filters that are impossible to handle on FE
-            .filter(it => !!it) as Filter[];
 
         this.allowedLabels = allowedLabels;
         this.viewId = viewId;
@@ -166,7 +161,6 @@ export class Queue {
         this.sortBy = sortBy;
         this.sortDirection = sortDirection;
         this.sortingLocked = sortingLocked;
-        this.filters = filterModels;
         this.created = created;
         this.processingDeadline = processingDeadline;
         this.residual = residual;
@@ -198,6 +192,11 @@ export class Queue {
 
         return this;
     }
+
+    @action
+    setFilters(filters: FilterField[]) {
+        this.filters = filters;
+    }
 }
 
 export interface NewQueue {
@@ -209,7 +208,7 @@ export interface NewQueue {
     sortBy: SORTING_FIELD;
     sortDirection: SORTING_ORDER;
     sortingLocked: boolean;
-    filters: ItemFilterDTO[];
+    filters: FilterConditionDto[];
 }
 
 export interface QueueToUpdate extends NewQueue {

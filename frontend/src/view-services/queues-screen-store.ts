@@ -22,7 +22,7 @@ import { QueueStore } from './queues';
 import { QUEUE_REVIEW_PROHIBITION_REASONS, ReviewPermissionStore } from './review-permission-store';
 import { AutoRefreshStorageItemManger } from './misc/auto-refresh-storage-item-manager';
 
-import { LocalStorageService } from '../utility-services/local-storage-service';
+import { LocalStorageService } from '../utility-services';
 
 @injectable()
 export class QueuesScreenStore {
@@ -132,12 +132,12 @@ export class QueuesScreenStore {
     private autoRefreshFn() {
         const now = Date.now();
         this.now = now;
-        const { selectedQueueId, selectedQueueItems } = this.queueStore;
+        const { selectedQueueId, items } = this.queueStore;
 
         if (
             this.isAutoRefreshEnabled
             && selectedQueueId
-            && selectedQueueItems
+            && items
         ) {
             const selectedQueueLastRefresh = this.lastRefreshMap.get(selectedQueueId);
 
@@ -254,21 +254,6 @@ export class QueuesScreenStore {
         }
 
         return queues.filter(q => q.supervisors.includes(user.id));
-    }
-
-    @computed
-    get allQueuesAssignedToCurrentUser() {
-        const { queues, escalatedQueues } = this.queueStore;
-        const { user } = this.currentUserStore;
-
-        if ((!queues && !escalatedQueues) || !user) {
-            return [];
-        }
-
-        return [
-            ...(queues?.filter(q => q.reviewers.includes(user.id)) || []),
-            ...(escalatedQueues?.filter(q => q.supervisors.includes(user.id)) || [])
-        ];
     }
 
     @computed

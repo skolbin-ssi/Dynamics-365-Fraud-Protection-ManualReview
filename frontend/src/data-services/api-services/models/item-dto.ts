@@ -29,4 +29,5 @@ export interface ItemDTO {
     reviewers: string[];
     ttl: number;
     get_etag: string;
+    queueIds?: string[]
 }

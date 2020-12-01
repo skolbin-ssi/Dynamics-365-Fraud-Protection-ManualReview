@@ -1,0 +1,43 @@
+/*!
+ * Copyright (c) Microsoft Corporation.
+ * Licensed under the MIT license.
+ */
+
+@import "../../../../../../styles/variables";
+
+.analysis-field {
+  display: flex;
+
+  &__container {
+    display: flex;
+    flex-direction: column;
+
+    margin-left: 5px;
+  }
+
+  &__name,
+  &__value {
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  &__name {
+    display: flex;
+    align-items: center;
+
+    color: $gray190;
+
+    & .queue-update-indicator {
+      margin-right: 0;
+      font-size: 14px;
+    }
+
+    & div:first-child {
+      margin-right: 5px;
+    }
+  }
+
+  &__value {
+    color: $colorReleased;
+  }
+}

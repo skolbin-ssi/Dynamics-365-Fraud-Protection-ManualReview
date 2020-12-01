@@ -82,6 +82,24 @@ public interface ItemLabelActivityRepositoryCustomMethods {
             final Set<String> queueIds);
 
     /**
+     * Calculate batch decisions performance by provided query parameters.
+     * Buckets are separated by labels and merchantRuleDecisions.
+     * Bucket ids and bucket numbers are null
+     * as method doesn't differentiate
+     * results by query parameters
+     *
+     * @param startDateTime a time bound
+     * @param endDateTime   a time bound
+     * @param analystIds    a list of analyst ids for filtering,
+     *                      if it's empty the all analysts are counted
+     * @return the list of buckets
+     */
+    List<ItemLabelingBucket> getBatchPerformance(
+            @NonNull final OffsetDateTime startDateTime,
+            @NonNull final OffsetDateTime endDateTime,
+            final Set<String> analystIds);
+
+    /**
      * Calculate overall spent time by provided query parameters.
      * Buckets are separated by labels.
      *

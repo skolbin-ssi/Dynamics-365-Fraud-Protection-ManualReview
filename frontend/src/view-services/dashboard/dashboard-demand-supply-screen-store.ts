@@ -3,11 +3,7 @@
 
 import { inject, injectable } from 'inversify';
 import {
-    action,
-    autorun,
-    computed,
-    observable,
-    IReactionDisposer
+    action, autorun, computed, IReactionDisposer, observable
 } from 'mobx';
 
 import { Serie } from '@nivo/line';
@@ -19,11 +15,11 @@ import { TYPES } from '../../types';
 import { ItemPlacementMetrics, QueueSizeHistory } from '../../models/dashboard/deman-supply';
 import { formatToISOStringWithLocalTimeZone } from '../../utils/date';
 import {
-    QUEUE_VIEW_TYPE,
-    STATISTIC_AGGREGATION,
     CHART_AGGREGATION_PERIOD,
     DEFAULT_TIME_TO_SLA_DURATION,
-    DEFAULT_TIME_TO_TIMEOUT_DURATION
+    DEFAULT_TIME_TO_TIMEOUT_DURATION,
+    QUEUE_VIEW_TYPE,
+    STATISTIC_AGGREGATION
 } from '../../constants';
 import { DashboardService, QueueService, UserService } from '../../data-services/interfaces';
 import { QueueStore } from '../queues';
@@ -31,6 +27,7 @@ import { Queue, Report } from '../../models';
 import { DashboardRequestApiParams } from '../../data-services/interfaces/dashboard-api-service';
 import { OverviewItem, QueuesOverview } from '../../models/queues';
 import { CSVReportBuilder } from '../../utility-services';
+import { DASHBOARD_REPORTS_NAMES } from '../../constants/dashboard-reports';
 
 export interface DemandSupplyDashboardTableItemData {
     queueName: string;
@@ -82,7 +79,6 @@ export class DashboardDemandSupplyScreenStore {
      */
     @observable queuesOverview: QueuesOverview | null = null;
 
-    @observable isQueuesSizeHistoryLoading = false;
     /**
      * ___ LOADERS ___
      */
@@ -91,8 +87,6 @@ export class DashboardDemandSupplyScreenStore {
 
     @observable isQueueSizeHistoryOverallLoading = false;
 
-    @observable isOverallDataLoading = false;
-
     @observable isItemPlacementLoading = false;
 
     @observable isQueuesOverviewLoading = false;
@@ -100,7 +94,7 @@ export class DashboardDemandSupplyScreenStore {
     /**
      * CSV report builder
      */
-    private readonly CSVReportBuilder = new CSVReportBuilder();
+    private readonly csvReportBuilder = new CSVReportBuilder();
 
     constructor(
         @inject(TYPES.DASHBOARD_SERVICE) private dashboardService: DashboardService,
@@ -119,8 +113,6 @@ export class DashboardDemandSupplyScreenStore {
 
                 this.fetchItemPlacementOverall({ from, to, aggregation });
                 this.fetchQueuesSizeHistoryOverall({ from, to, aggregation });
-
-                // TODO: Think on how to make a parallel requests e.g.: axios.all
                 this.fetchQueuesOverview();
                 this.fetchQueues();
                 this.fetchItemPlacement({ from, to, aggregation });
@@ -306,94 +298,104 @@ export class DashboardDemandSupplyScreenStore {
         return null;
     }
 
+    @computed
+    get isGenerateReportsButtonDisabled() {
+        return [
+            this.isQueueSizeHistoryOverallLoading,
+            this.isQueuesOverviewLoading,
+            this.isItemPlacementLoading,
+            this.isItemPlacementMetricsOverallLoading
+        ].some(item => item);
+    }
+
     /**
      * Collects reports for the dashboard
      */
     @computed
     get reports(): Report[] {
-        const reports = [];
+        const {
+            DEMAND_TOTAL_NEW__RELEASED_ORDERS,
+            DEMAND_TOTAL_REMAINING_ORDERS,
+            DEMAND_SUPPLY_STATS
+        } = DASHBOARD_REPORTS_NAMES.DEMAND;
 
-        if (this.totalReviewedNewItemsReport) {
-            reports.push(this.totalReviewedNewItemsReport);
-        }
-
-        if (this.totalRemainingOrdersReport) {
-            reports.push(this.totalRemainingOrdersReport);
-        }
-
-        if (this.queuesOverviewReport) {
-            reports.push(this.queuesOverviewReport);
-        }
-
-        return reports as Array<any>;
+        return [
+            this.totalReviewedNewItemsReport(DEMAND_TOTAL_NEW__RELEASED_ORDERS),
+            this.totalRemainingOrdersReport(DEMAND_TOTAL_REMAINING_ORDERS),
+            this.queuesOverviewReport(DEMAND_SUPPLY_STATS),
+        ].filter(report => report !== null) as Report[];
     }
 
-    @computed
-    private get totalReviewedNewItemsReport() {
-        if (this.itemPlacementMetricsOverall) {
-            const REPORT_NAME = 'Total reviewed/new orders';
-            const rawData = this.itemPlacementMetricsOverall.totalReviewedNewItemsReport;
+    /** ___ START REPORTS GENERATION METHODS ___ */
 
-            if (rawData?.length) {
-                const unparseObject: UnparseObject = {
-                    fields: ['date', 'reviewed', 'new orders'],
-                    data: rawData.flat()
-                };
+    private totalReviewedNewItemsReport(name: string) {
+        return computed(() => {
+            if (this.itemPlacementMetricsOverall) {
+                const rawData = this.itemPlacementMetricsOverall.totalReviewedNewItemsReport;
 
-                return this.CSVReportBuilder.buildReport(REPORT_NAME, unparseObject);
+                if (rawData?.length) {
+                    const unparseObject: UnparseObject = {
+                        fields: ['date', 'released', 'new orders'],
+                        data: rawData.flat()
+                    };
+
+                    return this.csvReportBuilder.buildReport(name, unparseObject);
+                }
             }
-        }
 
-        return null;
+            return null;
+        }).get();
     }
 
-    @computed
-    private get totalRemainingOrdersReport() {
-        if (this.queueSizeHistoryOverall) {
-            const REPORT_NAME = 'Total remaining orders';
-            const rawData = this.queueSizeHistoryOverall.remainingOrdersReport;
+    private totalRemainingOrdersReport(name: string) {
+        return computed(() => {
+            if (this.queueSizeHistoryOverall) {
+                const rawData = this.queueSizeHistoryOverall.remainingOrdersReport;
 
-            if (rawData?.length) {
+                if (rawData?.length) {
+                    const unparseObject: UnparseObject = {
+                        fields: ['date', 'remaining orders'],
+                        data: rawData
+                    };
+                    return this.csvReportBuilder.buildReport(name, unparseObject);
+                }
+            }
+
+            return null;
+        }).get();
+    }
+
+    private queuesOverviewReport(name: string) {
+        return computed(() => {
+            if (this.demandSupplyDashboardTableData) {
+                const checkNA = (item: any) => (typeof item !== 'undefined' ? item : 'N/A');
+
+                const rawData = this.demandSupplyDashboardTableData.map(item => {
+                    const analystsIds = item.queue?.assignees?.map(analyst => analyst) || [];
+
+                    return [
+                        item.queueName,
+                        checkNA(item.remaining),
+                        item.newOrders,
+                        item.reviewed,
+                        checkNA(item.nearToSlaCount),
+                        checkNA(item.nearToTimeoutCount),
+                        [...analystsIds]];
+                });
+
                 const unparseObject: UnparseObject = {
-                    fields: ['date', 'remaining orders'],
+                    fields: ['name', 'remaining', 'new orders', 'reviewed', 'near to SLA', 'near to timeout', 'analysts ids'],
                     data: rawData
                 };
-                return this.CSVReportBuilder.buildReport(REPORT_NAME, unparseObject);
+
+                return this.csvReportBuilder.buildReport(name, unparseObject);
             }
-        }
 
-        return null;
+            return null;
+        }).get();
     }
 
-    @computed
-    private get queuesOverviewReport() {
-        if (this.demandSupplyDashboardTableData) {
-            const REPORT_NAME = 'Queues demand/supply overview';
-            const checkNA = (item: any) => (typeof item !== 'undefined' ? item : 'N/A');
-
-            const rawData = this.demandSupplyDashboardTableData.map(item => {
-                const analystsIds = item.queue?.assignees?.map(analyst => analyst) || [];
-
-                return [
-                    item.queueName,
-                    checkNA(item.remaining),
-                    item.newOrders,
-                    item.reviewed,
-                    checkNA(item.nearToSlaCount),
-                    checkNA(item.nearToTimeoutCount),
-                    [...analystsIds]];
-            });
-
-            const unparseObject: UnparseObject = {
-                fields: ['name', 'remaining', 'new orders', 'reviewed', 'near to SLA', 'near to timeout', 'analysts ids'],
-                data: rawData
-            };
-
-            return this.CSVReportBuilder.buildReport(REPORT_NAME, unparseObject);
-        }
-
-        return null;
-    }
+    /** ___ START REPORTS GENERATION METHODS ___ */
 
     private getRemaining(id: string) {
         if (this.queues) {
@@ -413,7 +415,6 @@ export class DashboardDemandSupplyScreenStore {
 
     /**
      * Sort table according to remaining value
-     * Please, @see (https://stackoverflow.com/questions/56312968/javascript-sort-object-array-by-number-properties-which-include-undefined)
      * @param left - data item (DemandSupplyDashboardTableItemData)
      * @param right - data item (DemandSupplyDashboardTableItemData)
      */

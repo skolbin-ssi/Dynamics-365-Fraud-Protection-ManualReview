@@ -69,6 +69,9 @@ export class QueueStore implements ItemsLoadable<Item> {
      */
     @observable refreshingQueueIds: string[] = [];
 
+    @observable
+    isLoadingQueueItems = false;
+
     private regularQueuesMap = new Map<string, Queue>();
 
     private historicalQueuesMap = new Map<string, Queue>();
@@ -175,6 +178,7 @@ export class QueueStore implements ItemsLoadable<Item> {
      */
     @action
     async loadQueueItems(queueId: string, loadMore: boolean = false) {
+        this.isLoadingQueueItems = true;
         if (loadMore) {
             this.loadingMoreItems = true;
         } else {
@@ -185,10 +189,12 @@ export class QueueStore implements ItemsLoadable<Item> {
             const { data, canLoadMore } = await this.queueService.getQueueItems('QueueStore.getQueueItems', queueId, loadMore);
             this.items = loadMore ? [...this.items, ...data] : data;
             this.canLoadMore = canLoadMore;
+            this.isLoadingQueueItems = false;
             this.wasFirstPageLoaded = true;
             this.loadingMoreItems = false;
         } catch (e) {
             this.wasFirstPageLoaded = true;
+            this.isLoadingQueueItems = false;
             this.loadingMoreItems = false;
             throw e;
         }

@@ -57,7 +57,7 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
         const { linkAnalysisStore, queue, item } = this.props;
 
         if (queue) {
-            linkAnalysisStore.setQueueId(queue.queueId);
+            linkAnalysisStore.setQueueId(queue.viewId);
         }
 
         if (item) {

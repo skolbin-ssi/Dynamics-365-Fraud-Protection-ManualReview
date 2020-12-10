@@ -248,6 +248,7 @@ export class Dashboard extends Component<DashboardProps, any> {
         return (
             <div id="dashboard" className={CN}>
                 <DashboardHeader
+                    user={this.userStore.user}
                     onGoBackClick={this.handleGoBackHeaderClick}
                     isSearchBarDisplayed={!(canUserViewAnalystsPerformanceDashboard || canUserViewQueuesPerformanceDashboard)}
                     displayBackButton={this.isNotMainDashboardPage()}

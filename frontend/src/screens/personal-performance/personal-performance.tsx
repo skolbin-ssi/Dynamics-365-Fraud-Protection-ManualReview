@@ -162,6 +162,7 @@ export class PersonalPerformance extends Component<PersonalPerformanceComponentP
         return (
             <div className={CN}>
                 <DashboardHeader
+                    user={null}
                     isSearchBarDisplayed
                     dashboardScreenStore={this.dashboardScreenStore}
                 />

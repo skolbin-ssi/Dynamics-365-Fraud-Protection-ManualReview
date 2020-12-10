@@ -15,6 +15,7 @@ export interface QueuesItemProps {
     onClick: (queue: Queue) => void;
     isSelected: boolean;
     isQueueRefreshing: boolean;
+    isLoadingQueueItems: boolean;
 }
 
 const CN = 'queue-item';
@@ -23,19 +24,23 @@ const CN = 'queue-item';
 export class QueuesItem extends Component<QueuesItemProps, never> {
     @autobind
     onClick() {
-        const { onClick, queue } = this.props;
-        onClick(queue);
+        const { onClick, queue, isLoadingQueueItems } = this.props;
+        if (!isLoadingQueueItems) {
+            onClick(queue);
+        }
     }
 
     render() {
-        const { queue, isSelected, isQueueRefreshing } = this.props;
+        const {
+            queue, isSelected, isQueueRefreshing, isLoadingQueueItems
+        } = this.props;
         const { name, size } = queue;
         const sizeToDisplay = size > 1000 ? '> 1000' : size;
 
         return (
             <button
                 type="button"
-                className={cn(CN, { selected: isSelected })}
+                className={cn(CN, { selected: isSelected }, { [`${CN}--loading`]: isLoadingQueueItems })}
                 onClick={this.onClick}
             >
                 <div className={`${CN}__first-part`}>

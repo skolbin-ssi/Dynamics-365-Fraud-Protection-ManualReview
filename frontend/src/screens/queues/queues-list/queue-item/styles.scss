@@ -4,104 +4,127 @@ $horizontalMargin: 2px;
 $verticalMargin: 4px;
 
 .queue-item {
-    background: none;
-    border: none;
-    padding: 0;
-    height: 40px;
-    margin: $verticalMargin $horizontalMargin;
-    width: calc(100% - #{$horizontalMargin * 2});
+  $root: &;
+
+  background: none;
+  border: none;
+  padding: 0;
+  height: 40px;
+  margin: $verticalMargin $horizontalMargin;
+  width: calc(100% - #{$horizontalMargin * 2});
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  color: $neutralPrimary;
+  cursor: pointer;
+  position: relative;
+
+  &:focus {
+    outline: none;
+  }
+
+  &--loading:not(.selected) {
+    color: unset !important;
+    cursor: not-allowed !important;
+
+    span {
+      color: unset !important;
+    }
+  }
+
+  .queue-item-number {
+    background: linear-gradient(270deg, $white 63.33%, rgba(239, 246, 252, 0) 100%);
+    color: $neutralTertiary;
+    display: inline-block;
+    position: absolute;
+    right: 12px;
+    width: 75px;
+    text-align: right;
+  }
+
+  .queue-item-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+  }
+
+  &__first-part {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    color: $neutralPrimary;
-    cursor: pointer;
-    position: relative;
-    &:focus {
-        outline: none;
-    }
+    overflow: hidden;
+  }
+
+  &:hover {
+    background: $neutralLighter;
+    color: $themePrimary;
+
     .queue-item-number {
-        background: linear-gradient(270deg, $white 63.33%, rgba(239, 246, 252, 0) 100%);
-        color: $neutralTertiary;
-        display: inline-block;
-        position: absolute;
-        right: 12px;
-        width: 75px;
-        text-align: right;
+      color: $neutralTertiary;
+      background: linear-gradient(270deg, $neutralLighter 63.33%, rgba(239, 246, 252, 0) 100%);
     }
+  }
+
+  &:active {
+    background: $neutralLighter;
+    color: $black;
+
+    .queue-item-number {
+      background: linear-gradient(270deg, $neutralLighter 63.33%, rgba(239, 246, 252, 0) 100%);
+      color: $neutralSecondary;
+    }
+  }
+
+  &.selected {
+    background: $themeLighterAlt;
+    color: $themePrimary;
+
     .queue-item-name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        text-align: left;
+      font-weight: 600 !important;
     }
 
-    &__first-part {
-        display: flex;
-        align-items: center;
-        overflow: hidden;
+    .queue-item-number {
+      background: linear-gradient(270deg, $themeLighterAlt 63.33%, rgba(239, 246, 252, 0) 100%);
+      color: $themeDarkAlt;
+    }
+  }
+
+  &.selected:hover {
+    background: $neutralLighter;
+    color: $themePrimary;
+
+    .queue-item-name {
+      font-weight: 600 !important;
     }
 
-    &:hover {
-        background: $neutralLighter;
-        color: $themePrimary;
-        .queue-item-number {
-            color: $neutralTertiary;
-            background: linear-gradient(270deg, $neutralLighter 63.33%, rgba(239, 246, 252, 0) 100%);
-        }
+    .queue-item-number {
+      background: linear-gradient(270deg, $neutralLighter 63.33%, rgba(239, 246, 252, 0) 100%);
+      color: $themeDarkAlt;
+    }
+  }
+
+  &.selected:active {
+    background: $themeLighterAlt;
+    color: $black;
+
+    .queue-item-name {
+      font-weight: 600 !important;
     }
 
-    &:active {
-        background: $neutralLighter;
-        color: $black;
-        .queue-item-number {
-            background: linear-gradient(270deg, $neutralLighter 63.33%, rgba(239, 246, 252, 0) 100%);
-            color: $neutralSecondary;
-        }
+    .queue-item-number {
+      background: linear-gradient(270deg, $themeLighterAlt 63.33%, rgba(239, 246, 252, 0) 100%);
+      color: $themeDarkAlt;
     }
+  }
 
-    &.selected {
-        background: $themeLighterAlt;
-        color: $themePrimary;
-        .queue-item-name {
-            font-weight: 600 !important;
-        }
-        .queue-item-number {
-            background: linear-gradient(270deg, $themeLighterAlt 63.33%, rgba(239, 246, 252, 0) 100%);
-            color: $themeDarkAlt;
-        }
-    }
+  &:disabled {
+    cursor: not-allowed;
+    color: $neutralTertiary;
 
-    &.selected:hover {
-        background: $neutralLighter;
-        color: $themePrimary;
-        .queue-item-name {
-            font-weight: 600 !important;
-        }
-        .queue-item-number {
-            background: linear-gradient(270deg, $neutralLighter 63.33%, rgba(239, 246, 252, 0) 100%);
-            color: $themeDarkAlt;
-        }
+    .queue-item-number {
+      background: linear-gradient(270deg, $neutralTertiary 63.33%, rgba(239, 246, 252, 0) 100%);
+      color: $neutralTertiary;
     }
-
-    &.selected:active {
-        background: $themeLighterAlt;
-        color: $black;
-        .queue-item-name {
-            font-weight: 600 !important;
-        }
-        .queue-item-number {
-            background: linear-gradient(270deg, $themeLighterAlt 63.33%, rgba(239, 246, 252, 0) 100%);
-            color: $themeDarkAlt;
-        }
-    }
-
-    &:disabled {
-        cursor: not-allowed;
-        color: $neutralTertiary;
-        .queue-item-number {
-            background: linear-gradient(270deg, $neutralTertiary 63.33%, rgba(239, 246, 252, 0) 100%);
-            color: $neutralTertiary;
-        }
-    }
+  }
 }

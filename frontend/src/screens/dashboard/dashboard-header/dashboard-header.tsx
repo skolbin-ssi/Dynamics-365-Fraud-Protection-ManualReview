@@ -15,9 +15,11 @@ import { ActionButton } from '@fluentui/react/lib/Button';
 
 import { DashboardSearch } from './dashboard-search';
 
-import { DATE_RANGE, DATE_RANGE_DAYS, DATE_RANGE_DISPLAY } from '../../../constants';
+import {
+    DATE_RANGE, DATE_RANGE_DAYS, DATE_RANGE_DISPLAY, ROLE
+} from '../../../constants';
 import { getEndOfDate, getPastDate } from '../../../utils/date';
-import { Queue } from '../../../models';
+import { Queue, User } from '../../../models';
 import { TYPES } from '../../../types';
 import { DashboardScreenStore } from '../../../view-services';
 import './dashboard-header.scss';
@@ -53,9 +55,10 @@ interface DashboardHeaderProps {
      * renderSearchBar - render or not the search bar
      */
     renderSearchBar?: boolean
+
+    user: User | null;
 }
 
-// TODO: Move this component to the shared components as it is used in {PersonalPerformance, Dashboards} components
 @observer
 export class DashboardHeader extends Component<DashboardHeaderProps, never> {
     private maxDate: Date = new Date();
@@ -136,13 +139,27 @@ export class DashboardHeader extends Component<DashboardHeaderProps, never> {
 
     @autoBind
     renderGoBackButton() {
-        const { onGoBackClick } = this.props;
+        const {
+            onGoBackClick, isSearchBarDisplayed, displayBackButton, user
+        } = this.props;
+
+        const isAdmin = user?.roles.includes(ROLE.ADMIN_MANAGER);
+
+        let buttonVisibility;
+
+        if (isAdmin) {
+            buttonVisibility = true;
+        } else {
+            buttonVisibility = isSearchBarDisplayed && displayBackButton;
+        }
 
         return (
             <ActionButton
                 className={`${CN}__go-back-btn`}
                 iconProps={{ iconName: 'ChevronLeftSmall', className: `${CN}__back-to-queues-btn-icon` }}
                 onClick={onGoBackClick}
+                /* eslint-disable-next-line no-nested-ternary */
+                style={{ visibility: buttonVisibility ? 'initial' : 'hidden' }}
             >
                 Go Back
             </ActionButton>

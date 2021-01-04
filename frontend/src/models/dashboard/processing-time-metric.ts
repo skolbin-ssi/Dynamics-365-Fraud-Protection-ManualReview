@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 
 import { computed, observable } from 'mobx';
-import { Duration, toSeconds } from 'iso8601-duration';
+import { Duration, toSeconds, parse } from 'iso8601-duration';
 import { ProcessingTimeMetricDto } from '../../data-services/api-services/models/dashboard';
 import { TimeMetric } from './time-metrics';
 import { CurrentProgress } from './progress-performance-metric';
@@ -31,7 +31,7 @@ export class ProcessingTimeMetric implements ProcessingTimeMetricDto {
     @computed
     get getTimeToMakeDecision(): CurrentProgress {
         return {
-            current: this.calculateTimeToMakeDecision(this.currentPeriod.parsedWastedDuration),
+            current: this.calculateTimeToMakeDecision(this.currentPeriod.resolutionApplyingDuration),
             progress: 0
         };
     }
@@ -67,10 +67,11 @@ export class ProcessingTimeMetric implements ProcessingTimeMetricDto {
         return resultDurationString;
     }
 
-    private calculateTimeToMakeDecision(duration: Duration) {
+    private calculateTimeToMakeDecision(durationStr: string) {
+        const duration = parse(durationStr);
         const durationInSeconds = toSeconds(duration);
 
-        const ratio = durationInSeconds / this.currentPeriod.notWastedAmount;
+        const ratio = durationInSeconds / this.currentPeriod.resolutionAmount;
 
         if (!Number.isFinite(ratio)) {
             return 0;

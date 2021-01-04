@@ -49,9 +49,10 @@ export class QueuesList extends Component<QueuesListProps, never> {
         }
     }
 
-    mapSingleQueue(queue: Queue, selectedQueue: Queue | null, refreshingQueueIds: string[]) {
+    mapSingleQueue(queue: Queue, selectedQueue: Queue | null, refreshingQueueIds: string[], isLoadingQueueItems: boolean) {
         return (
             <QueuesItem
+                isLoadingQueueItems={isLoadingQueueItems}
                 key={queue.viewId}
                 queue={queue}
                 onClick={this.onChangeQueue}
@@ -65,9 +66,9 @@ export class QueuesList extends Component<QueuesListProps, never> {
     renderQueueList(list: Queue[]) {
         const { queuesScreenStore } = this.props;
         const { queueStore } = queuesScreenStore;
-        const { selectedQueue, refreshingQueueIds } = queueStore;
+        const { selectedQueue, refreshingQueueIds, isLoadingQueueItems } = queueStore;
 
-        return list.map(q => this.mapSingleQueue(q, selectedQueue, refreshingQueueIds));
+        return list.map(q => this.mapSingleQueue(q, selectedQueue, refreshingQueueIds, isLoadingQueueItems));
     }
 
     @autoBind

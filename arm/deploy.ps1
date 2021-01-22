@@ -145,8 +145,9 @@ if (!(Get-AzKeyVaultSecret -Name "client-secret" -VaultName $keyVaultName))
 }
 else
 {
-    $clientSecret = (Get-AzKeyVaultSecret -VaultName $keyVaultName -Name "client-secret").SecretValueText
-    $clientSecureSecret = ConvertTo-SecureString $clientSecret -AsPlainText -Force
+    $secret = (Get-AzKeyVaultSecret -VaultName $keyVaultName -Name "client-secret")
+    $secretValueText = ExtractSecret -secret $secret.SecretValue
+    $clientSecureSecret = ConvertTo-SecureString $secretValueText -AsPlainText -Force
 }
 
 # Store Map app client secret in Key Vault if it was provided
@@ -158,7 +159,8 @@ if (!(Get-AzKeyVaultSecret -Name "map-client-secret" -VaultName $keyVaultName))
 }
 else
 {
-    $mapClientSecret = (Get-AzKeyVaultSecret -VaultName $keyVaultName -Name "map-client-secret").SecretValueText
+    $mapClientSecretKey = (Get-AzKeyVaultSecret -VaultName $keyVaultName -Name "map-client-secret")
+	$mapClientSecret = ExtractSecret -secret $mapClientSecretKey.SecretValue;
 }
 
 # Store mail password in Key Vault if it was provided

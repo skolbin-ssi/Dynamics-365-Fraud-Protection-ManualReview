@@ -52,4 +52,5 @@ export interface PurchaseUserDTO {
     TotalRefundAmount: number;
     TotalSpend: number;
     TotalTransactions: number;
+    IsFraud: boolean;
 }

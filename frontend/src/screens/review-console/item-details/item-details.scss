@@ -71,6 +71,16 @@
     flex-direction: column;
   }
 
+  &__warning {
+    align-items: center;
+    background-color: #FED9CC ;
+    display: inline-flex;
+    color: black;
+		i {
+			color: #D83B01;
+		}
+  }
+
   &__order-controls-part {
     min-width: 80px;
   }

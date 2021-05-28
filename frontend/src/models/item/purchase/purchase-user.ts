@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import { computed, observable } from 'mobx';
+
 import { PurchaseUserDTO } from '../../../data-services/api-services/models/user-dto';
 import { BaseModel } from '../../misc';
 
@@ -80,6 +81,8 @@ export class PurchaseUser extends BaseModel {
 
     totalTransactions?: number;
 
+    isFraud: boolean=false;
+
     fromDTO(purchaseUser: PurchaseUserDTO) {
         const {
             UserId,
@@ -122,6 +125,7 @@ export class PurchaseUser extends BaseModel {
             TotalRefundAmount,
             TotalSpend,
             TotalTransactions,
+            IsFraud
         } = purchaseUser;
 
         this.userId = UserId;
@@ -160,6 +164,7 @@ export class PurchaseUser extends BaseModel {
         this.totalRefundAmount = TotalRefundAmount;
         this.totalSpend = TotalSpend;
         this.totalTransactions = TotalTransactions;
+        this.isFraud = IsFraud;
 
         return this;
     }

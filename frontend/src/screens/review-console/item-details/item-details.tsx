@@ -1,18 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import './item-details.scss';
+
 import autobind from 'autobind-decorator';
 import { resolve } from 'inversify-react';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
 
-import { Text } from '@fluentui/react/lib/Text';
-import { Spinner } from '@fluentui/react/lib/Spinner';
 import { ActionButton, IconButton } from '@fluentui/react/lib/Button';
+import { FontIcon } from '@fluentui/react/lib/Icon';
 import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
+import { Spinner } from '@fluentui/react/lib/Spinner';
+import { Text } from '@fluentui/react/lib/Text';
 
-import { Item } from '../../../models/item';
 import { ExternalLink, Queue } from '../../../models';
+import { Item } from '../../../models/item';
+import { TYPES } from '../../../types';
+import { ITEM_DETAILS_MODE, LinkAnalysisStore } from '../../../view-services';
 import { FraudScoreIndication } from './fraud-score-indication';
 import {
     AccountSummary,
@@ -27,11 +32,7 @@ import {
     TransactionSummary,
     Velocities,
 } from './parts';
-
-import './item-details.scss';
 import { LinkAnalysis } from './parts/link-analysis';
-import { TYPES } from '../../../types';
-import { ITEM_DETAILS_MODE, LinkAnalysisStore } from '../../../view-services';
 
 enum ITEM_DETAILS_TABS {
     CURRENT_TRANSACTION = 'transaction',
@@ -89,6 +90,7 @@ export class ItemDetails extends Component<ItemDetailsProps, ItemDetailsState> {
 
     renderOrderDetails(item: Item, externalLinksMap: ExternalLink[]) {
         const { selectedTab } = this.state;
+
         return (
             <Pivot
                 selectedKey={selectedTab}
@@ -213,7 +215,24 @@ export class ItemDetails extends Component<ItemDetailsProps, ItemDetailsState> {
                     />
                     <div className={`${CN}__order-id-part`}>
                         <Text className={`${CN}__order-id-title`}>Purchase ID:&nbsp;</Text>
-                        <Text className={`${CN}__order-id`}>{ reviewItem?.id }</Text>
+                        <Text className={`${CN}__order-id`}>
+                            { reviewItem?.id }
+                            &nbsp;
+                            {
+                                reviewItem?.purchase?.user?.isFraud
+                            && (
+                                <span className={`${CN}__warning`}>
+                                    &nbsp;
+                                    <FontIcon
+                                        iconName="WarningSolid"
+                                    />
+                                    &nbsp;
+                                    User Restricted
+                                    &nbsp;
+                                </span>
+                            )
+                            }
+                        </Text>
                     </div>
                     <div className={`${CN}__order-controls-part`}>
                         <IconButton

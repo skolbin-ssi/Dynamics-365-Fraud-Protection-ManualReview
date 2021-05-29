@@ -66,9 +66,6 @@ public class PublicItemService {
         Optional<Edge> selfEdge = entity.getEdges()
                 .stream()
                 .filter(t-> t.getName().equalsIgnoreCase("UserLabel") &&
-                        t.getSourceNode().equalsIgnoreCase("User") &&
-                        t.getDestinationNode().equalsIgnoreCase("User") &&
-                        t.getData().getAdditionalParams() !=null &&
                         t.getData().getAdditionalParams().get("LabelState") !=null &&
                         t.getData().getAdditionalParams().get("LabelState").equalsIgnoreCase("Fraud"))
                 .max(Comparator.comparing(x-> OffsetDateTime.parse(x.getData().getAdditionalParams().get("EventTimeStamp"))));

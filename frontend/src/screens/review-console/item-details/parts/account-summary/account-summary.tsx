@@ -126,11 +126,11 @@ export class AccountSummary extends Component<AccountSummaryProps, never> {
             { key: 'Profile type', value: user.profileType, className: `${CN}__span-2` },
             {
                 key: 'User ID',
-                value: this.renderValidatedInfo(
+                value: user.isFraud ? this.renderValidatedInfo(
                     user.userId,
                     !user.isFraud,
                     `${user.isFraud ? 'User Restricted' : ''}`
-                ),
+                ) : user.userId,
                 valueToCopy: user.userId
             },
             { key: 'Country', value: user.country },

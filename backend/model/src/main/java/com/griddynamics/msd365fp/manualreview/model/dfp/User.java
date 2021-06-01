@@ -73,6 +73,8 @@ public class User implements Serializable {
     @JsonSerialize(using = ISOStringDateTimeSerializer.class)
     private OffsetDateTime merchantLocalDate;
 
+    private Boolean isFraud = false;
+
     private Map<String, String> additionalParams = new HashMap<>();
 
     @JsonAnySetter

@@ -1,26 +1,28 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import './account-summary.scss';
+
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
+
 import { IconButton } from '@fluentui/react/lib/Button';
 import { FontIcon } from '@fluentui/react/lib/Icon';
 import { TooltipHost } from '@fluentui/react/lib/Tooltip';
+
+import { IconText } from '../../../../../components/icon-text';
 import { Price } from '../../../../../components/price';
+import { ExternalLink } from '../../../../../models';
+import { Item } from '../../../../../models/item';
+import { formatToLocaleString, formatToMMMDYYY } from '../../../../../utils/date';
+import { placeHold, stringToKebabCase } from '../../../../../utils/text';
 import { ItemDetailsKeyValue } from '../../item-details-key-value';
 import { ItemDetailsTile } from '../../item-details-tile';
 import { KeyValueItem, valuePlaceholder } from '../key-value-item';
-import { formatToMMMDYYY, formatToLocaleString } from '../../../../../utils/date';
-import { placeHold, stringToKebabCase } from '../../../../../utils/text';
-import { Item } from '../../../../../models/item';
-import { ExternalLink } from '../../../../../models';
 
-import './account-summary.scss';
-import { IconText } from '../../../../../components/icon-text';
-
-const CN = 'item-details-account-summary';
+const CN = 'item-details-account-summary, red';
 
 interface AccountSummaryProps {
     className?: string;
@@ -122,7 +124,15 @@ export class AccountSummary extends Component<AccountSummaryProps, never> {
 
         const renderingConfig: KeyValueItem[] = [
             { key: 'Profile type', value: user.profileType, className: `${CN}__span-2` },
-            { key: 'User ID', value: user.userId, valueToCopy: user.userId },
+            {
+                key: 'User ID',
+                value: user.isFraud ? this.renderValidatedInfo(
+                    user.userId,
+                    !user.isFraud,
+                    `${user.isFraud ? 'User Restricted' : ''}`
+                ) : user.userId,
+                valueToCopy: user.userId
+            },
             { key: 'Country', value: user.country },
             { key: 'Zip', value: user.zipCode, valueToCopy: user.zipCode },
             {

@@ -6,6 +6,8 @@ package com.griddynamics.msd365fp.manualreview.queues.service;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.PageProcessingUtility;
 import com.griddynamics.msd365fp.manualreview.dfpauth.util.UserPrincipalUtility;
 import com.griddynamics.msd365fp.manualreview.model.*;
+import com.griddynamics.msd365fp.manualreview.model.dfp.raw.Edge;
+import com.griddynamics.msd365fp.manualreview.model.dfp.raw.ExplorerEntity;
 import com.griddynamics.msd365fp.manualreview.model.event.internal.ItemResolutionEvent;
 import com.griddynamics.msd365fp.manualreview.model.event.type.LockActionType;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
@@ -31,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,6 +48,7 @@ public class PublicItemService {
     private final PublicItemClient publicItemClient;
     private final PublicQueueClient publicQueueClient;
     private final ModelMapper modelMapper;
+    private final DFPExplorerService dfpExplorerService;
 
     @Setter(onMethod = @__({@Value("${azure.cosmosdb.default-ttl}")}))
     private Duration defaultTtl;
@@ -55,7 +59,31 @@ public class PublicItemService {
             queueView = publicQueueClient.getActiveQueueView(queueId);
         }
         Item item = publicItemClient.getItem(itemId, queueView, null);
-        return modelMapper.map(item, ItemDTO.class);
+
+        ItemDTO realItem = modelMapper.map(item, ItemDTO.class);
+        ExplorerEntity entity = dfpExplorerService.exploreUser(realItem.getPurchase().getUser().getUserId());
+        //We need to check if there are self pointing edges, that have LabelState == Fraud, choose the one with the max EventTimeStamp
+        Optional<Edge> selfEdge = entity.getEdges()
+                .stream()
+                .filter(t-> t.getName().equalsIgnoreCase("UserLabel") &&
+                        t.getData().getAdditionalParams().get("LabelState") !=null &&
+                        t.getData().getAdditionalParams().get("LabelState").equalsIgnoreCase("Fraud"))
+                .max(Comparator.comparing(x-> OffsetDateTime.parse(x.getData().getAdditionalParams().get("EventTimeStamp"))));
+        boolean isFraud=selfEdge.isPresent();
+        //We need to check if there is EffectiveEndDate in that edge if there is it should be greater than today.
+        if(selfEdge.isPresent())
+        {
+            String stringDate = selfEdge.get().getData().getAdditionalParams().get("EffectiveEndDate");
+            if(stringDate!=null) {
+                OffsetDateTime endDate = OffsetDateTime.parse(stringDate);
+
+                isFraud = endDate.compareTo(OffsetDateTime.now())>0;
+            }
+        }
+
+        //set up isFraud flag
+        realItem.getPurchase().getUser().setIsFraud(isFraud);
+        return realItem;
     }
 
     public PageableCollection<ItemDTO> getQueueItemList(

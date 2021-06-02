@@ -144,6 +144,22 @@ function PutSecret {
         -SecretValue $secretSecureValue
 }
 
+
+function ExtractSecret {
+    param (
+        [SecureString] $secret
+    )
+
+    $secretValueText = '';
+	$ssPtr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($secret)
+	try {
+    $secretValueText = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($ssPtr)
+	} finally {
+		[System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($ssPtr)
+    }
+    return $secretValueText;
+}
+
 function GenReplyUrls {
     # Define Azure app reply urls
     $replyUrls = @(

@@ -65,6 +65,8 @@ class PublicItemServiceTest {
     @Mock
     private PublicQueueClient publicQueueClient;
     @Mock
+    private DFPExplorerService dfpExplorerService;
+    @Mock
     private UserPrincipal userPrincipal;
 
     @Captor
@@ -81,7 +83,7 @@ class PublicItemServiceTest {
     @BeforeEach
     public void setUp() {
         ModelMapper modelMapper = new ModelMapperConfig().modelMapper();
-        itemService = new PublicItemService(streamService, publicItemClient, publicQueueClient, modelMapper);
+        itemService = new PublicItemService(streamService, publicItemClient, publicQueueClient, modelMapper, dfpExplorerService);
         itemService.setDefaultTtl(Duration.ofSeconds(DEFAULT_TTL));
     }
 

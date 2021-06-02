@@ -30,7 +30,7 @@
     "@uifabric/fluent-theme": "^7.1.68",
     "@uifabric/icons": "^7.3.33",
     "autobind-decorator": "^2.4.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "azure-maps-control": "^2.0.26",
     "azure-maps-rest": "^2.0.5",
     "babel-eslint": "10.0.3",

@@ -220,8 +220,8 @@ spring:
             authorization-grant-type: client_credentials
             scope: https://api.dfp.microsoft-int.com/.default
           azure-dfp-la-api:
-            client-id: b2238e4d-a9ee-4939-ab8e-944f29fa7eb3
-            client-secret: daadc627-e96b-4e2d-a8b7-dd135d11e753
+            client-id: ${CLIENT_ID}
+            client-secret: ${client-secret:${CLIENT_SECRET}}
             authorization-grant-type: client_credentials
             scope: https://api.dfp.microsoft-int.com/.default
         provider:

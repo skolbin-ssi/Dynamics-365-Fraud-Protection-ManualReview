@@ -34,9 +34,12 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.griddynamics.msd365fp.manualreview.model.Constants.*;
 import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.*;
 
 @Slf4j
@@ -75,7 +78,24 @@ public class PublicItemService {
         {
             String stringDate = selfEdge.get().getData().getAdditionalParams().get("EffectiveEndDate");
             if(stringDate!=null) {
-                OffsetDateTime endDate = OffsetDateTime.parse(stringDate);
+                //set up the endDate to be in the past
+                OffsetDateTime endDate = OffsetDateTime.now().minusMinutes(1);
+                try
+                {
+                    endDate = OffsetDateTime.parse(stringDate, DateTimeFormatter.ofPattern(ISO_OFFSET_DATE_TIME_PATTERN));
+                }
+                catch(DateTimeParseException ignored)
+                {
+                    try
+                    {
+                        endDate = OffsetDateTime.parse(stringDate, DateTimeFormatter.ofPattern(DFP_DATE_TIME_PATTERN));
+                    }
+                    catch(DateTimeParseException ex)
+                    {
+                        //obviously there is an EndDate but we cannot parse it, so set up the EndDate to be 1 min in the future to play it safe and mark that user as a fraudster
+                        endDate = OffsetDateTime.now().plusMinutes(1);
+                    }
+                }
 
                 isFraud = endDate.compareTo(OffsetDateTime.now())>0;
             }

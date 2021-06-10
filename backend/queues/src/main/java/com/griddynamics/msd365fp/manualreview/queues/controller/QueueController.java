@@ -62,15 +62,15 @@ public class QueueController {
     }
 
     @Operation(summary = "Get list of items from the specified queue")
-    @GetMapping(value = "/{id}/items", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/{id}/items", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
     public PageableCollection<ItemDTO> getItemList(
             @PathVariable("id") final String id,
             @Parameter(description = "size of a page")
             @RequestParam(required = false, defaultValue = DEFAULT_ITEM_PAGE_SIZE_STR) final Integer size,
             @Parameter(description = "continuation token from previous request")
-            @RequestParam(required = false) String continuation) throws NotFoundException, BusyException {
-        return itemService.getQueueItemList(id, size, continuation);
+            @Valid @RequestBody final ContinuationTokenDTO continuation) throws NotFoundException, BusyException {
+        return itemService.getQueueItemList(id, size, continuation.getContinuation());
     }
 
     @Operation(summary = "Get particular item details")

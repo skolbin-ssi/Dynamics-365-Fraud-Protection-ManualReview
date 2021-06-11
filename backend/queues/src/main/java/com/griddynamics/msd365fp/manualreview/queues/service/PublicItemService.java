@@ -66,17 +66,27 @@ public class PublicItemService {
         ItemDTO realItem = modelMapper.map(item, ItemDTO.class);
         ExplorerEntity entity = dfpExplorerService.exploreUser(realItem.getPurchase().getUser().getUserId());
         //We need to check if there are self pointing edges, that have LabelState == Fraud, choose the one with the max EventTimeStamp
-        Optional<Edge> selfEdge = entity.getEdges()
-                .stream()
-                .filter(t-> t.getName().equalsIgnoreCase("UserLabel") &&
-                        t.getData().getAdditionalParams().get("LabelState") !=null &&
-                        t.getData().getAdditionalParams().get("LabelState").equalsIgnoreCase("Fraud"))
-                .max(Comparator.comparing(x-> OffsetDateTime.parse(x.getData().getAdditionalParams().get("EventTimeStamp"))));
-        boolean isFraud=selfEdge.isPresent();
+        Edge selfEdge = null;
+        try {
+            List<Edge> potentialFraudEdges = entity.getEdges()
+                    .stream()
+                    .filter(t -> t.getName().equalsIgnoreCase("UserLabel") &&
+                            t.getData().getAdditionalParams().get("LabelState") != null &&
+                            t.getData().getAdditionalParams().get("LabelState").equalsIgnoreCase("Fraud"))
+                    .sorted(Comparator.comparing(x -> OffsetDateTime.parse(x.getData().getAdditionalParams().get("EventTimeStamp"), DateTimeFormatter.ofPattern(ISO_OFFSET_DATE_TIME_PATTERN))))
+                    .collect(Collectors.toList());
+
+            if (potentialFraudEdges != null && potentialFraudEdges.size() > 0) {
+                selfEdge = potentialFraudEdges.get(potentialFraudEdges.size() - 1);
+            }
+        }catch(DateTimeParseException ignored)
+        {}
+
+        boolean isFraud=selfEdge!=null;
         //We need to check if there is EffectiveEndDate in that edge if there is it should be greater than today.
-        if(selfEdge.isPresent())
+        if(isFraud)
         {
-            String stringDate = selfEdge.get().getData().getAdditionalParams().get("EffectiveEndDate");
+            String stringDate = selfEdge.getData().getAdditionalParams().get("EffectiveEndDate");
             if(stringDate!=null) {
                 //set up the endDate to be in the past
                 OffsetDateTime endDate = OffsetDateTime.now().minusMinutes(1);
@@ -86,15 +96,8 @@ public class PublicItemService {
                 }
                 catch(DateTimeParseException ignored)
                 {
-                    try
-                    {
-                        endDate = OffsetDateTime.parse(stringDate, DateTimeFormatter.ofPattern(DFP_DATE_TIME_PATTERN));
-                    }
-                    catch(DateTimeParseException ex)
-                    {
-                        //obviously there is an EndDate but we cannot parse it, so set up the EndDate to be 1 min in the future to play it safe and mark that user as a fraudster
-                        endDate = OffsetDateTime.now().plusMinutes(1);
-                    }
+                    //obviously there is an EndDate but we cannot parse it, so set up the EndDate to be 1 min in the future to play it safe and mark that user as a fraudster
+                    endDate = OffsetDateTime.now().plusMinutes(1);
                 }
 
                 isFraud = endDate.compareTo(OffsetDateTime.now())>0;

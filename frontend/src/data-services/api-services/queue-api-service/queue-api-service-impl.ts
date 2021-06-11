@@ -59,18 +59,9 @@ export class QueueApiServiceImpl extends BaseApiService implements QueueApiServi
     }
 
     getQueueItems(id: string, size: number, continuationToken?: string | null) {
-        let manualParamsSerialized = `size=${size}`;
+        const manualParamsSerialized = `size=${size}`;
 
-        /**
-         * There is an issue with embedded axios encoding of the url params,
-         * this is why here configuration token is encoded manually
-         * if passed with axios config.params api will respond with 400
-         */
-        if (continuationToken) {
-            manualParamsSerialized += `&continuation=${encodeURIComponent(continuationToken)}`;
-        }
-
-        return this.get<GetQueueItemsResponse>(`/${id}/items?${manualParamsSerialized}`);
+        return this.post<GetQueueItemsResponse>(`/${id}/items?${manualParamsSerialized}`, { continuation: continuationToken || null });
     }
 
     lockTopQueueItem(queueId: string) {

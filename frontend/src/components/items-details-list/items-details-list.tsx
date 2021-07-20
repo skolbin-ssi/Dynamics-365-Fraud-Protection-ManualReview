@@ -1,12 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './item-details-list.scss';
+
+import autobind from 'autobind-decorator';
+import cn from 'classnames';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { resolve } from 'inversify-react';
-import autobind from 'autobind-decorator';
-import { History } from 'history';
 
+import { CommandButton } from '@fluentui/react/lib/Button';
+import { ContextualMenuItemType, IContextualMenuItem } from '@fluentui/react/lib/ContextualMenu';
 import {
     ColumnActionsMode,
     DetailsList,
@@ -14,21 +19,14 @@ import {
     IColumn,
     SelectionMode
 } from '@fluentui/react/lib/DetailsList';
-import { Text } from '@fluentui/react/lib/Text';
-import cn from 'classnames';
 import { Facepile } from '@fluentui/react/lib/Facepile';
 import { PersonaSize } from '@fluentui/react/lib/Persona';
 import { Spinner } from '@fluentui/react/lib/Spinner';
-import { CommandButton } from '@fluentui/react/lib/Button';
-import { ContextualMenuItemType, IContextualMenuItem } from '@fluentui/react/lib/ContextualMenu';
-import RiskClockIcon from '../../assets/icon/risk-clock.svg';
-import NormalClockIcon from '../../assets/icon/normal-clock.svg';
-import NoOrdersIllustrationSvg from '../../assets/no-orders-illustration.svg';
-import { QueueItemTags } from './queue-item-tags/queue-item-tags';
-import { QueueItemNote } from './queue-item-notes/queue-item-notes';
-import { ErrorContent } from '../error-content';
+import { Text } from '@fluentui/react/lib/Text';
 
-import { CurrentUserStore, QueueStore } from '../../view-services';
+import NormalClockIcon from '../../assets/icon/normal-clock.svg';
+import RiskClockIcon from '../../assets/icon/risk-clock.svg';
+import NoOrdersIllustrationSvg from '../../assets/no-orders-illustration.svg';
 import {
     AVAILABLE_SORTING_FIELDS,
     ITEM_LIST_COLUMN_KEYS,
@@ -36,13 +34,14 @@ import {
     ROUTES,
     SORTING_ORDER
 } from '../../constants';
-
-import { Item, ITEM_STATUS, Queue, } from '../../models';
 import { ItemSortSettingsDTO } from '../../data-services/api-services/models';
+import { ITEM_STATUS, Item, Queue, } from '../../models';
 import { TYPES } from '../../types';
+import { CurrentUserStore, QueueStore } from '../../view-services';
 import { ItemsLoadable } from '../../view-services/misc/items-loadable';
-
-import './item-details-list.scss';
+import { ErrorContent } from '../error-content';
+import { QueueItemNote } from './queue-item-notes/queue-item-notes';
+import { QueueItemTags } from './queue-item-tags/queue-item-tags';
 
 export interface ItemsDetailsListProps {
     queueStore: QueueStore;
@@ -248,6 +247,11 @@ export class ItemsDetailsList extends Component<ItemsDetailsListProps, never> {
         }
     }
 
+    private get residualQueue() {
+        const { queueStore } = this.props;
+        return queueStore.allQueues.find(queue => queue.residual === true);
+    }
+
     @autobind
     setItemToItemStore(selectedItem: Item) {
         const { queueStore, selectedQueue, searchId } = this.props;
@@ -262,9 +266,13 @@ export class ItemsDetailsList extends Component<ItemsDetailsListProps, never> {
         const isEscalatedItem = status === ITEM_STATUS.ESCALATED || status === ITEM_STATUS.ON_HOLD;
         const queues = isEscalatedItem ? queueStore.escalatedQueues : queueStore.queues;
 
-        const queueViewId = selectedQueue
+        let queueViewId = selectedQueue
             ? selectedQueue.viewId
             : queues?.find(queue => queue.queueId === selectedItem.selectedQueueId)?.viewId;
+        // If queueViewId is null, which means item belongs to Residual Queue
+        if (!queueViewId) {
+            queueViewId = this.residualQueue?.viewId;
+        }
 
         const isLockedInTheCurrentQueue = lockedOnQueueViewId === queueViewId;
         const isLockedByCurrent = lockedById === user?.id;
@@ -413,9 +421,10 @@ export class ItemsDetailsList extends Component<ItemsDetailsListProps, never> {
     renderQueues(item: Item) {
         const { queueStore } = this.props;
         const { queueIds, selectedQueueId } = item;
+        // In case item doesn't belong to active queue or one of the deleted queues, then selected queue will be residual queue
         const selectedQueueName = selectedQueueId
             ? queueStore.getQueueById(selectedQueueId!)?.name || `Deleted queue (ID ${selectedQueueId!.substr(0, 8)}...)`
-            : 'Deleted queue';
+            : this.residualQueue?.name;
         const queuesOptions: IContextualMenuItem[] = this.composeQueueOptionsForItem(item, queueIds);
 
         // The first option is the header "Open in", and only the second one is the real queue

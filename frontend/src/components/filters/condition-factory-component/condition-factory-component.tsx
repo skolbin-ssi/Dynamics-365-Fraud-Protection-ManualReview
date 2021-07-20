@@ -1,23 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
 import { observer } from 'mobx-react';
+import React, { Component } from 'react';
 
-import { RangeNumericCondition } from './range-numeric-condition';
-import { SimpleTextCondition } from './simple-text-condition';
-import { ToggleCondition } from './toggle-condition';
-import { TextInCondition } from './text-in-condition';
-import { SimpleDateCondition } from './simple-date-condtion';
-import { RangeDateCondition } from './range-date-condition';
-import { TEXT_CONDITION_TYPE } from './text-condition-type';
-import { RangeTextCondition } from './range-text-condition';
-
-import { Condition } from '../../../models/filter/condition';
 import {
-    ACCEPTABLE_CONDITIONS_RENDER_GROUP_TYPE,
-    ACCEPTABLE_CONDITIONS_RENDER_GROUPS
+    ACCEPTABLE_CONDITIONS_RENDER_GROUPS,
+    ACCEPTABLE_CONDITIONS_RENDER_GROUP_TYPE
 } from '../../../constants/settings/filter-field';
+import { Condition } from '../../../models/filter/condition';
 import {
     BetweenDateCondition,
     BetweenNumericCondition,
@@ -28,6 +19,14 @@ import {
     NumericCondition,
     TextCondition
 } from '../../../models/filter/conditions';
+import { RangeDateCondition } from './range-date-condition';
+import { RangeNumericCondition } from './range-numeric-condition';
+import { RangeTextCondition } from './range-text-condition';
+import { SimpleDateCondition } from './simple-date-condtion';
+import { SimpleTextCondition } from './simple-text-condition';
+import { TEXT_CONDITION_TYPE } from './text-condition-type';
+import { TextInCondition } from './text-in-condition';
+import { ToggleCondition } from './toggle-condition';
 
 interface ConditionFactoryComponentProps {
     condition: Condition

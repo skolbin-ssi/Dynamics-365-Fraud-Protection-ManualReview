@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './error-content.scss';
+
 import React from 'react';
+
 import { PrimaryButton } from '@fluentui/react/lib/Button';
 import { Stack } from '@fluentui/react/lib/Stack';
 import { Text } from '@fluentui/react/lib/Text';
-import './error-content.scss';
 
 interface ErrorContentProps {
     /**
@@ -54,3 +56,5 @@ export const ErrorContent: React.FunctionComponent<ErrorContentProps> = ({
         }
     </Stack>
 );
+
+ErrorContent.defaultProps = { buttonText: '', onClick: undefined };

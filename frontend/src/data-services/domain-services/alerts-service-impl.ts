@@ -39,7 +39,7 @@ export class AlertsServiceImpl extends BaseDomainService implements AlertsServic
 
         if (response.data) {
             try {
-                return dataTransformer.mapResponse(response.data);
+                return dataTransformer.mapResponse(response.data) as Alert[];
             } catch (e) {
                 throw this.handleException(
                     'getAlerts',
@@ -49,7 +49,7 @@ export class AlertsServiceImpl extends BaseDomainService implements AlertsServic
             }
         }
 
-        return [];
+        return [] as Alert[];
     }
 
     async createAlert(alert: Alert) {

@@ -1,10 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
+import './items-list.scss';
+
+import autobind from 'autobind-decorator';
 import cx from 'classnames';
 import { observer } from 'mobx-react';
-import autobind from 'autobind-decorator';
+import React, { Component } from 'react';
 
 import {
     ColumnActionsMode,
@@ -16,16 +18,14 @@ import {
     Selection,
     SelectionMode
 } from '@fluentui/react/lib/DetailsList';
-import { Text } from '@fluentui/react/lib/Text';
 import { Spinner } from '@fluentui/react/lib/Spinner';
+import { Text } from '@fluentui/react/lib/Text';
 
-import { ITEM_STATUS } from '../../../../../../models/item';
+import { IconText } from '../../../../../../components/icon-text';
 import { DEFAULT_LINK_ANALYSIS_ITEMS_PER_PAGE, ITEM_LIST_COLUMN_KEYS } from '../../../../../../constants';
-
-import './items-list.scss';
+import { ITEM_STATUS } from '../../../../../../models/item';
 import { LinkAnalysisDfpItem, LinkAnalysisMrItem } from '../../../../../../models/item/link-analysis';
 import { LinkAnalysisItem } from '../../../../../../view-services';
-import { IconText } from '../../../../../../components/icon-text';
 
 interface ItemsListComponentProps {
     data: LinkAnalysisItem[];
@@ -175,6 +175,13 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
         }
     ];
 
+    @autobind
+    handleSelectionChange() {
+        const { onSelectionChanged } = this.props;
+
+        onSelectionChanged(this.selection.getSelection() as LinkAnalysisItem[]);
+    }
+
     private onRenderRow: IDetailsListProps['onRenderRow'] = props => {
         const { isSelectable } = this.props;
 
@@ -197,13 +204,6 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
         }
         return null;
     };
-
-    @autobind
-    handleSelectionChange() {
-        const { onSelectionChanged } = this.props;
-
-        onSelectionChanged(this.selection.getSelection() as LinkAnalysisItem[]);
-    }
 
     @autobind
     handelLoadMoreClick() {

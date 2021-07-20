@@ -1,24 +1,25 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import './total-review.scss';
+
 import autoBind from 'autobind-decorator';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
+
 import { SliceTooltipProps } from '@nivo/line';
 
-import { SwitchHeader as AggregationHeader, SwitchHeader } from '../../switch-header';
 import {
     CHART_AGGREGATION_PERIOD,
     CHART_AGGREGATION_PERIOD_DISPLAY,
-    PERFORMANCE_RATING, TOP_QUEUES_DISPLAY_VIEW,
+    PERFORMANCE_RATING,
+    TOP_QUEUES_DISPLAY_VIEW,
     WARNING_MESSAGES
 } from '../../../../constants';
-
-import { LineChart, SliceTooltip } from '../../line-chart';
-
-import './total-review.scss';
-import { DataGridList } from '../../data-grid-list';
 import { AnalystPerformanceStore } from '../../../../view-services';
+import { DataGridList } from '../../data-grid-list';
+import { LineChart, SliceTooltip } from '../../line-chart';
+import { SwitchHeader as AggregationHeader, SwitchHeader } from '../../switch-header';
 
 interface TotalReviewComponentProps {
     analystPerformanceStore: AnalystPerformanceStore
@@ -28,28 +29,6 @@ const CN = 'total-review';
 
 @observer
 export class TotalReview extends Component<TotalReviewComponentProps, never> {
-    getDataTableHeaderTitle() {
-        const { analystPerformanceStore: { rating } } = this.props;
-        if (rating === PERFORMANCE_RATING.ALL) {
-            return TOP_QUEUES_DISPLAY_VIEW.get(rating)!;
-        }
-
-        return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
-    }
-
-    getLineChartYScaleMaxValue() {
-        const { analystPerformanceStore: { lineChartData, maxYTicksValue } } = this.props;
-        if (!lineChartData.length) {
-            return 10;
-        }
-
-        if (maxYTicksValue < 10) {
-            return maxYTicksValue;
-        }
-
-        return undefined;
-    }
-
     @autoBind
     handleQueueAggregationChange(label: CHART_AGGREGATION_PERIOD) {
         const { analystPerformanceStore } = this.props;
@@ -70,6 +49,28 @@ export class TotalReview extends Component<TotalReviewComponentProps, never> {
         const { analystPerformanceStore } = this.props;
 
         analystPerformanceStore.setChecked(queueId);
+    }
+
+    getLineChartYScaleMaxValue() {
+        const { analystPerformanceStore: { lineChartData, maxYTicksValue } } = this.props;
+        if (!lineChartData.length) {
+            return 10;
+        }
+
+        if (maxYTicksValue < 10) {
+            return maxYTicksValue;
+        }
+
+        return undefined;
+    }
+
+    getDataTableHeaderTitle() {
+        const { analystPerformanceStore: { rating } } = this.props;
+        if (rating === PERFORMANCE_RATING.ALL) {
+            return TOP_QUEUES_DISPLAY_VIEW.get(rating)!;
+        }
+
+        return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
     }
 
     render() {

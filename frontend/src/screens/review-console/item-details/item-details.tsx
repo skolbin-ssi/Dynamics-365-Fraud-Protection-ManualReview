@@ -72,20 +72,20 @@ export class ItemDetails extends Component<ItemDetailsProps, ItemDetailsState> {
     }
 
     @autobind
-    toggleView(event: React.MouseEvent<HTMLElement>) {
-        const { onTabChange } = this.props;
-        const mode = event.currentTarget.getAttribute('data-mode') as ITEM_DETAILS_MODE;
-        onTabChange(mode);
-        this.setState({ mode });
-    }
-
-    @autobind
     handlePivotChange(item?: PivotItem) {
         const itemKey = item?.props.itemKey;
 
         if (itemKey) {
             this.setState({ selectedTab: itemKey as ITEM_DETAILS_TABS });
         }
+    }
+
+    @autobind
+    toggleView(event: React.MouseEvent<HTMLElement>) {
+        const { onTabChange } = this.props;
+        const mode = event.currentTarget.getAttribute('data-mode') as ITEM_DETAILS_MODE;
+        onTabChange(mode);
+        this.setState({ mode });
     }
 
     renderOrderDetails(item: Item, externalLinksMap: ExternalLink[]) {

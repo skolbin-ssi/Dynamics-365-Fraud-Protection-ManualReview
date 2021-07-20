@@ -1,6 +1,15 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './queue-tiles.scss';
+
+import autobind from 'autobind-decorator';
+import cn from 'classnames';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
+
 import { DefaultButton } from '@fluentui/react/lib/Button';
 import { Facepile, IFacepilePersona, OverflowButtonType } from '@fluentui/react/lib/Facepile';
 import { FontIcon } from '@fluentui/react/lib/Icon';
@@ -8,12 +17,7 @@ import { PersonaSize } from '@fluentui/react/lib/Persona';
 import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
 import { Spinner } from '@fluentui/react/lib/Spinner';
 import { Text } from '@fluentui/react/lib/Text';
-import autobind from 'autobind-decorator';
-import cn from 'classnames';
-import { History } from 'history';
-import { resolve } from 'inversify-react';
-import { observer } from 'mobx-react';
-import React, { Component } from 'react';
+
 import {
     QUEUE_LIST_TYPE,
     QUEUE_MANAGEMENT,
@@ -22,12 +26,9 @@ import {
     ROUTES
 } from '../../constants';
 import { Queue } from '../../models';
-
 import { TYPES } from '../../types';
-import { AppStore, CurrentUserStore, QueuesScreenStore } from '../../view-services';
 import { formatToLocaleDateString } from '../../utils/date';
-
-import './queue-tiles.scss';
+import { AppStore, CurrentUserStore, QueuesScreenStore } from '../../view-services';
 
 const CN = 'queue-tiles';
 
@@ -53,6 +54,14 @@ export class QueueTiles extends Component<QueueTilesComponentProps, never> {
     }
 
     @autobind
+    handleQueueTypeChange(item?: PivotItem) {
+        if (item) {
+            const { itemKey } = item.props;
+            this.queuesScreenStore.setActiveTilesQueueList(itemKey as QUEUE_LIST_TYPE);
+        }
+    }
+
+    @autobind
     onCreateQueueClick() {
         this.appStore.toggleOpenedModalType(QUEUE_MUTATION_TYPES.CREATE);
     }
@@ -72,14 +81,6 @@ export class QueueTiles extends Component<QueueTilesComponentProps, never> {
         this.history.push({
             pathname: ROUTES.build.queues(queue.viewId)
         });
-    }
-
-    @autobind
-    handleQueueTypeChange(item?: PivotItem) {
-        if (item) {
-            const { itemKey } = item.props;
-            this.queuesScreenStore.setActiveTilesQueueList(itemKey as QUEUE_LIST_TYPE);
-        }
     }
 
     @autobind

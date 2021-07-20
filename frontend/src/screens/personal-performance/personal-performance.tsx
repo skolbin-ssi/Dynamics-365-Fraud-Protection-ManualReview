@@ -1,37 +1,35 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
+import './personal-performance.scss';
+
+import autoBind from 'autobind-decorator';
 import { History } from 'history';
 import { resolve } from 'inversify-react';
-import { RouteComponentProps } from 'react-router-dom';
 import { disposeOnUnmount, observer } from 'mobx-react';
-import autoBind from 'autobind-decorator';
 import queryString from 'query-string';
+import React, { Component } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 
-import { DashboardHeader } from '../dashboard/dashboard-header';
-import { EntityHeader } from '../dashboard/entity-header';
-import { TotalReview } from '../dashboard/analyst-performance/total-review';
-import { PerformanceOverview } from '../dashboard/analyst-performance/performance-overview';
-import { OverturnedPerformance } from '../dashboard/overturned-performance';
-
-import { TYPES } from '../../types';
-import { ROUTES } from '../../constants';
 import { ReportsModal } from '../../components/reports-modal';
+import { ROUTES } from '../../constants';
 import { QueuePerformance } from '../../models/dashboard';
-
+import { TYPES } from '../../types';
+import { PerformanceParsedQueryUrl } from '../../utility-services';
+import { formatToQueryDateString } from '../../utils/date';
 import {
-    ReportsModalStore,
+    AnalystPerformanceStore,
     CurrentUserStore,
     DashboardScreenStore,
-    AnalystPerformanceStore,
     QueueOverturnedPerformanceStore,
+    ReportsModalStore,
     UpdateQuerySearchReactionParams
 } from '../../view-services';
-import { PerformanceParsedQueryUrl } from '../../utility-services';
-
-import './personal-performance.scss';
-import { formatToQueryDateString } from '../../utils/date';
+import { PerformanceOverview } from '../dashboard/analyst-performance/performance-overview';
+import { TotalReview } from '../dashboard/analyst-performance/total-review';
+import { DashboardHeader } from '../dashboard/dashboard-header';
+import { EntityHeader } from '../dashboard/entity-header';
+import { OverturnedPerformance } from '../dashboard/overturned-performance';
 
 export interface PersonalPerformanceComponentProps extends RouteComponentProps {}
 
@@ -76,6 +74,14 @@ export class PersonalPerformance extends Component<PersonalPerformanceComponentP
 
         disposeOnUnmount(this, this.overturnedPerformanceStore.loadData(this.analystPerformanceStore));
         disposeOnUnmount(this, this.overturnedPerformanceStore.updateUrlParams(this.updateOverturnedUrlQuerySearchParams));
+    }
+
+    @autoBind
+    handleGenerateReportsButtonClick() {
+        const analystPerformanceReports = this.analystPerformanceStore.reports(true);
+        const overturnedPerformanceReports = this.overturnedPerformanceStore.reports(true);
+
+        this.reportsModalStore.showReportsModal([...analystPerformanceReports, ...overturnedPerformanceReports]);
     }
 
     getUrlParsedQuery() {
@@ -138,14 +144,6 @@ export class PersonalPerformance extends Component<PersonalPerformanceComponentP
 
         this.history.replace(`${ROUTES.PERSONAL_PERFORMANCE}?${stringifiedUrlParams}`);
         this.analystPerformanceStore.setUrlSelectedIds(params.ids); // sync URL selected ids with store selected Ids
-    }
-
-    @autoBind
-    handleGenerateReportsButtonClick() {
-        const analystPerformanceReports = this.analystPerformanceStore.reports(true);
-        const overturnedPerformanceReports = this.overturnedPerformanceStore.reports(true);
-
-        this.reportsModalStore.showReportsModal([...analystPerformanceReports, ...overturnedPerformanceReports]);
     }
 
     renderReportsModal() {

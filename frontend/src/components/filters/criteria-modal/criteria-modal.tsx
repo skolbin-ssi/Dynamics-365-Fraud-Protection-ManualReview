@@ -1,26 +1,28 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import './criteria-modal.scss';
+
 import autobind from 'autobind-decorator';
-import { Modal } from '@fluentui/react/lib/Modal';
-import { IContextualMenuItem } from '@fluentui/react/lib/ContextualMenu';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
+
 import {
     CommandBarButton,
     DefaultButton,
     IconButton,
     PrimaryButton
 } from '@fluentui/react/lib/Button';
-import { CriteriaItem } from '../criteria-item';
-import { FilterField } from '../../../models/filter/filter-field';
+import { IContextualMenuItem } from '@fluentui/react/lib/ContextualMenu';
+import { Modal } from '@fluentui/react/lib/Modal';
+
 import { Condition } from '../../../models/filter/condition';
+import { FilterField } from '../../../models/filter/filter-field';
 import {
     FILTER_MUTATION_STATE,
     FiltersStore
 } from '../../../view-services/essence-mutation-services/filters-store';
-
-import './criteria-modal.scss';
+import { CriteriaItem } from '../criteria-item';
 
 interface CriteriaModalComponentProps {
     filter: FilterField;
@@ -46,22 +48,6 @@ const CRITERIA_MODAL_STATE = {
 
 @observer
 export class CriteriaModal extends Component<CriteriaModalComponentProps, never> {
-    getAddButtonText() {
-        const { filter } = this.props;
-
-        const filterState = filter.isFilterUsed
-            ? FILTER_MUTATION_STATE.UPDATE
-            : FILTER_MUTATION_STATE.CREATE;
-
-        return CRITERIA_MODAL_STATE.ADD_BUTTON_TEXT[filterState];
-    }
-
-    isAddUpdateButtonDisabled() {
-        const { filter } = this.props;
-
-        return !filter.isFilterUsedConditionsAreValid;
-    }
-
     @autobind
     handleConditionDropdownChange(item: IContextualMenuItem | undefined) {
         const { filter } = this.props;
@@ -75,11 +61,6 @@ export class CriteriaModal extends Component<CriteriaModalComponentProps, never>
                 searchedCondition.setSortIndex(sortIndex || 0);
             }
         }
-    }
-
-    @autobind
-    usedConditions(condition: Condition) {
-        return condition.isConditionUsed;
     }
 
     @autobind
@@ -110,6 +91,27 @@ export class CriteriaModal extends Component<CriteriaModalComponentProps, never>
             searchedCondition.setIsDisabled(false);
             searchedCondition.setSortIndex(0);
         }
+    }
+
+    getAddButtonText() {
+        const { filter } = this.props;
+
+        const filterState = filter.isFilterUsed
+            ? FILTER_MUTATION_STATE.UPDATE
+            : FILTER_MUTATION_STATE.CREATE;
+
+        return CRITERIA_MODAL_STATE.ADD_BUTTON_TEXT[filterState];
+    }
+
+    isAddUpdateButtonDisabled() {
+        const { filter } = this.props;
+
+        return !filter.isFilterUsedConditionsAreValid;
+    }
+
+    @autobind
+    usedConditions(condition: Condition) {
+        return condition.isConditionUsed;
     }
 
     renderConditionItems() {

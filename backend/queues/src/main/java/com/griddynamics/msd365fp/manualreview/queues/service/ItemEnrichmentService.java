@@ -76,6 +76,9 @@ public class ItemEnrichmentService {
     @Setter(onMethod = @__({@Value("${azure.cosmosdb.default-ttl}")}))
     private Duration defaultTtl;
 
+    @Value("${azure.graph-api.previous-transactions-count}")
+    private int previousTransactionsCount;
+
     private final GeodeticCalculator geoCalc = new GeodeticCalculator();
 
 
@@ -418,7 +421,11 @@ public class ItemEnrichmentService {
                 .map(n -> ((PurchaseNodeData) n.getData()))
                 .filter(n -> !mainPurchase.getPurchaseId().equals(n.getPurchaseId()))
                 .filter(n -> n.getMerchantLocalDate() != null &&
-                        n.getMerchantLocalDate().isBefore(mainPurchase.getMerchantLocalDate()))
+                        n.getMerchantLocalDate().isBefore(mainPurchase.getMerchantLocalDate()) &&
+                        n.getMerchantLocalDate().isAfter(mainPurchase.getMerchantLocalDate().minusDays(7))
+                )
+                .sorted((n1, n2) -> n1.getMerchantLocalDate().isBefore( n2.getMerchantLocalDate())? 1 : -1)
+                .limit(previousTransactionsCount)
                 .map(n -> modelMapper.map(n, PreviousPurchase.class))
                 .collect(Collectors.toList()));
     }

@@ -1,4 +1,8 @@
 @import '../../../../styles/variables';
+.fraud-score-main{
+  position: absolute;
+  top: 0;
+}
 
 .fraud-score-indication {
   $root: &;
@@ -155,35 +159,43 @@
       line-height: 16px;
     }
   }
+}
 
-  &-list-score-factors {
-    max-height: 0;
-    color: $neutralSecondary;
-    background: white;
+.list-score-factors {
+  max-height: 0;
+  color: $neutralSecondary;
+  background: white;
+  display: none;
+  
+  &--expanded{
+    max-height: 400px;
+    padding-bottom: 12px;
+    padding-right: 30px;
+    display: block;
+    position: relative;
+    margin-top: 50px;
+    z-index: 100;
+    box-shadow: 0 10px 10px 0 rgba(0, 0, 0, 0.1), 0 3.2px 7.2px rgba(0, 0, 0, 0.03);
+  }
 
-    &--expanded {
-      max-height: 400px;
-      padding-bottom: 12px;
+  ul {
+    list-style: none;
+    margin: 0 -1.5em;    
+
+    li {
+      font-size: 12px;
+      line-height: 16px;
+      white-space: nowrap;
     }
 
-    ul {
-      list-style: none;
-      margin: 0 -1.5em;
-
-      li {
-        font-size: 12px;
-        line-height: 16px;
-      }
-
-      li::before {
-        content: "";
-        display: inline-block;
-        width: .3em;
-        height: .3em;
-        margin: .5em .75em .2em 1em;
-        border-radius: 50%;
-        background-color: $neutralTertiaryAlt;
-      }
+    li::before {
+      content: "";
+      display: inline-block;
+      width: .3em;
+      height: .3em;
+      margin: .5em .75em .2em 1em;
+      border-radius: 50%;
+      background-color: $neutralTertiaryAlt;
     }
   }
 }

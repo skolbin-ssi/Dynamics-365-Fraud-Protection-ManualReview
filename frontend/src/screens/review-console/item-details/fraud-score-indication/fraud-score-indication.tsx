@@ -1,13 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './fraud-score-indication.scss';
+
+import autobind from 'autobind-decorator';
+import cn from 'classnames';
+import React, { Component } from 'react';
+
 import { IconButton } from '@fluentui/react/lib/Button';
 import { Text } from '@fluentui/react/lib/Text';
-import cn from 'classnames';
-import autobind from 'autobind-decorator';
-import React, { Component } from 'react';
+
 import { Item } from '../../../../models/item';
-import './fraud-score-indication.scss';
 import { stringToKebabCase } from '../../../../utils/text';
 
 const CN = 'fraud-score-indication';
@@ -61,44 +64,45 @@ export class FraudScoreIndication extends Component<FraudScoreIndicationProps, F
         const factorsAmount = humanReadableCodes.length;
 
         return (
-            <div className={cn(className, CN, expanded && `${CN}--expanded`)}>
-                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                <div
-                    className={`${CN}__top`}
-                    role="button"
-                    tabIndex={0}
-                    onClick={this.toggle}
-                >
-                    <div className={`${CN}-value-indicator`}>
-                        <div className={`${CN}-value-indicator-bg`} />
-                        <div
-                            className={`${CN}-value-indicator-value`}
-                            style={{ transform: `rotate(${fraudScoreDeg}deg)` }}
-                        />
-                        <Text
-                            className={`${CN}-value-indicator-score`}
-                            variant="medium"
-                        >
-                            {riskScore}
+            <div className="fraud-score-main">
+                <div className={cn(className, CN, expanded && `${CN}--expanded`)}>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                    <div
+                        className={`${CN}__top`}
+                        role="button"
+                        tabIndex={0}
+                        onClick={this.toggle}
+                    >
+                        <div className={`${CN}-value-indicator`}>
+                            <div className={`${CN}-value-indicator-bg`} />
+                            <div
+                                className={`${CN}-value-indicator-value`}
+                                style={{ transform: `rotate(${fraudScoreDeg}deg)` }}
+                            />
+                            <Text
+                                className={`${CN}-value-indicator-score`}
+                                variant="medium"
+                            >
+                                {riskScore}
+                            </Text>
+                        </div>
+                        <Text className={`${CN}-title`} variant="medium">Fraud score</Text>
+                        <Text className={`${CN}-score-factors`} variant="medium">
+                            {factorsAmount}
+                            &nbsp;Score factors
                         </Text>
+                        { !!factorsAmount && (
+                            <IconButton
+                                className={`${CN}-expand`}
+                                iconProps={{
+                                    iconName: expanded ? 'ChevronUp' : 'ChevronDown'
+                                }}
+                                onClick={this.toggle}
+                            />
+                        )}
                     </div>
-                    <Text className={`${CN}-title`} variant="medium">Fraud score</Text>
-                    <Text className={`${CN}-score-factors`} variant="medium">
-                        {factorsAmount}
-                        &nbsp;Score factors
-                    </Text>
-                    { !!factorsAmount && (
-                        <IconButton
-                            className={`${CN}-expand`}
-                            iconProps={{
-                                iconName: expanded ? 'ChevronUp' : 'ChevronDown'
-                            }}
-                            onClick={this.toggle}
-                        />
-                    )}
                 </div>
-
-                <div className={cn(`${CN}-list-score-factors`, expanded && `${CN}-list-score-factors--expanded`)}>
+                <div className={cn('list-score-factors', expanded && 'list-score-factors--expanded')}>
                     {this.renderListOfCodes(humanReadableCodes)}
                 </div>
             </div>

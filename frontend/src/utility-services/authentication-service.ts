@@ -71,7 +71,12 @@ export class AuthenticationService {
                 navigateToLoginRequestUrl: false
             },
             cache: {
-                cacheLocation: 'sessionStorage'
+                cacheLocation: 'localStorage'
+            },
+            system:
+            {
+                loadFrameTimeout: 30000,
+                navigateFrameWait: 0
             }
         };
 
@@ -125,8 +130,16 @@ export class AuthenticationService {
         this.msal.logout();
     }
 
-    apiRequestInterceptor(config: ApiServiceRequestConfig) {
-        const idToken = this.msal.getRawIdToken();
+    async apiRequestInterceptor(config: ApiServiceRequestConfig) {
+        // TODO: shouldn't use idToken, should use accessToken
+        let idToken = this.msal.getRawIdToken();
+
+        if (this.isAuthenticated()) {
+            const test = await this.msal.acquireTokenSilent(this.msalAuthParams);
+            // eslint-disable-next-line no-console
+            console.log(test.idToken.rawIdToken);
+            idToken = test.idToken.rawIdToken;
+        }
 
         if (!idToken) {
             this.navigateTo(ROUTES.LOGIN);
@@ -220,6 +233,8 @@ export class AuthenticationService {
 
         try {
             authResponse = await this.msal.acquireTokenSilent(this.msalAuthParams);
+
+            return authResponse.accessToken;
         } catch (e) {
             // Acquire token silent failure, and send an interactive request
             if (e.errorMessage.includes('interaction_required')) {
@@ -227,10 +242,10 @@ export class AuthenticationService {
                 return authResponse.accessToken;
             }
 
+            this.msal.acquireTokenRedirect(this.msalAuthParams);
+
             throw e;
         }
-
-        return authResponse.accessToken;
     }
 
     /**

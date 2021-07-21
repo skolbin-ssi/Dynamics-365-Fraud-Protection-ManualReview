@@ -148,7 +148,7 @@ public class ItemEnrichmentService {
             mapMainEntityToItem(item, mainEntity);
 
             // 4. Get and map billing data for main purchase
-            enrichPurchasePaymentData(item.getPurchase());
+            enrichPurchasePaymentData(item.getPurchase(), true);
 
             // 5. Get user data from DFP and map to main purchase
             ExplorerEntity userEntity = getUserEntity(mainEntity);
@@ -159,7 +159,7 @@ public class ItemEnrichmentService {
                 mapPreviousPurchaseEntityToPreviousPurchase(
                         previousPurchase,
                         dfpExplorerService.explorePurchase(previousPurchase.getPurchaseId()));
-                enrichPurchasePaymentData(previousPurchase);
+                enrichPurchasePaymentData(previousPurchase, false);
             });
 
             // 7. Calculate derived fields
@@ -216,7 +216,7 @@ public class ItemEnrichmentService {
                 .findFirst().orElse(ExplorerEntity.EMPTY);
     }
 
-    private void enrichPurchasePaymentData(final Purchase purchase) {
+    private void enrichPurchasePaymentData(final Purchase purchase, boolean addAllAddresses) {
         if (purchase.getPaymentInstrumentList() == null || purchase.getPaymentInstrumentList().isEmpty()) {
             return;
         }
@@ -225,7 +225,7 @@ public class ItemEnrichmentService {
                 .map(dfpExplorerService::explorePaymentInstrument)
                 .collect(Collectors.toList());
 
-        mapPIEntitiesToPurchase(purchase, paymentInstrumentEntities);
+        mapPIEntitiesToPurchase(purchase, paymentInstrumentEntities, addAllAddresses);
     }
 
     private void mapMainEntityToItem(final Item item, final ExplorerEntity entity) {
@@ -354,7 +354,7 @@ public class ItemEnrichmentService {
                 .build());
     }
 
-    private void mapPIEntitiesToPurchase(final Purchase purchase, final List<ExplorerEntity> piEntities) {
+    private void mapPIEntitiesToPurchase(final Purchase purchase, final List<ExplorerEntity> piEntities, boolean addAllAddresses) {
         if (purchase.getPaymentInstrumentList() == null || purchase.getPaymentInstrumentList().isEmpty()) {
             return;
         }
@@ -412,7 +412,11 @@ public class ItemEnrichmentService {
         if (purchase.getAddressList() == null) {
             purchase.setAddressList(new LinkedList<>());
         }
-        purchase.getAddressList().addAll(billingAddressMap.values());
+        if(addAllAddresses) {
+            purchase.getAddressList().addAll(billingAddressMap.values());
+        } else {
+            purchase.getAddressList().add((Address) billingAddressMap.values().toArray()[billingAddressMap.size() - 1]);
+        }
     }
 
     private void mapPurchaseHistoryToMainPurchase(final MainPurchase mainPurchase, ExplorerEntity userEntity) {

@@ -412,7 +412,9 @@ public class ItemEnrichmentService {
         if (purchase.getAddressList() == null) {
             purchase.setAddressList(new LinkedList<>());
         }
-        purchase.getAddressList().add((Address) billingAddressMap.values().toArray()[billingAddressMap.size() - 1]);
+        if(billingAddressMap.size()>0) {
+            purchase.getAddressList().add((Address) billingAddressMap.values().toArray()[billingAddressMap.size() - 1]);
+        }
     }
 
     private void mapPurchaseHistoryToMainPurchase(final MainPurchase mainPurchase, ExplorerEntity userEntity) {

@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import { computed, observable } from 'mobx';
+
 import { DecisionDTO } from '../../data-services/api-services/models';
 
 export class Decision {
@@ -27,12 +28,14 @@ export class Decision {
         let r: string[];
 
         try {
-            const results = Array.from(this.reasonCodes.matchAll(/-(\w*):/gi));
+            const allReasonCodes = this.reasonCodes.split(',');
 
-            r = results.map(part => {
-                const str = part[1].split('_').join(' ').toLowerCase();
+            r = allReasonCodes.map(part => {
+                const current = part.replace(/[0-9]*-/g, '');
+                const words = current.split(':');
+                const str = words[0].split('_').join(' ').toLowerCase();
 
-                return str[0].toUpperCase() + str.slice(1);
+                return `${str[0].toUpperCase()}${str.slice(1)}: ${words[1]}`;
             });
         } catch (e) {
             r = [];

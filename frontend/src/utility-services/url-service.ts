@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 import queryString, { ParsedQuery } from 'query-string';
+
 import { CHART_AGGREGATION_PERIOD, PERFORMANCE_RATING } from '../constants';
 
 /**
@@ -16,15 +17,15 @@ type BooleanReadSearchFields<T> = {
  */
 interface ReadSearchQueryFields extends ParsedQuery {
     selectedIds: string[];
-    rating?: string;
-    aggregation?: string;
-    overturnedIds?: string[];
-    overturnedRating?: string;
-    overturnedAggregation?: string;
-    from?: string | null;
-    to?: string | null;
-    sortingField?: string,
-    sortingOrder?: string
+    rating: string | null;
+    aggregation: string | null;
+    overturnedIds: string[] | null;
+    overturnedRating: string | null;
+    overturnedAggregation: string | null;
+    from: string | null;
+    to: string | null;
+    sortingField: string | null,
+    sortingOrder: string | null
 }
 
 /**
@@ -37,8 +38,8 @@ export interface PerformanceParsedQueryUrl extends ParsedQuery {
     overturnedIds: string[],
     overturnedRating: PERFORMANCE_RATING,
     overturnedAggregation: CHART_AGGREGATION_PERIOD,
-    from?: string | null;
-    to?: string | null;
+    from: string | null;
+    to: string | null;
 }
 
 /**
@@ -54,7 +55,7 @@ export function readUrlSearchQueryOptions(search: string, fields: BooleanReadSea
         overturnedIds: [],
         overturnedRating: '',
         overturnedAggregation: ''
-    } as ReadSearchQueryFields;
+    } as unknown as ReadSearchQueryFields;
 
     if (fields.selectedIds) {
         const parsedQuery = queryString

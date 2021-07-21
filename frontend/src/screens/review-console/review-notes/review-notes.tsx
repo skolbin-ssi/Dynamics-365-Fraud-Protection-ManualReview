@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { FC } from 'react';
+import './review-notes.scss';
+
 import cn from 'classnames';
+import React, { FC } from 'react';
 
 import { Persona, PersonaSize } from '@fluentui/react/lib/Persona';
 import { Text } from '@fluentui/react/lib/Text';
 
 import { Note } from '../../../models';
 import { formatForNotes } from '../../../utils/date';
-
-import './review-notes.scss';
 
 interface ReviewNotesProps {
     className?: string;
@@ -59,3 +59,5 @@ export const ReviewNotes: FC<ReviewNotesProps> = (props: ReviewNotesProps) => {
         </ul>
     );
 };
+
+ReviewNotes.defaultProps = { className: '' };

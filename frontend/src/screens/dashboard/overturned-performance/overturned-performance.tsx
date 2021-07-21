@@ -1,25 +1,25 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import './overturned-performance.scss';
 
 import autoBind from 'autobind-decorator';
-import { BaseOverturnedPerformanceStore } from '../../../view-services/dashboard/base-overturned-performance-store';
-import { BasicEntityPerformance } from '../../../models/dashboard';
-import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
+
 import {
-    WARNING_MESSAGES,
+    CHART_AGGREGATION_PERIOD,
+    CHART_AGGREGATION_PERIOD_DISPLAY,
     PERFORMANCE_RATING,
     TOP_QUEUES_DISPLAY_VIEW,
-    CHART_AGGREGATION_PERIOD,
-    CHART_AGGREGATION_PERIOD_DISPLAY
+    WARNING_MESSAGES
 } from '../../../constants';
-import { BlurLoader } from '../blur-loader';
-import { BarChart } from '../bar-chart';
+import { BasicEntityPerformance } from '../../../models/dashboard';
+import { BaseOverturnedPerformanceStore } from '../../../view-services/dashboard/base-overturned-performance-store';
 import { AccuracyDataTable } from '../accuracy-data-table';
-
-import './overturned-performance.scss';
+import { BarChart } from '../bar-chart';
+import { BlurLoader } from '../blur-loader';
+import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
 
 interface OverturnedPerformanceComponentProps<T extends BasicEntityPerformance> {
     overturnedPerformanceStore: BaseOverturnedPerformanceStore<T>
@@ -29,15 +29,6 @@ const CN = 'overturned-performance';
 
 @observer
 export class OverturnedPerformance<T extends BasicEntityPerformance> extends Component<OverturnedPerformanceComponentProps<T>, never> {
-    getQueuesOverturnedDataTableHeaderTitle() {
-        const { overturnedPerformanceStore: { rating } } = this.props;
-        if (rating === PERFORMANCE_RATING.ALL) {
-            return TOP_QUEUES_DISPLAY_VIEW.get(rating)!;
-        }
-
-        return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
-    }
-
     @autoBind
     handleOverturnedChartAggregationChange(label: CHART_AGGREGATION_PERIOD) {
         const { overturnedPerformanceStore } = this.props;
@@ -57,6 +48,15 @@ export class OverturnedPerformance<T extends BasicEntityPerformance> extends Com
         const { overturnedPerformanceStore } = this.props;
 
         overturnedPerformanceStore.setChecked(analystId);
+    }
+
+    getQueuesOverturnedDataTableHeaderTitle() {
+        const { overturnedPerformanceStore: { rating } } = this.props;
+        if (rating === PERFORMANCE_RATING.ALL) {
+            return TOP_QUEUES_DISPLAY_VIEW.get(rating)!;
+        }
+
+        return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
     }
 
     render() {

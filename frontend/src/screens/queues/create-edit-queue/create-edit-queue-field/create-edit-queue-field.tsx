@@ -1,10 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React from 'react';
-import cn from 'classnames';
-
 import './create-edit-queue-field.scss';
+
+import cn from 'classnames';
+import React from 'react';
+
 import { IconButton } from '@fluentui/react/lib/Button';
 
 interface CreateEditQueueFieldProps {
@@ -47,4 +48,8 @@ export const CreateEditQueueField: React.FunctionComponent<CreateEditQueueFieldP
             { children }
         </div>
     );
+};
+
+CreateEditQueueField.defaultProps = {
+    className: '', title: '', description: '', showDeleteBtn: false, onDeleteClick: undefined
 };

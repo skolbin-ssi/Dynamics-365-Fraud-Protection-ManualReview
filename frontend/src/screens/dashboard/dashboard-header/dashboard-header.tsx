@@ -1,28 +1,31 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import autoBind from 'autobind-decorator';
-import { observer } from 'mobx-react';
-import cx from 'classnames';
-import { resolve } from 'inversify-react';
-import { History } from 'history';
+import './dashboard-header.scss';
 
+import autoBind from 'autobind-decorator';
+import cx from 'classnames';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
+
+import { ActionButton } from '@fluentui/react/lib/Button';
 import { DatePicker } from '@fluentui/react/lib/DatePicker';
 import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
 import { IPersonaProps } from '@fluentui/react/lib/Persona';
-import { ActionButton } from '@fluentui/react/lib/Button';
-
-import { DashboardSearch } from './dashboard-search';
 
 import {
-    DATE_RANGE, DATE_RANGE_DAYS, DATE_RANGE_DISPLAY, ROLE
+    DATE_RANGE,
+    DATE_RANGE_DAYS,
+    DATE_RANGE_DISPLAY,
+    ROLE
 } from '../../../constants';
-import { getEndOfDate, getPastDate } from '../../../utils/date';
 import { Queue, User } from '../../../models';
 import { TYPES } from '../../../types';
+import { getEndOfDate, getPastDate } from '../../../utils/date';
 import { DashboardScreenStore } from '../../../view-services';
-import './dashboard-header.scss';
+import { DashboardSearch } from './dashboard-search';
 
 const CN = 'dashboard-header';
 
@@ -74,21 +77,6 @@ export class DashboardHeader extends Component<DashboardHeaderProps, never> {
     ];
 
     @autoBind
-    getDatepickerValue(start?: boolean) {
-        const { dashboardScreenStore } = this.props;
-        const { dateRange } = dashboardScreenStore;
-        const nowDate = dateRange !== DATE_RANGE.CUSTOM
-            ? getEndOfDate(new Date())
-            : undefined;
-
-        if (start) {
-            return getPastDate(DATE_RANGE_DAYS[dateRange]);
-        }
-
-        return nowDate;
-    }
-
-    @autoBind
     handleDropdownChange(option: IDropdownOption | undefined) {
         const { dashboardScreenStore } = this.props;
 
@@ -116,16 +104,6 @@ export class DashboardHeader extends Component<DashboardHeaderProps, never> {
         }
     }
 
-    /**
-     * Disable date picker only when custom range selection is issued
-     */
-    isDatePickerDisabled() {
-        const { dashboardScreenStore } = this.props;
-        const { dateRange } = dashboardScreenStore;
-
-        return dateRange !== DATE_RANGE.CUSTOM;
-    }
-
     @autoBind
     handleEndDateSelection(date: Date | null | undefined) {
         const { dashboardScreenStore } = this.props;
@@ -135,6 +113,31 @@ export class DashboardHeader extends Component<DashboardHeaderProps, never> {
 
             dashboardScreenStore.setToDate(fullHoursDate);
         }
+    }
+
+    @autoBind
+    getDatepickerValue(start?: boolean) {
+        const { dashboardScreenStore } = this.props;
+        const { dateRange } = dashboardScreenStore;
+        const nowDate = dateRange !== DATE_RANGE.CUSTOM
+            ? getEndOfDate(new Date())
+            : undefined;
+
+        if (start) {
+            return getPastDate(DATE_RANGE_DAYS[dateRange]);
+        }
+
+        return nowDate;
+    }
+
+    /**
+     * Disable date picker only when custom range selection is issued
+     */
+    isDatePickerDisabled() {
+        const { dashboardScreenStore } = this.props;
+        const { dateRange } = dashboardScreenStore;
+
+        return dateRange !== DATE_RANGE.CUSTOM;
     }
 
     @autoBind

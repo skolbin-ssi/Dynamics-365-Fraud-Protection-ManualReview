@@ -1,31 +1,34 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { Modal } from '@fluentui/react/lib/Modal';
-import { Persona, PersonaSize } from '@fluentui/react/lib/Persona';
+import './page-layout.scss';
+
 import autobind from 'autobind-decorator';
+import cn from 'classnames';
 import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
-import cn from 'classnames';
-import { IRawStyle } from '@fluentui/react/lib/Styling';
-import { Panel } from '@fluentui/react/lib/Panel';
+
 import { ActionButton } from '@fluentui/react/lib/Button';
+import { Modal } from '@fluentui/react/lib/Modal';
+import { Panel } from '@fluentui/react/lib/Panel';
+import { Persona, PersonaSize } from '@fluentui/react/lib/Persona';
+import { IRawStyle } from '@fluentui/react/lib/Styling';
 import { Text } from '@fluentui/react/lib/Text';
+
 import { QUEUE_MUTATION_TYPES } from '../../constants';
 import { CreateEditQueueModal } from '../../screens/queues/create-edit-queue';
 import { TYPES } from '../../types';
 import { AppStore, CurrentUserStore, QueuesScreenStore } from '../../view-services';
 import { Header } from './header';
 import { LeftNavigation } from './left-navigation';
-import { ToastNotification } from './toast-notification';
 import {
     emailTextStyles,
     myAccountPanelStyles,
     signOutButtonStyles,
     userNameTextStyles
 } from './page-layout.styles';
-import './page-layout.scss';
+import { ToastNotification } from './toast-notification';
 
 export interface PageLayoutProps {
     styles?: IRawStyle;
@@ -49,14 +52,14 @@ export class PageLayout extends Component<PageLayoutProps, never> {
     private queueScreenStore!: QueuesScreenStore;
 
     @autobind
-    onToggleNavigation(isExpanded: boolean) {
-        this.appStore.toggleNavigationExpanded(isExpanded);
-    }
-
-    @autobind
     handleSignOut() {
         this.userStore.toggleUserPanel(false);
         this.userStore.signOut();
+    }
+
+    @autobind
+    onToggleNavigation(isExpanded: boolean) {
+        this.appStore.toggleNavigationExpanded(isExpanded);
     }
 
     @autobind

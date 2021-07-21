@@ -1,35 +1,35 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { disposeOnUnmount, observer } from 'mobx-react';
-import { resolve } from 'inversify-react';
-import { History } from 'history';
-import { RouteComponentProps } from 'react-router-dom';
+import './search-screen.scss';
+
 import autobind from 'autobind-decorator';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
+import { disposeOnUnmount, observer } from 'mobx-react';
+import React, { Component } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 
 import { Spinner } from '@fluentui/react/lib/Spinner';
-import { SearchResultsHeader } from './search-results-header';
-import { ItemsDetailsList } from '../../components/items-details-list';
-import { SearchCriteriaForm } from './search-criteria-form';
-import { ErrorContent } from '../../components/error-content';
-import SearchIllustrationSvg from '../../assets/search-illustration.svg';
 
-import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../utility-services';
-import { SearchScreenStore } from '../../view-services/search';
+import SearchIllustrationSvg from '../../assets/search-illustration.svg';
+import { ErrorContent } from '../../components/error-content';
+import { CriteriaModal } from '../../components/filters';
+import { ItemsDetailsList } from '../../components/items-details-list';
 import {
     ITEM_SORTING_FIELD,
     ROUTES,
     SORTING_ORDER,
 } from '../../constants';
-import { TYPES } from '../../types';
 import { ItemSearchQueryDTO, ItemSortSettingsDTO } from '../../data-services/api-services/models';
-import { FiltersStore } from '../../view-services/essence-mutation-services/filters-store';
-import { CriteriaModal } from '../../components/filters';
-
-import './search-screen.scss';
-import { SearchFiltersSummary } from './search-filters-summary';
 import { FilterConditionDto } from '../../data-services/api-services/models/settings/filter-condition-dto';
+import { TYPES } from '../../types';
+import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../utility-services';
+import { FiltersStore } from '../../view-services/essence-mutation-services/filters-store';
+import { SearchScreenStore } from '../../view-services/search';
+import { SearchCriteriaForm } from './search-criteria-form';
+import { SearchFiltersSummary } from './search-filters-summary';
+import { SearchResultsHeader } from './search-results-header';
 
 export interface SearchScreenRouteParams {
     searchId?: string;
@@ -76,6 +76,26 @@ export class SearchScreen extends Component<SearchScreenProps, never> {
         this.searchScreenStore.updateSearchQueryObject({});
         this.searchScreenStore.clearItems();
         this.searchScreenStore.resetSortingToDefault();
+    }
+
+    @autobind
+    handleCloseModal() {
+        this.filtersStore.closeCriteriaModal();
+    }
+
+    @autobind
+    handleOnCreateUpdateFilter() {
+        this.filtersStore.createUpdateFilter();
+    }
+
+    @autobind
+    handleFilterTileClick(filterId: string) {
+        this.filtersStore.updateFilter(filterId);
+    }
+
+    @autobind
+    handleRemoveFilterClick(filterId: string) {
+        this.filtersStore.removeFilter(filterId);
     }
 
     @autobind
@@ -193,26 +213,6 @@ export class SearchScreen extends Component<SearchScreenProps, never> {
         }
 
         this.history.replace(path);
-    }
-
-    @autobind
-    handleCloseModal() {
-        this.filtersStore.closeCriteriaModal();
-    }
-
-    @autobind
-    handleOnCreateUpdateFilter() {
-        this.filtersStore.createUpdateFilter();
-    }
-
-    @autobind
-    handleFilterTileClick(filterId: string) {
-        this.filtersStore.updateFilter(filterId);
-    }
-
-    @autobind
-    handleRemoveFilterClick(filterId: string) {
-        this.filtersStore.removeFilter(filterId);
     }
 
     renderCriteriaModal() {

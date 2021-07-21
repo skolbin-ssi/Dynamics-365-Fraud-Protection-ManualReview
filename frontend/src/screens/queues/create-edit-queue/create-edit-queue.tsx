@@ -1,11 +1,13 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
+import './create-edit-queue.scss';
+
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
 import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
+import React, { Component } from 'react';
 
 import { DefaultButton, IconButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import { FontIcon } from '@fluentui/react/lib/Icon';
@@ -14,20 +16,16 @@ import { Spinner } from '@fluentui/react/lib/Spinner';
 import { Text } from '@fluentui/react/lib/Text';
 
 import { VerticalTab } from '../../../components/vartical-tab/vertical-tab';
+import { CreateQueueModalTabs, QUEUE_MANAGEMENT, QUEUE_MUTATION_TYPES } from '../../../constants';
 import { Queue } from '../../../models';
 import { TYPES } from '../../../types';
+import { CurrentUserStore } from '../../../view-services';
 import { QueueMutationModalStore } from '../../../view-services/essence-mutation-services';
-
-import { CreateQueueModalTabs, QUEUE_MANAGEMENT, QUEUE_MUTATION_TYPES } from '../../../constants';
-
-import { GeneralTab } from './general-tab/general-tab';
-import { FiltersTab } from './filters-tab/filters-tab';
+import { FiltersStore } from '../../../view-services/essence-mutation-services/filters-store';
 import { AssignTab } from './assign-tab/assign-tab';
 import { DeleteTab } from './delete-tab/delete-tab';
-import { CurrentUserStore } from '../../../view-services';
-
-import './create-edit-queue.scss';
-import { FiltersStore } from '../../../view-services/essence-mutation-services/filters-store';
+import { FiltersTab } from './filters-tab/filters-tab';
+import { GeneralTab } from './general-tab/general-tab';
 
 interface CreateEditQueueModalProps {
     closeCreateEditQueueModal: () => void;
@@ -73,21 +71,6 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
         }
     }
 
-    setQueueFiltersToFiltersStoreMutatedFilters() {
-        const { queueMutationStore: { fields: { filters } } } = this.queueCreationModalStore;
-        const { mutationType } = this.props;
-
-        if (mutationType === QUEUE_MUTATION_TYPES.UPDATE) {
-            this.filtersStore.clearMutatedFilters();
-            this.filtersStore.setMutatedFilters(filters);
-        }
-    }
-
-    @autobind
-    setActiveTab(newValue: CreateQueueModalTabs) {
-        this.setState({ activeTab: newValue });
-    }
-
     @autobind
     handleClose() {
         const { closeCreateEditQueueModal } = this.props;
@@ -117,6 +100,21 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
         }
         if (result === 'failure') {
             this.handleClose();
+        }
+    }
+
+    @autobind
+    setActiveTab(newValue: CreateQueueModalTabs) {
+        this.setState({ activeTab: newValue });
+    }
+
+    setQueueFiltersToFiltersStoreMutatedFilters() {
+        const { queueMutationStore: { fields: { filters } } } = this.queueCreationModalStore;
+        const { mutationType } = this.props;
+
+        if (mutationType === QUEUE_MUTATION_TYPES.UPDATE) {
+            this.filtersStore.clearMutatedFilters();
+            this.filtersStore.setMutatedFilters(filters);
         }
     }
 

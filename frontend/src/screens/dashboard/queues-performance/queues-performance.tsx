@@ -1,38 +1,38 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './queues-performance.scss';
+
+import autoBind from 'autobind-decorator';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
+import { disposeOnUnmount, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import autoBind from 'autobind-decorator';
-import { resolve } from 'inversify-react';
-import { History } from 'history';
-import { disposeOnUnmount, observer } from 'mobx-react';
 
 import { DefaultButton } from '@fluentui/react/lib/Button';
 
-import { LineChart } from '../line-chart';
-import { DataGridList } from '../data-grid-list';
-import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
-
 import {
-    CHART_AGGREGATION_PERIOD, CHART_AGGREGATION_PERIOD_DISPLAY,
+    CHART_AGGREGATION_PERIOD,
+    CHART_AGGREGATION_PERIOD_DISPLAY,
     PERFORMANCE_RATING,
     ROUTES,
-    TOP_QUEUES_DISPLAY_VIEW, WARNING_MESSAGES,
+    TOP_QUEUES_DISPLAY_VIEW,
+    WARNING_MESSAGES,
 } from '../../../constants';
+import { QueuePerformance } from '../../../models/dashboard';
+import { TYPES } from '../../../types';
+import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
+import { formatToQueryDateString } from '../../../utils/date';
 import {
     DashboardScreenStore,
     QueuesPerformanceStore,
     ReportsModalStore,
     UpdateQuerySearchReactionParams
 } from '../../../view-services';
-import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
-
-import { TYPES } from '../../../types';
-import { QueuePerformance } from '../../../models/dashboard';
-
-import './queues-performance.scss';
-import { formatToQueryDateString } from '../../../utils/date';
+import { DataGridList } from '../data-grid-list';
+import { LineChart } from '../line-chart';
+import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
 
 const CN = 'queues-performance';
 
@@ -81,6 +81,36 @@ export class QueuesPerformance extends Component<QueuePerformanceProps, any> {
         this.queuesPerformanceStore.clearPerformanceData();
     }
 
+    @autoBind
+    handleSelectionChange(queueId: string) {
+        this.queuesPerformanceStore.setChecked(queueId);
+    }
+
+    @autoBind
+    handleRowClick(queue: QueuePerformance) {
+        this.history.push(
+            ROUTES.build.dashboard.queue(queue.id)
+        );
+    }
+
+    @autoBind
+    handleQueuePerformanceRatingChange(label: PERFORMANCE_RATING) {
+        const rating = PERFORMANCE_RATING[label]!;
+        this.queuesPerformanceStore.setRating(rating);
+    }
+
+    @autoBind
+    handleAggregationChange(label: CHART_AGGREGATION_PERIOD) {
+        this.queuesPerformanceStore.setAggregation(label);
+    }
+
+    @autoBind
+    handleGenerateReportsButtonClick() {
+        const { reports } = this.queuesPerformanceStore;
+
+        this.reportsModalStore.showReportsModal(reports);
+    }
+
     getLineChartYScaleMaxValue() {
         const { lineChartData } = this.queuesPerformanceStore;
         if (!lineChartData.length) {
@@ -113,36 +143,6 @@ export class QueuesPerformance extends Component<QueuePerformanceProps, any> {
 
         this.history.replace(`${ROUTES.DASHBOARD_QUEUES_PERFORMANCE}?${strigifiedFields}`);
         this.queuesPerformanceStore.setUrlSelectedIds(ids); // sync URL selected ids with store selected Ids
-    }
-
-    @autoBind
-    handleSelectionChange(queueId: string) {
-        this.queuesPerformanceStore.setChecked(queueId);
-    }
-
-    @autoBind
-    handleRowClick(queue: QueuePerformance) {
-        this.history.push(
-            ROUTES.build.dashboard.queue(queue.id)
-        );
-    }
-
-    @autoBind
-    handleQueuePerformanceRatingChange(label: PERFORMANCE_RATING) {
-        const rating = PERFORMANCE_RATING[label]!;
-        this.queuesPerformanceStore.setRating(rating);
-    }
-
-    @autoBind
-    handleAggregationChange(label: CHART_AGGREGATION_PERIOD) {
-        this.queuesPerformanceStore.setAggregation(label);
-    }
-
-    @autoBind
-    handleGenerateReportsButtonClick() {
-        const { reports } = this.queuesPerformanceStore;
-
-        this.reportsModalStore.showReportsModal(reports);
     }
 
     renderGenerateReportButton() {

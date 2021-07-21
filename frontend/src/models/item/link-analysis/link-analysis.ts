@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { LinkAnalysisDto } from '../../../data-services/api-services/models/item';
 import { ANALYSIS_FIELDS } from '../../../constants/link-analysis';
+import { LinkAnalysisDto } from '../../../data-services/api-services/models/item';
 import { FieldLinks } from './field-links';
 
 export class LinkAnalysis {
@@ -21,7 +21,7 @@ export class LinkAnalysis {
             id, analysisFields, fields, found, foundInMR
         } = linkAnalysisDto;
 
-        this.id = id || '';
+        this.id = id || null;
         this.found = found || 0;
         this.foundInMR = foundInMR || 0;
         this.analysisFields = analysisFields || [];

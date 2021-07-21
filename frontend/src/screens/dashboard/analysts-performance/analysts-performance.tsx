@@ -1,18 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import '../queue-performance/queue-performance.scss';
+import './analysts-performance.scss';
+
+import autoBind from 'autobind-decorator';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
+import { disposeOnUnmount, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import autoBind from 'autobind-decorator';
-import { resolve } from 'inversify-react';
-import { History } from 'history';
-import { disposeOnUnmount, observer } from 'mobx-react';
 
 import { DefaultButton } from '@fluentui/react/lib/Button';
-
-import { LineChart } from '../line-chart';
-import { DataGridList } from '../data-grid-list';
-import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
 
 import {
     CHART_AGGREGATION_PERIOD,
@@ -22,18 +21,16 @@ import {
     TOP_ANALYST_DISPLAY_VIEW,
     WARNING_MESSAGES,
 } from '../../../constants';
-import { DashboardScreenStore, ReportsModalStore, UpdateQuerySearchReactionParams } from '../../../view-services';
+import { AnalystPerformance } from '../../../models/dashboard';
+import { TYPES } from '../../../types';
 import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
-
+import { formatToQueryDateString } from '../../../utils/date';
+import { DashboardScreenStore, ReportsModalStore, UpdateQuerySearchReactionParams } from '../../../view-services';
 import { AnalystsPerformanceStore } from '../../../view-services/dashboard/analysts-performance-store';
 import { BlurLoader } from '../blur-loader';
-
-import { TYPES } from '../../../types';
-import { AnalystPerformance } from '../../../models/dashboard';
-
-import '../queue-performance/queue-performance.scss';
-import './analysts-performance.scss';
-import { formatToQueryDateString } from '../../../utils/date';
+import { DataGridList } from '../data-grid-list';
+import { LineChart } from '../line-chart';
+import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
 
 const CN = 'queues-performance';
 
@@ -85,6 +82,38 @@ export class AnalystsPerformance extends Component<QueuePerformanceProps, any> {
         this.analystsPerformanceStore.clearPerformanceData();
     }
 
+    @autoBind
+    handleSelectionChange(queueId: string) {
+        this.analystsPerformanceStore.setChecked(queueId);
+    }
+
+    @autoBind
+    handleQueuePerformanceRatingChange(label: PERFORMANCE_RATING) {
+        const rating = PERFORMANCE_RATING[label];
+        if (rating) {
+            this.analystsPerformanceStore.setRating(rating);
+        }
+    }
+
+    @autoBind
+    handleRowClick(analyst: AnalystPerformance) {
+        this.history.push(
+            ROUTES.build.dashboard.analyst(analyst.id)
+        );
+    }
+
+    @autoBind
+    handleAggregationChange(label: CHART_AGGREGATION_PERIOD) {
+        this.analystsPerformanceStore.setAggregation(label);
+    }
+
+    @autoBind
+    handleGenerateReportsButtonClick() {
+        const { reports } = this.analystsPerformanceStore;
+
+        this.reportsModalStore.showReportsModal(reports);
+    }
+
     getDataTableHeader() {
         const { rating } = this.analystsPerformanceStore;
         if (rating === PERFORMANCE_RATING.ALL) {
@@ -117,38 +146,6 @@ export class AnalystsPerformance extends Component<QueuePerformanceProps, any> {
 
         this.history.replace(`${ROUTES.DASHBOARD_ANALYSTS_PERFORMANCE}?${strigifiedFields}`);
         this.analystsPerformanceStore.setUrlSelectedIds(ids); // sync URL selected ids with store selected Ids
-    }
-
-    @autoBind
-    handleSelectionChange(queueId: string) {
-        this.analystsPerformanceStore.setChecked(queueId);
-    }
-
-    @autoBind
-    handleQueuePerformanceRatingChange(label: PERFORMANCE_RATING) {
-        const rating = PERFORMANCE_RATING[label];
-        if (rating) {
-            this.analystsPerformanceStore.setRating(rating);
-        }
-    }
-
-    @autoBind
-    handleRowClick(analyst: AnalystPerformance) {
-        this.history.push(
-            ROUTES.build.dashboard.analyst(analyst.id)
-        );
-    }
-
-    @autoBind
-    handleAggregationChange(label: CHART_AGGREGATION_PERIOD) {
-        this.analystsPerformanceStore.setAggregation(label);
-    }
-
-    @autoBind
-    handleGenerateReportsButtonClick() {
-        const { reports } = this.analystsPerformanceStore;
-
-        this.reportsModalStore.showReportsModal(reports);
     }
 
     renderGenerateReportButton() {

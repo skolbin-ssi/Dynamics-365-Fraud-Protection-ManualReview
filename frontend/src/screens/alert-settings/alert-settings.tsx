@@ -1,18 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { CommandBarButton } from '@fluentui/react/lib/Button';
+import './alert-settings.scss';
+
 import autobind from 'autobind-decorator';
 import { History } from 'history';
 import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+
+import { CommandBarButton } from '@fluentui/react/lib/Button';
+
 import { ALERT_MUTATION_TYPE, ROUTES } from '../../constants';
 import { TYPES } from '../../types';
 import { AlertsStore } from '../../view-services';
 import { AlertsList } from './alerts-list';
-import './alert-settings.scss';
 
 const CN = 'alert-settings';
 
@@ -29,11 +32,6 @@ export class AlertSettings extends Component<RouteComponentProps, never> {
     }
 
     @autobind
-    onNavToCreate() {
-        this.history.push({ pathname: ROUTES.ALERT_CREATE });
-    }
-
-    @autobind
     async handleAlertDeletion(alertId: string) {
         const { alerts } = this.alertsStore;
         const alertToDelete = alerts.find(({ id }) => id === alertId);
@@ -45,6 +43,11 @@ export class AlertSettings extends Component<RouteComponentProps, never> {
     @autobind
     handleAlertActiveToggle(alertId: string, checked: boolean) {
         this.alertsStore.toggleActive(alertId, checked);
+    }
+
+    @autobind
+    onNavToCreate() {
+        this.history.push({ pathname: ROUTES.ALERT_CREATE });
     }
 
     render() {

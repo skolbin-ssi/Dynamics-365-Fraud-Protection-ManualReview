@@ -12,12 +12,12 @@ export class PostQueueTransformer extends BaseQueueTransformer implements DataTr
         viewId?: string
     ): Queue {
         const updateQueueResponse = postQueuesResponse
-            .map(this.mapSingleQueue.bind(this));
+            .map(this.mapSingleQueue.bind(this)) as Queue[];
 
         if (viewId) {
             return updateQueueResponse.find(q => q.viewId === viewId) || updateQueueResponse[0];
         }
 
-        return updateQueueResponse[0];
+        return updateQueueResponse[0] as Queue;
     }
 }

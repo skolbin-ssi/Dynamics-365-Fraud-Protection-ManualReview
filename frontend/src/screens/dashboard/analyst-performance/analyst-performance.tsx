@@ -1,36 +1,34 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './analyst-performance.scss';
+
+import autoBind from 'autobind-decorator';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
+import { disposeOnUnmount, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import autoBind from 'autobind-decorator';
-import { resolve } from 'inversify-react';
-import { History } from 'history';
-import { disposeOnUnmount, observer } from 'mobx-react';
 
-import { EntityHeader } from '../entity-header';
-
+import {
+    CHART_AGGREGATION_PERIOD,
+    PERFORMANCE_RATING,
+    ROUTES,
+} from '../../../constants';
+import { QueuePerformance } from '../../../models/dashboard';
+import { TYPES } from '../../../types';
+import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
+import { formatToQueryDateString } from '../../../utils/date';
 import {
     AnalystPerformanceStore,
     QueueOverturnedPerformanceStore,
     ReportsModalStore,
     UpdateQuerySearchReactionParams,
 } from '../../../view-services';
-import {
-    CHART_AGGREGATION_PERIOD,
-    PERFORMANCE_RATING,
-    ROUTES,
-} from '../../../constants';
-import { TYPES } from '../../../types';
-
-import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
-import { formatToQueryDateString } from '../../../utils/date';
-import { TotalReview } from './total-review';
-import { PerformanceOverview } from './performance-overview';
+import { EntityHeader } from '../entity-header';
 import { OverturnedPerformance } from '../overturned-performance';
-import { QueuePerformance } from '../../../models/dashboard';
-
-import './analyst-performance.scss';
+import { PerformanceOverview } from './performance-overview';
+import { TotalReview } from './total-review';
 
 export interface AnalystPerformanceRouterParams {
     analystId: string
@@ -88,6 +86,66 @@ export class AnalystPerformance extends Component<AnalystPerformanceProps, any> 
         this.analystPerformanceStore.clearPerformanceData();
     }
 
+    @autoBind
+    handleGenerateReportsButtonClick() {
+        const analystPerformanceReports = this.analystPerformanceStore.reports();
+        const overturnedPerformanceReports = this.overturnedPerformanceStore.reports();
+
+        this.reportsModalStore.showReportsModal([...analystPerformanceReports, ...overturnedPerformanceReports]);
+    }
+
+    @autoBind
+    updateOverturnedUrlQuerySearch({
+        ids, rating, aggregation, from, to,
+    }: UpdateQuerySearchReactionParams) {
+        const { location: { search } } = this.props;
+        const { analystId } = this.analystPerformanceStore;
+
+        const searchPart = readUrlSearchQueryOptions(search, { selectedIds: true, rating: true, aggregation: true });
+
+        const strigifiedFields = stringifyIntoUrlQueryString({
+            selectedIds: searchPart.selectedIds,
+            rating: searchPart.rating,
+            aggregation: searchPart.aggregation,
+            overturnedIds: ids,
+            overturnedRating: rating,
+            overturnedAggregation: aggregation,
+            from: formatToQueryDateString(from, null),
+            to: formatToQueryDateString(to, null),
+        });
+
+        this.history.replace(`${ROUTES.build.dashboard.analyst(analystId)}?${strigifiedFields}`);
+
+        this.overturnedPerformanceStore.setUrlSelectedIds(ids); // sync URL selected ids with store selected Ids
+    }
+
+    @autoBind
+    updateQueueUrlQuerySearch({
+        ids, rating, aggregation, from, to,
+    }: UpdateQuerySearchReactionParams) {
+        const { location: { search } } = this.props;
+        const { analystId } = this.analystPerformanceStore;
+        const searchPart = readUrlSearchQueryOptions(search, {
+            overturnedIds: true,
+            overturnedRating: true,
+            overturnedAggregation: true
+        });
+
+        const stringifiedFields = stringifyIntoUrlQueryString({
+            selectedIds: ids,
+            rating,
+            aggregation,
+            overturnedIds: searchPart.overturnedIds,
+            overturnedRating: searchPart.overturnedRating,
+            overturnedAggregation: searchPart.aggregation,
+            from: formatToQueryDateString(from, null),
+            to: formatToQueryDateString(to, null),
+        });
+
+        this.history.replace(`${ROUTES.build.dashboard.analyst(analystId)}?${stringifiedFields}`);
+        this.analystPerformanceStore.setUrlSelectedIds(ids); // sync URL selected ids with store selected Ids
+    }
+
     readInitialQuerySearchAndUpdateStores() {
         const { match: { params: { analystId } }, location: { search } } = this.props;
 
@@ -122,66 +180,6 @@ export class AnalystPerformance extends Component<AnalystPerformanceProps, any> 
         if (query.overturnedAggregation) {
             this.overturnedPerformanceStore.setAggregation(query.overturnedAggregation as CHART_AGGREGATION_PERIOD);
         }
-    }
-
-    @autoBind
-    updateQueueUrlQuerySearch({
-        ids, rating, aggregation, from, to,
-    }: UpdateQuerySearchReactionParams) {
-        const { location: { search } } = this.props;
-        const { analystId } = this.analystPerformanceStore;
-        const searchPart = readUrlSearchQueryOptions(search, {
-            overturnedIds: true,
-            overturnedRating: true,
-            overturnedAggregation: true
-        });
-
-        const stringifiedFields = stringifyIntoUrlQueryString({
-            selectedIds: ids,
-            rating,
-            aggregation,
-            overturnedIds: searchPart.overturnedIds,
-            overturnedRating: searchPart.overturnedRating,
-            overturnedAggregation: searchPart.aggregation,
-            from: formatToQueryDateString(from, null),
-            to: formatToQueryDateString(to, null),
-        });
-
-        this.history.replace(`${ROUTES.build.dashboard.analyst(analystId)}?${stringifiedFields}`);
-        this.analystPerformanceStore.setUrlSelectedIds(ids); // sync URL selected ids with store selected Ids
-    }
-
-    @autoBind
-    updateOverturnedUrlQuerySearch({
-        ids, rating, aggregation, from, to,
-    }: UpdateQuerySearchReactionParams) {
-        const { location: { search } } = this.props;
-        const { analystId } = this.analystPerformanceStore;
-
-        const searchPart = readUrlSearchQueryOptions(search, { selectedIds: true, rating: true, aggregation: true });
-
-        const strigifiedFields = stringifyIntoUrlQueryString({
-            selectedIds: searchPart.selectedIds,
-            rating: searchPart.rating,
-            aggregation: searchPart.aggregation,
-            overturnedIds: ids,
-            overturnedRating: rating,
-            overturnedAggregation: aggregation,
-            from: formatToQueryDateString(from, null),
-            to: formatToQueryDateString(to, null),
-        });
-
-        this.history.replace(`${ROUTES.build.dashboard.analyst(analystId)}?${strigifiedFields}`);
-
-        this.overturnedPerformanceStore.setUrlSelectedIds(ids); // sync URL selected ids with store selected Ids
-    }
-
-    @autoBind
-    handleGenerateReportsButtonClick() {
-        const analystPerformanceReports = this.analystPerformanceStore.reports();
-        const overturnedPerformanceReports = this.overturnedPerformanceStore.reports();
-
-        this.reportsModalStore.showReportsModal([...analystPerformanceReports, ...overturnedPerformanceReports]);
     }
 
     render() {

@@ -124,7 +124,7 @@ export class QueuesScreenStore {
     @action
     private initAutoRefresh() {
         if (this.isAutoRefreshEnabled) {
-            this.refreshIntervalRef = window.setInterval(this.autoRefreshFn.bind(this), DEFAULT_QUEUE_AUTO_REFRESH_CHECK_MILLISECONDS);
+            this.refreshIntervalRef = window.setInterval(() => this.autoRefreshFn.bind(this), DEFAULT_QUEUE_AUTO_REFRESH_CHECK_MILLISECONDS);
         }
     }
 

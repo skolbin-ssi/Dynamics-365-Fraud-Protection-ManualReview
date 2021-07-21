@@ -1,13 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { Stack } from '@fluentui/react/lib/Stack';
-import { Text } from '@fluentui/react/lib/Text';
+import './error.scss';
+
 import autoBind from 'autobind-decorator';
 import { Location } from 'history';
 import { resolve } from 'inversify-react';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
+
+import { Stack } from '@fluentui/react/lib/Stack';
+import { Text } from '@fluentui/react/lib/Text';
+
 import ForbiddenIllustrationSvg from '../../assets/403Illustration.svg';
 import NotFoundIllustrationSvg from '../../assets/404Illustration.svg';
 import { ErrorContent } from '../../components/error-content';
@@ -15,7 +19,6 @@ import { headerStackStyles } from '../../components/page-layout/header/header.st
 import { ERROR_SCREEN_STATES, ROUTES } from '../../constants';
 import { TYPES } from '../../types';
 import { AuthenticationService } from '../../utility-services';
-import './error.scss';
 
 const CN = 'error';
 
@@ -33,13 +36,6 @@ export class Error extends Component<ErrorComponentProps, never> {
     @resolve(TYPES.AUTHENTICATION)
     private authenticationService!: AuthenticationService;
 
-    getErrorType(): ERROR_SCREEN_STATES {
-        const { match } = this.props;
-        const { params } = match;
-
-        return params.type as ERROR_SCREEN_STATES;
-    }
-
     // TODO: duplication on Login impl, come up with consistent approach
     handleLogin() {
         const { location } = this.props;
@@ -56,6 +52,13 @@ export class Error extends Component<ErrorComponentProps, never> {
             from = { pathname: ROUTES.QUEUES } as Location;
         }
         this.authenticationService.redirectToAzureLogin(from);
+    }
+
+    getErrorType(): ERROR_SCREEN_STATES {
+        const { match } = this.props;
+        const { params } = match;
+
+        return params.type as ERROR_SCREEN_STATES;
     }
 
     goHome() {

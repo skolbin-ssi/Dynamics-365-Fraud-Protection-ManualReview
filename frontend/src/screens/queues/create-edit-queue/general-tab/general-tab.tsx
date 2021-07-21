@@ -1,30 +1,30 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import './general-tab.scss';
+
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
 
 import { Checkbox } from '@fluentui/react/lib/Checkbox';
 import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
-import { TextField } from '@fluentui/react/lib/TextField';
-import { SpinButton } from '@fluentui/react/lib/SpinButton';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
+import { SpinButton } from '@fluentui/react/lib/SpinButton';
 import { Text } from '@fluentui/react/lib/Text';
+import { TextField } from '@fluentui/react/lib/TextField';
 
 import {
+    LABEL,
+    QUEUE_MUTATION_TYPES,
     SORTING_FIELD,
     SORTING_FIELD_DISPLAY,
-    SORTING_ORDER,
-    QUEUE_MUTATION_TYPES,
-    LABEL
+    SORTING_ORDER
 } from '../../../../constants';
-import { LockButton } from '../lock-button/lock-button';
 import { QueueMutationModalStore } from '../../../../view-services/essence-mutation-services';
 import { CreateEditQueueField } from '../create-edit-queue-field/create-edit-queue-field';
-
-import './general-tab.scss';
+import { LockButton } from '../lock-button/lock-button';
 
 interface SortBy extends IDropdownOption {
     key: SORTING_FIELD;
@@ -89,6 +89,12 @@ export class GeneralTab extends Component<GeneralTabProps, never> {
     }
 
     @autobind
+    handleLabelToggled(label: LABEL[]) {
+        const { queueMutationModalStoreInstance } = this.props;
+        queueMutationModalStoreInstance.queueMutationStore.changeLabelToggledState(label);
+    }
+
+    @autobind
     incrementProcessingDeadlineDaysChanged(value: string) {
         const { queueMutationModalStoreInstance } = this.props;
         queueMutationModalStoreInstance.queueMutationStore.changeProcessingDeadline(value, 'days', 'incr');
@@ -126,12 +132,6 @@ export class GeneralTab extends Component<GeneralTabProps, never> {
         const { processingDeadlineHours } = queueMutationModalStoreInstance.queueMutationStore.fields;
         queueMutationModalStoreInstance.queueMutationStore.changeProcessingDeadline(value, 'hours');
         return `${processingDeadlineHours} hour${processingDeadlineHours === 1 ? '' : 's'}`;
-    }
-
-    @autobind
-    handleLabelToggled(label: LABEL[]) {
-        const { queueMutationModalStoreInstance } = this.props;
-        queueMutationModalStoreInstance.queueMutationStore.changeLabelToggledState(label);
     }
 
     render() {

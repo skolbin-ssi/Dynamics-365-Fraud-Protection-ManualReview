@@ -1,11 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
-import { Spinner } from '@fluentui/react/lib/Spinner';
+import './review-console.scss';
 
-import { Stack } from '@fluentui/react/lib/Stack';
-import { Text } from '@fluentui/react/lib/Text';
 import autoBind from 'autobind-decorator';
 import cx from 'classnames';
 import { History } from 'history';
@@ -13,13 +10,18 @@ import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router-dom';
-import AllDoneIllustration from '../../assets/all-done-llustration.svg';
 
+import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
+import { Spinner } from '@fluentui/react/lib/Spinner';
+import { Stack } from '@fluentui/react/lib/Stack';
+import { Text } from '@fluentui/react/lib/Text';
+
+import AllDoneIllustration from '../../assets/all-done-llustration.svg';
 import OrderLockedIllustrationSvg from '../../assets/order-locked.svg';
 import { LABEL, ROUTES } from '../../constants';
 import { ApiServiceError } from '../../data-services/base-api-service';
-import { MrUserError } from '../../models/exceptions';
 import { Item } from '../../models';
+import { MrUserError } from '../../models/exceptions';
 import { TYPES } from '../../types';
 import { CurrentUserStore, ITEM_DETAILS_MODE, LockedItemsStore } from '../../view-services';
 import { ReviewConsoleScreenStore } from '../../view-services/review-console';
@@ -28,13 +30,10 @@ import {
     QUEUE_REVIEW_PROHIBITION_REASONS,
     ReviewPermissionStore
 } from '../../view-services/review-permission-store';
-
 import { ConsoleHeader } from './console-header';
 import { ItemDetails } from './item-details';
 import { ReviewModal } from './modal';
 import { ReviewActionsPanel } from './review-actions-panel';
-
-import './review-console.scss';
 import { StartReviewPanel } from './start-review-panel';
 
 export const CN = 'review-console';
@@ -115,10 +114,6 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         }
     }
 
-    isItemHeldByCurrentUser(reviewItem: Item | null): boolean {
-        return reviewItem?.hold?.ownerId === this.userStore?.user?.id;
-    }
-
     @autoBind
     handleGoToQueuesClick() {
         // if there are no more items in a queue we should proceed to the page with tiles - not the one with queue data
@@ -136,29 +131,6 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
             this.goBackToSearch(searchId);
         } else {
             this.goBackToQueueList(queue?.viewId);
-        }
-    }
-
-    goBackToQueueList(queueId: string = '') {
-        this.history.push({
-            pathname: ROUTES.build.queues(queueId)
-        });
-    }
-
-    goBackToSearch(searchId: string = '') {
-        this.history.push({
-            pathname: ROUTES.build.search(searchId)
-        });
-    }
-
-    replaceHistory(queueId: string) {
-        const { reviewItem } = this.reviewConsoleScreenStore;
-
-        if (reviewItem) {
-            this.reviewConsoleScreenStore.clearSearchId();
-            this.history.replace(
-                `${ROUTES.build.reviewConsole(queueId)}?itemId=${reviewItem.id}`
-            );
         }
     }
 
@@ -181,6 +153,76 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         this.setState({
             isModalOpen: false
         });
+    }
+
+    @autoBind
+    handleTabChangeMode(mode: ITEM_DETAILS_MODE) {
+        this.reviewConsoleScreenStore.setOpenDetailsTab(mode);
+    }
+
+    @autoBind
+    handleGoToLockedItemClick(queueViewId: string, itemId: string) {
+        this.reviewConsoleScreenStore.clearSearchId();
+        this.history.push({ pathname: ROUTES.build.itemDetailsReviewConsole(queueViewId, itemId) });
+        this.reviewConsoleScreenStore.getItem(itemId, queueViewId);
+
+        if (queueViewId !== this.reviewConsoleScreenStore.queue?.viewId) {
+            this.reviewConsoleScreenStore.getQueueData(queueViewId);
+        }
+    }
+
+    @autoBind
+    async handleLabeling(label: LABEL) {
+        await this.reviewConsoleScreenStore.labelOrder(label);
+
+        if (!this.reviewConsoleScreenStore.itemUpdatingError) {
+            this.processNextItem();
+        }
+    }
+
+    @autoBind
+    updateReviewConsoleHistoryPath(queueId: string, itemId: string) {
+        this.reviewConsoleScreenStore.clearSearchId();
+        this.history.push({
+            pathname: ROUTES.build.itemDetailsReviewConsole(queueId, itemId)
+        });
+    }
+
+    @autoBind
+    navigateBackToQueueOrdersPage() {
+        const { match: { params: { queueId } } } = this.props;
+
+        if (queueId) {
+            this.history.push({
+                pathname: ROUTES.build.queues(queueId)
+            });
+        }
+    }
+
+    @autoBind
+    async processNextItem() {
+        const { match: { params: { queueId } } } = this.props;
+
+        if (queueId) {
+            this.setState({ isModalOpen: false });
+
+            await this.reviewConsoleScreenStore.getReviewItem(queueId);
+            const { reviewItem: nextReviewItem } = this.reviewConsoleScreenStore;
+
+            if (nextReviewItem) {
+                this.updateReviewConsoleHistoryPath(queueId, nextReviewItem.id);
+            }
+        }
+    }
+
+    @autoBind
+    async navToReviewConsole() {
+        const { queue } = this.reviewConsoleScreenStore;
+
+        if (queue) {
+            await this.reviewConsoleScreenStore.getReviewItem(queue.viewId);
+            this.replaceHistory(queue.viewId);
+        }
     }
 
     @autoBind
@@ -213,74 +255,31 @@ export class ReviewConsole extends Component<ReviewConsoleProps, ReviewConsoleSt
         }
     }
 
-    @autoBind
-    async navToReviewConsole() {
-        const { queue } = this.reviewConsoleScreenStore;
-
-        if (queue) {
-            await this.reviewConsoleScreenStore.getReviewItem(queue.viewId);
-            this.replaceHistory(queue.viewId);
-        }
+    isItemHeldByCurrentUser(reviewItem: Item | null): boolean {
+        return reviewItem?.hold?.ownerId === this.userStore?.user?.id;
     }
 
-    @autoBind
-    async processNextItem() {
-        const { match: { params: { queueId } } } = this.props;
-
-        if (queueId) {
-            this.setState({ isModalOpen: false });
-
-            await this.reviewConsoleScreenStore.getReviewItem(queueId);
-            const { reviewItem: nextReviewItem } = this.reviewConsoleScreenStore;
-
-            if (nextReviewItem) {
-                this.updateReviewConsoleHistoryPath(queueId, nextReviewItem.id);
-            }
-        }
-    }
-
-    @autoBind
-    navigateBackToQueueOrdersPage() {
-        const { match: { params: { queueId } } } = this.props;
-
-        if (queueId) {
-            this.history.push({
-                pathname: ROUTES.build.queues(queueId)
-            });
-        }
-    }
-
-    @autoBind
-    updateReviewConsoleHistoryPath(queueId: string, itemId: string) {
-        this.reviewConsoleScreenStore.clearSearchId();
+    goBackToQueueList(queueId: string = '') {
         this.history.push({
-            pathname: ROUTES.build.itemDetailsReviewConsole(queueId, itemId)
+            pathname: ROUTES.build.queues(queueId)
         });
     }
 
-    @autoBind
-    async handleLabeling(label: LABEL) {
-        await this.reviewConsoleScreenStore.labelOrder(label);
-
-        if (!this.reviewConsoleScreenStore.itemUpdatingError) {
-            this.processNextItem();
-        }
+    goBackToSearch(searchId: string = '') {
+        this.history.push({
+            pathname: ROUTES.build.search(searchId)
+        });
     }
 
-    @autoBind
-    handleGoToLockedItemClick(queueViewId: string, itemId: string) {
-        this.reviewConsoleScreenStore.clearSearchId();
-        this.history.push({ pathname: ROUTES.build.itemDetailsReviewConsole(queueViewId, itemId) });
-        this.reviewConsoleScreenStore.getItem(itemId, queueViewId);
+    replaceHistory(queueId: string) {
+        const { reviewItem } = this.reviewConsoleScreenStore;
 
-        if (queueViewId !== this.reviewConsoleScreenStore.queue?.viewId) {
-            this.reviewConsoleScreenStore.getQueueData(queueViewId);
+        if (reviewItem) {
+            this.reviewConsoleScreenStore.clearSearchId();
+            this.history.replace(
+                `${ROUTES.build.reviewConsole(queueId)}?itemId=${reviewItem.id}`
+            );
         }
-    }
-
-    @autoBind
-    handleTabChangeMode(mode: ITEM_DETAILS_MODE) {
-        this.reviewConsoleScreenStore.setOpenDetailsTab(mode);
     }
 
     static renderReviewConsolePanelSpinner() {

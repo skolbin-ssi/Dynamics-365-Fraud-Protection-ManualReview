@@ -8340,10 +8340,10 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
-msal@^1.3.2:
-  version "1.3.2"
-  resolved "https://registry.yarnpkg.com/msal/-/msal-1.3.2.tgz#b8cf90d809c9dbaf961f37df661774513820b39c"
-  integrity sha512-vhcpM/ELL+UI7i4HzCegcbSfPMLqf3kp8mAT840bK1ZaDcb7Z1mOJik1jg202V0yfnh/bBPxZhQP6xFgD9g5eA==
+msal@^1.4.11:
+  version "1.4.11"
+  resolved "https://registry.yarnpkg.com/msal/-/msal-1.4.11.tgz#255e74e200ee5d603dca30e4e48e47fb57441370"
+  integrity sha512-8vW5/+irlcQQk87r8Qp3/kQEc552hr7FQLJ6GF5LLkqnwJDDxrswz6RYPiQhmiampymIs0PbHVZrNf8m+6DmgQ==
   dependencies:
     tslib "^1.9.3"
 

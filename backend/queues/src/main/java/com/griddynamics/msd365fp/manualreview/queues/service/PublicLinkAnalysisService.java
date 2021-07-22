@@ -32,11 +32,14 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.griddynamics.msd365fp.manualreview.model.Constants.DFP_DATE_TIME_PATTERN;
+import static com.griddynamics.msd365fp.manualreview.model.Constants.ISO_OFFSET_DATE_TIME_PATTERN;
 import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.MESSAGE_ITEM_IS_EMPTY;
 
 @Slf4j
@@ -218,17 +221,14 @@ public class PublicLinkAnalysisService {
                     .collect(Collectors.toList()));
         }
 
-        if (checkUserRestriction) {
             result.forEach(item -> {
                 if (item.getItem() != null &&
                         item.getItem().getPurchase() != null &&
                         item.getItem().getPurchase().getUser() != null &&
                         item.getItem().getPurchase().getUser().getEmail() != null) {
-                    UserEmailListEntity userEmailLists = dfpExplorerService.exploreUserEmailList(item.getItem().getPurchase().getUser().getEmail());
-                    item.setUserRestricted(userEmailLists.getCommonRestriction());
+                            item.setUserRestricted(this.isUserFraud(item.getItem().getPurchase().getUser().getEmail()));
                 }
             });
-        }
 
         return new PageableCollection<>(result,
                 end < linkAnalysis.getMrPurchaseIds().size() ? String.valueOf(end) : null);
@@ -265,15 +265,12 @@ public class PublicLinkAnalysisService {
             }
         }
 
-        if (checkUserRestriction) {
             result.forEach(details -> {
                 if (details.getUser() != null &&
                         details.getUser().getEmail() != null) {
-                    UserEmailListEntity userEmailLists = dfpExplorerService.exploreUserEmailList(details.getUser().getEmail());
-                    details.setUserRestricted(userEmailLists.getCommonRestriction());
+                    details.setUserRestricted(this.isUserFraud(details.getUser().getEmail()));
                 }
             });
-        }
 
         return new PageableCollection<>(result,
                 end < linkAnalysis.getMrPurchaseIds().size() ? String.valueOf(end) : null);
@@ -281,5 +278,50 @@ public class PublicLinkAnalysisService {
 
     public LinkAnalysisDTO getLinkAnalysisEntry(final String id) throws NotFoundException {
         return modelMapper.map(publicLinkAnalysisClient.getLinkAnalysisEntry(id), LinkAnalysisDTO.class);
+    }
+
+    private boolean isUserFraud(String email) {
+        ExplorerEntity entity = dfpExplorerService.exploreUser(email);
+
+        //We need to check if there are self pointing edges, that have LabelState == Fraud, choose the one with the max EventTimeStamp
+        Edge selfEdge = null;
+        try {
+            List<Edge> potentialFraudEdges = entity.getEdges()
+                    .stream()
+                    .filter(t -> t.getName().equalsIgnoreCase("UserLabel") &&
+                            t.getData().getAdditionalParams().get("LabelState") != null &&
+                            t.getData().getAdditionalParams().get("LabelState").equalsIgnoreCase("Fraud"))
+                    .sorted(Comparator.comparing(x -> OffsetDateTime.parse(x.getData().getAdditionalParams().get("EventTimeStamp"), DateTimeFormatter.ofPattern(ISO_OFFSET_DATE_TIME_PATTERN))))
+                    .collect(Collectors.toList());
+
+            if (potentialFraudEdges != null && potentialFraudEdges.size() > 0) {
+                selfEdge = potentialFraudEdges.get(potentialFraudEdges.size() - 1);
+            }
+        }catch(DateTimeParseException ignored)
+        {}
+
+        boolean isFraud=selfEdge!=null;
+        //We need to check if there is EffectiveEndDate in that edge if there is it should be greater than today.
+        if(isFraud)
+        {
+            String stringDate = selfEdge.getData().getAdditionalParams().get("EffectiveEndDate");
+            if(stringDate!=null) {
+                //set up the endDate to be in the past
+                OffsetDateTime endDate = OffsetDateTime.now().minusMinutes(1);
+                try
+                {
+                    endDate = OffsetDateTime.parse(stringDate, DateTimeFormatter.ofPattern(ISO_OFFSET_DATE_TIME_PATTERN));
+                }
+                catch(DateTimeParseException ignored)
+                {
+                    //obviously there is an EndDate but we cannot parse it, so set up the EndDate to be 1 min in the future to play it safe and mark that user as a fraudster
+                    endDate = OffsetDateTime.now().plusMinutes(1);
+                }
+
+                isFraud = endDate.compareTo(OffsetDateTime.now())>0;
+            }
+        }
+
+        return isFraud;
     }
 }

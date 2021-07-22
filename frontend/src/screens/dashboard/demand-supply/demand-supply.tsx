@@ -1,39 +1,38 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './demand-supply.scss';
+
+import autoBind from 'autobind-decorator';
+import cx from 'classnames';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
+import { disposeOnUnmount, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import autoBind from 'autobind-decorator';
-import { resolve } from 'inversify-react';
-import { History } from 'history';
-import { observer, disposeOnUnmount } from 'mobx-react';
-import cx from 'classnames';
 
-import { SliceTooltipProps } from '@nivo/line';
-import { Text } from '@fluentui/react/lib/Text';
-import { ShimmeredDetailsList } from '@fluentui/react/lib/ShimmeredDetailsList';
-import { DetailsListLayoutMode, SelectionMode, IColumn } from '@fluentui/react/lib/DetailsList';
+import { DefaultButton } from '@fluentui/react/lib/Button';
+import { DetailsListLayoutMode, IColumn, SelectionMode } from '@fluentui/react/lib/DetailsList';
 import { Facepile, IFacepilePersona, OverflowButtonType } from '@fluentui/react/lib/Facepile';
 import { PersonaSize } from '@fluentui/react/lib/Persona';
-import { DefaultButton } from '@fluentui/react/lib/Button';
+import { ShimmeredDetailsList } from '@fluentui/react/lib/ShimmeredDetailsList';
+import { Text } from '@fluentui/react/lib/Text';
+import { SliceTooltipProps } from '@nivo/line';
 
-import { SwitchHeader as AggregationHeader } from '../switch-header';
-import { LineChart, SliceTooltip } from '../line-chart';
-
+import {
+    CHART_AGGREGATION_PERIOD,
+    CHART_AGGREGATION_PERIOD_DISPLAY,
+    ROUTES,
+} from '../../../constants';
+import { TYPES } from '../../../types';
+import { ReportsModalStore } from '../../../view-services';
 import {
     DashboardDemandSupplyScreenStore,
     DemandSupplyDashboardTableItemData
 } from '../../../view-services/dashboard/dashboard-demand-supply-screen-store';
-import { TYPES } from '../../../types';
-
-import {
-    CHART_AGGREGATION_PERIOD,
-    CHART_AGGREGATION_PERIOD_DISPLAY, ROUTES,
-} from '../../../constants';
 import { BlurLoader } from '../blur-loader';
-import { ReportsModalStore } from '../../../view-services';
-
-import './demand-supply.scss';
+import { LineChart, SliceTooltip } from '../line-chart';
+import { SwitchHeader as AggregationHeader } from '../switch-header';
 
 const CN = 'demand-supply-dashboard';
 
@@ -166,12 +165,6 @@ export class DemandSupply extends Component<DemandSupplyProps, never> {
         disposeOnUnmount(this, this.dashboardDemandSupplyScreenStore.loadData());
     }
 
-    goToQueueDashboard(queueId: string) {
-        this.history.push(
-            ROUTES.build.dashboard.demandByQueue(queueId)
-        );
-    }
-
     @autoBind
     handleAggregationChange(label: CHART_AGGREGATION_PERIOD) {
         this.dashboardDemandSupplyScreenStore.setAggregationPeriod(label);
@@ -182,6 +175,12 @@ export class DemandSupply extends Component<DemandSupplyProps, never> {
         const { reports } = this.dashboardDemandSupplyScreenStore;
 
         this.reportsModalStore.showReportsModal(reports);
+    }
+
+    goToQueueDashboard(queueId: string) {
+        this.history.push(
+            ROUTES.build.dashboard.demandByQueue(queueId)
+        );
     }
 
     @autoBind

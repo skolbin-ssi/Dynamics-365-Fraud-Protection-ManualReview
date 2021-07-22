@@ -1,29 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './queue-performance.scss';
+
+import autoBind from 'autobind-decorator';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
+import { disposeOnUnmount, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import autoBind from 'autobind-decorator';
-import { resolve } from 'inversify-react';
-import { History } from 'history';
-import { disposeOnUnmount, observer } from 'mobx-react';
 
 import { DefaultButton } from '@fluentui/react/lib/Button';
 import { Shimmer } from '@fluentui/react/lib/Shimmer';
 
-import { LineChart } from '../line-chart';
-import { DataTableCompact } from '../data-table-compact';
-import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
-import { BlurLoader } from '../blur-loader';
-import { AccuracyDataTable } from '../accuracy-data-table';
-
-import {
-    AnalystOverturnedPerformanceStore,
-    DashboardScreenStore,
-    QueuePerformanceStore,
-    ReportsModalStore,
-    UpdateQuerySearchReactionParams
-} from '../../../view-services';
 import {
     CHART_AGGREGATION_PERIOD,
     CHART_AGGREGATION_PERIOD_DISPLAY,
@@ -33,12 +22,22 @@ import {
     WARNING_MESSAGES,
 } from '../../../constants';
 import { TYPES } from '../../../types';
-
-import './queue-performance.scss';
 import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
-import { BarChart } from '../bar-chart';
-import { ScoreDistribution } from './score-distribution';
 import { formatToQueryDateString } from '../../../utils/date';
+import {
+    AnalystOverturnedPerformanceStore,
+    DashboardScreenStore,
+    QueuePerformanceStore,
+    ReportsModalStore,
+    UpdateQuerySearchReactionParams
+} from '../../../view-services';
+import { AccuracyDataTable } from '../accuracy-data-table';
+import { BarChart } from '../bar-chart';
+import { BlurLoader } from '../blur-loader';
+import { DataTableCompact } from '../data-table-compact';
+import { LineChart } from '../line-chart';
+import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
+import { ScoreDistribution } from './score-distribution';
 
 const CN = 'queue-performance';
 
@@ -101,6 +100,46 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
     componentWillUnmount(): void {
         this.queuePerformanceStore.clearPerformanceData();
         this.queuePerformanceStore.clearQueue();
+    }
+
+    @autoBind
+    handleSelectionChange(queueId: string) {
+        this.queuePerformanceStore.setChecked(queueId);
+    }
+
+    @autoBind
+    handleAccuracySelectionChange(analystId: string) {
+        this.overturnedPerformanceStore.setChecked(analystId);
+    }
+
+    @autoBind
+    handleQueuePerformanceRatingChange(label: PERFORMANCE_RATING) {
+        const rating = PERFORMANCE_RATING[label]!;
+        this.queuePerformanceStore.setRating(rating);
+    }
+
+    @autoBind
+    handleOverturnedPerformanceRatingChange(label: PERFORMANCE_RATING) {
+        const rating = PERFORMANCE_RATING[label]!;
+        this.overturnedPerformanceStore.setRating(rating);
+    }
+
+    @autoBind
+    handleOverturnedChartAggregationChange(label: CHART_AGGREGATION_PERIOD) {
+        this.overturnedPerformanceStore.setAggregation(label);
+    }
+
+    @autoBind
+    handleQueuePerformanceAggregationChange(label: CHART_AGGREGATION_PERIOD) {
+        this.queuePerformanceStore.setAggregation(label);
+    }
+
+    @autoBind
+    handleGenerateReportsButtonClick() {
+        const { reports: queuePerformanceReports } = this.queuePerformanceStore;
+        const { reports: overturnedPerformanceReports } = this.overturnedPerformanceStore;
+
+        this.reportsModalStore.showReportsModal([...queuePerformanceReports, ...overturnedPerformanceReports]);
     }
 
     getLineChartYScaleMaxValue() {
@@ -214,46 +253,6 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
         this.history.replace(`${ROUTES.build.dashboard.queue(queueId)}?${strigifiedFields}`);
 
         this.overturnedPerformanceStore.setUrlSelectedIds(ids); // sync URL selected ids with store selected Ids
-    }
-
-    @autoBind
-    handleSelectionChange(queueId: string) {
-        this.queuePerformanceStore.setChecked(queueId);
-    }
-
-    @autoBind
-    handleAccuracySelectionChange(analystId: string) {
-        this.overturnedPerformanceStore.setChecked(analystId);
-    }
-
-    @autoBind
-    handleQueuePerformanceRatingChange(label: PERFORMANCE_RATING) {
-        const rating = PERFORMANCE_RATING[label]!;
-        this.queuePerformanceStore.setRating(rating);
-    }
-
-    @autoBind
-    handleOverturnedPerformanceRatingChange(label: PERFORMANCE_RATING) {
-        const rating = PERFORMANCE_RATING[label]!;
-        this.overturnedPerformanceStore.setRating(rating);
-    }
-
-    @autoBind
-    handleOverturnedChartAggregationChange(label: CHART_AGGREGATION_PERIOD) {
-        this.overturnedPerformanceStore.setAggregation(label);
-    }
-
-    @autoBind
-    handleQueuePerformanceAggregationChange(label: CHART_AGGREGATION_PERIOD) {
-        this.queuePerformanceStore.setAggregation(label);
-    }
-
-    @autoBind
-    handleGenerateReportsButtonClick() {
-        const { reports: queuePerformanceReports } = this.queuePerformanceStore;
-        const { reports: overturnedPerformanceReports } = this.overturnedPerformanceStore;
-
-        this.reportsModalStore.showReportsModal([...queuePerformanceReports, ...overturnedPerformanceReports]);
     }
 
     renderQueueName() {

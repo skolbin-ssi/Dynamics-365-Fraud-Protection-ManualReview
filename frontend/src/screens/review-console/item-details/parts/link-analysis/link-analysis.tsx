@@ -1,38 +1,41 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { disposeOnUnmount, observer } from 'mobx-react';
+import './link-analysis.scss';
+
 import autobind from 'autobind-decorator';
 import cx from 'classnames';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
+import { disposeOnUnmount, observer } from 'mobx-react';
+import React, { Component } from 'react';
 
 import {
-    CommandBarButton, DefaultButton, IconButton, PrimaryButton
+    CommandBarButton,
+    DefaultButton,
+    IconButton,
+    PrimaryButton
 } from '@fluentui/react/lib/Button';
 import { IContextualMenuItem, } from '@fluentui/react/lib/ContextualMenu';
-import { Text } from '@fluentui/react/lib/Text';
-import { Modal } from '@fluentui/react/lib/Modal';
-import { Spinner } from '@fluentui/react/lib/Spinner';
 import { FontIcon } from '@fluentui/react/lib/Icon';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
-import { History } from 'history';
+import { Modal } from '@fluentui/react/lib/Modal';
+import { Spinner } from '@fluentui/react/lib/Spinner';
+import { Text } from '@fluentui/react/lib/Text';
 
-import { resolve } from 'inversify-react';
-import { AnalysisField } from './analysis-field/analysis-field';
-import { ItemDetailsTile } from '../../item-details-tile';
+import SearchIllustrationSvg from '../../../../../assets/search-illustration.svg';
+import { ErrorContent } from '../../../../../components/error-content';
+import { LABEL, LABEL_NAMES, ROUTES } from '../../../../../constants';
+import { Queue } from '../../../../../models';
+import { Item } from '../../../../../models/item';
+import { LinkAnalysisMrItem } from '../../../../../models/item/link-analysis';
+import { TYPES } from '../../../../../types';
 import { ANALYSIS_RESULT_ITEMS, LinkAnalysisItem, LinkAnalysisStore } from '../../../../../view-services';
 import { ExpandableGroup } from '../../../../queues/queues-list/expandable-group';
-import { Item } from '../../../../../models/item';
-
-import './link-analysis.scss';
+import { ItemDetailsTile } from '../../item-details-tile';
+import { AnalysisField } from './analysis-field/analysis-field';
 import { ItemsList } from './items-list';
-import { LABEL, LABEL_NAMES, ROUTES } from '../../../../../constants';
-import { ErrorContent } from '../../../../../components/error-content';
-import SearchIllustrationSvg from '../../../../../assets/search-illustration.svg';
 import { ResultsDataTable } from './results-data-table';
-import { Queue } from '../../../../../models';
-import { TYPES } from '../../../../../types';
-import { LinkAnalysisMrItem } from '../../../../../models/item/link-analysis';
 
 interface LinkAnalysisComponentProps {
     queue: Queue | null;
@@ -71,42 +74,6 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
         const { linkAnalysisStore } = this.props;
 
         linkAnalysisStore.resetSelectedItems();
-    }
-
-    @autobind
-    getCommandBarButtonItem(): ApplyDecisionContextualMenuItem[] {
-        return [{
-            key: LABEL.GOOD,
-            text: LABEL_NAMES[LABEL.GOOD],
-            iconProps: {
-                iconName: 'CompletedSolid',
-                className: `${CN}__apply-decisions-btn-good`
-            },
-            onClick: () => this.handleApplyDecisionClick(LABEL.GOOD)
-        }, {
-            key: LABEL.BAD,
-            text: LABEL_NAMES[LABEL.BAD],
-            iconProps: {
-                iconName: 'Blocked2Solid',
-                className: `${CN}__apply-decisions-btn-bad`
-            },
-            onClick: () => this.handleApplyDecisionClick(LABEL.BAD)
-        }];
-    }
-
-    @autobind
-    updateUrlParams(searchId: string) {
-        const { queue, item } = this.props;
-
-        if (queue && item) {
-            let path = ROUTES.build.itemDetails(queue.viewId, item.id);
-
-            if (searchId) {
-                path += `?la=${searchId}`;
-            }
-
-            this.history.replace(path);
-        }
     }
 
     @autobind
@@ -162,6 +129,42 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
         }
 
         linkAnalysisStore.refreshAnalysisFieldCounts();
+    }
+
+    @autobind
+    getCommandBarButtonItem(): ApplyDecisionContextualMenuItem[] {
+        return [{
+            key: LABEL.GOOD,
+            text: LABEL_NAMES[LABEL.GOOD],
+            iconProps: {
+                iconName: 'CompletedSolid',
+                className: `${CN}__apply-decisions-btn-good`
+            },
+            onClick: () => this.handleApplyDecisionClick(LABEL.GOOD)
+        }, {
+            key: LABEL.BAD,
+            text: LABEL_NAMES[LABEL.BAD],
+            iconProps: {
+                iconName: 'Blocked2Solid',
+                className: `${CN}__apply-decisions-btn-bad`
+            },
+            onClick: () => this.handleApplyDecisionClick(LABEL.BAD)
+        }];
+    }
+
+    @autobind
+    updateUrlParams(searchId: string) {
+        const { queue, item } = this.props;
+
+        if (queue && item) {
+            let path = ROUTES.build.itemDetails(queue.viewId, item.id);
+
+            if (searchId) {
+                path += `?la=${searchId}`;
+            }
+
+            this.history.replace(path);
+        }
     }
 
     renderWarningMessage(item: Item) {

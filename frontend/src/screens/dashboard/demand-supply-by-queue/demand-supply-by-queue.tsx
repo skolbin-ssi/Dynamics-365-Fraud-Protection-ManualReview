@@ -1,37 +1,29 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './demand-supply-by-queue.scss';
+
+import autobind from 'autobind-decorator';
+import cx from 'classnames';
+import { History } from 'history';
+import { resolve } from 'inversify-react';
+import { disposeOnUnmount, observer } from 'mobx-react';
 import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
-import { resolve } from 'inversify-react';
-import autobind from 'autobind-decorator';
-import { History } from 'history';
-import { disposeOnUnmount, observer } from 'mobx-react';
-import cx from 'classnames';
 
-import { SliceTooltipProps } from '@nivo/line';
-import { Text } from '@fluentui/react/lib/Text';
-import { FontIcon } from '@fluentui/react/lib/Icon';
-import { Spinner } from '@fluentui/react/lib/Spinner';
-import { PersonaSize } from '@fluentui/react/lib/Persona';
 import { CommandBarButton, DefaultButton } from '@fluentui/react/lib/Button';
 import { Callout, DirectionalHint } from '@fluentui/react/lib/Callout';
 import { Facepile, IFacepilePersona, OverflowButtonType } from '@fluentui/react/lib/Facepile';
-import { Toggle } from '@fluentui/react/lib/Toggle';
+import { FontIcon } from '@fluentui/react/lib/Icon';
 import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
-import { Shimmer, ShimmerElementsGroup, ShimmerElementType } from '@fluentui/react/lib/Shimmer';
+import { PersonaSize } from '@fluentui/react/lib/Persona';
+import { Shimmer, ShimmerElementType, ShimmerElementsGroup } from '@fluentui/react/lib/Shimmer';
+import { Spinner } from '@fluentui/react/lib/Spinner';
+import { Text } from '@fluentui/react/lib/Text';
+import { Toggle } from '@fluentui/react/lib/Toggle';
+import { SliceTooltipProps } from '@nivo/line';
 
-import { DataTable } from './data-table/data-table';
-
-import { BlurLoader } from '../blur-loader';
-import { ProgressCell } from '../progress-cell/progress-cell';
-import { LineChart, SliceTooltip } from '../line-chart';
-import { SwitchHeader as AggregationHeader } from '../switch-header';
-
-import {
-    DemandQueuePerformanceStore,
-    QueueItem
-} from '../../../view-services/dashboard/demand-queue-performance-store';
+import { SwitchTabs } from '../../../components/switch-tabs';
 import {
     CHART_AGGREGATION_PERIOD,
     CHART_AGGREGATION_PERIOD_DISPLAY,
@@ -39,17 +31,22 @@ import {
     ROUTES,
     WARNING_MESSAGES
 } from '../../../constants';
-import { TYPES } from '../../../types';
-import { Item } from '../../../models/item';
-import { COLORS } from '../../../styles/variables';
 import { QueueView } from '../../../models';
 import { CurrentProgress } from '../../../models/dashboard/progress-performance-metric';
-import { ExpandableGroup } from '../../queues/queues-list/expandable-group';
-
+import { Item } from '../../../models/item';
+import { COLORS } from '../../../styles/variables';
+import { TYPES } from '../../../types';
 import { ReportsModalStore } from '../../../view-services';
-import { SwitchTabs } from '../../../components/switch-tabs';
-
-import './demand-supply-by-queue.scss';
+import {
+    DemandQueuePerformanceStore,
+    QueueItem
+} from '../../../view-services/dashboard/demand-queue-performance-store';
+import { ExpandableGroup } from '../../queues/queues-list/expandable-group';
+import { BlurLoader } from '../blur-loader';
+import { LineChart, SliceTooltip } from '../line-chart';
+import { ProgressCell } from '../progress-cell/progress-cell';
+import { SwitchHeader as AggregationHeader } from '../switch-header';
+import { DataTable } from './data-table/data-table';
 import { ScoreDistribution } from './score-distribution';
 
 const CN = 'demand-supply-by-queue-dashboard';
@@ -108,18 +105,6 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
     }
 
     /**
-     * Initializing table auto refresh toggle, if value has been saved previously to local storage
-     * reads that and set to the store, otherwise auto refresh toggle will have value as set in the store
-     */
-    readStorageAutoRefresh() {
-        const isAutoRefreshEnabled = this.demandQueuePerformanceStore.getAutoRefreshToggleValue;
-
-        if (isAutoRefreshEnabled !== null) {
-            this.demandQueuePerformanceStore.toggleAutoRefresh(isAutoRefreshEnabled);
-        }
-    }
-
-    /**
      * CLICK HANDLERS
      */
 
@@ -165,6 +150,18 @@ export class DemandSupplyByQueue extends Component<DemandSupplyProps, DemandSupp
         const { reports } = this.demandQueuePerformanceStore;
 
         this.reportsModalStore.showReportsModal(reports);
+    }
+
+    /**
+     * Initializing table auto refresh toggle, if value has been saved previously to local storage
+     * reads that and set to the store, otherwise auto refresh toggle will have value as set in the store
+     */
+    readStorageAutoRefresh() {
+        const isAutoRefreshEnabled = this.demandQueuePerformanceStore.getAutoRefreshToggleValue;
+
+        if (isAutoRefreshEnabled !== null) {
+            this.demandQueuePerformanceStore.toggleAutoRefresh(isAutoRefreshEnabled);
+        }
     }
 
     /**

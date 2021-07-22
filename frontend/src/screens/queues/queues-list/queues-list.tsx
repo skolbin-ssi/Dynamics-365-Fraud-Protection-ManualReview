@@ -1,22 +1,25 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { ActionButton, DefaultButton } from '@fluentui/react/lib/Button';
-import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
-import { Spinner } from '@fluentui/react/lib/Spinner';
-import { Text } from '@fluentui/react/lib/Text';
+import './queues-list.scss';
+
 import autoBind from 'autobind-decorator';
 import cn from 'classnames';
 import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
+
+import { ActionButton, DefaultButton } from '@fluentui/react/lib/Button';
+import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
+import { Spinner } from '@fluentui/react/lib/Spinner';
+import { Text } from '@fluentui/react/lib/Text';
+
 import { QUEUE_LIST_TYPE, QUEUE_MANAGEMENT } from '../../../constants';
 import { Queue } from '../../../models';
 import { TYPES } from '../../../types';
 import { CurrentUserStore, QueuesScreenStore } from '../../../view-services';
 import { ExpandableGroup } from './expandable-group';
 import { QueuesItem } from './queue-item';
-import './queues-list.scss';
 
 export const CN = 'queues-list';
 
@@ -34,12 +37,6 @@ export class QueuesList extends Component<QueuesListProps, never> {
     private user!: CurrentUserStore;
 
     @autoBind
-    onChangeQueue(queue: Queue) {
-        const { onChangeQueue } = this.props;
-        onChangeQueue(queue);
-    }
-
-    @autoBind
     handleQueueTypeChange(item?: PivotItem) {
         const { onQueueTypeChange } = this.props;
         if (item) {
@@ -47,6 +44,12 @@ export class QueuesList extends Component<QueuesListProps, never> {
             const escalated = itemKey === 'escalated';
             onQueueTypeChange(escalated);
         }
+    }
+
+    @autoBind
+    onChangeQueue(queue: Queue) {
+        const { onChangeQueue } = this.props;
+        onChangeQueue(queue);
     }
 
     mapSingleQueue(queue: Queue, selectedQueue: Queue | null, refreshingQueueIds: string[], isLoadingQueueItems: boolean) {

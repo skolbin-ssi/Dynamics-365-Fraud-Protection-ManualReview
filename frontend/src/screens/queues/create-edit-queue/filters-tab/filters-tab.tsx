@@ -1,19 +1,20 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
-import autobind from 'autobind-decorator';
-import { Text } from '@fluentui/react/lib/Text';
-import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
+import './filters-tab.scss';
 
-import { CreateEditQueueField } from '../create-edit-queue-field/create-edit-queue-field';
-import { QUEUE_MUTATION_TYPES } from '../../../../constants';
+import autobind from 'autobind-decorator';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
+
+import { MessageBar, MessageBarType } from '@fluentui/react/lib/MessageBar';
+import { Text } from '@fluentui/react/lib/Text';
+
 import { CriteriaModal, FilterContextMenu, FilterSummary } from '../../../../components/filters';
+import { QUEUE_MUTATION_TYPES } from '../../../../constants';
 import { QueueMutationModalStore } from '../../../../view-services/essence-mutation-services';
 import { FiltersStore } from '../../../../view-services/essence-mutation-services/filters-store';
-
-import './filters-tab.scss';
+import { CreateEditQueueField } from '../create-edit-queue-field/create-edit-queue-field';
 
 interface FilterTabProps {
     isDisabled: boolean,
@@ -27,15 +28,6 @@ const CN = 'filters-tab';
 
 @observer
 export class FiltersTab extends Component<FilterTabProps, FiltersTabState> {
-    setMutatedFiltersToQueueMutationStore() {
-        const {
-            filtersStore: { mutatedFilters },
-            queueMutationModalStoreInstance: { queueMutationStore }
-        } = this.props;
-
-        queueMutationStore.addFilters(mutatedFilters);
-    }
-
     @autobind
     handleCloseModal() {
         const { filtersStore } = this.props;
@@ -78,6 +70,15 @@ export class FiltersTab extends Component<FilterTabProps, FiltersTabState> {
         const { filtersStore } = this.props;
 
         filtersStore.handleSelectedMenuFilterFromSubMenu(filterId);
+    }
+
+    setMutatedFiltersToQueueMutationStore() {
+        const {
+            filtersStore: { mutatedFilters },
+            queueMutationModalStoreInstance: { queueMutationStore }
+        } = this.props;
+
+        queueMutationStore.addFilters(mutatedFilters);
     }
 
     renderFiltersSummaryTiles() {

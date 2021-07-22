@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import './toggle-condition.scss';
+
 import autobind from 'autobind-decorator';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
+
 import { Toggle } from '@fluentui/react/lib/Toggle';
+
 import { BooleanCondition } from '../../../../models/filter/conditions';
 import { ON_OFF_STATE_TEXT } from '../../../../models/filter/factories';
-
-import './toggle-condition.scss';
 
 interface ToggleConditionComponentProps {
     condition: BooleanCondition
@@ -24,15 +26,15 @@ export class ToggleCondition extends Component<ToggleConditionComponentProps, ne
         condition.validate();
     }
 
-    getConvertedValueToBoolean(value: string) {
-        return value === 'true';
-    }
-
     @autobind
     handleChange(event: React.MouseEvent<HTMLElement>, checked?: boolean) {
         const { condition } = this.props;
 
         condition.setValue(checked!);
+    }
+
+    getConvertedValueToBoolean(value: string) {
+        return value === 'true';
     }
 
     render() {

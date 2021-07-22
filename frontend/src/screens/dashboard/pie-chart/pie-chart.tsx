@@ -1,13 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React from 'react';
-import {
-    ResponsivePie, PieDatum, PieSvgProps
-} from '@nivo/pie';
-import cx from 'classnames';
-
 import './pie-chart.scss';
+
+import cx from 'classnames';
+import React from 'react';
+
+import {
+    PieDatum,
+    PieSvgProps,
+    ResponsivePie
+} from '@nivo/pie';
+
 import { COLORS } from '../../../styles/variables';
 
 interface PieChartProps {
@@ -108,7 +112,6 @@ export class PieChart extends React.Component<PieChartProps & PieSvgProps, never
                     innerRadius={0.7}
                     radialLabelsTextColor={{ from: 'color', modifiers: [['darker', 1]] }}
                     isInteractive={false}
-                    data={data}
                     padAngle={1}
                     enableSlicesLabels={false}
                     margin={{

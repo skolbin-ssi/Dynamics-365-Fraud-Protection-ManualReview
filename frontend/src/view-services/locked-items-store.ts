@@ -17,7 +17,7 @@ export interface ItemLock {
 @injectable()
 export class LockedItemsStore {
     @observable
-    lockedItems: Item[] | null = null;
+    lockedItems: Item[] | undefined | null;
 
     @observable
     loading: boolean = false;
@@ -26,7 +26,7 @@ export class LockedItemsStore {
     get itemLocks(): ItemLock[] | null {
         const { allQueues } = this.queueStore;
         if (!this.lockedItems) {
-            return this.lockedItems;
+            return null;
         }
 
         return this.lockedItems

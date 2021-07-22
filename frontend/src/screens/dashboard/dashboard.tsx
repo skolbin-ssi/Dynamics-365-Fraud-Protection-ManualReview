@@ -1,29 +1,22 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
+import './dashboard.scss';
+
 import autoBind from 'autobind-decorator';
-import { resolve } from 'inversify-react';
 import { History } from 'history';
+import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
+import React, { Component } from 'react';
 import {
-    Redirect, Route, RouteComponentProps, Switch
+    Redirect,
+    Route,
+    RouteComponentProps,
+    Switch
 } from 'react-router-dom';
 
-import { DashboardHeader } from './dashboard-header';
-import { DemandSupply } from './demand-supply';
-import { DemandSupplyByQueue } from './demand-supply-by-queue';
-import { QueuesPerformance } from './queues-performance';
-import { QueuePerformance } from './queue-performance';
-import { AnalystsPerformance } from './analysts-performance';
-import { AnalystPerformance } from './analyst-performance';
+import { ReportsModal } from '../../components/reports-modal';
 import { SwitchTabs } from '../../components/switch-tabs';
-import {
-    CurrentUserStore,
-    DashboardScreenStore,
-    QueuePerformanceStore,
-} from '../../view-services';
-import { readUrlSearchQueryOptions } from '../../utility-services';
 import {
     DASHBOARD_MANAGEMENT,
     DASHBOARD_SEGMENTATION,
@@ -32,9 +25,19 @@ import {
 } from '../../constants';
 import { Queue, User } from '../../models';
 import { TYPES } from '../../types';
-import { ReportsModal } from '../../components/reports-modal';
-
-import './dashboard.scss';
+import { readUrlSearchQueryOptions } from '../../utility-services';
+import {
+    CurrentUserStore,
+    DashboardScreenStore,
+    QueuePerformanceStore,
+} from '../../view-services';
+import { AnalystPerformance } from './analyst-performance';
+import { AnalystsPerformance } from './analysts-performance';
+import { DashboardHeader } from './dashboard-header';
+import { DemandSupply } from './demand-supply';
+import { DemandSupplyByQueue } from './demand-supply-by-queue';
+import { QueuePerformance } from './queue-performance';
+import { QueuesPerformance } from './queues-performance';
 
 const CN = 'dashboard';
 
@@ -75,21 +78,6 @@ export class Dashboard extends Component<DashboardProps, any> {
         if (dashboard && pathname !== prevPathname) {
             dashboard.scrollTo(0, 0);
         }
-    }
-
-    @autoBind
-    getActiveSegmentationTab() {
-        const { match: { path } } = this.props;
-
-        if (path === ROUTES.DASHBOARD_QUEUES_PERFORMANCE) {
-            return DASHBOARD_SEGMENTATION.QUEUES;
-        }
-
-        if (path === ROUTES.DASHBOARD_ANALYSTS_PERFORMANCE) {
-            return DASHBOARD_SEGMENTATION.ANALYSTS;
-        }
-
-        return DASHBOARD_SEGMENTATION.DEMAND;
     }
 
     /**
@@ -155,19 +143,6 @@ export class Dashboard extends Component<DashboardProps, any> {
         }
     }
 
-    isNotMainDashboardPage() {
-        const { match: { path } } = this.props;
-        return [
-            ROUTES.DASHBOARD_QUEUE_PERFORMANCE,
-            ROUTES.DASHBOARD_ANALYST_PERFORMANCE,
-            ROUTES.DASHBOARD_DEMAND_BY_QUEUE
-        ].includes(path);
-    }
-
-    goToPage(pagePath: string) {
-        this.history.push(pagePath);
-    }
-
     @autoBind
     handleGoBackHeaderClick() {
         const { match: { path } } = this.props;
@@ -184,6 +159,34 @@ export class Dashboard extends Component<DashboardProps, any> {
                 break;
             default:
         }
+    }
+
+    @autoBind
+    getActiveSegmentationTab() {
+        const { match: { path } } = this.props;
+
+        if (path === ROUTES.DASHBOARD_QUEUES_PERFORMANCE) {
+            return DASHBOARD_SEGMENTATION.QUEUES;
+        }
+
+        if (path === ROUTES.DASHBOARD_ANALYSTS_PERFORMANCE) {
+            return DASHBOARD_SEGMENTATION.ANALYSTS;
+        }
+
+        return DASHBOARD_SEGMENTATION.DEMAND;
+    }
+
+    isNotMainDashboardPage() {
+        const { match: { path } } = this.props;
+        return [
+            ROUTES.DASHBOARD_QUEUE_PERFORMANCE,
+            ROUTES.DASHBOARD_ANALYST_PERFORMANCE,
+            ROUTES.DASHBOARD_DEMAND_BY_QUEUE
+        ].includes(path);
+    }
+
+    goToPage(pagePath: string) {
+        this.history.push(pagePath);
     }
 
     renderReportsModal() {

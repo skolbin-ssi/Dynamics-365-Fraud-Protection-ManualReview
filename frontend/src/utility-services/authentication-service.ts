@@ -71,7 +71,7 @@ export class AuthenticationService {
                 navigateToLoginRequestUrl: false
             },
             cache: {
-                cacheLocation: 'sessionStorage'
+                cacheLocation: 'localStorage'
             },
             system:
             {
@@ -229,12 +229,9 @@ export class AuthenticationService {
             return authResponse.accessToken;
         } catch (e) {
             // Acquire token silent failure, and send an interactive request
-            if (e.errorMessage.includes('interaction_required')) {
-                authResponse = await this.msal.acquireTokenPopup(this.msalAuthParams);
-                return authResponse.accessToken;
+            if (this.requireInteraction(e.errorMessage)) {
+                this.msal.acquireTokenRedirect(this.msalAuthParams);
             }
-
-            this.msal.acquireTokenRedirect(this.msalAuthParams);
 
             throw e;
         }
@@ -245,14 +242,15 @@ export class AuthenticationService {
      */
     async getToken(): Promise<string> {
         let authResponse;
-
+        // the sid claim should only be used for silent token acquisition, never for interactive login, such as happens with acquireTokenRedirect
+        const authParamsWithSidClaim = { ...this.msalAuthParams, sid: this.user?.sid };
         try {
-            authResponse = await this.msal.acquireTokenSilent(this.msalAuthParams);
+            authResponse = await this.msal.acquireTokenSilent(authParamsWithSidClaim);
 
             return authResponse.idToken.rawIdToken;
         } catch (e) {
             // Acquire token silent failure, and send an interactive request
-            if (e.errorMessage.includes('interaction_required')) {
+            if (this.requireInteraction(e.errorMessage) || e.name === 'InteractionRequiredAuthError') {
                 this.msal.acquireTokenRedirect(this.msalAuthParams);
             }
 
@@ -268,4 +266,17 @@ export class AuthenticationService {
 
         return `${origin}${ROUTES.LOGIN}`;
     }
+
+    private get user() {
+        const account = this.msal.getAccount();
+        return account ? { ...account, profile: account.idToken } : null;
+    }
+
+    private requireInteraction = (errorMessage: Msal.AuthError['errorMessage']): boolean => {
+        if (!errorMessage || !errorMessage.length) {
+            return false;
+        }
+
+        return errorMessage.includes('consent_required') || errorMessage.includes('interaction_required') || errorMessage.includes('login_required');
+    };
 }

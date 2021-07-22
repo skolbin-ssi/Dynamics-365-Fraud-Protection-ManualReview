@@ -71,7 +71,7 @@ export class AuthenticationService {
                 navigateToLoginRequestUrl: false
             },
             cache: {
-                cacheLocation: 'localStorage'
+                cacheLocation: 'sessionStorage'
             },
             system:
             {
@@ -81,27 +81,27 @@ export class AuthenticationService {
         };
 
         this.msalAuthParams = {
-            scopes: [
-                'https://atlas.microsoft.com//user_impersonation'
-            ]
+            scopes: this.scopes
         };
 
         this.msal = new MRUserAgentApplication(this.msalConfig);
     }
+
+    private scopes = [
+        'openid',
+        'user.read',
+        'profile',
+        'email',
+        'Directory.AccessAsUser.All',
+        'https://atlas.microsoft.com//user_impersonation'
+    ];
 
     /**
      * Redirect user to Azure AD Login Page
      */
     redirectToAzureLogin(returnLocation: Location = this.defaultRedirectLocation) {
         this.msal.loginRedirect({
-            scopes: [
-                'openid',
-                'user.read',
-                'profile',
-                'email',
-                'Directory.AccessAsUser.All',
-                'https://atlas.microsoft.com//user_impersonation'
-            ],
+            scopes: this.scopes,
             prompt: 'select_account',
             state: JSON.stringify(returnLocation),
             redirectUri: this.redirectUrl,
@@ -131,15 +131,7 @@ export class AuthenticationService {
     }
 
     async apiRequestInterceptor(config: ApiServiceRequestConfig) {
-        // TODO: shouldn't use idToken, should use accessToken
-        let idToken = this.msal.getRawIdToken();
-
-        if (this.isAuthenticated()) {
-            const test = await this.msal.acquireTokenSilent(this.msalAuthParams);
-            // eslint-disable-next-line no-console
-            console.log(test.idToken.rawIdToken);
-            idToken = test.idToken.rawIdToken;
-        }
+        const idToken = await this.getToken();
 
         if (!idToken) {
             this.navigateTo(ROUTES.LOGIN);
@@ -243,6 +235,26 @@ export class AuthenticationService {
             }
 
             this.msal.acquireTokenRedirect(this.msalAuthParams);
+
+            throw e;
+        }
+    }
+
+    /**
+     * Acquire raw id token.
+     */
+    async getToken(): Promise<string> {
+        let authResponse;
+
+        try {
+            authResponse = await this.msal.acquireTokenSilent(this.msalAuthParams);
+
+            return authResponse.idToken.rawIdToken;
+        } catch (e) {
+            // Acquire token silent failure, and send an interactive request
+            if (e.errorMessage.includes('interaction_required')) {
+                this.msal.acquireTokenRedirect(this.msalAuthParams);
+            }
 
             throw e;
         }

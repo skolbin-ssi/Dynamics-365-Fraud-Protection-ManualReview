@@ -225,8 +225,8 @@ public class PublicLinkAnalysisService {
                 if (item.getItem() != null &&
                         item.getItem().getPurchase() != null &&
                         item.getItem().getPurchase().getUser() != null &&
-                        item.getItem().getPurchase().getUser().getEmail() != null) {
-                            item.setUserRestricted(this.isUserFraud(item.getItem().getPurchase().getUser().getEmail()));
+                        item.getItem().getPurchase().getUser().getUserId() != null) {
+                            item.setUserRestricted(this.isUserFraud(item.getItem().getPurchase().getUser().getUserId()));
                 }
             });
 
@@ -267,8 +267,8 @@ public class PublicLinkAnalysisService {
 
             result.forEach(details -> {
                 if (details.getUser() != null &&
-                        details.getUser().getEmail() != null) {
-                    details.setUserRestricted(this.isUserFraud(details.getUser().getEmail()));
+                        details.getUser().getUserId() != null) {
+                    details.setUserRestricted(this.isUserFraud(details.getUser().getUserId()));
                 }
             });
 
@@ -280,8 +280,8 @@ public class PublicLinkAnalysisService {
         return modelMapper.map(publicLinkAnalysisClient.getLinkAnalysisEntry(id), LinkAnalysisDTO.class);
     }
 
-    private boolean isUserFraud(String email) {
-        ExplorerEntity entity = dfpExplorerService.exploreUser(email);
+    private boolean isUserFraud(String userId) {
+        ExplorerEntity entity = dfpExplorerService.exploreUser(userId);
 
         //We need to check if there are self pointing edges, that have LabelState == Fraud, choose the one with the max EventTimeStamp
         Edge selfEdge = null;

@@ -22,7 +22,7 @@ import { ItemDetailsKeyValue } from '../../item-details-key-value';
 import { ItemDetailsTile } from '../../item-details-tile';
 import { KeyValueItem, valuePlaceholder } from '../key-value-item';
 
-const CN = 'item-details-account-summary, red';
+const CN = 'item-details-account-summary';
 
 interface AccountSummaryProps {
     className?: string;

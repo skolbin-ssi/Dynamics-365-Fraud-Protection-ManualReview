@@ -55,12 +55,16 @@ export class AuthenticationService {
 
     private msal: MRUserAgentApplication;
 
+    private scopes: string[];
+
     constructor(
         @inject(TYPES.CONFIGURATION) private readonly config: Configuration,
         @inject(TYPES.HISTORY) private readonly history: History
     ) {
         const { authentication } = this.config;
         const { clientId, tenant, baseAuthUrl } = authentication;
+
+        this.scopes = [`api://${clientId}/user_impersonation`];
 
         // Config object to be passed to Msal on creation
         this.msalConfig = {
@@ -71,7 +75,8 @@ export class AuthenticationService {
                 navigateToLoginRequestUrl: false
             },
             cache: {
-                cacheLocation: 'localStorage'
+                cacheLocation: 'localStorage',
+                storeAuthStateInCookie: true
             },
             system:
             {
@@ -86,15 +91,6 @@ export class AuthenticationService {
 
         this.msal = new MRUserAgentApplication(this.msalConfig);
     }
-
-    private scopes = [
-        'openid',
-        'user.read',
-        'profile',
-        'email',
-        'Directory.AccessAsUser.All',
-        'https://atlas.microsoft.com//user_impersonation'
-    ];
 
     /**
      * Redirect user to Azure AD Login Page
@@ -218,34 +214,13 @@ export class AuthenticationService {
     }
 
     /**
-     * Acquire Access token for Azure maps interaction.
-     */
-    async getAtlasAccessToken(): Promise<string> {
-        let authResponse;
-
-        try {
-            authResponse = await this.msal.acquireTokenSilent(this.msalAuthParams);
-
-            return authResponse.accessToken;
-        } catch (e) {
-            // Acquire token silent failure, and send an interactive request
-            if (this.requireInteraction(e.errorMessage)) {
-                this.msal.acquireTokenRedirect(this.msalAuthParams);
-            }
-
-            throw e;
-        }
-    }
-
-    /**
      * Acquire raw id token.
      */
     async getToken(): Promise<string> {
-        let authResponse;
-        // the sid claim should only be used for silent token acquisition, never for interactive login, such as happens with acquireTokenRedirect
-        const authParamsWithSidClaim = { ...this.msalAuthParams, sid: this.user?.sid };
+        let authResponse: Msal.AuthResponse;
         try {
-            authResponse = await this.msal.acquireTokenSilent(authParamsWithSidClaim);
+            // Only pass the clientId to renew an idToken
+            authResponse = await this.msal.acquireTokenSilent({ ...this.msalAuthParams, scopes: ['27193f56-cb90-4e67-8cf2-13eabbbabca5'] });
 
             return authResponse.idToken.rawIdToken;
         } catch (e) {
@@ -265,11 +240,6 @@ export class AuthenticationService {
         const { origin } = window.location;
 
         return `${origin}${ROUTES.LOGIN}`;
-    }
-
-    private get user() {
-        const account = this.msal.getAccount();
-        return account ? { ...account, profile: account.idToken } : null;
     }
 
     private requireInteraction = (errorMessage: Msal.AuthError['errorMessage']): boolean => {

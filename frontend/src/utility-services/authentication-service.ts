@@ -220,7 +220,7 @@ export class AuthenticationService {
         let authResponse: Msal.AuthResponse;
         try {
             // Only pass the clientId to renew an idToken
-            authResponse = await this.msal.acquireTokenSilent({ ...this.msalAuthParams, scopes: ['27193f56-cb90-4e67-8cf2-13eabbbabca5'] });
+            authResponse = await this.msal.acquireTokenSilent({ ...this.msalAuthParams, scopes: [this.config.authentication.clientId] });
 
             return authResponse.idToken.rawIdToken;
         } catch (e) {

@@ -56,15 +56,15 @@ export class Address {
         this.firstName = FirstName;
         this.lastName = LastName;
         this.phoneNumber = PhoneNumber;
-        this.street1 = Street1;
-        this.street2 = Street2;
-        this.street3 = Street3;
-        this.city = City;
-        this.state = State;
-        this.countryRegion = CountryRegion;
-        this.district = District;
-        this.zipCode = ZipCode;
-        this.country = Country;
+        this.street1 = this.removeNAFromAddress(Street1);
+        this.street2 = this.removeNAFromAddress(Street2);
+        this.street3 = this.removeNAFromAddress(Street3);
+        this.city = this.removeNAFromAddress(City);
+        this.state = this.removeNAFromAddress(State);
+        this.countryRegion = this.removeNAFromAddress(CountryRegion);
+        this.district = this.removeNAFromAddress(District);
+        this.zipCode = this.removeNAFromAddress(ZipCode);
+        this.country = this.removeNAFromAddress(Country);
         this.type = Type;
 
         return this;
@@ -93,5 +93,9 @@ export class Address {
 
     private filterEmpty(arr: string[]) {
         return arr.filter(a => !!a);
+    }
+
+    private removeNAFromAddress(field: string) {
+        return field && field.toLocaleLowerCase() === 'n/a' ? '' : field;
     }
 }

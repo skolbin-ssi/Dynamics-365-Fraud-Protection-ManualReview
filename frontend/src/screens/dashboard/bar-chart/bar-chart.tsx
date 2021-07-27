@@ -1,24 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React from 'react';
-import cx from 'classnames';
+import './bar-chart.scss';
+
 import autobind from 'autobind-decorator';
+import cx from 'classnames';
+import React from 'react';
 
 import { BarExtendedDatum, BarSvgProps, ResponsiveBar, } from '@nivo/bar';
 
-import { WarningChartMessage } from '../warning-chart-message';
-import { AccuracyChartDatum } from '../../../view-services/dashboard/base-overturned-performance-store';
-import { formatDateToFullMonthDayYear } from '../../../utils/date';
 import {
     OVERTURNED_DECISIONS_DISPLAY_NAMES,
     OVERTURN_CHART_DATUM_KEYS,
     OVERTURN_CHART_KEYS,
     OVERTURN_LABELS_TO_OVERTURN_CHART_KEYS_COLORS
 } from '../../../constants';
-
-import './bar-chart.scss';
-
+import { formatDateToFullMonthDayYear } from '../../../utils/date';
+import { AccuracyChartDatum } from '../../../view-services/dashboard/base-overturned-performance-store';
+import { WarningChartMessage } from '../warning-chart-message';
 import { generateTicksValues } from './generate-ticks-values';
 
 interface OverturnedChartDatumAccumulator {

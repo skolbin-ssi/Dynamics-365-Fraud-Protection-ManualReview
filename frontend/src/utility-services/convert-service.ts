@@ -5,10 +5,6 @@ import papa, { UnparseConfig, UnparseObject } from 'papaparse';
 
 export type UnparseTypes = Array<Object> | Array<Array<any>> | UnparseObject;
 
-const configOverride: UnparseConfig = {
-    delimiter: '\t'
-};
-
 /**
  * Converts raw data to CSV string
  *
@@ -18,7 +14,7 @@ const configOverride: UnparseConfig = {
 export function convertToCSVString(data: UnparseTypes, config?: UnparseConfig): string {
     let unparsedData = '';
     try {
-        unparsedData = papa.unparse(data, { ...config, ...configOverride });
+        unparsedData = papa.unparse(data, { ...config });
     } catch (e) {
         // eslint-disable-next-line no-console
         console.log(e);

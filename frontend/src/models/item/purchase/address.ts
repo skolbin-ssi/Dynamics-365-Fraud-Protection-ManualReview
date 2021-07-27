@@ -84,11 +84,23 @@ export class Address {
     }
 
     get displayLineAddress() {
+        let formattedAddress: string = '';
         const part1 = this.filterEmpty([this.street1, this.street2, this.street3]).join(' ');
         const part2 = this.filterEmpty([this.city, this.state]).join(' ');
         const part3 = this.filterEmpty([this.zipCode, this.country]).join(' ');
+        if (part1) {
+            formattedAddress = `${part1}\n`;
+        }
 
-        return `${part1}\n${[part2, part3].join(', ')}`;
+        if (part2 && part3) {
+            formattedAddress = `${formattedAddress}${[part2, part3].join(', ')}`;
+        } else if (part2) {
+            formattedAddress = `${formattedAddress}${part2}`;
+        } else {
+            formattedAddress = `${formattedAddress}${part3}`;
+        }
+
+        return formattedAddress;
     }
 
     private filterEmpty(arr: string[]) {

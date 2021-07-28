@@ -1,6 +1,6 @@
-/* eslint-disable react/sort-comp */
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+/* eslint-disable react/sort-comp */
 
 import './total-review.scss';
 

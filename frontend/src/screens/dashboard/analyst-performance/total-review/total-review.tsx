@@ -1,3 +1,4 @@
+/* eslint-disable react/sort-comp */
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -29,28 +30,6 @@ const CN = 'total-review';
 
 @observer
 export class TotalReview extends Component<TotalReviewComponentProps, never> {
-    getLineChartYScaleMaxValue() {
-        const { analystPerformanceStore: { lineChartData, maxYTicksValue } } = this.props;
-        if (!lineChartData.length) {
-            return 10;
-        }
-
-        if (maxYTicksValue < 10) {
-            return maxYTicksValue;
-        }
-
-        return undefined;
-    }
-
-    getDataTableHeaderTitle() {
-        const { analystPerformanceStore: { rating } } = this.props;
-        if (rating === PERFORMANCE_RATING.ALL) {
-            return TOP_QUEUES_DISPLAY_VIEW.get(rating)!;
-        }
-
-        return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
-    }
-
     @autoBind
     handleQueueAggregationChange(label: CHART_AGGREGATION_PERIOD) {
         const { analystPerformanceStore } = this.props;
@@ -71,6 +50,28 @@ export class TotalReview extends Component<TotalReviewComponentProps, never> {
         const { analystPerformanceStore } = this.props;
 
         analystPerformanceStore.setChecked(queueId);
+    }
+
+    getLineChartYScaleMaxValue() {
+        const { analystPerformanceStore: { lineChartData, maxYTicksValue } } = this.props;
+        if (!lineChartData.length) {
+            return 10;
+        }
+
+        if (maxYTicksValue < 10) {
+            return maxYTicksValue;
+        }
+
+        return undefined;
+    }
+
+    getDataTableHeaderTitle() {
+        const { analystPerformanceStore: { rating } } = this.props;
+        if (rating === PERFORMANCE_RATING.ALL) {
+            return TOP_QUEUES_DISPLAY_VIEW.get(rating)!;
+        }
+
+        return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
     }
 
     render() {

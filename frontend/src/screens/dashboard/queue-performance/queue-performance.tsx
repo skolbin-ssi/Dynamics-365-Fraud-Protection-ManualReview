@@ -1,3 +1,4 @@
+/* eslint-disable react/sort-comp */
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
@@ -102,33 +103,6 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
         this.queuePerformanceStore.clearQueue();
     }
 
-    getLineChartYScaleMaxValue() {
-        const { lineChartData } = this.queuePerformanceStore;
-        if (!lineChartData.length) {
-            return 10;
-        }
-
-        return undefined;
-    }
-
-    getQueueAnalystDataTableHeaderTitle() {
-        const { rating } = this.queuePerformanceStore;
-        if (rating === PERFORMANCE_RATING.ALL) {
-            return TOP_ANALYST_DISPLAY_VIEW.get(rating)!;
-        }
-
-        return `${TOP_ANALYST_DISPLAY_VIEW.get(rating)} analysts`;
-    }
-
-    getOverturnedAnalystDataTableHeaderTitle() {
-        const { rating } = this.overturnedPerformanceStore;
-        if (rating === PERFORMANCE_RATING.ALL) {
-            return TOP_ANALYST_DISPLAY_VIEW.get(rating)!;
-        }
-
-        return `${TOP_ANALYST_DISPLAY_VIEW.get(rating)} analysts`;
-    }
-
     @autoBind
     handleSelectionChange(queueId: string) {
         this.queuePerformanceStore.setChecked(queueId);
@@ -167,6 +141,33 @@ export class QueuePerformance extends Component<RouteComponentProps<QueuePerform
         const { reports: overturnedPerformanceReports } = this.overturnedPerformanceStore;
 
         this.reportsModalStore.showReportsModal([...queuePerformanceReports, ...overturnedPerformanceReports]);
+    }
+
+    getLineChartYScaleMaxValue() {
+        const { lineChartData } = this.queuePerformanceStore;
+        if (!lineChartData.length) {
+            return 10;
+        }
+
+        return undefined;
+    }
+
+    getQueueAnalystDataTableHeaderTitle() {
+        const { rating } = this.queuePerformanceStore;
+        if (rating === PERFORMANCE_RATING.ALL) {
+            return TOP_ANALYST_DISPLAY_VIEW.get(rating)!;
+        }
+
+        return `${TOP_ANALYST_DISPLAY_VIEW.get(rating)} analysts`;
+    }
+
+    getOverturnedAnalystDataTableHeaderTitle() {
+        const { rating } = this.overturnedPerformanceStore;
+        if (rating === PERFORMANCE_RATING.ALL) {
+            return TOP_ANALYST_DISPLAY_VIEW.get(rating)!;
+        }
+
+        return `${TOP_ANALYST_DISPLAY_VIEW.get(rating)} analysts`;
     }
 
     readInitialQuerySearchAndUpdateStores() {

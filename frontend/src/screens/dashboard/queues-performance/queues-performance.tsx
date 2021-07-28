@@ -178,7 +178,7 @@ export class QueuesPerformance extends Component<QueuePerformanceProps, any> {
                     <CHART_AGGREGATION_PERIOD>
                     activeTab={aggregation}
                     className={`${CN}__aggregation-header`}
-                    title="Total review"
+                    title="Hit rate"
                     viewSwitchName="View:"
                     onViewChange={this.handleAggregationChange}
                     viewMap={CHART_AGGREGATION_PERIOD_DISPLAY}

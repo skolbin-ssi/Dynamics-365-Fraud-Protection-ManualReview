@@ -92,7 +92,7 @@ export class TotalReview extends Component<TotalReviewComponentProps, never> {
                 <AggregationHeader
                     <CHART_AGGREGATION_PERIOD>
                     activeTab={aggregation}
-                    title="Total review"
+                    title="Hit rate"
                     viewSwitchName="View:"
                     onViewChange={this.handleQueueAggregationChange}
                     viewMap={CHART_AGGREGATION_PERIOD_DISPLAY}

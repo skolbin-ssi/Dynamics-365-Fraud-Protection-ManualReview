@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+/* eslint-disable react/sort-comp */
 
 import './total-review.scss';
 
@@ -91,14 +92,14 @@ export class TotalReview extends Component<TotalReviewComponentProps, never> {
                 <AggregationHeader
                     <CHART_AGGREGATION_PERIOD>
                     activeTab={aggregation}
-                    title="Total review"
+                    title="Hit rate"
                     viewSwitchName="View:"
                     onViewChange={this.handleQueueAggregationChange}
                     viewMap={CHART_AGGREGATION_PERIOD_DISPLAY}
                 />
                 <LineChart
                     /* eslint-disable-next-line react/jsx-props-no-spreading */
-                    sliceTooltip={(props: SliceTooltipProps) => <SliceTooltip {...props} showSummaryRow />}
+                    sliceTooltip={(props: SliceTooltipProps) => <SliceTooltip {...props} showSummaryRow={false} showPercentage />}
                     hasData={hasStorePerformanceData}
                     hasSelectedItems={hasSelectedItems}
                     noDataWarningMessage={WARNING_MESSAGES.NO_DATA_FOR_SELECTED_PERIOD_MESSAGE}
@@ -107,6 +108,7 @@ export class TotalReview extends Component<TotalReviewComponentProps, never> {
                     isLoading={isDataLoading}
                     data={lineChartData}
                     maxYTicksValue={this.getLineChartYScaleMaxValue()}
+                    showPercentage
                 />
                 <div className={`${CN}__total-review-table`}>
                     <SwitchHeader

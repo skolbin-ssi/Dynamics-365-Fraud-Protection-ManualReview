@@ -160,7 +160,7 @@ export class LineChart extends Component<LineChartProps, never> {
                             tickPadding: (maxYTicksValue && maxYTicksValue >= 1000) ? 0 : 5,
                         }}
                         margin={{
-                            top: 30, bottom: 30, left: 30, right: 20
+                            top: 30, bottom: 30, left: 40, right: 20
                         }}
                         isInteractive={hasData}
                         useMesh

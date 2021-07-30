@@ -56,7 +56,7 @@ mr:
       enrichment-delay: PT5M
       max-enrichment-delay: PT15M
       max-enrichment-attempts: 10
-      history-depth: 10
+      history-depth: 50
     dictionary-reconciliation-task:
       enabled: true
       delay: PT1H
@@ -90,7 +90,6 @@ azure:
     app-service-principal-url: https://graph.microsoft.com/v1.0/servicePrincipals/${DFP_SP_ID}
     user-photo-url-template: https://graph.microsoft.com/beta/users/#user_id#/photo/$value
     timeout: PT5S
-    previous-transactions-count: 50
     retries: 2
     role-mapping:
       ManualReviewFraudManager: ADMIN_MANAGER

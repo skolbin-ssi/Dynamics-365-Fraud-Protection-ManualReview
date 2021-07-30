@@ -194,16 +194,9 @@ public class ItemEnrichmentService {
     }
 
     private Set<PreviousPurchase> extractMostActualPreviousPurchases(final MainPurchase mainPurchase) {
-        Set<PreviousPurchase> actualPurchaseHistory = mainPurchase.getPreviousPurchaseList().stream()
+        return mainPurchase.getPreviousPurchaseList().stream()
                 .filter(pn -> pn.getMerchantLocalDate().isAfter(mainPurchase.getMerchantLocalDate().minusWeeks(1L)))
                 .collect(Collectors.toSet());
-        if (actualPurchaseHistory.size() < historyDepth) {
-            actualPurchaseHistory = mainPurchase.getPreviousPurchaseList().stream()
-                    .sorted(Comparator.comparing(PreviousPurchase::getMerchantLocalDate).reversed())
-                    .limit(historyDepth)
-                    .collect(Collectors.toSet());
-        }
-        return actualPurchaseHistory;
     }
 
     private ExplorerEntity getUserEntity(final ExplorerEntity mainEntity) {

@@ -87,16 +87,17 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
                     : item.purchaseId;
 
                 return (
-                    <>
-                        <Text variant="smallPlus" className={`${CN}__order-id-cell`} title={itemId}>
+                    <div className={`${CN}__order-id-cell`}>
+                        <Text variant="smallPlus" title={itemId}>
                             {itemId}
                         </Text>
                         <IconButton
+                            className={`${CN}__copy-button`}
                             iconProps={{ iconName: 'Copy' }}
                             title="Copy"
                             onClick={this.onCopyButtonClick(itemId)}
                         />
-                    </>
+                    </div>
                 );
             }
         },
@@ -247,6 +248,7 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
                     }}
                 />
                 <IconButton
+                    className={`${CN}__copy-button`}
                     iconProps={{ iconName: 'Copy' }}
                     title="Copy"
                     onClick={this.onCopyButtonClick(value)}

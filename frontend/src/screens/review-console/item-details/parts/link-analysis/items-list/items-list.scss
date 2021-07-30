@@ -8,6 +8,21 @@
   .ms-DetailsHeader {
     padding-top: 0 !important;
   }
+  // $root: &;
+  
+  // &:hover {
+  //   #{$root}__copy-button {
+  //     display: inline-block;
+  //   }
+  // }
+
+  &__copy-button {
+    display: none;
+    width: 20px;
+    height: 20px;
+    margin-left: 6px;
+    color: $gray;
+  }
 
   .ms-DetailsRow-fields {
     height: 43px;
@@ -21,6 +36,13 @@
   &__order-id-cell {
     overflow: hidden;
     text-overflow: ellipsis;
+    display: flex;
+    align-items: center;
+    &:hover {
+      .items-list__copy-button {
+        display: inline-block;
+      }
+    }
   }
 
   &__cell {
@@ -29,9 +51,15 @@
 
   &__cell-email {
     display: flex;
-    button{
-      margin-top: -5px;
+    align-items: center;
+    $root: &;
+  
+    &:hover {
+      .items-list__copy-button {
+        display: inline-block;
+      }
     }
+
     .icon-text {
       align-items: center;
 

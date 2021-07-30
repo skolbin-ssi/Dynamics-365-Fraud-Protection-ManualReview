@@ -8,6 +8,7 @@ import cx from 'classnames';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 
+import { IconButton } from '@fluentui/react/lib/Button';
 import {
     ColumnActionsMode,
     DetailsList,
@@ -74,7 +75,7 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
             name: 'Order ID',
             fieldName: 'id',
             minWidth: 50,
-            maxWidth: 240,
+            maxWidth: 260,
             isCollapsible: true,
             isRowHeader: true,
             isPadded: true,
@@ -86,9 +87,17 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
                     : item.purchaseId;
 
                 return (
-                    <Text variant="smallPlus" className={`${CN}__order-id-cell`} title={itemId}>
-                        {itemId}
-                    </Text>
+                    <div className={`${CN}__order-id-cell`}>
+                        <Text variant="smallPlus" title={itemId}>
+                            {itemId}
+                        </Text>
+                        <IconButton
+                            className={`${CN}__copy-button`}
+                            iconProps={{ iconName: 'Copy' }}
+                            title="Copy"
+                            onClick={this.onCopyButtonClick(itemId)}
+                        />
+                    </div>
                 );
             }
         },
@@ -205,6 +214,10 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
         return null;
     };
 
+    onCopyButtonClick=(value: string) => () => {
+        navigator.clipboard.writeText(value);
+    };
+
     @autobind
     handelLoadMoreClick() {
         const { onLoadMoreClick } = this.props;
@@ -214,25 +227,33 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
 
     renderEmailWithIcon(value: any, userRestricted?: boolean, tooltipText?: string | JSX.Element) {
         return (
-            <IconText
-                text={value || null}
-                textVariant="smallPlus"
-                title={value}
-                placeholder="N/A"
-                iconValue={userRestricted}
-                icons={{
-                    GOOD: {
-                        value: false,
-                        iconName: 'CompletedSolid',
-                        tooltipText
-                    },
-                    BAD: {
-                        value: true,
-                        iconName: 'WarningSolid',
-                        tooltipText
-                    },
-                }}
-            />
+            <>
+                <IconText
+                    text={value || null}
+                    textVariant="smallPlus"
+                    title={value}
+                    placeholder="N/A"
+                    iconValue={userRestricted}
+                    icons={{
+                        GOOD: {
+                            value: false,
+                            iconName: 'CompletedSolid',
+                            tooltipText
+                        },
+                        BAD: {
+                            value: true,
+                            iconName: 'WarningSolid',
+                            tooltipText
+                        },
+                    }}
+                />
+                <IconButton
+                    className={`${CN}__copy-button`}
+                    iconProps={{ iconName: 'Copy' }}
+                    title="Copy"
+                    onClick={this.onCopyButtonClick(value)}
+                />
+            </>
         );
     }
 

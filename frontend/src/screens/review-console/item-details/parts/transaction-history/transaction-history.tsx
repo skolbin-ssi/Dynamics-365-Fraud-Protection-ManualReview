@@ -1,9 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import cn from 'classnames';
+import './transaction-history.scss';
+
 import autobind from 'autobind-decorator';
+import cn from 'classnames';
+import React, { Component } from 'react';
+
 import {
     ColumnActionsMode,
     DetailsList,
@@ -13,18 +16,17 @@ import {
 } from '@fluentui/react/lib/DetailsList';
 import { MessageBar } from '@fluentui/react/lib/MessageBar';
 import { Text } from '@fluentui/react/lib/Text';
-import { ItemDetailsTile } from '../../item-details-tile';
+
+import { IconText } from '../../../../../components/icon-text';
+import { Price } from '../../../../../components/price';
+import { ADDRESS_TYPE, Address, Item } from '../../../../../models/item';
 import { PreviousPurchase } from '../../../../../models/item/purchase/previous-purchase';
 import {
     convertToUTCAndFormatToLocalString,
     formatDateStringToJSDate,
     formatToMMMDYYY
 } from '../../../../../utils/date';
-import { Price } from '../../../../../components/price';
-import { IconText } from '../../../../../components/icon-text';
-
-import { Address, ADDRESS_TYPE, Item } from '../../../../../models/item';
-import './transaction-history.scss';
+import { ItemDetailsTile } from '../../item-details-tile';
 
 const CN = 'transaction-history';
 
@@ -276,7 +278,7 @@ export class TransactionHistory extends Component<TransactionHistoryProps, never
                 title="Transaction history"
             >
                 <MessageBar className={`${CN}__message-bar`}>
-                    The table contains full information only for last 10 transactions / last week transactions.
+                    The table contains full information only for last 50 transactions / last week transactions.
                 </MessageBar>
                 {this.renderHistory()}
             </ItemDetailsTile>

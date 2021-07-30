@@ -1,22 +1,22 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
+import './line-chart.scss';
+
 import autoBind from 'autobind-decorator';
+import cx from 'classnames';
+import React, { Component } from 'react';
+
+import { Spinner } from '@fluentui/react/lib/Spinner';
 import {
     LineSvgProps,
     ResponsiveLine,
     SliceTooltipProps,
 } from '@nivo/line';
 
-import { Spinner } from '@fluentui/react/lib/Spinner';
-import cx from 'classnames';
-
-import { SliceTooltip } from './slice-tooltip';
-
-import './line-chart.scss';
 import { WarningChartMessage } from '../warning-chart-message';
 import { generateTicksValues } from './generate-ticks-values';
+import { SliceTooltip } from './slice-tooltip';
 
 const CN = 'line-chart';
 
@@ -63,6 +63,8 @@ interface LineChartProps extends LineSvgProps {
      * maxTicksValuesCount - maximum number of ticks that could fit to the chart
      */
     maxTicksValuesCount?: number
+
+    showPercentage?: boolean
 }
 
 @autoBind
@@ -124,7 +126,8 @@ export class LineChart extends Component<LineChartProps, never> {
             hasData,
             data,
             chartClassName,
-            maxTicksValuesCount
+            maxTicksValuesCount,
+            showPercentage
         } = this.props;
 
         return (
@@ -152,12 +155,12 @@ export class LineChart extends Component<LineChartProps, never> {
                         }}
                         axisLeft={{
                             tickSize: 5,
-                            format: 'd',
+                            format: showPercentage ? v => `${v}%` : 'd',
                             // TODO: A first digit always disappear if the number >= 1000. Find a better way to fix this issue
                             tickPadding: (maxYTicksValue && maxYTicksValue >= 1000) ? 0 : 5,
                         }}
                         margin={{
-                            top: 30, bottom: 30, left: 30, right: 20
+                            top: 30, bottom: 30, left: 40, right: 20
                         }}
                         isInteractive={hasData}
                         useMesh

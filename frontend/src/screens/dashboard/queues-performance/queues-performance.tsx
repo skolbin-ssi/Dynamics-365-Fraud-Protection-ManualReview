@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+/* eslint-disable react/sort-comp */
 
 import './queues-performance.scss';
 
@@ -11,6 +12,7 @@ import React, { Component } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 
 import { DefaultButton } from '@fluentui/react/lib/Button';
+import { SliceTooltipProps } from '@nivo/line';
 
 import {
     CHART_AGGREGATION_PERIOD,
@@ -31,7 +33,7 @@ import {
     UpdateQuerySearchReactionParams
 } from '../../../view-services';
 import { DataGridList } from '../data-grid-list';
-import { LineChart } from '../line-chart';
+import { LineChart, SliceTooltip } from '../line-chart';
 import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
 
 const CN = 'queues-performance';
@@ -81,6 +83,24 @@ export class QueuesPerformance extends Component<QueuePerformanceProps, any> {
         this.queuesPerformanceStore.clearPerformanceData();
     }
 
+    getLineChartYScaleMaxValue() {
+        const { lineChartData } = this.queuesPerformanceStore;
+        if (!lineChartData.length) {
+            return 10;
+        }
+
+        return undefined;
+    }
+
+    getDataTableHeader() {
+        const { rating } = this.queuesPerformanceStore;
+        if (rating === PERFORMANCE_RATING.ALL) {
+            return TOP_QUEUES_DISPLAY_VIEW.get(rating)!;
+        }
+
+        return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
+    }
+
     @autoBind
     handleSelectionChange(queueId: string) {
         this.queuesPerformanceStore.setChecked(queueId);
@@ -109,24 +129,6 @@ export class QueuesPerformance extends Component<QueuePerformanceProps, any> {
         const { reports } = this.queuesPerformanceStore;
 
         this.reportsModalStore.showReportsModal(reports);
-    }
-
-    getLineChartYScaleMaxValue() {
-        const { lineChartData } = this.queuesPerformanceStore;
-        if (!lineChartData.length) {
-            return 10;
-        }
-
-        return undefined;
-    }
-
-    getDataTableHeader() {
-        const { rating } = this.queuesPerformanceStore;
-        if (rating === PERFORMANCE_RATING.ALL) {
-            return TOP_QUEUES_DISPLAY_VIEW.get(rating)!;
-        }
-
-        return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
     }
 
     @autoBind
@@ -176,12 +178,14 @@ export class QueuesPerformance extends Component<QueuePerformanceProps, any> {
                     <CHART_AGGREGATION_PERIOD>
                     activeTab={aggregation}
                     className={`${CN}__aggregation-header`}
-                    title="Total review"
+                    title="Hit rate"
                     viewSwitchName="View:"
                     onViewChange={this.handleAggregationChange}
                     viewMap={CHART_AGGREGATION_PERIOD_DISPLAY}
                 />
                 <LineChart
+                    // eslint-disable-next-line react/jsx-props-no-spreading
+                    sliceTooltip={(props: SliceTooltipProps) => <SliceTooltip {...props} showSummaryRow={false} showPercentage />}
                     hasData={hasStorePerformanceData}
                     hasSelectedItems={hasSelectedItems}
                     noDataWarningMessage={WARNING_MESSAGES.NO_DATA_FOR_SELECTED_PERIOD_MESSAGE}
@@ -190,6 +194,7 @@ export class QueuesPerformance extends Component<QueuePerformanceProps, any> {
                     data={lineChartData}
                     maxYTicksValue={this.getLineChartYScaleMaxValue()}
                     enableArea
+                    showPercentage
                 />
                 <div>
                     <SwitchHeader

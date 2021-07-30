@@ -39,5 +39,6 @@
 
   &__value {
     color: $colorReleased;
+    word-break: break-all;
   }
 }

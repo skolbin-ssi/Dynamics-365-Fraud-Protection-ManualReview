@@ -1,17 +1,17 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './slice-tooltip.scss';
+
+import cx from 'classnames';
 /* eslint-disable react/prop-types */
 import React from 'react';
-import cx from 'classnames';
 
-import { Point, SliceTooltipProps as NivoSliceTooltipProps } from '@nivo/line';
 import { Persona, PersonaSize } from '@fluentui/react/lib/Persona';
+import { SliceTooltipProps as NivoSliceTooltipProps, Point } from '@nivo/line';
 
-import { formatDateToFullMonthDayYear } from '../../../../utils';
 import { User } from '../../../../models/user';
-
-import './slice-tooltip.scss';
+import { formatDateToFullMonthDayYear } from '../../../../utils';
 
 interface SliceTooltipProps {
     /**
@@ -23,6 +23,8 @@ interface SliceTooltipProps {
      * showSummaryRow - calculate sum of tooltip items
      */
     showSummaryRow?: boolean
+
+    showPercentage?: boolean
 }
 
 export interface ExtendedPoint extends Point {
@@ -36,7 +38,9 @@ export interface ExtendedPoint extends Point {
 const CN = 'slice-tooltip';
 const FIRST_POINT_INDEX = 0;
 
-export const SliceTooltip: React.FC<SliceTooltipProps & NivoSliceTooltipProps> = ({ slice, withAvatar, showSummaryRow }) => {
+export const SliceTooltip: React.FC<SliceTooltipProps & NivoSliceTooltipProps> = ({
+    slice, withAvatar, showSummaryRow, showPercentage
+}) => {
     const dateXValue = slice.points[FIRST_POINT_INDEX]?.data.x || new Date();
     const totalCount = slice.points
         .map(datum => Number(datum.data.y))
@@ -105,7 +109,10 @@ export const SliceTooltip: React.FC<SliceTooltipProps & NivoSliceTooltipProps> =
                                 {renderIndicator(value as ExtendedPoint)}
                                 <div className={`${CN}__field-name`}>{(value as ExtendedPoint).data.name || (value as ExtendedPoint).data?.entityId }</div>
                             </div>
-                            <div className={`${CN}__field-value`}>{value.data.y}</div>
+                            <div className={`${CN}__field-value`}>
+                                {value.data.y}
+                                {showPercentage && '%'}
+                            </div>
                         </div>
                     ))
             }

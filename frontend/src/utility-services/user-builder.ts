@@ -34,18 +34,7 @@ export class UserBuilder {
     }
 
     buildById(userId: string): User | null {
-        const user = this.userService.getUser(userId);
-
-        if (user) {
-            this.userService
-                .getUserPhoto(user.id)
-                .then(imageUrl => user.setImageUrl(imageUrl))
-                .catch(e => this.logger.debug(e));
-
-            return user;
-        }
-
-        return null;
+        return this.userService.getUser(userId);
     }
 
     /**

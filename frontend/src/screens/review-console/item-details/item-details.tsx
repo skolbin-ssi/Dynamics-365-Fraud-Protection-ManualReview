@@ -8,7 +8,7 @@ import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 
-import { ActionButton, IconButton } from '@fluentui/react/lib/Button';
+import { IconButton } from '@fluentui/react/lib/Button';
 import { FontIcon } from '@fluentui/react/lib/Icon';
 import { Pivot, PivotItem } from '@fluentui/react/lib/Pivot';
 import { Spinner } from '@fluentui/react/lib/Spinner';
@@ -171,10 +171,8 @@ export class ItemDetails extends Component<ItemDetailsProps, ItemDetailsState> {
 
     render() {
         const {
-            queue,
             reviewItem,
             loadingReviewItem,
-            handleBackToQueuesClickCallback,
             loadingReviewItemError
         } = this.props;
         const { mode } = this.state;
@@ -189,20 +187,6 @@ export class ItemDetails extends Component<ItemDetailsProps, ItemDetailsState> {
 
         if (loadingReviewItemError) {
             return null;
-        }
-
-        if (queue && !queue?.size) {
-            return (
-                <div className={`${CN}__status-data`}>
-                    <Text>This queue is empty</Text>
-                    <ActionButton
-                        className={`${CN}__back-to-queues`}
-                        onClick={handleBackToQueuesClickCallback}
-                    >
-                        Back to Queues
-                    </ActionButton>
-                </div>
-            );
         }
 
         return (

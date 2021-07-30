@@ -1,22 +1,22 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
+import './report-modal.scss';
+
 import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
+import React, { Component } from 'react';
 import { CSVLink } from 'react-csv';
 
-import { Modal } from '@fluentui/react/lib/Modal';
 import { IconButton } from '@fluentui/react/lib/Button';
+import { Modal } from '@fluentui/react/lib/Modal';
 
-import { TYPES } from '../../types';
-import { ReportsModalStore } from '../../view-services';
 import ExcelIconSVG from '../../assets/excel-icon.svg';
 import { Report } from '../../models/misc';
-import { formatTodddMMMDDYYYY, getClientTimeZoneString, formatDateToFullMMDDYYYY } from '../../utils/date';
-
-import './report-modal.scss';
+import { TYPES } from '../../types';
+import { formatDateToFullMMDDYYYY, formatTodddMMMDDYYYY, getClientTimeZoneString } from '../../utils/date';
 import { capitalize } from '../../utils/text';
+import { ReportsModalStore } from '../../view-services';
 
 const CN = 'reports-modal';
 
@@ -43,7 +43,7 @@ export class ReportsModal extends Component<ReportsModalProps, never> {
                 <div>{name}</div>
                 <div>CSV</div>
                 <CSVLink
-                    filename={fileName}
+                    filename={`${fileName}.csv`}
                     className={`${CN}__download-link`}
                     data={data}
                 >

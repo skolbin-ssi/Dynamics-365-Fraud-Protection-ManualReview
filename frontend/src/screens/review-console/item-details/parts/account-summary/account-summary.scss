@@ -3,11 +3,6 @@
 .item-details-account-summary {
   $root: &;
 
-  &__header {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-  }
-
   &__top {
     position: relative;
     display: grid;

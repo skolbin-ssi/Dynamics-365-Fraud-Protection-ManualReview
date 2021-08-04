@@ -72,7 +72,7 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
         },
         {
             key: ITEM_LIST_COLUMN_KEYS.ORDER_ID,
-            name: 'Order ID',
+            name: 'Purchase ID',
             fieldName: 'id',
             minWidth: 50,
             maxWidth: 260,
@@ -84,6 +84,37 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
             onRender: (item: LinkAnalysisItem) => {
                 const itemId = isMrItem(item)
                     ? item.item.id
+                    : item.purchaseId;
+
+                return (
+                    <div className={`${CN}__order-id-cell`}>
+                        <Text variant="smallPlus" title={itemId}>
+                            {itemId}
+                        </Text>
+                        <IconButton
+                            className={`${CN}__copy-button`}
+                            iconProps={{ iconName: 'Copy' }}
+                            title="Copy"
+                            onClick={this.onCopyButtonClick(itemId)}
+                        />
+                    </div>
+                );
+            }
+        },
+        {
+            key: ITEM_LIST_COLUMN_KEYS.ORIGINAL_ORDER_ID,
+            name: 'Original Order ID',
+            fieldName: 'purchase.originalOrderId',
+            minWidth: 50,
+            maxWidth: 260,
+            isCollapsible: true,
+            isRowHeader: true,
+            isPadded: true,
+            className: `${CN}__cell`,
+            columnActionsMode: ColumnActionsMode.disabled,
+            onRender: (item: LinkAnalysisItem) => {
+                const itemId = isMrItem(item)
+                    ? item.item.purchase.originalOrderId || ''
                     : item.purchaseId;
 
                 return (

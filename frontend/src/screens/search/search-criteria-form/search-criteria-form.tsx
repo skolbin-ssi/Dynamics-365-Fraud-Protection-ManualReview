@@ -1,25 +1,25 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import { observer } from 'mobx-react';
+import './search-criteria-form.scss';
+
 import autobind from 'autobind-decorator';
 import cx from 'classnames';
+import { observer } from 'mobx-react';
+import React, { Component } from 'react';
 
+import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import { Callout } from '@fluentui/react/lib/Callout';
 import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
-import { TextField } from '@fluentui/react/lib/TextField';
-import { DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
-import { ITag } from '@fluentui/react/lib/Pickers';
 import { IPersonaProps } from '@fluentui/react/lib/Persona';
+import { ITag } from '@fluentui/react/lib/Pickers';
+import { TextField } from '@fluentui/react/lib/TextField';
 
 import { FilterContextMenu, UniqueTagPicker, UserPicker } from '../../../components';
-import { FilterContextualMenuItem } from '../../../models/filter/selectable-options';
 import { LABEL_NAMES } from '../../../constants';
 import { ItemSearchQueryDTO } from '../../../data-services/api-services/models';
-
 import { Queue } from '../../../models';
-import './search-criteria-form.scss';
+import { FilterContextualMenuItem } from '../../../models/filter/selectable-options';
 
 const CN = 'search-criteria-form';
 
@@ -174,10 +174,10 @@ export class SearchCriteriaForm extends Component<SearchCriteriaFormProps, Searc
                     />
                     <TextField
                         className={`${CN}__field`}
-                        label="Order IDs"
+                        label="Purchase IDs"
                         onChange={this.onOrderIdsChange}
                         defaultValue={orderIdsValue}
-                        title="Order IDs should be separated with commas"
+                        title="Purchase IDs should be separated with commas"
                         multiline
                         rows={1}
                         resizable={false}

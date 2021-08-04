@@ -83,7 +83,7 @@ export class ItemsDetailsList extends Component<ItemsDetailsListProps, never> {
         },
         {
             key: ITEM_LIST_COLUMN_KEYS.ORDER_ID,
-            name: 'Order ID',
+            name: 'Purchase ID',
             fieldName: 'id',
             minWidth: 50,
             isCollapsible: true,

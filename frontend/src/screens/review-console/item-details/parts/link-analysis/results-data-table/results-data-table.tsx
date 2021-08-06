@@ -1,15 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
+import './results-data-table.scss';
+
+import autobind from 'autobind-decorator';
 import cx from 'classnames';
 import { observer } from 'mobx-react';
-import autobind from 'autobind-decorator';
+import React, { Component } from 'react';
 
-import { FontIcon } from '@fluentui/react/lib/Icon';
 import { IconButton } from '@fluentui/react/lib/Button';
+import { FontIcon } from '@fluentui/react/lib/Icon';
 
-import './results-data-table.scss';
 import { BatchLabelItemsResult } from '../../../../../../models/item';
 
 interface ResultsDataTableProps {
@@ -90,7 +91,7 @@ export class ResultsDataTable extends Component<ResultsDataTableProps, never> {
                         <div>Decisions status</div>
                         <FontIcon iconName="SortUp" />
                     </div>
-                    <div className={`${CN}__heading`}>Order id</div>
+                    <div className={`${CN}__heading`}>Purchase ID</div>
                 </div>
                 {items.map(item => this.renderAnalysisResultRow(item))}
             </div>

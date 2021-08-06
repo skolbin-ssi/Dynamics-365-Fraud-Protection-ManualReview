@@ -1,27 +1,26 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React from 'react';
-import cx from 'classnames';
+import './data-table.scss';
 
-import { Text } from '@fluentui/react/lib/Text';
+import cx from 'classnames';
+import React from 'react';
+
+import { IColumn, SelectionMode } from '@fluentui/react/lib/DetailsList';
 import { Facepile } from '@fluentui/react/lib/Facepile';
+import { FontIcon } from '@fluentui/react/lib/Icon';
 import { PersonaSize } from '@fluentui/react/lib/Persona';
 import { ShimmeredDetailsList } from '@fluentui/react/lib/ShimmeredDetailsList';
-import { SelectionMode, IColumn } from '@fluentui/react/lib/DetailsList';
-import { FontIcon } from '@fluentui/react/lib/Icon';
+import { Text } from '@fluentui/react/lib/Text';
 import { TooltipHost } from '@fluentui/react/lib/Tooltip';
 
-import { Item } from '../../../../models/item';
-
-import './data-table.scss';
-import RiskClockIcon from '../../../../assets/icon/risk-clock.svg';
 import NormalClockIcon from '../../../../assets/icon/normal-clock.svg';
-
+import RiskClockIcon from '../../../../assets/icon/risk-clock.svg';
 import {
     DEFAULT_DATA_LIST_SHIMMER_LINES_NUMBER,
     DEFAULT_HIGH_RISK_DAYS_COUNT
 } from '../../../../constants';
+import { Item } from '../../../../models/item';
 
 interface DataTableProps<T extends Item> {
     data: T[] | null;
@@ -50,7 +49,7 @@ export class DataTable<T extends Item> extends React.Component<DataTableProps<T>
         },
         {
             key: 'order-id',
-            name: 'Order ID',
+            name: 'Purchase ID',
             minWidth: 100,
             headerClassName: `${CN}__data-header-cell`,
             onRender: (item: Item) => {

@@ -103,7 +103,7 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
         },
         {
             key: ITEM_LIST_COLUMN_KEYS.ORIGINAL_ORDER_ID,
-            name: 'Original Order ID',
+            name: 'Original order ID',
             fieldName: 'purchase.originalOrderId',
             minWidth: 50,
             maxWidth: 260,

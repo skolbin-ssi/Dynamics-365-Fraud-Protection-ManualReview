@@ -174,7 +174,7 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
                 messageBarType={MessageBarType.warning}
                 messageBarIconProps={{ iconName: 'Warning', className: `${CN}__warning-message-icon` }}
             >
-                Please note, that you have selected current order id
+                Please note, that you have selected current purchase id
                 &nbsp;
                 <span style={{ fontWeight: 600 }}>{item.id}</span>
                 &nbsp;

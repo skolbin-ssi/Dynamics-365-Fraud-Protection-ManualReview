@@ -689,7 +689,7 @@ export class DemandQueuePerformanceStore {
                 });
 
                 const unparseObject: UnparseObject = {
-                    fields: ['fraud score', 'order id', 'amount', 'import date', 'timeout', 'time left', 'analyst id'],
+                    fields: ['fraud score', 'purchase id', 'amount', 'import date', 'timeout', 'time left', 'analyst id'],
                     data: rawReportData
                 };
 

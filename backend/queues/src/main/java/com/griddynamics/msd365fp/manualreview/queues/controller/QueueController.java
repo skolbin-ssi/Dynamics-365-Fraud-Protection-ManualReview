@@ -6,6 +6,7 @@ package com.griddynamics.msd365fp.manualreview.queues.controller;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
 import com.griddynamics.msd365fp.manualreview.model.exception.*;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemDataField;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewType;
 import com.griddynamics.msd365fp.manualreview.queues.model.dto.*;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
@@ -44,6 +46,9 @@ public class QueueController {
     private final PublicQueueService queueService;
     private final PublicItemService itemService;
 
+    public static final String DEFAULT_SORTING_FIELD = "IMPORT_DATE";
+    public static final String DEFAULT_SORTING_DIRECTION = "DESC";
+
     @Operation(summary = "Get queue view details by ID")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
@@ -69,8 +74,12 @@ public class QueueController {
             @Parameter(description = "size of a page")
             @RequestParam(required = false, defaultValue = DEFAULT_ITEM_PAGE_SIZE_STR) final Integer size,
             @Parameter(description = "continuation token from previous request")
-            @Valid @RequestBody final ContinuationTokenDTO continuation) throws NotFoundException, BusyException {
-        return itemService.getQueueItemList(id, size, continuation.getContinuation());
+            @Valid @RequestBody final ContinuationTokenDTO continuation,
+            @Parameter(description = "sorting field")
+            @RequestParam(required = false, defaultValue = DEFAULT_SORTING_FIELD) final ItemDataField sortingField,
+            @Parameter(description = "sorting direction")
+            @RequestParam(required = false, defaultValue = DEFAULT_SORTING_DIRECTION) final Sort.Direction sortingDirection) throws NotFoundException, BusyException {
+        return itemService.getQueueItemList(id, size, continuation.getContinuation(), sortingField, sortingDirection);
     }
 
     @Operation(summary = "Get particular item details")

@@ -9,10 +9,7 @@ import com.griddynamics.msd365fp.manualreview.model.PageableCollection;
 import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.model.exception.EmptySourceException;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
-import com.griddynamics.msd365fp.manualreview.queues.model.BasicItemInfo;
-import com.griddynamics.msd365fp.manualreview.queues.model.BatchUpdateResult;
-import com.griddynamics.msd365fp.manualreview.queues.model.QueueView;
-import com.griddynamics.msd365fp.manualreview.queues.model.QueueViewType;
+import com.griddynamics.msd365fp.manualreview.queues.model.*;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Item;
 import com.griddynamics.msd365fp.manualreview.queues.model.persistence.Queue;
 import com.griddynamics.msd365fp.manualreview.queues.repository.ItemRepository;
@@ -50,7 +47,18 @@ public class PublicItemClient {
     public PageableCollection<Item> getQueueViewItemList(
             @NonNull QueueView queueView,
             int pageSize,
-            @Nullable String continuationToken) throws BusyException {
+            @Nullable String continuationToken,
+            @Nullable final ItemDataField sortingField,
+            @Nullable final Sort.Direction sortingDirection) throws BusyException {
+
+        Sort.Order sort = new Sort.Order(queueView.getSorting().getOrder(), queueView.getSorting().getField().getPath());
+
+        if(sortingField!=null && sortingDirection!=null)
+        {
+            sort = new Sort.Order(sortingDirection, sortingField.getPath());
+        }
+
+        Sort.Order finalSort = sort;
         return PageProcessingUtility.getNotEmptyPage(
                 continuationToken,
                 continuation -> {
@@ -59,7 +67,7 @@ public class PublicItemClient {
                                 queueView.getViewType(),
                                 pageSize,
                                 continuation,
-                                new Sort.Order(queueView.getSorting().getOrder(), queueView.getSorting().getField().getPath()),
+                                finalSort,
                                 null,
                                 null);
                     } else {
@@ -68,12 +76,13 @@ public class PublicItemClient {
                                 queueView.getQueueId(),
                                 pageSize,
                                 continuation,
-                                new Sort.Order(queueView.getSorting().getOrder(), queueView.getSorting().getField().getPath()),
+                                finalSort,
                                 null,
                                 null);
                     }
                 });
     }
+
 
     @PostFilter("@dataSecurityService.checkPermissionForItemReading(authentication, filterObject, #queues)")
     public Collection<BasicItemInfo> getItemInfoByIds(

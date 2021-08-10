@@ -5,15 +5,20 @@ import { inject, injectable } from 'inversify';
 import {
     action, computed, observable, runInAction
 } from 'mobx';
-import { CollectedInfoService, QueueService } from '../../data-services';
+import { CollectedInfoService, ItemSortSettingsDTO, QueueService } from '../../data-services';
 import { Item, Queue } from '../../models';
 import { TYPES } from '../../types';
 import { ItemsLoadable } from '../misc/items-loadable';
 import { calculateDaysLeft, getProcessingDeadlineValues } from '../../utils';
-import { QUEUE_VIEW_TYPE } from '../../constants';
+import { DEFAULT_SORTING, QUEUE_VIEW_TYPE } from '../../constants';
 
 @injectable()
 export class QueueStore implements ItemsLoadable<Item> {
+    /**
+     * Sorting field and direction
+     */
+    @observable sorting: ItemSortSettingsDTO = DEFAULT_SORTING;
+
     /**
      * Queues list
      */
@@ -114,6 +119,16 @@ export class QueueStore implements ItemsLoadable<Item> {
     }
 
     @action
+    updateSorting = async (updatedSorting: ItemSortSettingsDTO) => {
+        this.sorting = updatedSorting;
+        if (this.selectedQueueId) {
+            this.wasFirstPageLoaded = false;
+            this.items = [];
+            await this.loadQueueItems(this.selectedQueueId);
+        }
+    };
+
+    @action
     async loadHistoricalQueues() {
         const historicalQueues: Queue[] | null = await this.collectedInfoService.getQueuesCollectedInfo();
 
@@ -186,7 +201,7 @@ export class QueueStore implements ItemsLoadable<Item> {
         }
 
         try {
-            const { data, canLoadMore } = await this.queueService.getQueueItems('QueueStore.getQueueItems', queueId, loadMore);
+            const { data, canLoadMore } = await this.queueService.getQueueItems('QueueStore.getQueueItems', queueId, loadMore, this.sorting);
             this.items = loadMore ? [...this.items, ...data] : data;
             this.canLoadMore = canLoadMore;
             this.isLoadingQueueItems = false;

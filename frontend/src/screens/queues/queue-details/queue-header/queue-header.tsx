@@ -1,31 +1,35 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { CommandBarButton, PrimaryButton } from '@fluentui/react/lib/Button';
-import { Facepile, IFacepilePersona, OverflowButtonType } from '@fluentui/react/lib/Facepile';
-import { FontIcon } from '@fluentui/react/lib/Icon';
-import { PersonaSize } from '@fluentui/react/lib/Persona';
-import { Text } from '@fluentui/react/lib/Text';
-import { Toggle } from '@fluentui/react/lib/Toggle';
+import './queue-header.scss';
+
 import autobind from 'autobind-decorator';
 import cx from 'classnames';
 import { History } from 'history';
 import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
+
+import { CommandBarButton, PrimaryButton } from '@fluentui/react/lib/Button';
+import { Facepile, IFacepilePersona, OverflowButtonType } from '@fluentui/react/lib/Facepile';
+import { FontIcon } from '@fluentui/react/lib/Icon';
+import { PersonaSize } from '@fluentui/react/lib/Persona';
+import { Text } from '@fluentui/react/lib/Text';
+import { Toggle } from '@fluentui/react/lib/Toggle';
+
 import {
     ROUTES,
     SIZES,
+    SORTING_FIELD,
     SORTING_FIELD_DISPLAY,
     SORTING_ORDER
 } from '../../../../constants';
+import { ItemSortSettingsDTO } from '../../../../data-services/api-services/models/item-search-query-dto';
 import { Queue } from '../../../../models';
 import { TYPES } from '../../../../types';
+import { formatToLocaleDateString } from '../../../../utils/date';
 import { QueuesScreenStore } from '../../../../view-services';
 import { WindowSizeStore } from '../../../../view-services/misc/window-size-store';
-import { formatToLocaleDateString } from '../../../../utils/date';
-
-import './queue-header.scss';
 
 export const CN = 'queue-header';
 
@@ -42,6 +46,7 @@ export interface QueueHeaderProps {
     canEditQueue: boolean;
     canAssignAnalyst: boolean;
     queueLastUpdated: string | null;
+    sorted: ItemSortSettingsDTO;
 }
 
 @observer
@@ -129,7 +134,8 @@ export class QueueHeader extends Component<QueueHeaderProps, never> {
     renderQueueDetails() {
         const {
             queue,
-            queueLastUpdated
+            queueLastUpdated,
+            sorted
         } = this.props;
 
         if (!queue) {
@@ -159,10 +165,10 @@ export class QueueHeader extends Component<QueueHeaderProps, never> {
                     )}
                     <Text className={`${CN}__meta-title`}>Sorted: </Text>
                     <Text className={`${CN}__meta-value ${CN}__meta-value--bold`}>
-                        {SORTING_FIELD_DISPLAY[queue.sortBy]}
+                        {SORTING_FIELD_DISPLAY[sorted?.field as keyof typeof SORTING_FIELD]}
                         <FontIcon
                             className={`${CN}__sort-order-icon`}
-                            iconName={queue?.sortDirection === SORTING_ORDER.ASC ? 'SortUp' : 'SortDown'}
+                            iconName={sorted?.order === SORTING_ORDER.ASC ? 'SortUp' : 'SortDown'}
                         />
                     </Text>
                 </div>

@@ -98,6 +98,7 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
                         canEditQueue={canUserEditQueue}
                         canAssignAnalyst={canUserAssignAnalyst}
                         queueLastUpdated={selectedQueueUpdated}
+                        sorted={sorting}
                     />
                     { toRender }
                 </div>

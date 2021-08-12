@@ -9,6 +9,7 @@ import React, { Component } from 'react';
 import { Text } from '@fluentui/react/lib/Text';
 
 import { ItemsDetailsList } from '../../../components/items-details-list';
+import { ITEM_SORTING_FIELD, SORTING_FIELD, SORTING_ORDER } from '../../../constants';
 import { Queue } from '../../../models';
 import { QueuesScreenStore } from '../../../view-services';
 import { QueueStore } from '../../../view-services/queues';
@@ -64,6 +65,11 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
 
         let toRender: JSX.Element;
 
+        const sortingObject = sorting ?? {
+            field: (selectedQueue?.sortBy || SORTING_FIELD.SCORE) as unknown as ITEM_SORTING_FIELD,
+            order: selectedQueue?.sortDirection || SORTING_ORDER.ASC
+        };
+
         if (selectedQueueId && !selectedQueue) {
             toRender = this.renderNoSelectedQueue();
         } else {
@@ -75,7 +81,7 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
                     selectedQueue={selectedQueue}
                     loadingMessage="Loading orders..."
                     noItemsMessage="No orders in the queue. Please wait for a while."
-                    sortingObject={sorting}
+                    sortingObject={sortingObject}
                     handleSortingUpdate={updateSorting}
                 />
             );

@@ -10,14 +10,14 @@ import { Item, Queue } from '../../models';
 import { TYPES } from '../../types';
 import { ItemsLoadable } from '../misc/items-loadable';
 import { calculateDaysLeft, getProcessingDeadlineValues } from '../../utils';
-import { DEFAULT_SORTING, QUEUE_VIEW_TYPE } from '../../constants';
+import { QUEUE_VIEW_TYPE } from '../../constants';
 
 @injectable()
 export class QueueStore implements ItemsLoadable<Item> {
     /**
      * Sorting field and direction
      */
-    @observable sorting: ItemSortSettingsDTO = DEFAULT_SORTING;
+    @observable sorting: ItemSortSettingsDTO | undefined = undefined;
 
     /**
      * Queues list

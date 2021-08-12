@@ -46,9 +46,6 @@ public class QueueController {
     private final PublicQueueService queueService;
     private final PublicItemService itemService;
 
-    public static final String DEFAULT_SORTING_FIELD = "IMPORT_DATE";
-    public static final String DEFAULT_SORTING_DIRECTION = "DESC";
-
     @Operation(summary = "Get queue view details by ID")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Secured({ADMIN_MANAGER_ROLE, SENIOR_ANALYST_ROLE, ANALYST_ROLE})
@@ -76,9 +73,9 @@ public class QueueController {
             @Parameter(description = "continuation token from previous request")
             @Valid @RequestBody final ContinuationTokenDTO continuation,
             @Parameter(description = "sorting field")
-            @RequestParam(required = false, defaultValue = DEFAULT_SORTING_FIELD) final ItemDataField sortingField,
+            @RequestParam(required = false) final ItemDataField sortingField,
             @Parameter(description = "sorting direction")
-            @RequestParam(required = false, defaultValue = DEFAULT_SORTING_DIRECTION) final Sort.Direction sortingDirection) throws NotFoundException, BusyException {
+            @RequestParam(required = false) final Sort.Direction sortingDirection) throws NotFoundException, BusyException {
         return itemService.getQueueItemList(id, size, continuation.getContinuation(), sortingField, sortingDirection);
     }
 

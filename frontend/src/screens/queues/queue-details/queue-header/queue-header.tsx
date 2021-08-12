@@ -46,7 +46,7 @@ export interface QueueHeaderProps {
     canEditQueue: boolean;
     canAssignAnalyst: boolean;
     queueLastUpdated: string | null;
-    sorted: ItemSortSettingsDTO;
+    sorted: ItemSortSettingsDTO | undefined;
 }
 
 @observer
@@ -142,6 +142,9 @@ export class QueueHeader extends Component<QueueHeaderProps, never> {
             return null;
         }
 
+        const sortOrder = sorted?.order || queue?.sortDirection;
+        const sortField = sorted?.field || queue?.sortBy;
+
         return (
             <div className={`${CN}__row`}>
                 <Text variant="large" className={`${CN}__queue-name`}>{queue.name}</Text>
@@ -165,10 +168,10 @@ export class QueueHeader extends Component<QueueHeaderProps, never> {
                     )}
                     <Text className={`${CN}__meta-title`}>Sorted: </Text>
                     <Text className={`${CN}__meta-value ${CN}__meta-value--bold`}>
-                        {SORTING_FIELD_DISPLAY[sorted?.field as keyof typeof SORTING_FIELD]}
+                        {SORTING_FIELD_DISPLAY[sortField as keyof typeof SORTING_FIELD]}
                         <FontIcon
                             className={`${CN}__sort-order-icon`}
-                            iconName={sorted?.order === SORTING_ORDER.ASC ? 'SortUp' : 'SortDown'}
+                            iconName={sortOrder === SORTING_ORDER.ASC ? 'SortUp' : 'SortDown'}
                         />
                     </Text>
                 </div>

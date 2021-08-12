@@ -31,6 +31,7 @@ import {
     QueueItemsOverviewRequestParams
 } from '../interfaces';
 import { QueuesOverview } from '../../models/queues';
+import { ItemSortSettingsDTO } from '../api-services/models/item-search-query-dto';
 
 @injectable()
 export class QueueServiceImpl extends BaseDomainService implements QueueService {
@@ -94,7 +95,8 @@ export class QueueServiceImpl extends BaseDomainService implements QueueService 
         chainContinuationIdentifier: string,
         id: string,
         shouldLoadMore: boolean,
-        size: number = DEFAULT_QUEUE_ITEMS_PER_PAGE
+        sortingObject?: ItemSortSettingsDTO,
+        size: number = DEFAULT_QUEUE_ITEMS_PER_PAGE,
     ): Promise<PageableList<Item>> {
         const dataTransformer = new GetQueueItemsTransformer(this.userBuilder);
         const uniqueSequenceChainId = `${chainContinuationIdentifier}-${id}`;
@@ -102,7 +104,7 @@ export class QueueServiceImpl extends BaseDomainService implements QueueService 
 
         try {
             const token = shouldLoadMore ? this.getContinuationToken(uniqueSequenceChainId) : null;
-            response = await this.queueApiService.getQueueItems(id, size, token);
+            response = await this.queueApiService.getQueueItems(id, size, sortingObject, token);
         } catch (e) {
             throw this.handleApiException('getQueues', e, {
                 500: `Failed to get items for queue (${id}) from the Api due to internal server error`

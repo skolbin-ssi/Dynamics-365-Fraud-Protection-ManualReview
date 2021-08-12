@@ -7,6 +7,7 @@ import { TYPES } from '../../../types';
 import { AuthenticationService, Configuration } from '../../../utility-services';
 import { BaseApiService } from '../../base-api-service';
 import { QueueApiService, QueueItemsOverviewApiParams } from '../../interfaces';
+import { ItemSortSettingsDTO } from '../models/item-search-query-dto';
 import {
     DeleteQueueResponse, GetQueueItemsResponse,
     GetQueueResponse, GetQueuesOverviewResponse,
@@ -58,8 +59,12 @@ export class QueueApiServiceImpl extends BaseApiService implements QueueApiServi
         return this.patch<PatchQueueResponse>(`/${id}`, queue);
     }
 
-    getQueueItems(id: string, size: number, continuationToken?: string | null) {
-        const manualParamsSerialized = `size=${size}`;
+    getQueueItems(id: string, size: number, sortingObject?: ItemSortSettingsDTO, continuationToken?: string | null) {
+        let manualParamsSerialized = `size=${size}`;
+
+        if (sortingObject) {
+            manualParamsSerialized += `&sortingField=${sortingObject.field}&sortingDirection=${sortingObject.order}`;
+        }
 
         return this.post<GetQueueItemsResponse>(`/${id}/items?${manualParamsSerialized}`, { continuation: continuationToken || null });
     }

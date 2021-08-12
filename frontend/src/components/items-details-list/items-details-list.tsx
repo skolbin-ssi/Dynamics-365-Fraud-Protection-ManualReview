@@ -49,7 +49,7 @@ export interface ItemsDetailsListProps {
     handleLoadMoreRowsClick: () => void;
     handleSortingUpdate?: (sortingObject: ItemSortSettingsDTO) => void;
     searchId?: string;
-    sortingObject?: ItemSortSettingsDTO;
+    sortingObject?: ItemSortSettingsDTO | undefined;
     selectedQueue?: Queue | null;
     loadingMessage?: string;
     noItemsMessage?: string

@@ -187,7 +187,7 @@ export class QueuesScreenStore {
     @action
     markQueueAsSelectedAndLoadItems(queue: Queue, loadItems: boolean = true) {
         this.queueStore.markQueueAsSelected(queue);
-
+        this.queueStore.sorting = undefined;
         if (loadItems) {
             this.loadQueueItems(queue.viewId);
         }

@@ -1,16 +1,19 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import './queue-details.scss';
+
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
+
 import { Text } from '@fluentui/react/lib/Text';
+
+import { ItemsDetailsList } from '../../../components/items-details-list';
+import { ITEM_SORTING_FIELD, SORTING_FIELD, SORTING_ORDER } from '../../../constants';
 import { Queue } from '../../../models';
 import { QueuesScreenStore } from '../../../view-services';
 import { QueueStore } from '../../../view-services/queues';
-import { ItemsDetailsList } from '../../../components/items-details-list';
 import { QueueHeader } from './queue-header';
-
-import './queue-details.scss';
 
 export interface QueueDetailsProps {
     className: string;
@@ -49,7 +52,9 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
         const {
             selectedQueue,
             selectedQueueId,
-            refreshingQueueIds
+            refreshingQueueIds,
+            sorting,
+            updateSorting
         } = queueStore;
         const {
             isAutoRefreshEnabled,
@@ -59,6 +64,11 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
         } = queueScreenStore;
 
         let toRender: JSX.Element;
+
+        const sortingObject = sorting ?? {
+            field: (selectedQueue?.sortBy || SORTING_FIELD.SCORE) as unknown as ITEM_SORTING_FIELD,
+            order: selectedQueue?.sortDirection || SORTING_ORDER.ASC
+        };
 
         if (selectedQueueId && !selectedQueue) {
             toRender = this.renderNoSelectedQueue();
@@ -71,6 +81,8 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
                     selectedQueue={selectedQueue}
                     loadingMessage="Loading orders..."
                     noItemsMessage="No orders in the queue. Please wait for a while."
+                    sortingObject={sortingObject}
+                    handleSortingUpdate={updateSorting}
                 />
             );
         }
@@ -92,6 +104,7 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
                         canEditQueue={canUserEditQueue}
                         canAssignAnalyst={canUserAssignAnalyst}
                         queueLastUpdated={selectedQueueUpdated}
+                        sorted={sorting}
                     />
                     { toRender }
                 </div>

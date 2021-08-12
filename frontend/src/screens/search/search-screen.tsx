@@ -79,26 +79,6 @@ export class SearchScreen extends Component<SearchScreenProps, never> {
     }
 
     @autobind
-    handleCloseModal() {
-        this.filtersStore.closeCriteriaModal();
-    }
-
-    @autobind
-    handleOnCreateUpdateFilter() {
-        this.filtersStore.createUpdateFilter();
-    }
-
-    @autobind
-    handleFilterTileClick(filterId: string) {
-        this.filtersStore.updateFilter(filterId);
-    }
-
-    @autobind
-    handleRemoveFilterClick(filterId: string) {
-        this.filtersStore.removeFilter(filterId);
-    }
-
-    @autobind
     async onSearchButtonClick() {
         await this.searchScreenStore.createSearchQuery();
 
@@ -127,6 +107,26 @@ export class SearchScreen extends Component<SearchScreenProps, never> {
             this.filtersStore.setUsedFilterFields(buildFiltersField);
             this.filtersStore.setMutatedFiltersWithSortIndex([...buildFiltersField]);
         }
+    }
+
+    @autobind
+    handleCloseModal() {
+        this.filtersStore.closeCriteriaModal();
+    }
+
+    @autobind
+    handleOnCreateUpdateFilter() {
+        this.filtersStore.createUpdateFilter();
+    }
+
+    @autobind
+    handleFilterTileClick(filterId: string) {
+        this.filtersStore.updateFilter(filterId);
+    }
+
+    @autobind
+    handleRemoveFilterClick(filterId: string) {
+        this.filtersStore.removeFilter(filterId);
     }
 
     @autobind

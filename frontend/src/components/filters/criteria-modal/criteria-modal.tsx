@@ -48,6 +48,16 @@ const CRITERIA_MODAL_STATE = {
 
 @observer
 export class CriteriaModal extends Component<CriteriaModalComponentProps, never> {
+    getAddButtonText() {
+        const { filter } = this.props;
+
+        const filterState = filter.isFilterUsed
+            ? FILTER_MUTATION_STATE.UPDATE
+            : FILTER_MUTATION_STATE.CREATE;
+
+        return CRITERIA_MODAL_STATE.ADD_BUTTON_TEXT[filterState];
+    }
+
     @autobind
     handleConditionDropdownChange(item: IContextualMenuItem | undefined) {
         const { filter } = this.props;
@@ -91,16 +101,6 @@ export class CriteriaModal extends Component<CriteriaModalComponentProps, never>
             searchedCondition.setIsDisabled(false);
             searchedCondition.setSortIndex(0);
         }
-    }
-
-    getAddButtonText() {
-        const { filter } = this.props;
-
-        const filterState = filter.isFilterUsed
-            ? FILTER_MUTATION_STATE.UPDATE
-            : FILTER_MUTATION_STATE.CREATE;
-
-        return CRITERIA_MODAL_STATE.ADD_BUTTON_TEXT[filterState];
     }
 
     isAddUpdateButtonDisabled() {

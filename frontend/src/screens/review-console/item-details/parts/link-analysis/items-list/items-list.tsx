@@ -213,13 +213,6 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
         }
     ];
 
-    @autobind
-    handleSelectionChange() {
-        const { onSelectionChanged } = this.props;
-
-        onSelectionChanged(this.selection.getSelection() as LinkAnalysisItem[]);
-    }
-
     private onRenderRow: IDetailsListProps['onRenderRow'] = props => {
         const { isSelectable } = this.props;
 
@@ -252,6 +245,13 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
         const { onLoadMoreClick } = this.props;
 
         onLoadMoreClick();
+    }
+
+    @autobind
+    handleSelectionChange() {
+        const { onSelectionChanged } = this.props;
+
+        onSelectionChanged(this.selection.getSelection() as LinkAnalysisItem[]);
     }
 
     renderEmailWithIcon(value: any, userRestricted?: boolean, tooltipText?: string | JSX.Element) {

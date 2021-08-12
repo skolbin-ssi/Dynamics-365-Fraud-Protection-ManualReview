@@ -29,6 +29,15 @@ const CN = 'overturned-performance';
 
 @observer
 export class OverturnedPerformance<T extends BasicEntityPerformance> extends Component<OverturnedPerformanceComponentProps<T>, never> {
+    getQueuesOverturnedDataTableHeaderTitle() {
+        const { overturnedPerformanceStore: { rating } } = this.props;
+        if (rating === PERFORMANCE_RATING.ALL) {
+            return TOP_QUEUES_DISPLAY_VIEW.get(rating)!;
+        }
+
+        return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
+    }
+
     @autoBind
     handleOverturnedChartAggregationChange(label: CHART_AGGREGATION_PERIOD) {
         const { overturnedPerformanceStore } = this.props;
@@ -48,15 +57,6 @@ export class OverturnedPerformance<T extends BasicEntityPerformance> extends Com
         const { overturnedPerformanceStore } = this.props;
 
         overturnedPerformanceStore.setChecked(analystId);
-    }
-
-    getQueuesOverturnedDataTableHeaderTitle() {
-        const { overturnedPerformanceStore: { rating } } = this.props;
-        if (rating === PERFORMANCE_RATING.ALL) {
-            return TOP_QUEUES_DISPLAY_VIEW.get(rating)!;
-        }
-
-        return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
     }
 
     render() {

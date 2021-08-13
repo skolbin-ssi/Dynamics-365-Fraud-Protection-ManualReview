@@ -54,14 +54,6 @@ export class QueueTiles extends Component<QueueTilesComponentProps, never> {
     }
 
     @autobind
-    handleQueueTypeChange(item?: PivotItem) {
-        if (item) {
-            const { itemKey } = item.props;
-            this.queuesScreenStore.setActiveTilesQueueList(itemKey as QUEUE_LIST_TYPE);
-        }
-    }
-
-    @autobind
     onCreateQueueClick() {
         this.appStore.toggleOpenedModalType(QUEUE_MUTATION_TYPES.CREATE);
     }
@@ -72,6 +64,14 @@ export class QueueTiles extends Component<QueueTilesComponentProps, never> {
         if (canUserEditQueue) {
             this.queuesScreenStore.markQueueAsSelectedAndLoadItems(queue, false);
             this.appStore.toggleOpenedModalType(QUEUE_MUTATION_TYPES.UPDATE);
+        }
+    }
+
+    @autobind
+    handleQueueTypeChange(item?: PivotItem) {
+        if (item) {
+            const { itemKey } = item.props;
+            this.queuesScreenStore.setActiveTilesQueueList(itemKey as QUEUE_LIST_TYPE);
         }
     }
 

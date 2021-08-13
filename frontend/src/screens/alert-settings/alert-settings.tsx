@@ -32,6 +32,11 @@ export class AlertSettings extends Component<RouteComponentProps, never> {
     }
 
     @autobind
+    onNavToCreate() {
+        this.history.push({ pathname: ROUTES.ALERT_CREATE });
+    }
+
+    @autobind
     async handleAlertDeletion(alertId: string) {
         const { alerts } = this.alertsStore;
         const alertToDelete = alerts.find(({ id }) => id === alertId);
@@ -43,11 +48,6 @@ export class AlertSettings extends Component<RouteComponentProps, never> {
     @autobind
     handleAlertActiveToggle(alertId: string, checked: boolean) {
         this.alertsStore.toggleActive(alertId, checked);
-    }
-
-    @autobind
-    onNavToCreate() {
-        this.history.push({ pathname: ROUTES.ALERT_CREATE });
     }
 
     render() {

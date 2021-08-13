@@ -52,14 +52,14 @@ export class PageLayout extends Component<PageLayoutProps, never> {
     private queueScreenStore!: QueuesScreenStore;
 
     @autobind
-    handleSignOut() {
-        this.userStore.toggleUserPanel(false);
-        this.userStore.signOut();
+    onToggleNavigation(isExpanded: boolean) {
+        this.appStore.toggleNavigationExpanded(isExpanded);
     }
 
     @autobind
-    onToggleNavigation(isExpanded: boolean) {
-        this.appStore.toggleNavigationExpanded(isExpanded);
+    handleSignOut() {
+        this.userStore.toggleUserPanel(false);
+        this.userStore.signOut();
     }
 
     @autobind

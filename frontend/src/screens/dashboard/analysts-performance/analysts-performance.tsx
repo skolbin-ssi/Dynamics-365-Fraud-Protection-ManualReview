@@ -82,6 +82,24 @@ export class AnalystsPerformance extends Component<QueuePerformanceProps, any> {
         this.analystsPerformanceStore.clearPerformanceData();
     }
 
+    getDataTableHeader() {
+        const { rating } = this.analystsPerformanceStore;
+        if (rating === PERFORMANCE_RATING.ALL) {
+            return TOP_ANALYST_DISPLAY_VIEW.get(rating)!;
+        }
+
+        return `${TOP_ANALYST_DISPLAY_VIEW.get(rating)} analysts`;
+    }
+
+    getLineChartYScaleMaxValue() {
+        const { lineChartData } = this.analystsPerformanceStore;
+        if (!lineChartData.length) {
+            return 10;
+        }
+
+        return undefined;
+    }
+
     @autoBind
     handleSelectionChange(queueId: string) {
         this.analystsPerformanceStore.setChecked(queueId);
@@ -112,24 +130,6 @@ export class AnalystsPerformance extends Component<QueuePerformanceProps, any> {
         const { reports } = this.analystsPerformanceStore;
 
         this.reportsModalStore.showReportsModal(reports);
-    }
-
-    getDataTableHeader() {
-        const { rating } = this.analystsPerformanceStore;
-        if (rating === PERFORMANCE_RATING.ALL) {
-            return TOP_ANALYST_DISPLAY_VIEW.get(rating)!;
-        }
-
-        return `${TOP_ANALYST_DISPLAY_VIEW.get(rating)} analysts`;
-    }
-
-    getLineChartYScaleMaxValue() {
-        const { lineChartData } = this.analystsPerformanceStore;
-        if (!lineChartData.length) {
-            return 10;
-        }
-
-        return undefined;
     }
 
     @autoBind

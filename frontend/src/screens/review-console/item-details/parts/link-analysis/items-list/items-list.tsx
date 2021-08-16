@@ -113,7 +113,9 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
             className: `${CN}__cell`,
             columnActionsMode: ColumnActionsMode.disabled,
             onRender: (item: LinkAnalysisItem) => {
-                const itemId = (item as LinkAnalysisMrItem)?.item?.purchase?.originalOrderId || '';
+                const itemId = isMrItem(item)
+                    ? item.item?.purchase?.originalOrderId || ''
+                    : '';
 
                 return (
                     <div className={`${CN}__order-id-cell`}>

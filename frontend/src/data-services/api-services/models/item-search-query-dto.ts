@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { LABEL, ITEM_SORTING_FIELD, SORTING_ORDER } from '../../../constants';
+import { ITEM_SORTING_FIELD, LABEL, SORTING_ORDER } from '../../../constants';
 import { FilterConditionDto } from './settings/filter-condition-dto';
 
 export interface ItemSortSettingsDTO {
@@ -10,6 +10,7 @@ export interface ItemSortSettingsDTO {
 }
 export interface ItemSearchQueryDTO {
     ids?: string[];
+    originalOrderIds?: string[];
     active?: boolean;
     queueIds?: string[];
     residual?: boolean;

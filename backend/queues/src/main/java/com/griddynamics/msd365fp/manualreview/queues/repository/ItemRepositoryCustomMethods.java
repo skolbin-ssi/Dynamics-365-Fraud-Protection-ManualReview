@@ -124,6 +124,7 @@ public interface ItemRepositoryCustomMethods {
 
     PageableCollection<Item> searchForItems(
             @Nullable Set<String> ids,
+            @Nullable Set<String> originalOrderIds,
             @Nullable Set<String> queueIds,
             boolean residual,
             @Nullable Boolean isActive,

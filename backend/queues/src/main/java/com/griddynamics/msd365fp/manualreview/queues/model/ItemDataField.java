@@ -28,6 +28,7 @@ public enum ItemDataField implements Serializable {
 
     // purchase
     TOTAL_AMOUNT("purchase.TotalAmountInUSD"),
+    ORIGINAL_ORDER_ID("purchase.OriginalOrderId"),
     PRODUCT_SKU("purchase.ProductList[].Sku"),
     PRODUCT_CATEGORY("purchase.ProductList[].Category"),
     PRODUCT_TYPE("purchase.ProductList[].Type"),

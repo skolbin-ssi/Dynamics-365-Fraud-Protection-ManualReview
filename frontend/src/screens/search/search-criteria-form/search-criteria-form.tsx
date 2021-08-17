@@ -82,6 +82,15 @@ export class SearchCriteriaForm extends Component<SearchCriteriaFormProps, Searc
 
     @autobind
     onOrderIdsChange(event: React.FormEvent, newValue?: string) {
+        this.onIdsChange(false, newValue);
+    }
+
+    @autobind
+    onOriginalOrderIdsChange(_: React.FormEvent, newValue?: string) {
+        this.onIdsChange(true, newValue);
+    }
+
+    onIdsChange(isOriginalIds: boolean, newValue?: string) {
         const { searchQuery, handleSearchQueryUpdate } = this.props;
 
         const ids: string[] = [];
@@ -92,10 +101,14 @@ export class SearchCriteriaForm extends Component<SearchCriteriaFormProps, Searc
             }
         });
 
-        const updatedSearchQueryObj = { ...searchQuery, ids };
+        const updatedSearchQueryObj = { ...searchQuery };
 
-        if (!ids.length) {
-            delete updatedSearchQueryObj.ids;
+        if (ids.length > 0) {
+            if (isOriginalIds) {
+                updatedSearchQueryObj.originalOrderIds = ids;
+            } else {
+                updatedSearchQueryObj.ids = ids;
+            }
         }
 
         handleSearchQueryUpdate(updatedSearchQueryObj);
@@ -145,6 +158,7 @@ export class SearchCriteriaForm extends Component<SearchCriteriaFormProps, Searc
         const {
             active,
             ids,
+            originalOrderIds,
             queueIds,
             labels,
             labelAuthorIds,
@@ -154,6 +168,7 @@ export class SearchCriteriaForm extends Component<SearchCriteriaFormProps, Searc
         } = searchQuery || {};
         const searchIn = this.searchInOptions.find(option => option.data === active);
         const orderIdsValue: string = (ids || []).join(', ');
+        const originalOrderIdsValue: string = (originalOrderIds || []).join(', ');
 
         return isCriteriaCalloutVisible
             ? (
@@ -171,6 +186,17 @@ export class SearchCriteriaForm extends Component<SearchCriteriaFormProps, Searc
                         defaultSelectedKey={searchIn?.key || SEARCH_IN_OPTIONS.ALL}
                         onChange={this.onSearchInChange}
                         dropdownWidth={367}
+                    />
+                    <TextField
+                        className={`${CN}__field`}
+                        label="Original order IDs"
+                        onChange={this.onOriginalOrderIdsChange}
+                        defaultValue={originalOrderIdsValue}
+                        title="Original IDs should be separated with commas"
+                        multiline
+                        rows={1}
+                        resizable={false}
+                        autoAdjustHeight
                     />
                     <TextField
                         className={`${CN}__field`}

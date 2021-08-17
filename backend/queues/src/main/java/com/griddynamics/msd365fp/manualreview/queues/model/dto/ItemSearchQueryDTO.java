@@ -14,6 +14,7 @@ import java.util.Set;
 @Data
 public class ItemSearchQueryDTO {
     private Set<String> ids;
+    private Set<String> originalOrderIds;
     private Boolean active;
     private Set<String> queueIds;
     private boolean residual = false;

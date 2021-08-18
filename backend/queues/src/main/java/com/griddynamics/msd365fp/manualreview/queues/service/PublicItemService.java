@@ -14,6 +14,7 @@ import com.griddynamics.msd365fp.manualreview.model.exception.BusyException;
 import com.griddynamics.msd365fp.manualreview.model.exception.EmptySourceException;
 import com.griddynamics.msd365fp.manualreview.model.exception.IncorrectConditionException;
 import com.griddynamics.msd365fp.manualreview.model.exception.NotFoundException;
+import com.griddynamics.msd365fp.manualreview.queues.model.ItemDataField;
 import com.griddynamics.msd365fp.manualreview.queues.model.ItemEvent;
 import com.griddynamics.msd365fp.manualreview.queues.model.QueueView;
 import com.griddynamics.msd365fp.manualreview.queues.model.dto.*;
@@ -27,6 +28,7 @@ import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.SerializationUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -112,10 +114,12 @@ public class PublicItemService {
     public PageableCollection<ItemDTO> getQueueItemList(
             @NonNull final String queueId,
             final int pageSize,
-            @Nullable final String continuationToken) throws NotFoundException, BusyException {
+            @Nullable final String continuationToken,
+            @Nullable final ItemDataField sortingField,
+            @Nullable final Sort.Direction sortingDirection) throws NotFoundException, BusyException {
         QueueView queueView = publicQueueClient.getActiveQueueView(queueId);
         PageableCollection<Item> queriedItems =
-                publicItemClient.getQueueViewItemList(queueView, pageSize, continuationToken);
+                publicItemClient.getQueueViewItemList(queueView, pageSize, continuationToken, sortingField, sortingDirection);
         return new PageableCollection<>(
                 queriedItems.getValues()
                         .stream()

@@ -37,6 +37,12 @@ export class QueuesList extends Component<QueuesListProps, never> {
     private user!: CurrentUserStore;
 
     @autoBind
+    onChangeQueue(queue: Queue) {
+        const { onChangeQueue } = this.props;
+        onChangeQueue(queue);
+    }
+
+    @autoBind
     handleQueueTypeChange(item?: PivotItem) {
         const { onQueueTypeChange } = this.props;
         if (item) {
@@ -44,12 +50,6 @@ export class QueuesList extends Component<QueuesListProps, never> {
             const escalated = itemKey === 'escalated';
             onQueueTypeChange(escalated);
         }
-    }
-
-    @autoBind
-    onChangeQueue(queue: Queue) {
-        const { onChangeQueue } = this.props;
-        onChangeQueue(queue);
     }
 
     mapSingleQueue(queue: Queue, selectedQueue: Queue | null, refreshingQueueIds: string[], isLoadingQueueItems: boolean) {

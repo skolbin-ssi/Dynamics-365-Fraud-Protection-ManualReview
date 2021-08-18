@@ -36,6 +36,18 @@ export class Error extends Component<ErrorComponentProps, never> {
     @resolve(TYPES.AUTHENTICATION)
     private authenticationService!: AuthenticationService;
 
+    getErrorType(): ERROR_SCREEN_STATES {
+        const { match } = this.props;
+        const { params } = match;
+
+        return params.type as ERROR_SCREEN_STATES;
+    }
+
+    goHome() {
+        const { history } = this.props;
+        history.push(ROUTES.QUEUES);
+    }
+
     // TODO: duplication on Login impl, come up with consistent approach
     handleLogin() {
         const { location } = this.props;
@@ -52,18 +64,6 @@ export class Error extends Component<ErrorComponentProps, never> {
             from = { pathname: ROUTES.QUEUES } as Location;
         }
         this.authenticationService.redirectToAzureLogin(from);
-    }
-
-    getErrorType(): ERROR_SCREEN_STATES {
-        const { match } = this.props;
-        const { params } = match;
-
-        return params.type as ERROR_SCREEN_STATES;
-    }
-
-    goHome() {
-        const { history } = this.props;
-        history.push(ROUTES.QUEUES);
     }
 
     renderMessage() {

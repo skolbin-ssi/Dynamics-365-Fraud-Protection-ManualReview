@@ -60,6 +60,17 @@ export class TransactionHistory extends Component<TransactionHistoryProps, never
             onRender: this.renderTransactionCell,
         },
         {
+            key: 'orderId',
+            name: 'Original order Id',
+            minWidth: 150,
+            maxWidth: 150,
+            isPadded: true,
+            columnActionsMode: ColumnActionsMode.disabled,
+            onRender: (pp: PreviousPurchase) => (
+                <Text variant="small">{pp?.originalOrderId || ''}</Text>
+            )
+        },
+        {
             key: 'amount',
             name: 'Amount',
             minWidth: 70,

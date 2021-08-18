@@ -77,6 +77,21 @@ export class DashboardHeader extends Component<DashboardHeaderProps, never> {
     ];
 
     @autoBind
+    getDatepickerValue(start?: boolean) {
+        const { dashboardScreenStore } = this.props;
+        const { dateRange } = dashboardScreenStore;
+        const nowDate = dateRange !== DATE_RANGE.CUSTOM
+            ? getEndOfDate(new Date())
+            : undefined;
+
+        if (start) {
+            return getPastDate(DATE_RANGE_DAYS[dateRange]);
+        }
+
+        return nowDate;
+    }
+
+    @autoBind
     handleDropdownChange(option: IDropdownOption | undefined) {
         const { dashboardScreenStore } = this.props;
 
@@ -113,21 +128,6 @@ export class DashboardHeader extends Component<DashboardHeaderProps, never> {
 
             dashboardScreenStore.setToDate(fullHoursDate);
         }
-    }
-
-    @autoBind
-    getDatepickerValue(start?: boolean) {
-        const { dashboardScreenStore } = this.props;
-        const { dateRange } = dashboardScreenStore;
-        const nowDate = dateRange !== DATE_RANGE.CUSTOM
-            ? getEndOfDate(new Date())
-            : undefined;
-
-        if (start) {
-            return getPastDate(DATE_RANGE_DAYS[dateRange]);
-        }
-
-        return nowDate;
     }
 
     /**

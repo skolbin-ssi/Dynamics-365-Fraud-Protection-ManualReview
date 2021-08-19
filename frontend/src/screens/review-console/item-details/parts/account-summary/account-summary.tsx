@@ -250,6 +250,7 @@ export class AccountSummary extends Component<AccountSummaryProps, never> {
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
+                        key={name}
                     >
                         {name}
                     </a>

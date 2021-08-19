@@ -72,6 +72,21 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
     }
 
     @autobind
+    setActiveTab(newValue: CreateQueueModalTabs) {
+        this.setState({ activeTab: newValue });
+    }
+
+    setQueueFiltersToFiltersStoreMutatedFilters() {
+        const { queueMutationStore: { fields: { filters } } } = this.queueCreationModalStore;
+        const { mutationType } = this.props;
+
+        if (mutationType === QUEUE_MUTATION_TYPES.UPDATE) {
+            this.filtersStore.clearMutatedFilters();
+            this.filtersStore.setMutatedFilters(filters);
+        }
+    }
+
+    @autobind
     handleClose() {
         const { closeCreateEditQueueModal } = this.props;
         closeCreateEditQueueModal();
@@ -100,21 +115,6 @@ export class CreateEditQueueModal extends Component<CreateEditQueueModalProps, C
         }
         if (result === 'failure') {
             this.handleClose();
-        }
-    }
-
-    @autobind
-    setActiveTab(newValue: CreateQueueModalTabs) {
-        this.setState({ activeTab: newValue });
-    }
-
-    setQueueFiltersToFiltersStoreMutatedFilters() {
-        const { queueMutationStore: { fields: { filters } } } = this.queueCreationModalStore;
-        const { mutationType } = this.props;
-
-        if (mutationType === QUEUE_MUTATION_TYPES.UPDATE) {
-            this.filtersStore.clearMutatedFilters();
-            this.filtersStore.setMutatedFilters(filters);
         }
     }
 

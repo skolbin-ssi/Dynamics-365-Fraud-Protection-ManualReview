@@ -1,13 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { ApiServiceResponse } from '../base-api-service';
-import {
-    GetQueuesResponse, PostQueueRequest, GetQueueResponse,
-    DeleteQueueResponse, PatchQueueRequest, PatchQueueResponse,
-    GetQueueItemsResponse, LockQueueItemResponse, PostQueueResponse, GetQueuesOverviewResponse
-} from '../api-services/queue-api-service/api-models';
 import { QUEUE_VIEW_TYPE } from '../../constants';
+import { ItemSortSettingsDTO } from '../api-services/models/item-search-query-dto';
+import {
+    DeleteQueueResponse,
+    GetQueueItemsResponse,
+    GetQueueResponse,
+    GetQueuesOverviewResponse,
+    GetQueuesResponse,
+    LockQueueItemResponse,
+    PatchQueueRequest,
+    PatchQueueResponse,
+    PostQueueRequest,
+    PostQueueResponse
+} from '../api-services/queue-api-service/api-models';
+import { ApiServiceResponse } from '../base-api-service';
 
 export interface QueueItemsOverviewApiParams {
     id: string,
@@ -54,9 +62,10 @@ export interface QueueApiService {
      * Get list of items from the specified queue
      * @param id
      * @param size
-     * @param continuationToken
+     * @param sortingObject - optional sorting parameters
+     * @param continuationToken     
      */
-    getQueueItems(id: string, size: number, continuationToken?: string | null): Promise<ApiServiceResponse<GetQueueItemsResponse>>;
+    getQueueItems(id: string, size: number, sortingObject?: ItemSortSettingsDTO, continuationToken?: string | null): Promise<ApiServiceResponse<GetQueueItemsResponse>>;
 
     /**
      * Lock the top item from the specified queue

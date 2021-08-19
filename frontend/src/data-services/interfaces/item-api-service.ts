@@ -1,15 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { DEFAULT_QUEUE_ITEMS_PER_PAGE, LABEL } from '../../constants';
-import { ApiServiceResponse } from '../base-api-service';
+import { LABEL } from '../../constants';
+import { PostLinkAnalysisBody } from '../../models/item/link-analysis';
 import {
-    GetItemResponse, GetLinkAnalysisDfpItemsResponse, GetLinkAnalysisMrItemsResponse,
-    GetLockedItemsResponse, PatchBatchLabelItemsResponse,
+    GetItemResponse,
+    GetLinkAnalysisDfpItemsResponse,
+    GetLinkAnalysisMrItemsResponse,
+    GetLockedItemsResponse,
+    PatchBatchLabelItemsResponse,
     PostLinkAnalysisResponse
 } from '../api-services/item-api-service/api-models';
 import { DeleteItemLockResponse } from '../api-services/item-api-service/api-models/delete-item-lock-response';
-import { PostLinkAnalysisBody } from '../../models/item/link-analysis';
+import { ApiServiceResponse } from '../base-api-service';
 import { BatchItemsLabelApiParams } from './item-service';
 
 export interface ItemApiService {
@@ -68,7 +71,7 @@ export interface ItemApiService {
     postLinkAnalysis(postLinkAnalysisBody: PostLinkAnalysisBody): Promise<ApiServiceResponse<PostLinkAnalysisResponse>>;
 
     /**
-     * Get items form MR linked to the current item
+     * Get items from MR linked to the current item
      * @param id - search id
      * @param size - amount of items to load
      * @param continuationToken - unique id that will be same for first and subsequent calls
@@ -76,7 +79,7 @@ export interface ItemApiService {
     getLinkAnalysisMrItems(id: string, size: number, continuationToken?: string | null): Promise<ApiServiceResponse<GetLinkAnalysisMrItemsResponse>>;
 
     /**
-     * Get items form MR linked to the current item
+     * Get items from MR linked to the current item
      * @param id - search id
      * @param size - amount of items to load
      * @param continuationToken - unique id that will be same for first and subsequent calls

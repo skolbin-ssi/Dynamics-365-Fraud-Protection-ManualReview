@@ -66,6 +66,7 @@ export class TransactionHistory extends Component<TransactionHistoryProps, never
             name: 'Original order Id',
             minWidth: 230,
             maxWidth: 230,
+
             isPadded: true,
             columnActionsMode: ColumnActionsMode.disabled,
             onRender: (pp: PreviousPurchase) => (

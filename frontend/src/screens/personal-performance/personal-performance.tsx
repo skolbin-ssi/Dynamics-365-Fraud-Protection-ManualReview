@@ -76,18 +76,18 @@ export class PersonalPerformance extends Component<PersonalPerformanceComponentP
         disposeOnUnmount(this, this.overturnedPerformanceStore.updateUrlParams(this.updateOverturnedUrlQuerySearchParams));
     }
 
+    getUrlParsedQuery() {
+        const { location: { search } } = this.props;
+        return queryString
+            .parse(search, { arrayFormat: 'comma' }) as PerformanceParsedQueryUrl;
+    }
+
     @autoBind
     handleGenerateReportsButtonClick() {
         const analystPerformanceReports = this.analystPerformanceStore.reports(true);
         const overturnedPerformanceReports = this.overturnedPerformanceStore.reports(true);
 
         this.reportsModalStore.showReportsModal([...analystPerformanceReports, ...overturnedPerformanceReports]);
-    }
-
-    getUrlParsedQuery() {
-        const { location: { search } } = this.props;
-        return queryString
-            .parse(search, { arrayFormat: 'comma' }) as PerformanceParsedQueryUrl;
     }
 
     @autoBind

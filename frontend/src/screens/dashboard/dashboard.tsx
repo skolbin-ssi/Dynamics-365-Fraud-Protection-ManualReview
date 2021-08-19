@@ -80,6 +80,21 @@ export class Dashboard extends Component<DashboardProps, any> {
         }
     }
 
+    @autoBind
+    getActiveSegmentationTab() {
+        const { match: { path } } = this.props;
+
+        if (path === ROUTES.DASHBOARD_QUEUES_PERFORMANCE) {
+            return DASHBOARD_SEGMENTATION.QUEUES;
+        }
+
+        if (path === ROUTES.DASHBOARD_ANALYSTS_PERFORMANCE) {
+            return DASHBOARD_SEGMENTATION.ANALYSTS;
+        }
+
+        return DASHBOARD_SEGMENTATION.DEMAND;
+    }
+
     /**
      * Redirect to the specific Analyst page
      * @param analyst
@@ -102,9 +117,9 @@ export class Dashboard extends Component<DashboardProps, any> {
 
     // TODO: Clear commented code after decision should we keep previous URL params on not
     /**
-     * Redirect to the specific Queue page
-     * @param queue
-     */
+      * Redirect to the specific Queue page
+      * @param queue
+      */
     @autoBind
     handleQueueSearchChange(queue: Queue) {
         const { match: { params } } = this.props;
@@ -159,21 +174,6 @@ export class Dashboard extends Component<DashboardProps, any> {
                 break;
             default:
         }
-    }
-
-    @autoBind
-    getActiveSegmentationTab() {
-        const { match: { path } } = this.props;
-
-        if (path === ROUTES.DASHBOARD_QUEUES_PERFORMANCE) {
-            return DASHBOARD_SEGMENTATION.QUEUES;
-        }
-
-        if (path === ROUTES.DASHBOARD_ANALYSTS_PERFORMANCE) {
-            return DASHBOARD_SEGMENTATION.ANALYSTS;
-        }
-
-        return DASHBOARD_SEGMENTATION.DEMAND;
     }
 
     isNotMainDashboardPage() {

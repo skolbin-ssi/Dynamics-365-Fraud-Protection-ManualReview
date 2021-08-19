@@ -77,6 +77,27 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
     }
 
     @autobind
+    getCommandBarButtonItem(): ApplyDecisionContextualMenuItem[] {
+        return [{
+            key: LABEL.GOOD,
+            text: LABEL_NAMES[LABEL.GOOD],
+            iconProps: {
+                iconName: 'CompletedSolid',
+                className: `${CN}__apply-decisions-btn-good`
+            },
+            onClick: () => this.handleApplyDecisionClick(LABEL.GOOD)
+        }, {
+            key: LABEL.BAD,
+            text: LABEL_NAMES[LABEL.BAD],
+            iconProps: {
+                iconName: 'Blocked2Solid',
+                className: `${CN}__apply-decisions-btn-bad`
+            },
+            onClick: () => this.handleApplyDecisionClick(LABEL.BAD)
+        }];
+    }
+
+    @autobind
     handleRefreshButtonClick() {
         const { linkAnalysisStore } = this.props;
 
@@ -129,27 +150,6 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
         }
 
         linkAnalysisStore.refreshAnalysisFieldCounts();
-    }
-
-    @autobind
-    getCommandBarButtonItem(): ApplyDecisionContextualMenuItem[] {
-        return [{
-            key: LABEL.GOOD,
-            text: LABEL_NAMES[LABEL.GOOD],
-            iconProps: {
-                iconName: 'CompletedSolid',
-                className: `${CN}__apply-decisions-btn-good`
-            },
-            onClick: () => this.handleApplyDecisionClick(LABEL.GOOD)
-        }, {
-            key: LABEL.BAD,
-            text: LABEL_NAMES[LABEL.BAD],
-            iconProps: {
-                iconName: 'Blocked2Solid',
-                className: `${CN}__apply-decisions-btn-bad`
-            },
-            onClick: () => this.handleApplyDecisionClick(LABEL.BAD)
-        }];
     }
 
     @autobind

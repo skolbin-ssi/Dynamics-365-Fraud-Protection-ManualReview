@@ -28,6 +28,15 @@ const CN = 'filters-tab';
 
 @observer
 export class FiltersTab extends Component<FilterTabProps, FiltersTabState> {
+    setMutatedFiltersToQueueMutationStore() {
+        const {
+            filtersStore: { mutatedFilters },
+            queueMutationModalStoreInstance: { queueMutationStore }
+        } = this.props;
+
+        queueMutationStore.addFilters(mutatedFilters);
+    }
+
     @autobind
     handleCloseModal() {
         const { filtersStore } = this.props;
@@ -70,15 +79,6 @@ export class FiltersTab extends Component<FilterTabProps, FiltersTabState> {
         const { filtersStore } = this.props;
 
         filtersStore.handleSelectedMenuFilterFromSubMenu(filterId);
-    }
-
-    setMutatedFiltersToQueueMutationStore() {
-        const {
-            filtersStore: { mutatedFilters },
-            queueMutationModalStoreInstance: { queueMutationStore }
-        } = this.props;
-
-        queueMutationStore.addFilters(mutatedFilters);
     }
 
     renderFiltersSummaryTiles() {

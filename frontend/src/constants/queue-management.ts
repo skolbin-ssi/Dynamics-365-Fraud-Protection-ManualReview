@@ -111,11 +111,15 @@ export enum SORTING_ORDER {
 export enum SORTING_FIELD {
     IMPORT_DATE = 'IMPORT_DATE',
     SCORE = 'SCORE',
+    TOTAL_AMOUNT = 'TOTAL_AMOUNT',
+    LABEL_AUTHOR_ID = 'LABEL_AUTHOR_ID'
 }
 
 export const SORTING_FIELD_DISPLAY = {
     [SORTING_FIELD.IMPORT_DATE]: 'Import date',
-    [SORTING_FIELD.SCORE]: 'Fraud score'
+    [SORTING_FIELD.SCORE]: 'Fraud score',
+    [SORTING_FIELD.TOTAL_AMOUNT]: 'Total amount',
+    [SORTING_FIELD.LABEL_AUTHOR_ID]: 'Analyst'
 };
 
 export enum LABEL {

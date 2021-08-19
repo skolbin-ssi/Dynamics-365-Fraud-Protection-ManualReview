@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-/* eslint-disable react/sort-comp */
 
 import './total-review.scss';
 
@@ -30,28 +29,6 @@ const CN = 'total-review';
 
 @observer
 export class TotalReview extends Component<TotalReviewComponentProps, never> {
-    @autoBind
-    handleQueueAggregationChange(label: CHART_AGGREGATION_PERIOD) {
-        const { analystPerformanceStore } = this.props;
-
-        analystPerformanceStore.setAggregation(label);
-    }
-
-    @autoBind
-    handleQueuePerformanceRatingChange(label: PERFORMANCE_RATING) {
-        const { analystPerformanceStore } = this.props;
-
-        const rating = PERFORMANCE_RATING[label]!;
-        analystPerformanceStore.setRating(rating);
-    }
-
-    @autoBind
-    handleSelectionChange(queueId: string) {
-        const { analystPerformanceStore } = this.props;
-
-        analystPerformanceStore.setChecked(queueId);
-    }
-
     getLineChartYScaleMaxValue() {
         const { analystPerformanceStore: { lineChartData, maxYTicksValue } } = this.props;
         if (!lineChartData.length) {
@@ -72,6 +49,28 @@ export class TotalReview extends Component<TotalReviewComponentProps, never> {
         }
 
         return `${TOP_QUEUES_DISPLAY_VIEW.get(rating)} queues`;
+    }
+
+    @autoBind
+    handleQueueAggregationChange(label: CHART_AGGREGATION_PERIOD) {
+        const { analystPerformanceStore } = this.props;
+
+        analystPerformanceStore.setAggregation(label);
+    }
+
+    @autoBind
+    handleQueuePerformanceRatingChange(label: PERFORMANCE_RATING) {
+        const { analystPerformanceStore } = this.props;
+
+        const rating = PERFORMANCE_RATING[label]!;
+        analystPerformanceStore.setRating(rating);
+    }
+
+    @autoBind
+    handleSelectionChange(queueId: string) {
+        const { analystPerformanceStore } = this.props;
+
+        analystPerformanceStore.setChecked(queueId);
     }
 
     render() {

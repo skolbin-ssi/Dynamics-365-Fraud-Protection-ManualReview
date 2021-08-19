@@ -26,15 +26,15 @@ export class ToggleCondition extends Component<ToggleConditionComponentProps, ne
         condition.validate();
     }
 
+    getConvertedValueToBoolean(value: string) {
+        return value === 'true';
+    }
+
     @autobind
     handleChange(event: React.MouseEvent<HTMLElement>, checked?: boolean) {
         const { condition } = this.props;
 
         condition.setValue(checked!);
-    }
-
-    getConvertedValueToBoolean(value: string) {
-        return value === 'true';
     }
 
     render() {

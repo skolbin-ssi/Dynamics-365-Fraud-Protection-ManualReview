@@ -1,14 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { QUEUE_VIEW_TYPE } from '../../constants';
 import {
     Item,
-    NewQueue, PageableList,
+    NewQueue,
+    PageableList,
     Queue,
     QueueToUpdate
 } from '../../models';
 import { QueuesOverview } from '../../models/queues';
-import { QUEUE_VIEW_TYPE } from '../../constants';
+import { ItemSortSettingsDTO } from '../api-services/models/item-search-query-dto';
 
 export interface QueueItemsOverviewRequestParams {
     /**
@@ -64,7 +66,7 @@ export interface QueueService {
      * @param shouldLoadMore - should perform initial request or load more from last call
      * @param size - amount of items to load
      */
-    getQueueItems(chainContinuationIdentifier: string, id: string, shouldLoadMore: boolean, size?: number): Promise<PageableList<Item>>;
+    getQueueItems(chainContinuationIdentifier: string, id: string, shouldLoadMore: boolean, sortingObject?: ItemSortSettingsDTO, size?: number): Promise<PageableList<Item>>;
 
     /**
      * Creating a new queue

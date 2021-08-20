@@ -98,6 +98,22 @@ export class ItemsDetailsList extends Component<ItemsDetailsListProps, never> {
             )
         },
         {
+            key: ITEM_LIST_COLUMN_KEYS.ORIGINAL_ORDER_ID,
+            name: 'Original order ID',
+            minWidth: 50,
+            maxWidth: 200,
+            isCollapsible: true,
+            isRowHeader: true,
+            isPadded: true,
+            className: `${CN}__cell`,
+            columnActionsMode: ColumnActionsMode.disabled,
+            onRender: (item: Item) => (
+                <Text variant="smallPlus" className={`${CN}__order-id-cell`} title={item.purchase?.originalOrderId}>
+                    {item.purchase?.originalOrderId}
+                </Text>
+            )
+        },
+        {
             key: ITEM_LIST_COLUMN_KEYS.QUEUES,
             name: 'Queues',
             fieldName: 'queues',

@@ -438,6 +438,7 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
     @Override
     public PageableCollection<Item> searchForItems(
             @Nullable Set<String> ids,
+            @Nullable Set<String> originalOrderIds,
             @Nullable Set<String> queueIds,
             boolean residual,
             @Nullable Boolean isActive,
@@ -457,6 +458,7 @@ public class ItemRepositoryCustomMethodsImpl implements ItemRepositoryCustomMeth
                 //WHERE
                 .enriched()
                 .and().inField(ItemDataField.ID, ids)
+                .and().inField(ItemDataField.ORIGINAL_ORDER_ID, originalOrderIds)
                 .and().queueIds(queueIds, residual)
                 .and().active(isActive)
                 .and().all(itemFilters)

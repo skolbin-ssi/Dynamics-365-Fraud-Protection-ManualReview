@@ -28,6 +28,7 @@ public class SearchQuery implements Serializable {
     private String id;
 
     private Set<String> ids;
+    private Set<String> originalOrderIds;
     private Boolean active;
     private Set<String> queueIds;
     @Builder.Default

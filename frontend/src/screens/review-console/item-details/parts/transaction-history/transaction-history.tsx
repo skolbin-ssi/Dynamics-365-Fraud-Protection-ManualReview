@@ -5,6 +5,7 @@ import './transaction-history.scss';
 
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
+import { groupBy } from 'lodash';
 import React, { Component } from 'react';
 
 import {
@@ -12,6 +13,7 @@ import {
     DetailsList,
     DetailsListLayoutMode,
     IColumn,
+    IGroup,
     SelectionMode
 } from '@fluentui/react/lib/DetailsList';
 import { MessageBar } from '@fluentui/react/lib/MessageBar';
@@ -53,8 +55,8 @@ export class TransactionHistory extends Component<TransactionHistoryProps, never
         {
             key: 'transaction',
             name: 'Transaction',
-            minWidth: 150,
-            maxWidth: 150,
+            minWidth: 230,
+            maxWidth: 230,
             isPadded: true,
             columnActionsMode: ColumnActionsMode.disabled,
             onRender: this.renderTransactionCell,
@@ -62,8 +64,9 @@ export class TransactionHistory extends Component<TransactionHistoryProps, never
         {
             key: 'orderId',
             name: 'Original order Id',
-            minWidth: 150,
-            maxWidth: 150,
+            minWidth: 230,
+            maxWidth: 230,
+
             isPadded: true,
             columnActionsMode: ColumnActionsMode.disabled,
             onRender: (pp: PreviousPurchase) => (
@@ -264,9 +267,30 @@ export class TransactionHistory extends Component<TransactionHistoryProps, never
                 return 0;
             });
 
+        const groupsData = groupBy(items, 'originalOrderId');
+
+        const groups: IGroup[] = [];
+        const groupedItems: PreviousPurchase[] = [];
+        let groupIndex = 0;
+
+        Object.keys(groupsData).forEach((id: string) => {
+            const currentGroup = groupsData[id];
+            currentGroup.forEach((i: PreviousPurchase) => groupedItems.push(i));
+
+            groups.push({
+                key: `group${id}`,
+                name: `Original order ID: ${id}`,
+                startIndex: groupIndex,
+                count: currentGroup.length,
+                level: 1
+            });
+            groupIndex += currentGroup.length;
+        });
+
         return (
             <DetailsList
-                items={items}
+                items={groupedItems}
+                groups={groups}
                 columns={this.purchaseHistoryColumns}
                 layoutMode={DetailsListLayoutMode.justified}
                 selectionMode={SelectionMode.none}

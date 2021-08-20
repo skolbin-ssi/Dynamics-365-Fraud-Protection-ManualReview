@@ -375,6 +375,7 @@ public class ItemService {
                 continuationToken,
                 continuation -> itemRepository.searchForItems(
                         searchQuery.getIds(),
+                        searchQuery.getOriginalOrderIds(),
                         searchQuery.getQueueIds(),
                         searchQuery.isResidual(),
                         searchQuery.getActive(),

@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { VELOCITIES, VELOCITY_KEYS } from '../../../constants/transaction';
 import { CalculatedFieldsDTO } from '../../../data-services/api-services/models/calculated-fields-dto';
 import { DisposabilityCheck } from './disposability-check';
-import { VELOCITIES, VELOCITY_KEYS } from '../../../constants/transaction';
 
 export interface TransactionVelocity {
     key: VELOCITY_KEYS;
@@ -12,6 +12,7 @@ export interface TransactionVelocity {
     hour: number;
     day: number;
     week: number;
+    lifetime: number | undefined;
     customPlaceholder?: string;
 }
 
@@ -112,6 +113,7 @@ export class CalculatedFields {
                     hour: calculatedFields[key].hour,
                     day: calculatedFields[key].day,
                     week: calculatedFields[key].week,
+                    lifetime: calculatedFields[key].lifetime,
                     customPlaceholder
                 });
             }

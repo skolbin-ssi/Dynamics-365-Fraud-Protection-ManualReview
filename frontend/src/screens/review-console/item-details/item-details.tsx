@@ -21,7 +21,6 @@ import { ITEM_DETAILS_MODE, LinkAnalysisStore } from '../../../view-services';
 import { FraudScoreIndication } from './fraud-score-indication';
 import {
     AccountSummary,
-    AccountTransactionsSummary,
     Console,
     CustomData,
     DeviceInformation,
@@ -117,13 +116,12 @@ export class ItemDetails extends Component<ItemDetailsProps, ItemDetailsState> {
                     itemKey={ITEM_DETAILS_TABS.PREVIOUS_TRANSACTIONS}
                 >
                     <div className={`${CN}__order-details`}>
-                        <AccountTransactionsSummary item={item} className={`${CN}__full-width`} />
-                        <TransactionHistory item={item} className={`${CN}__full-width`} />
                         {
                             item.purchase.calculatedFields.velocities.length
                                 ? <Velocities item={item} className={`${CN}__full-width`} />
                                 : null
                         }
+                        <TransactionHistory item={item} className={`${CN}__full-width`} />
                     </div>
                 </PivotItem>
             </Pivot>

@@ -9,6 +9,5 @@ export * from './payment-information';
 export * from './device-information';
 export * from './ip-information';
 export * from './custom-data';
-export * from './account-transactions-summary';
 export * from './transaction-history';
 export * from './velocities';

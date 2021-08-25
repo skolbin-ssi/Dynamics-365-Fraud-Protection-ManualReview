@@ -233,36 +233,19 @@ public enum ItemFilterField implements Serializable {
             "0", null,
             "Count of transactions with unique IP Countries made by the user last week before current purchase making. Collected near to time of purchase receiving."
     ),
+    LIFE_TIME_UNIQUE_IP_COUNTRIES("Velocity/Stats", "Transactions with unique IP Countries (lifetime)",
+            ItemDataField.LIFE_TIME_UNIQUE_IP_COUNTRIES,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Count of all transactions with unique IP Countries made by the user before current purchase making. Collected near to time of purchase receiving."
+    ),
     CUSTOM_CONNECTION_COUNT_BUCKET("Velocity/Stats", "Connection count bucket",
             ItemDataField.CUSTOM_CONNECTION_COUNT_BUCKET,
             Set.of(CONTAINS, REGEXP, BETWEEN_ALPH, NOT_BETWEEN_ALPH, EQUAL_ALPH, NOT_EQUAL_ALPH, LESS_ALPH, GREATER_ALPH, LESS_OR_EQUAL_ALPH, GREATER_OR_EQUAL_ALPH),
             null, null,
             "The parameter is retrieved from 'connection_count_bucket' field in custom purchase data."
     ),
-    TOTAL_TRANSACTION_AMOUNT("Velocity/Stats", "Transaction amount (total)",
-            ItemDataField.TOTAL_TRANSACTION_AMOUNT,
-            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
-            "0", null,
-            "Total expenses. Registered in DFP on moment of purchase making."
-    ),
-    TOTAL_TRANSACTION_COUNT("Velocity/Stats", "Transaction count (total)",
-            ItemDataField.TOTAL_TRANSACTION_COUNT,
-            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
-            "0", null,
-            "Total amount of made transactions. Registered in DFP  on moment of purchase making."
-    ),
-    LAST_30DAYS_TRANSACTION_AMOUNT("Velocity/Stats", "Transaction amount (30 days)",
-            ItemDataField.LAST_30DAYS_TRANSACTION_AMOUNT,
-            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
-            "0", null,
-            "Expenses for the last 30 days before purchase making. Registered in DFP."
-    ),
-    LAST_30DAYS_TRANSACTION_COUNT("Velocity/Stats", "Transaction count (30 days)",
-            ItemDataField.LAST_30DAYS_TRANSACTION_COUNT,
-            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
-            "0", null,
-            "Amount of made transactions for the last 30 days before purchase making. Registered in DFP."
-    ),
+
     CUSTOM_LAST6MONTHS_INVITATIONS_SENT("Velocity/Stats", "Invitation sent count (6 months)",
             ItemDataField.CUSTOM_LAST6MONTHS_INVITATIONS_SENT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
@@ -291,7 +274,13 @@ public enum ItemFilterField implements Serializable {
             ItemDataField.LAST_WEEK_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of transactions for the last hour before purchase making. Collected near to time of purchase receiving."
+            "Amount of transactions for the last week before purchase making. Collected near to time of purchase receiving."
+    ),
+    LIFE_TIME_TRANSACTION_COUNT("Velocity/Stats", "Transaction count (lifetime)",
+            ItemDataField.LIFE_TIME_TRANSACTION_COUNT,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Amount of all transactions for the current user. Collected near to time of purchase receiving."
     ),
     LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT("Velocity/Stats", "Successful transaction count (1 hour)",
             ItemDataField.LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT,
@@ -309,7 +298,13 @@ public enum ItemFilterField implements Serializable {
             ItemDataField.LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of approved transactions for the last hour before purchase making. Collected near to time of purchase receiving."
+            "Amount of approved transactions for the last week before purchase making. Collected near to time of purchase receiving."
+    ),
+    LIFE_TIME_SUCCESSFUL_TRANSACTION_COUNT("Velocity/Stats", "Successful transaction count (lifetime)",
+            ItemDataField.LIFE_TIME_SUCCESSFUL_TRANSACTION_COUNT,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Amount of all approved transactions for the user before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_HOUR_REJECTED_TRANSACTION_COUNT("Velocity/Stats", "Rejected transaction count (1 hour)",
             ItemDataField.LAST_HOUR_REJECTED_TRANSACTION_COUNT,
@@ -327,7 +322,13 @@ public enum ItemFilterField implements Serializable {
             ItemDataField.LAST_WEEK_REJECTED_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of rejected transactions for the last hour before purchase making. Collected near to time of purchase receiving."
+            "Amount of rejected transactions for the last week before purchase making. Collected near to time of purchase receiving."
+    ),
+    LIFE_TIME_REJECTED_TRANSACTION_COUNT("Velocity/Stats", "Rejected transaction count (lifetime)",
+            ItemDataField.LIFE_TIME_REJECTED_TRANSACTION_COUNT,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Amount of all rejected transactions for that user before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_HOUR_FAILED_TRANSACTION_COUNT("Velocity/Stats", "Failed transaction count (1 hour)",
             ItemDataField.LAST_HOUR_FAILED_TRANSACTION_COUNT,
@@ -345,7 +346,13 @@ public enum ItemFilterField implements Serializable {
             ItemDataField.LAST_WEEK_FAILED_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of failed transactions for the last hour before purchase making. Collected near to time of purchase receiving."
+            "Amount of failed transactions for the last week before purchase making. Collected near to time of purchase receiving."
+    ),
+    LIFE_TIME_FAILED_TRANSACTION_COUNT("Velocity/Stats", "Failed transaction count (lifetime)",
+            ItemDataField.LIFE_TIME_FAILED_TRANSACTION_COUNT,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Amount of all failed transactions for the user before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_HOUR_TRANSACTION_AMOUNT("Velocity/Stats", "Transaction amount (1 hour)",
             ItemDataField.LAST_HOUR_TRANSACTION_AMOUNT,
@@ -365,6 +372,12 @@ public enum ItemFilterField implements Serializable {
             "0", null,
             "Expenses for the last week before purchase making. Collected near to time of purchase receiving."
     ),
+    LIFE_TIME_TRANSACTION_AMOUNT("Velocity/Stats", "Transaction amount (lifetime)",
+            ItemDataField.LIFE_TIME_TRANSACTION_AMOUNT,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Amount of all expenses for the user before purchase making. Collected near to time of purchase receiving."
+    ),
     LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT("Velocity/Stats", "Successful transaction amount (1 hour)",
             ItemDataField.LAST_HOUR_SUCCESSFUL_TRANSACTION_AMOUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
@@ -382,6 +395,12 @@ public enum ItemFilterField implements Serializable {
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
             "Expenses in approved transactions for the last week before purchase making. Collected near to time of purchase receiving."
+    ),
+    LIFE_TIME_SUCCESSFUL_TRANSACTION_AMOUNT("Velocity/Stats", "Successful transaction amount (lifetime)",
+            ItemDataField.LIFE_TIME_SUCCESSFUL_TRANSACTION_AMOUNT,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Amount of all expenses in approved transactions for the user before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_HOUR_REJECTED_TRANSACTION_AMOUNT("Velocity/Stats", "Rejected transaction amount (1 hour)",
             ItemDataField.LAST_HOUR_REJECTED_TRANSACTION_AMOUNT,
@@ -401,6 +420,12 @@ public enum ItemFilterField implements Serializable {
             "0", null,
             "Expenses in rejected transactions for the last week before purchase making. Collected near to time of purchase receiving."
     ),
+    LIFE_TIME_REJECTED_TRANSACTION_AMOUNT("Velocity/Stats", "Rejected transaction amount (lifetime)",
+            ItemDataField.LIFE_TIME_REJECTED_TRANSACTION_AMOUNT,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Amount of all expenses in rejected transactions for the user before purchase making. Collected near to time of purchase receiving."
+    ),
     LAST_HOUR_FAILED_TRANSACTION_AMOUNT("Velocity/Stats", "Failed transaction amount (1 hour)",
             ItemDataField.LAST_HOUR_FAILED_TRANSACTION_AMOUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
@@ -419,7 +444,12 @@ public enum ItemFilterField implements Serializable {
             "0", null,
             "Expenses in failed transactions for the last week before purchase making. Collected near to time of purchase receiving."
     ),
-
+    LIFE_TIME_FAILED_TRANSACTION_AMOUNT("Velocity/Stats", "Failed transaction amount (lifetime)",
+            ItemDataField.LIFE_TIME_FAILED_TRANSACTION_AMOUNT,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Amount of all expenses in failed transactions for the user before purchase making. Collected near to time of purchase receiving."
+    ),
     LAST_HOUR_UNIQUE_PI("Velocity/Stats", "Unique used payment instruments count (1 hour)",
             ItemDataField.LAST_HOUR_UNIQUE_PI,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
@@ -438,23 +468,35 @@ public enum ItemFilterField implements Serializable {
             "0", null,
             "Count of unique payment instruments used by the user last week before purchase making. Collected near to time of purchase receiving."
     ),
+    LIFE_TIME_UNIQUE_PI("Velocity/Stats", "Unique used payment instruments count (lifetime)",
+            ItemDataField.LIFE_TIME_UNIQUE_PI,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Count of unique payment instruments used by the user before purchase making. Collected near to time of purchase receiving."
+    ),
     LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI("Velocity/Stats", "Transaction count with current payment instrument (1 hour)",
             ItemDataField.LAST_HOUR_TRANSACTION_COUNT_CURRENT_PI,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Count of Transactions made with the usage of payment instruments from the current transaction during the last hour before purchase making. Collected near to time of purchase receiving."
+            "Count of transactions made with the usage of payment instruments from the current transaction during the last hour before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_DAY_TRANSACTION_COUNT_CURRENT_PI("Velocity/Stats", "Transaction count with current payment instrument (1 day)",
             ItemDataField.LAST_DAY_TRANSACTION_COUNT_CURRENT_PI,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Count of Transactions made with the usage of payment instruments from the current transaction during the last day before purchase making. Collected near to time of purchase receiving."
+            "Count of transactions made with the usage of payment instruments from the current transaction during the last day before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI("Velocity/Stats", "Transaction count with current payment instrument (1 week)",
             ItemDataField.LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Count of Transactions made with the usage of payment instruments from the current transaction during the last week before purchase making. Collected near to time of purchase receiving."
+            "Count of transactions made with the usage of payment instruments from the current transaction during the last week before purchase making. Collected near to time of purchase receiving."
+    ),
+    LIFE_TIME_TRANSACTION_COUNT_CURRENT_PI("Velocity/Stats", "Transaction count with current payment instrument (lifetime)",
+            ItemDataField.LAST_WEEK_TRANSACTION_COUNT_CURRENT_PI,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Count of transactions made with the usage of payment instruments from the current transaction before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI("Velocity/Stats", "Transaction amount with current payment instrument (1 hour)",
             ItemDataField.LAST_HOUR_TRANSACTION_AMOUNT_CURRENT_PI,
@@ -473,6 +515,12 @@ public enum ItemFilterField implements Serializable {
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
             "Expenses processed with the usage of payment instruments from the current transaction during the last week before purchase making. Collected near to time of purchase receiving."
+    ),
+    LIFE_TIME_TRANSACTION_AMOUNT_CURRENT_PI("Velocity/Stats", "Transaction amount with current payment instrument (lifetime)",
+            ItemDataField.LIFE_TIME_TRANSACTION_AMOUNT_CURRENT_PI,
+            Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
+            "0", null,
+            "Expenses processed with the usage of payment instruments from the current transaction before purchase making. Collected near to time of purchase receiving."
     );
 
     @Getter

@@ -60,7 +60,7 @@ mr:
       enrichment-delay: PT30S
       max-enrichment-delay: PT2M
       max-enrichment-attempts: 10
-      history-depth: 50
+      history-depth: 20
     dictionary-reconciliation-task:
       enabled: true
       delay: PT1H

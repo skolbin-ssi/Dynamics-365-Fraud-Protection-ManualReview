@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.griddynamics.msd365fp.manualreview.queues.config.Constants.DEFAULT_ITEM_PAGE_SIZE;
+import static java.util.stream.Collectors.groupingBy;
 
 @Slf4j
 @Service
@@ -152,7 +153,7 @@ public class ItemEnrichmentService {
             mapPurchaseHistoryToMainPurchase(item.getPurchase(), userEntity);
 
             // 6. Get and map data for detailed transaction history
-            extractMostActualPreviousPurchases(item.getPurchase()).forEach(previousPurchase -> {
+            item.getPurchase().getPreviousPurchaseList().forEach(previousPurchase -> {
                 mapPreviousPurchaseEntityToPreviousPurchase(
                         previousPurchase,
                         dfpExplorerService.explorePurchase(previousPurchase.getPurchaseId()));
@@ -161,6 +162,9 @@ public class ItemEnrichmentService {
 
             // 7. Calculate derived fields
             calculateDerivedFields(item);
+
+            //remove previous transactions that are too old.
+            removeOldPreviousPurchases(item.getPurchase());
 
             // 8. Save item
             boolean itemWasNew = item.getEnriched() == null;
@@ -193,10 +197,32 @@ public class ItemEnrichmentService {
         }
     }
 
-    private Set<PreviousPurchase> extractMostActualPreviousPurchases(final MainPurchase mainPurchase) {
-        return mainPurchase.getPreviousPurchaseList().stream()
+    private void removeOldPreviousPurchases(final MainPurchase mainPurchase) {
+        //We need all the purchases group by original Order Id
+        Map<String, List<PreviousPurchase>> actualPurchaseHistory = mainPurchase.getPreviousPurchaseList().stream()
+                .sorted(Comparator.comparing(PreviousPurchase::getMerchantLocalDate).reversed())
                 .filter(pn -> pn.getMerchantLocalDate().isAfter(mainPurchase.getMerchantLocalDate().minusWeeks(1L)))
-                .collect(Collectors.toSet());
+                .collect(groupingBy(PreviousPurchase::getOriginalOrderId));
+
+        //if the groups are more than history depth - delete the ones that are at the end of the grouping map, since they are sorted by date desc
+        if (actualPurchaseHistory.size()>= historyDepth) {
+            Integer current = 0;
+            for(Iterator<String> iterator = actualPurchaseHistory.keySet().iterator(); iterator.hasNext(); ) {
+                iterator.next();
+                if(current > historyDepth)
+                {
+                    iterator.remove();
+                }
+                current++;
+            }
+        }
+
+        //after we are done with adjusting the number - flatten the group map back to normal list and assign it to the main purchase
+        List<PreviousPurchase> result =  actualPurchaseHistory
+                .entrySet().stream()
+                .flatMap(m -> m.getValue().stream())
+                .collect(Collectors.toList());
+        mainPurchase.setPreviousPurchaseList(result);
     }
 
     private ExplorerEntity getUserEntity(final ExplorerEntity mainEntity) {
@@ -413,11 +439,9 @@ public class ItemEnrichmentService {
                 .map(n -> ((PurchaseNodeData) n.getData()))
                 .filter(n -> !mainPurchase.getPurchaseId().equals(n.getPurchaseId()))
                 .filter(n -> n.getMerchantLocalDate() != null &&
-                        n.getMerchantLocalDate().isBefore(mainPurchase.getMerchantLocalDate()) &&
-                        n.getMerchantLocalDate().isAfter(mainPurchase.getMerchantLocalDate().minusDays(7))
+                        n.getMerchantLocalDate().isBefore(mainPurchase.getMerchantLocalDate())
                 )
                 .sorted((n1, n2) -> n1.getMerchantLocalDate().isBefore( n2.getMerchantLocalDate())? 1 : -1)
-                .limit(historyDepth)
                 .map(n -> modelMapper.map(n, PreviousPurchase.class))
                 .collect(Collectors.toList()));
     }
@@ -658,14 +682,25 @@ public class ItemEnrichmentService {
             purchase.setPreviousPurchaseList(new LinkedList<>());
         }
 
+        //We need to group by original order id get the transaction that has max MerchantLocalDate, remove the rest and flat the grouping map
         Set<PreviousPurchase> lastWeekPreviousPurchases = purchase.getPreviousPurchaseList().stream()
                 .filter(pp -> pp.getMerchantLocalDate().isAfter(purchase.getMerchantLocalDate().minusWeeks(1)))
+                .collect(groupingBy(PreviousPurchase::getOriginalOrderId))
+                .entrySet().stream()
+                .flatMap(m -> m.getValue().stream().max(Comparator.comparing(PreviousPurchase::getMerchantLocalDate)).stream())
                 .collect(Collectors.toSet());
+
         Set<PreviousPurchase> lastDayPreviousPurchases = lastWeekPreviousPurchases.stream()
                 .filter(pp -> pp.getMerchantLocalDate().isAfter(purchase.getMerchantLocalDate().minusDays(1)))
+                .collect(groupingBy(PreviousPurchase::getOriginalOrderId))
+                .entrySet().stream()
+                .flatMap(m -> m.getValue().stream().max(Comparator.comparing(PreviousPurchase::getMerchantLocalDate)).stream())
                 .collect(Collectors.toSet());
         Set<PreviousPurchase> lastHourPreviousPurchases = lastDayPreviousPurchases.stream()
                 .filter(pp -> pp.getMerchantLocalDate().isAfter(purchase.getMerchantLocalDate().minusHours(1)))
+                .collect(groupingBy(PreviousPurchase::getOriginalOrderId))
+                .entrySet().stream()
+                .flatMap(m -> m.getValue().stream().max(Comparator.comparing(PreviousPurchase::getMerchantLocalDate)).stream())
                 .collect(Collectors.toSet());
 
         calculatedFields.setTransactionCount(new Velocity<>(

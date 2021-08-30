@@ -219,25 +219,25 @@ public enum ItemFilterField implements Serializable {
             ItemDataField.LAST_HOUR_UNIQUE_IP_COUNTRIES,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Count of transactions with unique IP Countries made by the user last hour before current purchase making. Collected near to time of purchase receiving."
+            "Count of transactions with unique IP Countries made by the user last hour before current purchase. Collected near to time of purchase receiving."
     ),
     LAST_DAY_UNIQUE_IP_COUNTRIES("Velocity/Stats", "Transactions with unique IP Countries (1 day)",
             ItemDataField.LAST_DAY_UNIQUE_IP_COUNTRIES,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Count of transactions with unique IP Countries made by the user last day before current purchase making. Collected near to time of purchase receiving."
+            "Count of transactions with unique IP Countries made by the user last day before current purchase. Collected near to time of purchase receiving."
     ),
     LAST_WEEK_UNIQUE_IP_COUNTRIES("Velocity/Stats", "Transactions with unique IP Countries (1 week)",
             ItemDataField.LAST_WEEK_UNIQUE_IP_COUNTRIES,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Count of transactions with unique IP Countries made by the user last week before current purchase making. Collected near to time of purchase receiving."
+            "Count of transactions with unique IP Countries made by the user last week before current purchase. Collected near to time of purchase receiving."
     ),
     LIFE_TIME_UNIQUE_IP_COUNTRIES("Velocity/Stats", "Transactions with unique IP Countries (lifetime)",
             ItemDataField.LIFE_TIME_UNIQUE_IP_COUNTRIES,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Count of all transactions with unique IP Countries made by the user before current purchase making. Collected near to time of purchase receiving."
+            "Count of all transactions with unique IP Countries made by the user before current purchase. Collected near to time of purchase receiving."
     ),
     CUSTOM_CONNECTION_COUNT_BUCKET("Velocity/Stats", "Connection count bucket",
             ItemDataField.CUSTOM_CONNECTION_COUNT_BUCKET,

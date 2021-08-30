@@ -683,6 +683,13 @@ public class ItemEnrichmentService {
         }
 
         //We need to group by original order id get the transaction that has max MerchantLocalDate, remove the rest and flat the grouping map
+
+        Set<PreviousPurchase> lifetimePreviousPurchases = purchase.getPreviousPurchaseList().stream()
+                .collect(groupingBy(PreviousPurchase::getOriginalOrderId))
+                .entrySet().stream()
+                .flatMap(m -> m.getValue().stream().max(Comparator.comparing(PreviousPurchase::getMerchantLocalDate)).stream())
+                .collect(Collectors.toSet());
+
         Set<PreviousPurchase> lastWeekPreviousPurchases = purchase.getPreviousPurchaseList().stream()
                 .filter(pp -> pp.getMerchantLocalDate().isAfter(purchase.getMerchantLocalDate().minusWeeks(1)))
                 .collect(groupingBy(PreviousPurchase::getOriginalOrderId))
@@ -696,6 +703,7 @@ public class ItemEnrichmentService {
                 .entrySet().stream()
                 .flatMap(m -> m.getValue().stream().max(Comparator.comparing(PreviousPurchase::getMerchantLocalDate)).stream())
                 .collect(Collectors.toSet());
+
         Set<PreviousPurchase> lastHourPreviousPurchases = lastDayPreviousPurchases.stream()
                 .filter(pp -> pp.getMerchantLocalDate().isAfter(purchase.getMerchantLocalDate().minusHours(1)))
                 .collect(groupingBy(PreviousPurchase::getOriginalOrderId))
@@ -706,12 +714,14 @@ public class ItemEnrichmentService {
         calculatedFields.setTransactionCount(new Velocity<>(
                 (long) lastHourPreviousPurchases.size(),
                 (long) lastDayPreviousPurchases.size(),
-                (long) lastWeekPreviousPurchases.size()));
+                (long) lastWeekPreviousPurchases.size(),
+                (long) lifetimePreviousPurchases.size()));
 
         calculatedFields.setTransactionAmount(new Velocity<>(
                 getPurchaseSetSumAmount(lastHourPreviousPurchases),
                 getPurchaseSetSumAmount(lastDayPreviousPurchases),
-                getPurchaseSetSumAmount(lastWeekPreviousPurchases)));
+                getPurchaseSetSumAmount(lastWeekPreviousPurchases),
+                getPurchaseSetSumAmount(lifetimePreviousPurchases)));
 
 
         Set<PreviousPurchase> lastHourRejectedPreviousPurchases = lastHourPreviousPurchases.stream()
@@ -723,16 +733,21 @@ public class ItemEnrichmentService {
         Set<PreviousPurchase> lastWeekRejectedPreviousPurchases = lastWeekPreviousPurchases.stream()
                 .filter(pp -> REJECTED_TRANSACTION_STATUS.equalsIgnoreCase(pp.getLastMerchantStatus()))
                 .collect(Collectors.toSet());
+        Set<PreviousPurchase> lifetimeRejectedPreviousPurchases = lifetimePreviousPurchases.stream()
+                .filter(pp -> REJECTED_TRANSACTION_STATUS.equalsIgnoreCase(pp.getLastMerchantStatus()))
+                .collect(Collectors.toSet());
 
         calculatedFields.setRejectedTransactionCount(new Velocity<>(
                 (long) lastHourRejectedPreviousPurchases.size(),
                 (long) lastDayRejectedPreviousPurchases.size(),
-                (long) lastWeekRejectedPreviousPurchases.size()));
+                (long) lastWeekRejectedPreviousPurchases.size(),
+                (long) lifetimeRejectedPreviousPurchases.size()));
 
         calculatedFields.setRejectedTransactionAmount(new Velocity<>(
                 getPurchaseSetSumAmount(lastHourRejectedPreviousPurchases),
                 getPurchaseSetSumAmount(lastDayRejectedPreviousPurchases),
-                getPurchaseSetSumAmount(lastWeekRejectedPreviousPurchases)));
+                getPurchaseSetSumAmount(lastWeekRejectedPreviousPurchases),
+                getPurchaseSetSumAmount(lifetimeRejectedPreviousPurchases)));
 
 
         Set<PreviousPurchase> lastHourFailedPreviousPurchases = lastHourPreviousPurchases.stream()
@@ -744,16 +759,21 @@ public class ItemEnrichmentService {
         Set<PreviousPurchase> lastWeekFailedPreviousPurchases = lastWeekPreviousPurchases.stream()
                 .filter(pp -> FAILED_TRANSACTION_STATUS.equalsIgnoreCase(pp.getLastMerchantStatus()))
                 .collect(Collectors.toSet());
+        Set<PreviousPurchase> lifetimeFailedPreviousPurchases = lifetimePreviousPurchases.stream()
+                .filter(pp -> FAILED_TRANSACTION_STATUS.equalsIgnoreCase(pp.getLastMerchantStatus()))
+                .collect(Collectors.toSet());
 
         calculatedFields.setFailedTransactionCount(new Velocity<>(
                 (long) lastHourFailedPreviousPurchases.size(),
                 (long) lastDayFailedPreviousPurchases.size(),
-                (long) lastWeekFailedPreviousPurchases.size()));
+                (long) lastWeekFailedPreviousPurchases.size(),
+                (long) lifetimeFailedPreviousPurchases.size()));
 
         calculatedFields.setFailedTransactionAmount(new Velocity<>(
                 getPurchaseSetSumAmount(lastHourFailedPreviousPurchases),
                 getPurchaseSetSumAmount(lastDayFailedPreviousPurchases),
-                getPurchaseSetSumAmount(lastWeekFailedPreviousPurchases)));
+                getPurchaseSetSumAmount(lastWeekFailedPreviousPurchases),
+                getPurchaseSetSumAmount(lifetimeFailedPreviousPurchases)));
 
 
         Set<PreviousPurchase> lastHourSuccessfulPreviousPurchases = lastHourPreviousPurchases.stream()
@@ -765,21 +785,27 @@ public class ItemEnrichmentService {
         Set<PreviousPurchase> lastWeekSuccessfulPreviousPurchases = lastWeekPreviousPurchases.stream()
                 .filter(pp -> APPROVED_TRANSACTION_STATUS.equalsIgnoreCase(pp.getLastMerchantStatus()))
                 .collect(Collectors.toSet());
+        Set<PreviousPurchase> lifetimeSuccessfulPreviousPurchases = lifetimePreviousPurchases.stream()
+                .filter(pp -> APPROVED_TRANSACTION_STATUS.equalsIgnoreCase(pp.getLastMerchantStatus()))
+                .collect(Collectors.toSet());
 
         calculatedFields.setSuccessfulTransactionCount(new Velocity<>(
                 (long) lastHourSuccessfulPreviousPurchases.size(),
                 (long) lastDaySuccessfulPreviousPurchases.size(),
-                (long) lastWeekSuccessfulPreviousPurchases.size()));
+                (long) lastWeekSuccessfulPreviousPurchases.size(),
+                (long) lifetimeSuccessfulPreviousPurchases.size()));
 
         calculatedFields.setSuccessfulTransactionAmount(new Velocity<>(
                 getPurchaseSetSumAmount(lastHourSuccessfulPreviousPurchases),
                 getPurchaseSetSumAmount(lastDaySuccessfulPreviousPurchases),
-                getPurchaseSetSumAmount(lastWeekSuccessfulPreviousPurchases)));
+                getPurchaseSetSumAmount(lastWeekSuccessfulPreviousPurchases),
+                getPurchaseSetSumAmount(lifetimeSuccessfulPreviousPurchases)));
 
         calculatedFields.setUniquePaymentInstrumentCount(new Velocity<>(
                 getUniquePaymentInstrumentCount(lastHourPreviousPurchases),
                 getUniquePaymentInstrumentCount(lastDayPreviousPurchases),
-                getUniquePaymentInstrumentCount(lastWeekPreviousPurchases)));
+                getUniquePaymentInstrumentCount(lastWeekPreviousPurchases),
+                getUniquePaymentInstrumentCount(lifetimePreviousPurchases)));
 
         if (purchase.getPaymentInstrumentList() == null) {
             purchase.setPaymentInstrumentList(new LinkedList<>());
@@ -795,21 +821,26 @@ public class ItemEnrichmentService {
                 filterPreviousPurchasesByPIUsage(lastDayPreviousPurchases, currentPurchasePaymentInstrumentIds);
         Set<PreviousPurchase> lastWeekTransactionWithCurrentPaymentInstrument =
                 filterPreviousPurchasesByPIUsage(lastWeekPreviousPurchases, currentPurchasePaymentInstrumentIds);
+        Set<PreviousPurchase> lifetimeTransactionWithCurrentPaymentInstrument =
+                filterPreviousPurchasesByPIUsage(lifetimePreviousPurchases, currentPurchasePaymentInstrumentIds);
 
         calculatedFields.setCurrentPaymentInstrumentTransactionCount(new Velocity<>(
                 (long) lastHourTransactionWithCurrentPaymentInstrument.size(),
                 (long) lastDayTransactionWithCurrentPaymentInstrument.size(),
-                (long) lastWeekTransactionWithCurrentPaymentInstrument.size()));
+                (long) lastWeekTransactionWithCurrentPaymentInstrument.size(),
+                (long) lifetimeTransactionWithCurrentPaymentInstrument.size()));
 
         calculatedFields.setCurrentPaymentInstrumentTransactionAmount(new Velocity<>(
                 getPurchaseSetSumAmount(lastHourTransactionWithCurrentPaymentInstrument),
                 getPurchaseSetSumAmount(lastDayTransactionWithCurrentPaymentInstrument),
-                getPurchaseSetSumAmount(lastWeekTransactionWithCurrentPaymentInstrument)));
+                getPurchaseSetSumAmount(lastWeekTransactionWithCurrentPaymentInstrument),
+                getPurchaseSetSumAmount(lifetimeTransactionWithCurrentPaymentInstrument)));
 
         calculatedFields.setUniqueIPCountries(new Velocity<>(
                 countUniqueIPCountriesInPreviousPurchases(lastHourPreviousPurchases),
                 countUniqueIPCountriesInPreviousPurchases(lastDayPreviousPurchases),
-                countUniqueIPCountriesInPreviousPurchases(lastWeekPreviousPurchases)));
+                countUniqueIPCountriesInPreviousPurchases(lastWeekPreviousPurchases),
+                countUniqueIPCountriesInPreviousPurchases(lifetimePreviousPurchases)));
 
         item.getPurchase().setCalculatedFields(calculatedFields);
     }

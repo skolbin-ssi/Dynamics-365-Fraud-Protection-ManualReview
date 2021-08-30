@@ -1,9 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
+import './velocities.scss';
+
 import autobind from 'autobind-decorator';
 import cn from 'classnames';
+import React, { Component } from 'react';
+
 import {
     ColumnActionsMode,
     DetailsList,
@@ -12,12 +15,11 @@ import {
     SelectionMode
 } from '@fluentui/react/lib/DetailsList';
 import { Text } from '@fluentui/react/lib/Text';
-import { ItemDetailsTile } from '../../item-details-tile';
-import { Item } from '../../../../../models/item';
 
-import { TransactionVelocity } from '../../../../../models/item/purchase/calculated-fields';
-import './velocities.scss';
 import { Price } from '../../../../../components/price';
+import { Item } from '../../../../../models/item';
+import { TransactionVelocity } from '../../../../../models/item/purchase/calculated-fields';
+import { ItemDetailsTile } from '../../item-details-tile';
 
 const CN = 'velocities';
 
@@ -66,12 +68,22 @@ export class Velocities extends Component<VelocitiesProps, never> {
             className: `${CN}__value`,
             onRender: (data: TransactionVelocity) => this.renderValue(data.isAmount, data.week, data.customPlaceholder),
         },
+        {
+            key: 'lifetime',
+            name: 'Lifetime',
+            minWidth: 100,
+            isPadded: true,
+            columnActionsMode: ColumnActionsMode.disabled,
+            className: `${CN}__value`,
+            onRender: (data: TransactionVelocity) => this.renderValue(data.isAmount, data.lifetime, data.customPlaceholder),
+        },
     ];
 
     private readonly valuePlaceholder = (value = 'N/A') => (<span className="placeholder">{value}</span>);
 
     @autobind
-    renderValue(isAmount: boolean, value: number, customPlaceholder?: string) {
+    renderValue(isAmount: boolean, value: number | undefined, customPlaceholder?: string) {
+        if (value === undefined) return this.valuePlaceholder();
         if (!Number.isFinite(value)) return this.valuePlaceholder(customPlaceholder);
 
         return (

@@ -15,6 +15,7 @@ export interface VelocityDTO {
     hour: number;
     day: number;
     week: number;
+    lifetime?: number;
 }
 
 export interface CalculatedFieldsDTO {

@@ -5,7 +5,6 @@ package com.griddynamics.msd365fp.manualreview.model.dfp;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,4 +19,5 @@ public class Velocity<T extends Serializable> implements Serializable {
     private T hour;
     private T day;
     private T week;
+    private T lifetime;
 }

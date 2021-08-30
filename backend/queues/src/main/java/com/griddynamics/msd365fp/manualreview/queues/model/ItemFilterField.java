@@ -262,97 +262,97 @@ public enum ItemFilterField implements Serializable {
             ItemDataField.LAST_HOUR_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of transactions for the last hour before purchase making. Collected near to time of purchase receiving."
+            "Count of transactions for the last hour before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_DAY_TRANSACTION_COUNT("Velocity/Stats", "Transaction count (1 day)",
             ItemDataField.LAST_DAY_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of transactions for the last day before purchase making. Collected near to time of purchase receiving."
+            "Count of transactions for the last day before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_WEEK_TRANSACTION_COUNT("Velocity/Stats", "Transaction count (1 week)",
             ItemDataField.LAST_WEEK_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of transactions for the last week before purchase making. Collected near to time of purchase receiving."
+            "Count of transactions for the last week before purchase making. Collected near to time of purchase receiving."
     ),
     LIFE_TIME_TRANSACTION_COUNT("Velocity/Stats", "Transaction count (lifetime)",
             ItemDataField.LIFE_TIME_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of all transactions for the current user. Collected near to time of purchase receiving."
+            "Count of all transactions for the current user. Collected near to time of purchase receiving."
     ),
     LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT("Velocity/Stats", "Successful transaction count (1 hour)",
             ItemDataField.LAST_HOUR_SUCCESSFUL_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of approved transactions for the last hour before purchase making. Collected near to time of purchase receiving."
+            "Count of approved transactions for the last hour before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT("Velocity/Stats", "Successful transaction count (1 day)",
             ItemDataField.LAST_DAY_SUCCESSFUL_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of approved transactions for the last day before purchase making. Collected near to time of purchase receiving."
+            "Count of approved transactions for the last day before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT("Velocity/Stats", "Successful transaction count (1 week)",
             ItemDataField.LAST_WEEK_SUCCESSFUL_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of approved transactions for the last week before purchase making. Collected near to time of purchase receiving."
+            "Count of approved transactions for the last week before purchase making. Collected near to time of purchase receiving."
     ),
     LIFE_TIME_SUCCESSFUL_TRANSACTION_COUNT("Velocity/Stats", "Successful transaction count (lifetime)",
             ItemDataField.LIFE_TIME_SUCCESSFUL_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of all approved transactions for the user before purchase making. Collected near to time of purchase receiving."
+            "Count of all approved transactions for the user before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_HOUR_REJECTED_TRANSACTION_COUNT("Velocity/Stats", "Rejected transaction count (1 hour)",
             ItemDataField.LAST_HOUR_REJECTED_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of rejected transactions for the last hour before purchase making. Collected near to time of purchase receiving."
+            "Count of rejected transactions for the last hour before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_DAY_REJECTED_TRANSACTION_COUNT("Velocity/Stats", "Rejected transaction count (1 day)",
             ItemDataField.LAST_DAY_REJECTED_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of rejected transactions for the last day before purchase making. Collected near to time of purchase receiving."
+            "Count of rejected transactions for the last day before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_WEEK_REJECTED_TRANSACTION_COUNT("Velocity/Stats", "Rejected transaction count (1 week)",
             ItemDataField.LAST_WEEK_REJECTED_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of rejected transactions for the last week before purchase making. Collected near to time of purchase receiving."
+            "Count of rejected transactions for the last week before purchase making. Collected near to time of purchase receiving."
     ),
     LIFE_TIME_REJECTED_TRANSACTION_COUNT("Velocity/Stats", "Rejected transaction count (lifetime)",
             ItemDataField.LIFE_TIME_REJECTED_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of all rejected transactions for that user before purchase making. Collected near to time of purchase receiving."
+            "Count of all rejected transactions for that user before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_HOUR_FAILED_TRANSACTION_COUNT("Velocity/Stats", "Failed transaction count (1 hour)",
             ItemDataField.LAST_HOUR_FAILED_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of failed transactions for the last hour before purchase making. Collected near to time of purchase receiving."
+            "Count of failed transactions for the last hour before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_DAY_FAILED_TRANSACTION_COUNT("Velocity/Stats", "Failed transaction count (1 day)",
             ItemDataField.LAST_DAY_FAILED_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of failed transactions for the last day before purchase making. Collected near to time of purchase receiving."
+            "Count of failed transactions for the last day before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_WEEK_FAILED_TRANSACTION_COUNT("Velocity/Stats", "Failed transaction count (1 week)",
             ItemDataField.LAST_WEEK_FAILED_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of failed transactions for the last week before purchase making. Collected near to time of purchase receiving."
+            "Count of failed transactions for the last week before purchase making. Collected near to time of purchase receiving."
     ),
     LIFE_TIME_FAILED_TRANSACTION_COUNT("Velocity/Stats", "Failed transaction count (lifetime)",
             ItemDataField.LIFE_TIME_FAILED_TRANSACTION_COUNT,
             Set.of(BETWEEN, NOT_BETWEEN, EQUAL, NOT_EQUAL, LESS, GREATER, LESS_OR_EQUAL, GREATER_OR_EQUAL),
             "0", null,
-            "Amount of all failed transactions for the user before purchase making. Collected near to time of purchase receiving."
+            "Count of all failed transactions for the user before purchase making. Collected near to time of purchase receiving."
     ),
     LAST_HOUR_TRANSACTION_AMOUNT("Velocity/Stats", "Transaction amount (1 hour)",
             ItemDataField.LAST_HOUR_TRANSACTION_AMOUNT,

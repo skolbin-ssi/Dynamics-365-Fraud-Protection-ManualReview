@@ -685,28 +685,28 @@ public class ItemEnrichmentService {
         //We need to group by original order id get the transaction that has max MerchantLocalDate, remove the rest and flat the grouping map
 
         Set<PreviousPurchase> lifetimePreviousPurchases = purchase.getPreviousPurchaseList().stream()
-                .collect(groupingBy(PreviousPurchase::getOriginalOrderId))
+                .collect(groupingBy(m -> m.getOriginalOrderId() == null ? m.getPurchaseId() : m.getOriginalOrderId()))
                 .entrySet().stream()
                 .flatMap(m -> m.getValue().stream().max(Comparator.comparing(PreviousPurchase::getMerchantLocalDate)).stream())
                 .collect(Collectors.toSet());
 
         Set<PreviousPurchase> lastWeekPreviousPurchases = purchase.getPreviousPurchaseList().stream()
                 .filter(pp -> pp.getMerchantLocalDate().isAfter(purchase.getMerchantLocalDate().minusWeeks(1)))
-                .collect(groupingBy(PreviousPurchase::getOriginalOrderId))
+                .collect(groupingBy(m -> m.getOriginalOrderId() == null ? m.getPurchaseId() : m.getOriginalOrderId()))
                 .entrySet().stream()
                 .flatMap(m -> m.getValue().stream().max(Comparator.comparing(PreviousPurchase::getMerchantLocalDate)).stream())
                 .collect(Collectors.toSet());
 
         Set<PreviousPurchase> lastDayPreviousPurchases = lastWeekPreviousPurchases.stream()
                 .filter(pp -> pp.getMerchantLocalDate().isAfter(purchase.getMerchantLocalDate().minusDays(1)))
-                .collect(groupingBy(PreviousPurchase::getOriginalOrderId))
+                .collect(groupingBy(m -> m.getOriginalOrderId() == null ? m.getPurchaseId() : m.getOriginalOrderId()))
                 .entrySet().stream()
                 .flatMap(m -> m.getValue().stream().max(Comparator.comparing(PreviousPurchase::getMerchantLocalDate)).stream())
                 .collect(Collectors.toSet());
 
         Set<PreviousPurchase> lastHourPreviousPurchases = lastDayPreviousPurchases.stream()
                 .filter(pp -> pp.getMerchantLocalDate().isAfter(purchase.getMerchantLocalDate().minusHours(1)))
-                .collect(groupingBy(PreviousPurchase::getOriginalOrderId))
+                .collect(groupingBy(m -> m.getOriginalOrderId() == null ? m.getPurchaseId() : m.getOriginalOrderId()))
                 .entrySet().stream()
                 .flatMap(m -> m.getValue().stream().max(Comparator.comparing(PreviousPurchase::getMerchantLocalDate)).stream())
                 .collect(Collectors.toSet());

@@ -2,16 +2,17 @@
 // Licensed under the MIT license.
 
 import {
-    action, computed, observable
+    action,
+    computed,
+    observable
 } from 'mobx';
 
+import { AnalystPerformanceDTO } from '../../data-services/api-services/models/dashboard';
+import { AnalystPerformanceDetails } from './analyst-performance-details';
 import { EntityPerformance } from './entity-performance';
 import { PerformanceMetrics } from './performance-metrics';
-
 import { User } from '../user';
-
 import { generateColor } from '../../utils/colors';
-import { AnalystPerformanceDTO } from '../../data-services/api-services/models/dashboard';
 
 /**
  * AnalystPerformance - analyst performance model
@@ -20,10 +21,13 @@ export class AnalystPerformance extends EntityPerformance {
     @observable
     analyst: User | null = null;
 
+    details: AnalystPerformanceDetails[] | undefined;
+
     fromDto(entity: AnalystPerformanceDTO) {
         this.id = entity.id;
         this.data = entity.data;
         this.total = (entity.total as PerformanceMetrics);
+        this.details = entity.details.map(item => new AnalystPerformanceDetails().fromDto(item));
         generateColor(entity.id)
             .then(generatedColor => {
                 this.color = generatedColor || '';

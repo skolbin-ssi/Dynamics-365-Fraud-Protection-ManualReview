@@ -1,21 +1,25 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import React, { Component } from 'react';
-import autoBind from 'autobind-decorator';
-import { observer } from 'mobx-react';
-import cx from 'classnames';
-
-import { Text } from '@fluentui/react/lib/Text';
-import { Checkbox } from '@fluentui/react/lib/Checkbox';
-import { DetailsListLayoutMode, IColumn, SelectionMode, } from '@fluentui/react/lib/DetailsList';
-import { Persona, PersonaSize, IPersonaProps } from '@fluentui/react/lib/Persona';
-import { ShimmeredDetailsList } from '@fluentui/react/lib/ShimmeredDetailsList';
-
-import { AnalystPerformance, BasicEntityPerformance } from '../../../models/dashboard';
-import { DEFAULT_DATA_LIST_SHIMMER_LINES_NUMBER } from '../../../constants';
-
 import './data-grid-list.scss';
+
+import { DetailsListLayoutMode, IColumn, SelectionMode, } from '@fluentui/react/lib/DetailsList';
+import { IPersonaProps, Persona, PersonaSize } from '@fluentui/react/lib/Persona';
+import React, { Component } from 'react';
+
+import { Checkbox } from '@fluentui/react/lib/Checkbox';
+import { ShimmeredDetailsList } from '@fluentui/react/lib/ShimmeredDetailsList';
+import { Text } from '@fluentui/react/lib/Text';
+import autoBind from 'autobind-decorator';
+import cx from 'classnames';
+import { observer } from 'mobx-react';
+import { observable } from 'mobx';
+import { CSVLink } from 'react-csv';
+import { DEFAULT_DATA_LIST_SHIMMER_LINES_NUMBER } from '../../../constants';
+import { AnalystPerformance, BasicEntityPerformance } from '../../../models/dashboard';
+import { CSVReportBuilder } from '../../../utility-services';
+import { AnalystPerformanceDetails } from '../../../models/dashboard/analyst-performance-details';
+import { convertToCSVString } from '../../../utility-services/convert-service';
 
 const CN = 'data-grid-list';
 
@@ -26,112 +30,155 @@ interface DataGridListProps<T> {
     isLoading: boolean;
     data: T[] | null;
     onRowClick?(selectedItem: any): void;
-    onRowSelection(queueId: string, checked?: boolean): void
+    onRowSelection(queueId: string, checked?: boolean): void;
 }
 
 @observer
 export class DataGridList<T extends BasicEntityPerformance> extends Component<DataGridListProps<T>, never> {
-    private readonly columns: IColumn[] = [
-        {
+    @observable
+    protected csvReportBuilder = new CSVReportBuilder();
+
+    private get columns(): IColumn[] {
+        const result = [
+            {
             // eslint-disable-next-line react/destructuring-assignment
-            key: this.props.isAnalystTable ? 'analyst' : ' queue',
-            // eslint-disable-next-line react/destructuring-assignment
-            name: this.props.isAnalystTable ? 'Analyst' : 'Queue',
-            minWidth: 50,
-            maxWidth: 600,
-            onRender: this.renderFirstColumn,
-        },
-        {
-            key: 'reviewed',
-            name: 'Reviewed',
-            minWidth: 50,
-            maxWidth: 120,
-            className: `${CN}__right-aligned-cell`,
-            onRender: ({ total }: T) => (
-                <div className={`${CN}__content-row`}>
-                    <Text variant="medium" className={`${CN}__score-cell`}>
-                        {total.reviewed}
-                    </Text>
-                </div>
-            ),
-        },
-        {
-            key: 'good',
-            name: 'Good',
-            minWidth: 50,
-            maxWidth: 120,
-            className: `${CN}__right-aligned-cell`,
-            onRender: (queue: T) => (
-                <div className={`${CN}__content-row`}>
-                    <Text variant="medium" className={`${CN}__score-cell`}>
-                        {queue.total.good}
-                    </Text>
-                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--good`)}>
-                        <span>
-                            {queue.goodDecisionsRatio}
-                            %
-                        </span>
+                key: this.props.isAnalystTable ? 'analyst' : ' queue',
+                // eslint-disable-next-line react/destructuring-assignment
+                name: this.props.isAnalystTable ? 'Analyst' : 'Queue',
+                minWidth: 50,
+                maxWidth: 600,
+                onRender: this.renderFirstColumn,
+            },
+            {
+                key: 'reviewed',
+                name: 'Reviewed',
+                minWidth: 50,
+                maxWidth: 80,
+                className: `${CN}__right-aligned-cell`,
+                onRender: ({ total }: T) => (
+                    <div className={`${CN}__content-row`}>
+                        <Text variant="medium" className={`${CN}__score-cell`}>
+                            {total.reviewed}
+                        </Text>
                     </div>
-                </div>
-            ),
-        },
-        {
-            key: 'watched',
-            name: 'Watch',
-            minWidth: 50,
-            maxWidth: 120,
-            className: `${CN}__right-aligned-cell`,
-            onRender: (queue: T) => (
-                <div className={`${CN}__content-row`}>
-                    <Text variant="medium" className={`${CN}__score-cell`}>
-                        {queue.total.watched}
-                    </Text>
-                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--watched`)}>
-                        <span>
-                            {queue.watchDecisionsRatio}
-                            %
-                        </span>
+                ),
+            },
+            {
+                key: 'good',
+                name: 'Good',
+                minWidth: 50,
+                maxWidth: 80,
+                className: `${CN}__right-aligned-cell`,
+                onRender: (queue: T) => (
+                    <div className={`${CN}__content-row`}>
+                        <Text variant="medium" className={`${CN}__score-cell`}>
+                            {queue.total.good}
+                        </Text>
+                        <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--good`)}>
+                            <span>
+                                {queue.goodDecisionsRatio}
+                                %
+                            </span>
+                        </div>
                     </div>
-                </div>
-            ),
-        },
-        {
-            key: 'bad',
-            name: 'Bad',
-            minWidth: 50,
-            maxWidth: 120,
-            className: `${CN}__right-aligned-cell`,
-            onRender: (queue: T) => (
-                <div className={`${CN}__content-row`}>
-                    <Text variant="medium" className={`${CN}__score-cell`}>
-                        {queue.total.bad}
-                    </Text>
-                    <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--bad`)}>
-                        <span>
+                ),
+            },
+            {
+                key: 'watched',
+                name: 'Watch',
+                minWidth: 50,
+                maxWidth: 80,
+                className: `${CN}__right-aligned-cell`,
+                onRender: (queue: T) => (
+                    <div className={`${CN}__content-row`}>
+                        <Text variant="medium" className={`${CN}__score-cell`}>
+                            {queue.total.watched}
+                        </Text>
+                        <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--watched`)}>
+                            <span>
+                                {queue.watchDecisionsRatio}
+                                %
+                            </span>
+                        </div>
+                    </div>
+                ),
+            },
+            {
+                key: 'bad',
+                name: 'Bad',
+                minWidth: 50,
+                maxWidth: 80,
+                className: `${CN}__right-aligned-cell`,
+                onRender: (queue: T) => (
+                    <div className={`${CN}__content-row`}>
+                        <Text variant="medium" className={`${CN}__score-cell`}>
+                            {queue.total.bad}
+                        </Text>
+                        <div className={cx(`${CN}__cell-label`, `${CN}__cell-label--bad`)}>
+                            <span>
+                                {queue.badDecisionsRatio}
+                                %
+                            </span>
+                        </div>
+                    </div>
+                ),
+            },
+            {
+                key: 'badDecisionsRate',
+                name: 'Bad decision rate',
+                minWidth: 80,
+                maxWidth: 120,
+                className: `${CN}__right-aligned-cell`,
+                onRender: (queue: T) => (
+                    <div className={`${CN}__content-row`}>
+                        <Text variant="medium" className={`${CN}__score-cell`}>
                             {queue.badDecisionsRatio}
                             %
-                        </span>
+                        </Text>
                     </div>
-                </div>
-            ),
-        },
-        {
-            key: 'badDecisionsRate',
-            name: 'Bad decision rate',
-            minWidth: 80,
-            maxWidth: 80,
-            className: `${CN}__right-aligned-cell`,
-            onRender: (queue: T) => (
-                <div className={`${CN}__content-row`}>
-                    <Text variant="medium" className={`${CN}__score-cell`}>
-                        {queue.badDecisionsRatio}
-                        %
-                    </Text>
-                </div>
-            ),
-        },
+                ),
+            }
 
-    ];
+        ];
+
+        const { isAnalystTable } = this.props;
+
+        if (isAnalystTable) {
+            result.push(
+                {
+                    key: 'totalActionsApplied',
+                    name: 'Total actions applied',
+                    minWidth: 100,
+                    maxWidth: 100,
+                    className: `${CN}__right-aligned-cell`,
+                    onRender: (queue: T) => (
+                        <CSVLink
+                            filename={`${queue.name}.csv`}
+                            className={`${CN}__download-link`}
+                            data={this.DataForDownload(queue.details)}
+                        >
+                            Download
+                        </CSVLink>
+                    ),
+                },
+            );
+        }
+
+        return result;
+    }
+
+    DataForDownload(data: AnalystPerformanceDetails[] | undefined): string {
+        if (data) {
+            const dataForConversion = data.map(x => ({
+                PurchaseId: x.id,
+                Label: x.label,
+                Decision: x.merchantRuleDecision,
+                Link: `${window.location.origin}/search/xx/item/${x.id}`
+            }));
+            return convertToCSVString(dataForConversion);
+        }
+        return '';
+    }
 
     renderUserRow(entity: BasicEntityPerformance) {
         const { onRowClick } = this.props;

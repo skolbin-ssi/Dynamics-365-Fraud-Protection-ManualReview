@@ -4,15 +4,14 @@
 import '../queue-performance/queue-performance.scss';
 import './analysts-performance.scss';
 
-import autoBind from 'autobind-decorator';
-import { History } from 'history';
-import { resolve } from 'inversify-react';
-import { disposeOnUnmount, observer } from 'mobx-react';
 import React, { Component } from 'react';
-import { RouteComponentProps } from 'react-router-dom';
-
+import { disposeOnUnmount, observer } from 'mobx-react';
 import { DefaultButton } from '@fluentui/react/lib/Button';
-
+import { History } from 'history';
+import { RouteComponentProps } from 'react-router-dom';
+import autoBind from 'autobind-decorator';
+import { resolve } from 'inversify-react';
+import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
 import {
     CHART_AGGREGATION_PERIOD,
     CHART_AGGREGATION_PERIOD_DISPLAY,
@@ -21,16 +20,16 @@ import {
     TOP_ANALYST_DISPLAY_VIEW,
     WARNING_MESSAGES,
 } from '../../../constants';
-import { AnalystPerformance } from '../../../models/dashboard';
-import { TYPES } from '../../../types';
-import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
-import { formatToQueryDateString } from '../../../utils/date';
 import { DashboardScreenStore, ReportsModalStore, UpdateQuerySearchReactionParams } from '../../../view-services';
+import { readUrlSearchQueryOptions, stringifyIntoUrlQueryString } from '../../../utility-services';
+
+import { AnalystPerformance } from '../../../models/dashboard';
 import { AnalystsPerformanceStore } from '../../../view-services/dashboard/analysts-performance-store';
 import { BlurLoader } from '../blur-loader';
 import { DataGridList } from '../data-grid-list';
 import { LineChart } from '../line-chart';
-import { SwitchHeader as AggregationHeader, SwitchHeader } from '../switch-header';
+import { TYPES } from '../../../types';
+import { formatToQueryDateString } from '../../../utils/date';
 
 const CN = 'queues-performance';
 

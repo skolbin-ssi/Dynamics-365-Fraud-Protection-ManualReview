@@ -3,6 +3,7 @@
 
 package com.griddynamics.msd365fp.manualreview.analytics.repository;
 
+import com.griddynamics.msd365fp.manualreview.analytics.model.AnalystDetails;
 import com.griddynamics.msd365fp.manualreview.analytics.model.ItemLabelingBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.LabelBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.LabelingTimeBucket;
@@ -59,6 +60,23 @@ public interface ItemLabelActivityRepositoryCustomMethods {
             @NonNull final Duration aggregation,
             final Set<String> analystIds,
             final Set<String> queueIds);
+
+    /**
+     * Calculate overall performance by provided query parameters.
+     * Buckets are separated by labels and merchantRuleDecisions.
+     * Bucket ids are filled by analyst ids. The number of the bucket
+     * defines a period of time in accordance with {@code aggregation}.
+     *
+     * @param startDateTime a time bound
+     * @param endDateTime   a time bound
+     * @param analystIds    a list of analyst ids for filtering,
+     *                      if it's empty the all analysts are counted
+     * @return the list of decisions and individual purchases made by the analysts in analystIds Set
+     */
+    List<AnalystDetails> getAnalystDetails(
+            @NonNull final OffsetDateTime startDateTime,
+            @NonNull final OffsetDateTime endDateTime,
+            final Set<String> analystIds);
 
     /**
      * Calculate overall performance by provided query parameters.

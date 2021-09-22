@@ -36,10 +36,10 @@
             "value": "eastus"
         },
         "autoscaleMaxThroughputAnalyticsDB": {
-            "value": 4000
+            "value": 10000
         },
         "autoscaleMaxThroughputQueuesDB": {
-            "value": 4000
+            "value": 10000
         },
         "ehubMaximumThroughputUnits": {
             "value": 8

@@ -53,8 +53,8 @@
       },
       "autoscaleMaxThroughputAnalyticsDb": {
         "type": "int",
-        "defaultValue": 4000,
-        "minValue": 4000,
+        "defaultValue": 10000,
+        "minValue": 10000,
         "maxValue": 100000,
         "metadata": {
           "description": "Maximum throughput for the Analytics Db"
@@ -62,8 +62,8 @@
       },
       "autoscaleMaxThroughputQueuesDb": {
         "type": "int",
-        "defaultValue": 4000,
-        "minValue": 4000,
+        "defaultValue": 10000,
+        "minValue": 10000,
         "maxValue": 100000,
         "metadata": {
           "description": "Maximum throughput for the Queues Db"

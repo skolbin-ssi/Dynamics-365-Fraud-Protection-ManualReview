@@ -3,6 +3,7 @@
 
 package com.griddynamics.msd365fp.manualreview.analytics.service.dashboard;
 
+import com.griddynamics.msd365fp.manualreview.analytics.model.AnalystDetails;
 import com.griddynamics.msd365fp.manualreview.analytics.model.ItemLabelingBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.LabelBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.LabelingTimeBucket;
@@ -69,12 +70,25 @@ public class PublicItemLabelingHistoryClient {
             @NonNull final Duration aggregation,
             final Set<String> analystIds,
             final Set<String> queueIds) {
-        return labelActivityRepository.getAnalystPerformance(
+        var result =  labelActivityRepository.getAnalystPerformance(
                 from,
                 to,
                 aggregation,
                 analystIds,
                 queueIds);
+
+        return result;
+    }
+
+    public List<AnalystDetails> getAnalystDetails( @NonNull final OffsetDateTime from,
+                                                   @NonNull final OffsetDateTime to,
+                                                   final Set<String> analystIds) {
+        var result =  labelActivityRepository.getAnalystDetails(
+                from,
+                to,
+                analystIds);
+
+        return result;
     }
 
     @PreAuthorize("@dataSecurityService.checkPermissionForAnalystPerformanceReading(authentication, #analystIds)")

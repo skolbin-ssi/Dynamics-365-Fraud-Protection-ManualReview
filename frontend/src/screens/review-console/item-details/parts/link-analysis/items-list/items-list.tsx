@@ -16,17 +16,20 @@ import {
     IColumn,
     IDetailsListProps,
     IDetailsRowStyles,
+    IGroup,
     Selection,
     SelectionMode
 } from '@fluentui/react/lib/DetailsList';
 import { Spinner } from '@fluentui/react/lib/Spinner';
 import { Text } from '@fluentui/react/lib/Text';
 
+import { groupBy } from 'lodash';
 import { IconText } from '../../../../../../components/icon-text';
 import { DEFAULT_LINK_ANALYSIS_ITEMS_PER_PAGE, ITEM_LIST_COLUMN_KEYS } from '../../../../../../constants';
 import { ITEM_STATUS } from '../../../../../../models/item';
 import { LinkAnalysisDfpItem, LinkAnalysisMrItem } from '../../../../../../models/item/link-analysis';
 import { LinkAnalysisItem } from '../../../../../../view-services';
+import { formatDateStringToJSDate } from '../../../../../../utils/date/formatters';
 
 interface ItemsListComponentProps {
     data: LinkAnalysisItem[];
@@ -326,6 +329,44 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
             this.selection.setAllSelected(false);
             return this.renderLoader();
         }
+        const sortedData = data
+            .slice()
+            .sort((prev, next) => {
+                const prevX = isMrItem(prev)
+                    ? prev.item?.purchase?.merchantLocalDate
+                    : prev.merchantLocalDate;
+                const nextX = isMrItem(next)
+                    ? next.item?.purchase?.merchantLocalDate
+                    : next.merchantLocalDate;
+                const prevDate = formatDateStringToJSDate(prevX);
+                const nextDate = formatDateStringToJSDate(nextX);
+
+                if (prevDate && nextDate) {
+                    return nextDate.getTime() - prevDate.getTime();
+                }
+
+                return 0;
+            });
+
+        const groupsData = groupBy(data, 'item.purchase.originalOrderId');
+
+        const groups: IGroup[] = [];
+        const groupedItems: LinkAnalysisItem[] = [];
+        let groupIndex = 0;
+
+        Object.keys(groupsData).forEach((id: string) => {
+            const currentGroup = groupsData[id];
+            currentGroup.forEach((i: LinkAnalysisItem) => groupedItems.push(i));
+
+            groups.push({
+                key: `group${id}`,
+                name: `Original order ID: ${id}`,
+                startIndex: groupIndex,
+                count: currentGroup.length,
+                level: 1
+            });
+            groupIndex += currentGroup.length;
+        });
 
         if (isSelectable) {
             return (
@@ -333,12 +374,13 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
                     <DetailsList
                         columns={this.columns}
                         className={cx(CN)}
+                        groups={groups}
                         selection={this.selection}
-                        items={data || []}
+                        items={sortedData || []}
                         /* eslint-disable-next-line react/jsx-props-no-spreading */
                         onRenderRow={this.onRenderRow}
                     />
-                    { data.length > 0 && this.renderLoadMoreBtn() }
+                    { sortedData.length > 0 && this.renderLoadMoreBtn() }
                 </>
             );
         }
@@ -349,11 +391,12 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
                     columns={this.columns}
                     selectionMode={SelectionMode.none}
                     className={cx(CN)}
-                    items={data || []}
+                    groups={groups}
+                    items={sortedData || []}
                     /* eslint-disable-next-line react/jsx-props-no-spreading */
                     onRenderRow={this.onRenderRow}
                 />
-                { data.length > 0 && this.renderLoadMoreBtn() }
+                { sortedData.length > 0 && this.renderLoadMoreBtn() }
             </>
         );
     }

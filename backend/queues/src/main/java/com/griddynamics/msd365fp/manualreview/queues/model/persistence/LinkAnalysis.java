@@ -62,7 +62,7 @@ public class LinkAnalysis {
         @Override
         public int compareTo(@NonNull final MRItemInfo o) {
             return Comparator
-                    .comparing(MRItemInfo::getImported)
+                    .comparing(MRItemInfo::getImported).reversed()
                     .thenComparing(MRItemInfo::getId)
                     .compare(this, o);
         }

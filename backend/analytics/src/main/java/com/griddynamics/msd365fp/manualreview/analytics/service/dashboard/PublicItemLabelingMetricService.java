@@ -3,10 +3,7 @@
 
 package com.griddynamics.msd365fp.manualreview.analytics.service.dashboard;
 
-import com.griddynamics.msd365fp.manualreview.analytics.model.ItemLabelingBucket;
-import com.griddynamics.msd365fp.manualreview.analytics.model.LabelBucket;
-import com.griddynamics.msd365fp.manualreview.analytics.model.LabelingTimeBucket;
-import com.griddynamics.msd365fp.manualreview.analytics.model.LockTimeBucket;
+import com.griddynamics.msd365fp.manualreview.analytics.model.*;
 import com.griddynamics.msd365fp.manualreview.analytics.model.dto.*;
 import com.griddynamics.msd365fp.manualreview.analytics.util.DataGenerationUtility;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +15,8 @@ import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @RequiredArgsConstructor
@@ -131,11 +130,18 @@ public class PublicItemLabelingMetricService {
                 queueIds);
         aggergateDBResultsToLabelingMetricMaps(from, to, aggregation, result, totalResult, dbResult);
 
+        List<AnalystDetails> details = labelingClient.getAnalystDetails(
+                from,
+                to,
+                analystIds);
+        Map<String, List<AnalystDetails>> detailsGroupedByAnalyst = details.stream().collect(groupingBy(AnalystDetails::getAnalystId));
+
         if (!result.isEmpty()) {
             result.forEach((id, data) -> dto.add(ItemLabelingMetricsByAnalystDTO.builder()
                     .id(id)
                     .data(data)
                     .total(totalResult.get(id))
+                    .details(detailsGroupedByAnalyst.get(id))
                     .build()));
         }
 
@@ -205,7 +211,7 @@ public class PublicItemLabelingMetricService {
             Set<String> queueIds) {
         return new RiskScoreOverviewDTO(labelingClient.getRiskScoreDistribution(from, to, bucketSize, analystIds, queueIds)
                 .collect(
-                        Collectors.groupingBy(
+                        groupingBy(
                                 LabelBucket::getLowerBound,
                                 Collector.of(
                                         RiskScoreOverviewDTO.RiskScoreBucketDTO::new,

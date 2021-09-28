@@ -3,6 +3,7 @@
 
 package com.griddynamics.msd365fp.manualreview.analytics.repository;
 
+import com.griddynamics.msd365fp.manualreview.analytics.model.AnalystDetails;
 import com.griddynamics.msd365fp.manualreview.analytics.model.ItemLabelingBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.LabelBucket;
 import com.griddynamics.msd365fp.manualreview.analytics.model.LabelingTimeBucket;
@@ -90,7 +91,28 @@ public class ItemLabelActivityRepositoryImpl implements ItemLabelActivityReposit
                 .map(Optional::get)
                 .collect(Collectors.toList());
     }
+    
+    @Override
+    public List<AnalystDetails> getAnalystDetails(@NonNull final OffsetDateTime startDateTime,
+                                                  @NonNull final OffsetDateTime endDateTime,
+                                                  final Set<String> analystIds) {
+        String query = String.format(
+                        "SELECT c.label, c.merchantRuleDecision, c.id, c.analystId " +
+                        "FROM c WHERE " +
+                        "(c.labeled BETWEEN %1$s AND %2$s) " +
+                        " %3$s " +
+                        "AND IS_DEFINED(c.queueId) AND NOT IS_NULL(c.queueId) ",
 
+                startDateTime.toEpochSecond(),
+                endDateTime.toEpochSecond(),
+                CollectionUtils.isEmpty(analystIds) ? "" :
+                        String.format("AND c.analystId IN ('%1$s') ", String.join("','", analystIds)));
+        return itemLabelActivityContainer.runCrossPartitionQuery(query)
+                .map(cip -> itemLabelActivityContainer.castCosmosObjectToClassInstance(cip.toJson(), AnalystDetails.class))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public List<ItemLabelingBucket> getTotalPerformance(@NonNull final OffsetDateTime startDateTime,

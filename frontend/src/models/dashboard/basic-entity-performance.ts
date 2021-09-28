@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { AnalystPerformanceDetails } from './analyst-performance-details';
 import { PerformanceMetrics } from './performance-metrics';
-
 import { PeriodPerformanceMetrics } from '../../data-services/api-services/models/dashboard';
 
 /**
@@ -23,6 +23,11 @@ export interface BasicEntityPerformance {
      * data - entity performance metrics
      */
     data: PeriodPerformanceMetrics;
+
+    /**
+     * details - entity performance details
+     */
+    details?: AnalystPerformanceDetails[];
 
     /**
      * total - total (aggregated) performance for an entity

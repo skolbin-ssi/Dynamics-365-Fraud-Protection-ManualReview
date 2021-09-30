@@ -29,7 +29,6 @@ import { DEFAULT_LINK_ANALYSIS_ITEMS_PER_PAGE, ITEM_LIST_COLUMN_KEYS } from '../
 import { ITEM_STATUS } from '../../../../../../models/item';
 import { LinkAnalysisDfpItem, LinkAnalysisMrItem } from '../../../../../../models/item/link-analysis';
 import { LinkAnalysisItem } from '../../../../../../view-services';
-import { formatDateStringToJSDate } from '../../../../../../utils/date/formatters';
 
 interface ItemsListComponentProps {
     data: LinkAnalysisItem[];
@@ -329,25 +328,6 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
             this.selection.setAllSelected(false);
             return this.renderLoader();
         }
-        const sortedData = data
-            .slice()
-            .sort((prev, next) => {
-                const prevX = isMrItem(prev)
-                    ? prev.item?.purchase?.merchantLocalDate
-                    : prev.merchantLocalDate;
-                const nextX = isMrItem(next)
-                    ? next.item?.purchase?.merchantLocalDate
-                    : next.merchantLocalDate;
-                const prevDate = formatDateStringToJSDate(prevX);
-                const nextDate = formatDateStringToJSDate(nextX);
-
-                if (prevDate && nextDate) {
-                    return nextDate.getTime() - prevDate.getTime();
-                }
-
-                return 0;
-            });
-
         const groupsData = groupBy(data, 'item.purchase.originalOrderId');
 
         const groups: IGroup[] = [];
@@ -376,11 +356,11 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
                         className={cx(CN)}
                         groups={groups}
                         selection={this.selection}
-                        items={sortedData || []}
+                        items={data || []}
                         /* eslint-disable-next-line react/jsx-props-no-spreading */
                         onRenderRow={this.onRenderRow}
                     />
-                    { sortedData.length > 0 && this.renderLoadMoreBtn() }
+                    { data.length > 0 && this.renderLoadMoreBtn() }
                 </>
             );
         }
@@ -392,11 +372,11 @@ export class ItemsList extends Component<ItemsListComponentProps, never> {
                     selectionMode={SelectionMode.none}
                     className={cx(CN)}
                     groups={groups}
-                    items={sortedData || []}
+                    items={data || []}
                     /* eslint-disable-next-line react/jsx-props-no-spreading */
                     onRenderRow={this.onRenderRow}
                 />
-                { sortedData.length > 0 && this.renderLoadMoreBtn() }
+                { data.length > 0 && this.renderLoadMoreBtn() }
             </>
         );
     }

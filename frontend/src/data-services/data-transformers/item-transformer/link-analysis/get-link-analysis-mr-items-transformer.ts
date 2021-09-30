@@ -6,13 +6,24 @@ import { LinkAnalysisMrItem } from '../../../../models/item/link-analysis';
 import { GetLinkAnalysisMrItemsResponse } from '../../../api-services/item-api-service/api-models';
 import { LinkAnalysisMrItemDto } from '../../../api-services/models/item';
 import { UserBuilder } from '../../../../utility-services';
+import { formatDateStringToJSDate } from '../../../../utils/date/formatters';
 
 export class GetLinkAnalysisMrItemsTransformer implements DataTransformer {
     constructor(private readonly userBuilder: UserBuilder) {}
 
     mapResponse(getLinkAnalysisMrItemsResponse: GetLinkAnalysisMrItemsResponse): LinkAnalysisMrItem[] {
         return getLinkAnalysisMrItemsResponse.values
-            .map(linkAnalysisMrItemDto => this.mapSingleItem(linkAnalysisMrItemDto));
+            .map(linkAnalysisMrItemDto => this.mapSingleItem(linkAnalysisMrItemDto))
+            .sort((prev, next) => {
+                const prevDate = formatDateStringToJSDate(prev.item?.purchase?.merchantLocalDate);
+                const nextDate = formatDateStringToJSDate(next.item?.purchase?.merchantLocalDate);
+
+                if (prevDate && nextDate) {
+                    return nextDate.getTime() - prevDate.getTime();
+                }
+
+                return 0;
+            });
     }
 
     private mapSingleItem(linkAnalysisMrItemDto: LinkAnalysisMrItemDto) {

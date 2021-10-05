@@ -4,6 +4,16 @@
   &__title {
     height: 44px;
     width: 100%;
+    align-items: center;
+    display: flex;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 16px;
+    color: $themePrimary;
+  }
+
+  &__ribbon
+  {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -12,13 +22,6 @@
     position: relative;
     outline: none;
     border-bottom: 1px solid $neutralLight;
-
-    span {
-      font-weight: 600;
-      font-size: 14px;
-      line-height: 16px;
-      color: $themePrimary;
-    }
 
     &--collapsed {
       background-color: $neutralLighterAlt;

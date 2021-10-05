@@ -10,13 +10,14 @@ import { resolve } from 'inversify-react';
 import { observer } from 'mobx-react';
 import React, { Component } from 'react';
 
-import { CommandBarButton, PrimaryButton } from '@fluentui/react/lib/Button';
+import { CommandBarButton, DefaultButton, PrimaryButton } from '@fluentui/react/lib/Button';
 import { Facepile, IFacepilePersona, OverflowButtonType } from '@fluentui/react/lib/Facepile';
 import { FontIcon } from '@fluentui/react/lib/Icon';
 import { PersonaSize } from '@fluentui/react/lib/Persona';
 import { Text } from '@fluentui/react/lib/Text';
 import { Toggle } from '@fluentui/react/lib/Toggle';
 
+import { CSVLink } from 'react-csv';
 import {
     ROUTES,
     SIZES,
@@ -30,6 +31,7 @@ import { TYPES } from '../../../../types';
 import { formatToLocaleDateString } from '../../../../utils/date';
 import { QueuesScreenStore } from '../../../../view-services';
 import { WindowSizeStore } from '../../../../view-services/misc/window-size-store';
+import { CSVData } from '../../../../utility-services/csv-data-builder';
 
 export const CN = 'queue-header';
 
@@ -47,6 +49,7 @@ export interface QueueHeaderProps {
     canAssignAnalyst: boolean;
     queueLastUpdated: string | null;
     sorted: ItemSortSettingsDTO | undefined;
+    csvData: CSVData[];
 }
 
 @observer
@@ -135,7 +138,8 @@ export class QueueHeader extends Component<QueueHeaderProps, never> {
         const {
             queue,
             queueLastUpdated,
-            sorted
+            sorted,
+            csvData
         } = this.props;
 
         if (!queue) {
@@ -174,6 +178,19 @@ export class QueueHeader extends Component<QueueHeaderProps, never> {
                             iconName={sortOrder === SORTING_ORDER.ASC ? 'SortUp' : 'SortDown'}
                         />
                     </Text>
+                    { csvData?.length > 0
+                        && (
+                            <CSVLink
+                                filename={`${queue.name}.csv`}
+                                data={csvData}
+                            >
+                                <DefaultButton
+                                    className={`${CN}__button`}
+                                    text="Download"
+                                    iconProps={{ iconName: 'DownloadDocument' }}
+                                />
+                            </CSVLink>
+                        )}
                 </div>
             </div>
         );

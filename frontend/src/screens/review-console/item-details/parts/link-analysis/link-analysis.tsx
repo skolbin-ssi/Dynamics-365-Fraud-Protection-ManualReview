@@ -23,12 +23,13 @@ import { Modal } from '@fluentui/react/lib/Modal';
 import { Spinner } from '@fluentui/react/lib/Spinner';
 import { Text } from '@fluentui/react/lib/Text';
 
+import { CSVLink } from 'react-csv';
 import SearchIllustrationSvg from '../../../../../assets/search-illustration.svg';
 import { ErrorContent } from '../../../../../components/error-content';
 import { LABEL, LABEL_NAMES, ROUTES } from '../../../../../constants';
 import { Queue } from '../../../../../models';
 import { Item } from '../../../../../models/item';
-import { LinkAnalysisMrItem } from '../../../../../models/item/link-analysis';
+import { LinkAnalysisDfpItem, LinkAnalysisMrItem } from '../../../../../models/item/link-analysis';
 import { TYPES } from '../../../../../types';
 import { ANALYSIS_RESULT_ITEMS, LinkAnalysisItem, LinkAnalysisStore } from '../../../../../view-services';
 import { ExpandableGroup } from '../../../../queues/queues-list/expandable-group';
@@ -36,6 +37,7 @@ import { ItemDetailsTile } from '../../item-details-tile';
 import { AnalysisField } from './analysis-field/analysis-field';
 import { ItemsList } from './items-list';
 import { ResultsDataTable } from './results-data-table';
+import { getAnalysisFormattedData } from '../../../../../utility-services/csv-data-builder';
 
 interface LinkAnalysisComponentProps {
     queue: Queue | null;
@@ -390,6 +392,27 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
         );
     }
 
+    renderDownloadLink(items: LinkAnalysisMrItem[] | LinkAnalysisDfpItem[]): JSX.Element {
+        if (items.length > 0) {
+            return (
+                <>
+                    <CSVLink
+                        filename="LinkAnalysis.csv"
+                        data={getAnalysisFormattedData(items)}
+                    >
+                        <DefaultButton
+                            className={`${CN}__button`}
+                            text="Download"
+                            iconProps={{ iconName: 'DownloadDocument' }}
+                        />
+                    </CSVLink>
+                </>
+            );
+        }
+
+        return <></>;
+    }
+
     render() {
         const {
             linkAnalysisStore: {
@@ -438,11 +461,13 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
                                         {`Analysis results (${found})`}
                                     </Text>
                                     {this.renderCommandApplyDecisionsButton()}
+
                                 </div>
                                 <div>
                                     <ExpandableGroup
                                         key="mr-orders"
                                         title={`Orders selected for Manual Review (${foundInMr})`}
+                                        additionalElements={this.renderDownloadLink(mrItems)}
                                         defaultExpanded
                                     >
                                         <ItemsList
@@ -462,6 +487,7 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
                                     <ExpandableGroup
                                         key="dfp-orders"
                                         title={`Other data in Dynamics 356 Fraud Protection (${foundInDfp})`}
+                                        additionalElements={this.renderDownloadLink(dfpItems)}
                                         defaultExpanded
                                     >
                                         <ItemsList

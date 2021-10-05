@@ -14,6 +14,7 @@ import { Queue } from '../../../models';
 import { QueuesScreenStore } from '../../../view-services';
 import { QueueStore } from '../../../view-services/queues';
 import { QueueHeader } from './queue-header';
+import { getFormattedData } from '../../../utility-services/csv-data-builder';
 
 export interface QueueDetailsProps {
     className: string;
@@ -105,6 +106,7 @@ export class QueueDetails extends Component<QueueDetailsProps, never> {
                         canAssignAnalyst={canUserAssignAnalyst}
                         queueLastUpdated={selectedQueueUpdated}
                         sorted={sorting}
+                        csvData={queueStore ? getFormattedData(queueStore, queueStore) : []}
                     />
                     { toRender }
                 </div>

@@ -11,6 +11,7 @@ const CN = 'queues-list-expandable-group';
 
 interface ExpandableGroupProps {
     title: string;
+    additionalElements?: JSX.Element;
     children: React.ReactNode;
     defaultExpanded?: boolean;
 }
@@ -36,25 +37,28 @@ export class ExpandableGroup extends Component<ExpandableGroupProps, ExpandableG
     }
 
     render() {
-        const { title, children } = this.props;
+        const { title, children, additionalElements } = this.props;
         const { expanded } = this.state;
 
         return (
             <div className={CN}>
-                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
-                <div
-                    role="button"
-                    tabIndex={-1}
-                    className={cn(`${CN}__title`, !expanded && `${CN}__title--collapsed`)}
-                    onClick={this.toggle}
-                >
-                    <span>{title}</span>
+                <div className={cn(`${CN}__ribbon`, !expanded && `${CN}__ribbon--collapsed`)}>
+                    {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */}
+                    <div
+                        role="button"
+                        tabIndex={-1}
+                        className={cn(`${CN}__title`)}
+                        onClick={this.toggle}
+                    >
+                        {title}
+                    </div>
                     <IconButton
                         iconProps={{
                             iconName: expanded ? 'ChevronDown' : 'ChevronRight'
                         }}
                         onClick={this.toggle}
                     />
+                    {additionalElements}
                 </div>
                 <div className={cn(`${CN}__content`, expanded && `${CN}__content--expanded`)}>
                     { children }

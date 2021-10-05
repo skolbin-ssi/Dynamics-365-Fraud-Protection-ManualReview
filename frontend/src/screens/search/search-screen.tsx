@@ -30,6 +30,7 @@ import { SearchScreenStore } from '../../view-services/search';
 import { SearchCriteriaForm } from './search-criteria-form';
 import { SearchFiltersSummary } from './search-filters-summary';
 import { SearchResultsHeader } from './search-results-header';
+import { getFormattedData } from '../../utility-services/csv-data-builder';
 
 export interface SearchScreenRouteParams {
     searchId?: string;
@@ -309,6 +310,7 @@ export class SearchScreen extends Component<SearchScreenProps, never> {
                     <SearchResultsHeader
                         searchResultsCount={this.searchScreenStore.items.length}
                         wasFirstPageLoaded={this.searchScreenStore.wasFirstPageLoaded}
+                        csvData={this.searchScreenStore ? getFormattedData(this.searchScreenStore, this.searchScreenStore.queueStore) : []}
                     />
                     <div className={`${CN}__item-details-wrapper`}>
                         <ItemsDetailsList

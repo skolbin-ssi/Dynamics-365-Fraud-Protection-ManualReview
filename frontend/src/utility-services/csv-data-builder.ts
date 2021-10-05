@@ -30,9 +30,9 @@ export function getFormattedData(allItems: ItemsLoadable<Item>, queueStore: Queu
         importDate: item.displayImportDateTime,
         amount: item.amount,
         status: item.status,
-        analyst: item.analyst,
+        analyst: item.analyst?.name,
         tags: item.tagsJoined,
-        notes: item.notes
+        notes: item.notes?.map(n => n.note).join(',')
     }));
 }
 

@@ -9,12 +9,11 @@ import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
 import { Text } from '@fluentui/react/lib/Text';
 import { Pivot, PivotItem, PivotLinkFormat, } from '@fluentui/react/lib/Pivot';
 
-import { CSVLink } from 'react-csv';
-import { DefaultButton } from '@fluentui/react/lib/Button';
 import { ITEM_SORTING_FIELD, SORTING_ORDER } from '../../../constants';
 import { ItemSortSettingsDTO } from '../../../data-services/api-services/models';
 import './search-results-header.scss';
 import { CSVData } from '../../../utility-services/csv-data-builder';
+import { CSVDownloadButton } from '../../../components/csv-download-button/csv-download-button';
 
 const CN = 'search-results-header';
 
@@ -124,19 +123,7 @@ export class SearchResultsHeader extends Component<QueueHeaderProps, never> {
                     </Text>
                 </div>
                 {handleSortingUpdate ? this.renderSorting() : null}
-                { csvData?.length > 0
-                    && (
-                        <CSVLink
-                            filename="searchResult.csv"
-                            data={csvData}
-                        >
-                            <DefaultButton
-                                className={`${CN}__button`}
-                                text="Download"
-                                iconProps={{ iconName: 'DownloadDocument' }}
-                            />
-                        </CSVLink>
-                    )}
+                <CSVDownloadButton csvData={csvData} fileName="searchResult" />
             </div>
         );
     }

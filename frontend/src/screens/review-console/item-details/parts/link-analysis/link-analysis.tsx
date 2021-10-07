@@ -23,7 +23,6 @@ import { Modal } from '@fluentui/react/lib/Modal';
 import { Spinner } from '@fluentui/react/lib/Spinner';
 import { Text } from '@fluentui/react/lib/Text';
 
-import { CSVLink } from 'react-csv';
 import SearchIllustrationSvg from '../../../../../assets/search-illustration.svg';
 import { ErrorContent } from '../../../../../components/error-content';
 import { LABEL, LABEL_NAMES, ROUTES } from '../../../../../constants';
@@ -38,6 +37,7 @@ import { AnalysisField } from './analysis-field/analysis-field';
 import { ItemsList } from './items-list';
 import { ResultsDataTable } from './results-data-table';
 import { getAnalysisFormattedData } from '../../../../../utility-services/csv-data-builder';
+import { CSVDownloadButton } from '../../../../../components/csv-download-button/csv-download-button';
 
 interface LinkAnalysisComponentProps {
     queue: Queue | null;
@@ -395,18 +395,7 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
     renderDownloadLink(items: LinkAnalysisMrItem[] | LinkAnalysisDfpItem[]): JSX.Element {
         if (items.length > 0) {
             return (
-                <>
-                    <CSVLink
-                        filename="LinkAnalysis.csv"
-                        data={getAnalysisFormattedData(items)}
-                    >
-                        <DefaultButton
-                            className={`${CN}__button`}
-                            text="Download"
-                            iconProps={{ iconName: 'DownloadDocument' }}
-                        />
-                    </CSVLink>
-                </>
+                <CSVDownloadButton csvData={getAnalysisFormattedData(items)} fileName="LinkAnalysis" />
             );
         }
 

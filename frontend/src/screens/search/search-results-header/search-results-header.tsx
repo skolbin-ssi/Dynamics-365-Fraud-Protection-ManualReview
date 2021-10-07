@@ -5,13 +5,15 @@ import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import autobind from 'autobind-decorator';
 import { Dropdown, IDropdownOption } from '@fluentui/react/lib/Dropdown';
+
 import { Text } from '@fluentui/react/lib/Text';
 import { Pivot, PivotItem, PivotLinkFormat, } from '@fluentui/react/lib/Pivot';
 
 import { ITEM_SORTING_FIELD, SORTING_ORDER } from '../../../constants';
 import { ItemSortSettingsDTO } from '../../../data-services/api-services/models';
-
 import './search-results-header.scss';
+import { CSVData } from '../../../utility-services/csv-data-builder';
+import { CSVDownloadButton } from '../../../components/csv-download-button/csv-download-button';
 
 const CN = 'search-results-header';
 
@@ -19,7 +21,8 @@ export interface QueueHeaderProps {
     searchResultsCount: number;
     sortingObject?: ItemSortSettingsDTO;
     handleSortingUpdate?: (sortingObject: ItemSortSettingsDTO) => void;
-    wasFirstPageLoaded: boolean
+    wasFirstPageLoaded: boolean;
+    csvData: CSVData[];
 }
 
 @observer
@@ -103,6 +106,7 @@ export class SearchResultsHeader extends Component<QueueHeaderProps, never> {
             handleSortingUpdate,
             searchResultsCount,
             wasFirstPageLoaded,
+            csvData
         } = this.props;
 
         if (!wasFirstPageLoaded) return null;
@@ -119,6 +123,7 @@ export class SearchResultsHeader extends Component<QueueHeaderProps, never> {
                     </Text>
                 </div>
                 {handleSortingUpdate ? this.renderSorting() : null}
+                <CSVDownloadButton csvData={csvData} fileName="searchResult" />
             </div>
         );
     }

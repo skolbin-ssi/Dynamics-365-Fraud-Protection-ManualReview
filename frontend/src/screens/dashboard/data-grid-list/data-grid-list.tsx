@@ -14,12 +14,12 @@ import autoBind from 'autobind-decorator';
 import cx from 'classnames';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
-import { CSVLink } from 'react-csv';
 import { DEFAULT_DATA_LIST_SHIMMER_LINES_NUMBER } from '../../../constants';
 import { AnalystPerformance, BasicEntityPerformance } from '../../../models/dashboard';
 import { CSVReportBuilder } from '../../../utility-services';
 import { AnalystPerformanceDetails } from '../../../models/dashboard/analyst-performance-details';
 import { convertToCSVString } from '../../../utility-services/convert-service';
+import { CSVDownloadButton } from '../../../components/csv-download-button/csv-download-button';
 
 const CN = 'data-grid-list';
 
@@ -151,15 +151,7 @@ export class DataGridList<T extends BasicEntityPerformance> extends Component<Da
                     minWidth: 100,
                     maxWidth: 100,
                     className: `${CN}__right-aligned-cell`,
-                    onRender: (queue: T) => (
-                        <CSVLink
-                            filename={`${queue.name}.csv`}
-                            className={`${CN}__download-link`}
-                            data={this.DataForDownload(queue.details)}
-                        >
-                            Download
-                        </CSVLink>
-                    ),
+                    onRender: (queue: T) => (<CSVDownloadButton csvData={this.DataForDownload(queue.details)} fileName={queue.name} />),
                 },
             );
         }

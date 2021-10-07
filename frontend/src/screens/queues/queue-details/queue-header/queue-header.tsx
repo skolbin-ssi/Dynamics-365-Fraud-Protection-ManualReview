@@ -30,6 +30,8 @@ import { TYPES } from '../../../../types';
 import { formatToLocaleDateString } from '../../../../utils/date';
 import { QueuesScreenStore } from '../../../../view-services';
 import { WindowSizeStore } from '../../../../view-services/misc/window-size-store';
+import { CSVData } from '../../../../utility-services/csv-data-builder';
+import { CSVDownloadButton } from '../../../../components/csv-download-button/csv-download-button';
 
 export const CN = 'queue-header';
 
@@ -47,6 +49,7 @@ export interface QueueHeaderProps {
     canAssignAnalyst: boolean;
     queueLastUpdated: string | null;
     sorted: ItemSortSettingsDTO | undefined;
+    csvData: CSVData[];
 }
 
 @observer
@@ -135,7 +138,8 @@ export class QueueHeader extends Component<QueueHeaderProps, never> {
         const {
             queue,
             queueLastUpdated,
-            sorted
+            sorted,
+            csvData
         } = this.props;
 
         if (!queue) {
@@ -174,6 +178,7 @@ export class QueueHeader extends Component<QueueHeaderProps, never> {
                             iconName={sortOrder === SORTING_ORDER.ASC ? 'SortUp' : 'SortDown'}
                         />
                     </Text>
+                    <CSVDownloadButton csvData={csvData} fileName={queue.name} />
                 </div>
             </div>
         );

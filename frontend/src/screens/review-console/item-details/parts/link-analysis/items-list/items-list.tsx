@@ -27,8 +27,8 @@ import { groupBy } from 'lodash';
 import { IconText } from '../../../../../../components/icon-text';
 import { DEFAULT_LINK_ANALYSIS_ITEMS_PER_PAGE, ITEM_LIST_COLUMN_KEYS } from '../../../../../../constants';
 import { ITEM_STATUS } from '../../../../../../models/item';
-import { LinkAnalysisDfpItem, LinkAnalysisMrItem } from '../../../../../../models/item/link-analysis';
 import { LinkAnalysisItem } from '../../../../../../view-services';
+import { isMrItem } from '../../../../../../utility-services/csv-data-builder';
 
 interface ItemsListComponentProps {
     data: LinkAnalysisItem[];
@@ -41,10 +41,6 @@ interface ItemsListComponentProps {
 }
 
 const CN = 'items-list';
-
-function isMrItem(item: LinkAnalysisMrItem | LinkAnalysisDfpItem): item is LinkAnalysisMrItem {
-    return 'item' in (item as LinkAnalysisMrItem);
-}
 
 @observer
 export class ItemsList extends Component<ItemsListComponentProps, never> {

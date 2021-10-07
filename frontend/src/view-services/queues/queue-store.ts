@@ -92,7 +92,6 @@ export class QueueStore implements ItemsLoadable<Item> {
     @action
     async loadQueues(viewType: QUEUE_VIEW_TYPE = QUEUE_VIEW_TYPE.REGULAR) {
         this.loadingQueues = true;
-
         try {
             const queues = await this
                 .queueService
@@ -321,6 +320,6 @@ export class QueueStore implements ItemsLoadable<Item> {
     }
 
     getQueueById(queueId: string) {
-        return this.regularQueuesMap?.get(queueId) || this.historicalQueuesMap?.get(queueId);
+        return this.regularQueuesMap.get(queueId) || this.historicalQueuesMap.get(queueId);
     }
 }

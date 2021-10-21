@@ -171,7 +171,8 @@ export class ItemDetails extends Component<ItemDetailsProps, ItemDetailsState> {
         const {
             reviewItem,
             loadingReviewItem,
-            loadingReviewItemError
+            loadingReviewItemError,
+            queue
         } = this.props;
         const { mode } = this.state;
 
@@ -246,6 +247,7 @@ export class ItemDetails extends Component<ItemDetailsProps, ItemDetailsState> {
                             checked={mode === ITEM_DETAILS_MODE.LINK_ANALYSIS}
                             data-mode={ITEM_DETAILS_MODE.LINK_ANALYSIS}
                             onClick={this.toggleView}
+                            disabled={!queue}
                         />
                     </div>
                 </div>

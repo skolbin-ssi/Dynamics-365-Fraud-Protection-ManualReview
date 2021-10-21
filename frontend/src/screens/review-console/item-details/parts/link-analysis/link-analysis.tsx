@@ -23,6 +23,7 @@ import { Modal } from '@fluentui/react/lib/Modal';
 import { Spinner } from '@fluentui/react/lib/Spinner';
 import { Text } from '@fluentui/react/lib/Text';
 
+import { TextField } from '@fluentui/react/lib/TextField';
 import SearchIllustrationSvg from '../../../../../assets/search-illustration.svg';
 import { ErrorContent } from '../../../../../components/error-content';
 import { LABEL, LABEL_NAMES, ROUTES } from '../../../../../constants';
@@ -107,6 +108,13 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
     }
 
     @autobind
+    handleBla() {
+        const { linkAnalysisStore } = this.props;
+
+        linkAnalysisStore.openMakeDecisionModal();
+    }
+
+    @autobind
     handleLoadMoreItemClick(type: ANALYSIS_RESULT_ITEMS) {
         const { linkAnalysisStore } = this.props;
 
@@ -125,7 +133,7 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
     @autobind
     handleApplyDecisionClick(label: LABEL) {
         const { linkAnalysisStore } = this.props;
-
+        linkAnalysisStore.closeMakeDecisionModal();
         linkAnalysisStore.setDecisionLabelToApply(label);
         linkAnalysisStore.openConfirmationModal();
     }
@@ -260,6 +268,65 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
         );
     }
 
+    renderMakeDecisionModal() {
+        const { linkAnalysisStore } = this.props;
+        const closeModal = () => linkAnalysisStore.closeMakeDecisionModal();
+
+        return (
+            <Modal
+                titleAriaId="Make decision modal"
+                isOpen={linkAnalysisStore.isMakeDecisionModalOpen}
+                onDismiss={closeModal}
+                containerClassName={`${CN}__modal`}
+            >
+                <div className={`${CN}__modal-header`}>
+                    <div className={`${CN}__modal-title`}>
+                        Apply decisions result
+                    </div>
+                    <IconButton
+                        ariaLabel="Close confirmation modal"
+                        iconProps={{
+                            iconName: 'Cancel'
+                        }}
+                        onClick={closeModal}
+                    />
+                </div>
+                <div className={`${CN}__note-area`}>
+                    <div>Note:</div>
+                    <TextField
+                        className={`${CN}__add-note-field`}
+                        borderless
+                        placeholder="Write a note"
+                        multiline
+                        autoAdjustHeight
+                        resizable={false}
+                        onChange={(_: any, newValue?: string) => linkAnalysisStore.setNewNoteValue(newValue || '')}
+                    />
+                </div>
+                <div className={`${CN}__buttons-area`}>
+                    <button
+                        type="button"
+                        data-action={LABEL.GOOD}
+                        className={`${CN}__good-btn`}
+                        onClick={() => this.handleApplyDecisionClick(LABEL.GOOD)}
+                    >
+                        <FontIcon iconName="CompletedSolid" className={`${CN}__btn-label-icon`} />
+                        <Text>{LABEL_NAMES[LABEL.GOOD]}</Text>
+                    </button>
+                    <button
+                        type="button"
+                        data-action={LABEL.BAD}
+                        className={`${CN}__bad-btn`}
+                        onClick={() => this.handleApplyDecisionClick(LABEL.BAD)}
+                    >
+                        <FontIcon iconName="Blocked2Solid" className={`${CN}__btn-label-icon`} />
+                        <Text>{LABEL_NAMES[LABEL.BAD]}</Text>
+                    </button>
+                </div>
+            </Modal>
+        );
+    }
+
     renderResultModal() {
         const { linkAnalysisStore } = this.props;
         const {
@@ -377,9 +444,10 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
     renderCommandApplyDecisionsButton() {
         const { linkAnalysisStore: { totalCountDecisionsToBeApplied } } = this.props;
         const isDisabled = totalCountDecisionsToBeApplied === 0;
+        const { linkAnalysisStore } = this.props;
 
         return (
-            <CommandBarButton
+            <PrimaryButton
                 disabled={isDisabled}
                 className={cx(
                     `${CN}__apply-decisions-btn`,
@@ -387,7 +455,7 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
                 )}
                 text={`Apply decisions (${totalCountDecisionsToBeApplied})`}
                 iconProps={{ iconName: 'CheckList' }}
-                menuProps={{ items: this.getCommandBarButtonItem() }}
+                onClick={() => linkAnalysisStore.openMakeDecisionModal()}
             />
         );
     }
@@ -497,6 +565,7 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
                 }
                 {this.renderConfirmationModal()}
                 {this.renderResultModal()}
+                {this.renderMakeDecisionModal()}
             </div>
         );
     }

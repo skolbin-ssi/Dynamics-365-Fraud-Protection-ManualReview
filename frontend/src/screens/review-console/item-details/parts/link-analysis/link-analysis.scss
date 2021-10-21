@@ -172,4 +172,95 @@
     color: $highRiskColor;
   }
 
+  &__buttons-area {
+    justify-content: space-around;
+    display: flex;
+  }
+
+  &__note-area {
+    margin: 10px;
+  }
+
+  &__label-buttons {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 62px);
+    grid-auto-rows: 62px;
+    gap: 8px;
+    margin-bottom: 32px;
+
+    .ms-layer {
+      position: absolute;
+    }
+  }
+
+  &__good-btn,
+  &__bad-btn {
+    cursor: pointer;
+    width: 280px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    border: none;
+    border-radius: 4px;
+    padding: 0 28px;
+
+    &:focus {
+      outline: none;
+    }
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    & > span {
+      font-weight: 600 !important;
+    }
+  }
+
+  &__good-btn {
+    background-color: $goodFill;
+    color: $goodColor;
+    justify-self: end;
+
+    &:hover {
+      background: $goodFillHover;
+    }
+
+    &:active {
+      background: $goodFillActive;
+    }
+  }
+
+  &__bad-btn {
+    background-color: $badFill;
+    color: $badColor;
+    justify-self: start;
+
+    &:hover {
+      background: $badFillHover;
+    }
+
+    &:active {
+      background: $badFillActive;
+    }
+  }
+
+  &__btn-label-icon {
+    margin-right: 8px;
+    font-size: 20px;
+  }
+
+  &__add-note-field {
+    grid-column: span 3;
+    textarea {
+      border-radius: 2px;
+      min-height: 80px;
+      max-height: 115px;
+      border: 2px solid $themePrimary;
+      outline: none;
+      overflow-y: scroll;
+    }
+  }
+
 }

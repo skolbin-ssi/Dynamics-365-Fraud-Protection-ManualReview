@@ -74,7 +74,6 @@ public class ItemLabelActivityRepositoryImpl implements ItemLabelActivityReposit
                                 "(SELECT c.label, c.merchantRuleDecision, count(c.label) AS cnt, c.analystId as id, FLOOR((c.labeled-%1$s)/%3$s) AS bucket " +
                                 "FROM c WHERE " +
                                 "(c.labeled BETWEEN %1$s AND %2$s) " +
-                                "AND IS_DEFINED(c.queueId) AND NOT IS_NULL(c.queueId) " +
                                 "%4$s " +
                                 "%5$s " +
                                 "group by c.analystId, FLOOR((c.labeled-%1$s)/%3$s), c.label, c.merchantRuleDecision) " +

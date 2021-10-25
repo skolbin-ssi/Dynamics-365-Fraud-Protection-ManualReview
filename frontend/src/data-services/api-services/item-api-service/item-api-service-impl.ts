@@ -63,8 +63,8 @@ export class ItemApiServiceImpl extends BaseApiService implements ItemApiService
         });
     }
 
-    patchBatchLabel({ label, itemIds }: BatchItemsLabelApiParams) {
-        return this.patch<PatchBatchLabelItemsResponse>('/batch/label', { label, itemIds }, {
+    patchBatchLabel({ label, itemIds, note }: BatchItemsLabelApiParams) {
+        return this.patch<PatchBatchLabelItemsResponse>('/batch/label', { label, itemIds, note }, {
             headers: {
                 'Content-Type': 'application/json'
             },

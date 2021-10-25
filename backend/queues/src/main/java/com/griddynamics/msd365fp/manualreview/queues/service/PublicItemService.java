@@ -342,10 +342,17 @@ public class PublicItemService {
                         item.setLabel(new ItemLabel());
                     }
                     item.getLabel().label(batchLabel.getLabel(), actor, null, null);
+                    if(batchLabel.getNote()!=null) {
+                        item.getNotes().add(ItemNote.builder()
+                                .created(OffsetDateTime.now())
+                                .note(batchLabel.getNote())
+                                .userId(actor)
+                                .build());
+                    }
                     item.getNotes().add(ItemNote.builder()
-                            .created(OffsetDateTime.now())
+                            .created(OffsetDateTime.now().plusSeconds(1))
                             .note(String.format("# Applied [%s] label in bulk operation", batchLabel.getLabel()))
-                            .userId(UserPrincipalUtility.getUserId())
+                            .userId(actor)
                             .build());
                     labelResolution(item);
                     return oldItem;

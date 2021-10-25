@@ -53,10 +53,16 @@ export class LinkAnalysisStore {
     isConfirmationModalOpen = false;
 
     @observable
+    isMakeDecisionModalOpen = false;
+
+    @observable
     isResultModalOpen = false;
 
     @observable
     decisionLabelToApply: LABEL = LABEL.GOOD;
+
+    @observable
+    note!: string;
 
     @observable
     queueId: string = '';
@@ -163,7 +169,8 @@ export class LinkAnalysisStore {
         try {
             const result = await this.itemsService.batchLabelItems({
                 label: this.decisionLabelToApply,
-                itemIds: this.mrItemsStore.selectedAnalysisItemsToLabeledIds
+                itemIds: this.mrItemsStore.selectedAnalysisItemsToLabeledIds,
+                note: this.note
             });
 
             runInAction(() => {
@@ -251,6 +258,10 @@ export class LinkAnalysisStore {
         this.item = item;
     }
 
+    @action setNewNoteValue(value: string) {
+        this.note = value?.trim();
+    }
+
     @action
     setAnalysisFields(analysisFields: AnalysisField[]) {
         this.analysisFields = analysisFields;
@@ -284,6 +295,16 @@ export class LinkAnalysisStore {
     @action
     closeResultModal() {
         this.isResultModalOpen = false;
+    }
+
+    @action
+    openMakeDecisionModal() {
+        this.isMakeDecisionModalOpen = true;
+    }
+
+    @action
+    closeMakeDecisionModal() {
+        this.isMakeDecisionModalOpen = false;
     }
 
     @action

@@ -14,7 +14,8 @@ import {
 
 export interface BatchItemsLabelApiParams {
     label: LABEL;
-    itemIds: string[]
+    itemIds: string[],
+    note?: string;
 }
 
 export interface ItemService {

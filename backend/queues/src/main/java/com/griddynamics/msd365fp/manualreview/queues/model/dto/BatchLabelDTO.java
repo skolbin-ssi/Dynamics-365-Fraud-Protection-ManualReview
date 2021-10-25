@@ -19,4 +19,6 @@ public class BatchLabelDTO {
     private Label label;
     @NotNull
     private Set<String> itemIds;
+
+    private String note;
 }

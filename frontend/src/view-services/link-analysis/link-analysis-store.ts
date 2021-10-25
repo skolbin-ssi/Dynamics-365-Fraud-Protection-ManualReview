@@ -259,7 +259,7 @@ export class LinkAnalysisStore {
     }
 
     @action setNewNoteValue(value: string) {
-        this.note = value;
+        this.note = value?.trim();
     }
 
     @action

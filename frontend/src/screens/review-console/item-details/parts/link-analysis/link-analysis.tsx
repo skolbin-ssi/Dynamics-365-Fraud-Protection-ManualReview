@@ -108,13 +108,6 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
     }
 
     @autobind
-    handleBla() {
-        const { linkAnalysisStore } = this.props;
-
-        linkAnalysisStore.openMakeDecisionModal();
-    }
-
-    @autobind
     handleLoadMoreItemClick(type: ANALYSIS_RESULT_ITEMS) {
         const { linkAnalysisStore } = this.props;
 
@@ -268,6 +261,20 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
         );
     }
 
+    renderDecisionBtn(label: LABEL, className: string, iconName: string): JSX.Element {
+        return (
+            <button
+                type="button"
+                data-action={label}
+                className={`${CN}__${className}`}
+                onClick={() => this.handleApplyDecisionClick(label)}
+            >
+                <FontIcon iconName={iconName} className={`${CN}__btn-label-icon`} />
+                <Text>{LABEL_NAMES[label]}</Text>
+            </button>
+        );
+    }
+
     renderMakeDecisionModal() {
         const { linkAnalysisStore } = this.props;
         const closeModal = () => linkAnalysisStore.closeMakeDecisionModal();
@@ -300,28 +307,12 @@ export class LinkAnalysis extends Component<LinkAnalysisComponentProps, never> {
                         multiline
                         autoAdjustHeight
                         resizable={false}
-                        onChange={(_: any, newValue?: string) => linkAnalysisStore.setNewNoteValue(newValue || '')}
+                        onChange={(_: any, newValue?: string) => linkAnalysisStore.setNewNoteValue(newValue ?? '')}
                     />
                 </div>
                 <div className={`${CN}__buttons-area`}>
-                    <button
-                        type="button"
-                        data-action={LABEL.GOOD}
-                        className={`${CN}__good-btn`}
-                        onClick={() => this.handleApplyDecisionClick(LABEL.GOOD)}
-                    >
-                        <FontIcon iconName="CompletedSolid" className={`${CN}__btn-label-icon`} />
-                        <Text>{LABEL_NAMES[LABEL.GOOD]}</Text>
-                    </button>
-                    <button
-                        type="button"
-                        data-action={LABEL.BAD}
-                        className={`${CN}__bad-btn`}
-                        onClick={() => this.handleApplyDecisionClick(LABEL.BAD)}
-                    >
-                        <FontIcon iconName="Blocked2Solid" className={`${CN}__btn-label-icon`} />
-                        <Text>{LABEL_NAMES[LABEL.BAD]}</Text>
-                    </button>
+                    {this.renderDecisionBtn(LABEL.GOOD, 'good-btn', 'CompletedSolid')}
+                    {this.renderDecisionBtn(LABEL.BAD, 'bad-btn', 'Blocked2Solid')}
                 </div>
             </Modal>
         );

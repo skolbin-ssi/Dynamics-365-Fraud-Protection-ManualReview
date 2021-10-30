@@ -38,7 +38,7 @@ dependencies {
     implementation 'org.springframework:spring-core'
 
 //    Web
-    implementation 'org.modelmapper:modelmapper:2.3.7'
+    implementation 'org.modelmapper:modelmapper:2.4.3'
     implementation 'org.springframework:spring-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.2'

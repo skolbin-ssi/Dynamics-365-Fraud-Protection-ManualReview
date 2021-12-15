@@ -26,7 +26,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.util.Strings;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -309,7 +308,7 @@ public class AlertService {
 
     private String getTemplate(Map<String, String> mailTemplates, String templateName) {
         String template = mailTemplates.get(templateName);
-        if (Strings.isEmpty(template)) {
+        if (template.isEmpty()) {
             throw new TemplateNotFoundException(String.format("Template [%s] was not found. " +
                             "Please check ConfigurableAppSetting container in CosmosDB for [%s] parameter.",
                     templateName, AppSettingsType.MAIL_TEMPLATES.toString()));

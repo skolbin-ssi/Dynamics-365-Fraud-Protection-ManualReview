@@ -308,7 +308,7 @@ public class AlertService {
 
     private String getTemplate(Map<String, String> mailTemplates, String templateName) {
         String template = mailTemplates.get(templateName);
-        if (template.isEmpty()) {
+        if (template.isBlank()) {
             throw new TemplateNotFoundException(String.format("Template [%s] was not found. " +
                             "Please check ConfigurableAppSetting container in CosmosDB for [%s] parameter.",
                     templateName, AppSettingsType.MAIL_TEMPLATES.toString()));

@@ -25,4 +25,3 @@ public class MapTokenDTO {
     @NotNull
     private String tokenType;
 }
-

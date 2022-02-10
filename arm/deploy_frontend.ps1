@@ -59,7 +59,7 @@ $dstCtx = New-AzStorageContext -StorageAccountName $dstSA -StorageAccountKey $ds
 Enable-AzStorageStaticWebsite -Context $dstCtx -IndexDocument "index.html"
 
 # Update configuration file in deployment storage account
-Get-AzStorageBlobContent `
+$newBlob = Get-AzStorageBlobContent `
     -Container $srcCont `
     -Context $srcCtx `
     -Blob "config.json" `
@@ -72,15 +72,9 @@ $json.clientId = $clientId
 $json.tenant = $tenantId
 $json.mapClientId = $mapClientId
 
-$json | ConvertTo-Json | Set-Content 'config.json'
+$jsonUpdated = $json | ConvertTo-Json
 
-Set-AzStorageBlobContent `
-    -Container $srcCont `
-    -Context $srcCtx `
-    -File "config.json" `
-    -Blob "config.json" `
-    -Properties @{"ContentType" = "application/json";} `
-    -Force
+$newBlob.ICloudBlob.UploadText($jsonUpdated)
 
 # Patch content type for files in frontend static container
 # Current implementation of Set-AzStorageBlobContent sets default content

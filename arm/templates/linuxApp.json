@@ -216,6 +216,10 @@
                   "name": "KEYVAULT_ENDPOINT",
                   "value": "[parameters('keyVaultEndpoint')]"
                 },
+				{
+                  "name": "WEBSITE_RUN_FROM_PACKAGE_HEALTH_CHECK",
+                  "value": "1"
+                },
                 {
                   "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
                   "value": "[concat('InstrumentationKey=',reference(resourceId('Microsoft.Insights/components', parameters('appInsightName')),'2018-05-01-preview').InstrumentationKey)]"

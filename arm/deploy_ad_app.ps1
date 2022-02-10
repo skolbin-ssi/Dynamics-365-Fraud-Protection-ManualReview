@@ -158,7 +158,7 @@ deployAdApp -AD_APP_NAME "$prefix" -CLIENT_SECRET "$clientSecret" -REPLY_URLS $r
 
 # read application id and service principal id
 $appAd = Get-AzADApplication -DisplayName $prefix
-$appServicePrincipal = Get-AzADServicePrincipal -ApplicationId $appAd.ApplicationId
+$appServicePrincipal = Get-AzADServicePrincipal -ApplicationId $appAd.AppId
 
 # read DFP application service principal
 try {
@@ -185,14 +185,14 @@ $tenantShortName = GetTenantShortName -TenantId $tenantId
 # Outputs
 Write-Host "== Collect shared parameters"
 Write-Host "Azure AD application name:"$prefix
-Write-Host "Azure AD application client id:"$appAd.ApplicationId
+Write-Host "Azure AD application client id:"$appAd.AppId
 Write-Host "Azure AD app service principal:"$appServicePrincipal.Id
 Write-Host "Dynamics 365 Fraud Protection service principal id:"$dfpAppServicePrincipal.Id
 Write-Host "Tenant id:"$tenantId
 Write-Host "Tenant short name:"$tenantShortName
 
 return @{ 
-    "appClientId"           = $appAd.ApplicationId
+    "appClientId"           = $appAd.AppId
     "appSpId"         = $appServicePrincipal.Id
     "dfpSpId"         = $dfpAppServicePrincipal.Id
     "clientTenantShortName" = $tenantShortName

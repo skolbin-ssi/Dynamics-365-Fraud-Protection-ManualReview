@@ -202,11 +202,7 @@ function CreateMapApp {
     )
 
     Write-Host "= Create application"
-	Write-Host $mapAppName
-	
-	Write-Host $mapAppSecurePassword
-	
-	Write-Host $mapApp.AppId
+
 	$mapAppName
     if (!($mapApp = Get-AzADApplication -DisplayName $mapAppName)) {
         $mapApp = New-AzADApplication `

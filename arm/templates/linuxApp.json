@@ -218,7 +218,7 @@
                 },
 				{
                   "name": "WEBSITE_RUN_FROM_PACKAGE_HEALTH_CHECK",
-                  "value": "1"
+                  "value": "0"
                 },
                 {
                   "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",

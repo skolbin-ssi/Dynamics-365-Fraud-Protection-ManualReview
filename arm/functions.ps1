@@ -202,6 +202,8 @@ function CreateMapApp {
     )
 
     Write-Host "= Create application"
+
+	$mapAppName
     if (!($mapApp = Get-AzADApplication -DisplayName $mapAppName)) {
         $mapApp = New-AzADApplication `
             -DisplayName $mapAppName `
@@ -210,8 +212,8 @@ function CreateMapApp {
 
         Write-Host "= Update application identifier uri"
         Update-AzADApplication `
-            -ApplicationId $mapApp.ApplicationId `
-            -IdentifierUri "api://$($mapApp.ApplicationId)"
+            -ApplicationId $mapApp.AppId `
+            -IdentifierUri "api://$($mapApp.AppId)"
     } else {
         Write-Host "Application is already exist"
     }
@@ -220,14 +222,14 @@ function CreateMapApp {
     if (!($mapSp = Get-AzADServicePrincipal -DisplayName $mapAppName)) {
         $mapSp = New-AzADServicePrincipal `
             -DisplayName $mapAppName `
-            -ApplicationId $mapApp.ApplicationId `
+            -ApplicationId $mapApp.AppId `
             -SkipAssignment
     } else {
         Write-Host "Service principal is already exist"
     }
 
     return @{ 
-        "mapAppId" = $mapApp.ApplicationId 
+        "mapAppId" = $mapApp.AppId 
         "mapSpId" = $mapSp.Id 
     }
 }

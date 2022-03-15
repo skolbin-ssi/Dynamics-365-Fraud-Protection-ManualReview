@@ -49,7 +49,7 @@ public class ResolutionService {
     @Setter(onMethod = @__({@Autowired}))
     private ResolutionService thisService;
 
-    @Value("${azure.cosmosdb.default-ttl}")
+    @Value("${azure.cosmos.default-ttl}")
     private Duration defaultTtl;
     @Value("${azure.dfp.purchase-status-event-url}")
     private String purchaseStatusUrl;

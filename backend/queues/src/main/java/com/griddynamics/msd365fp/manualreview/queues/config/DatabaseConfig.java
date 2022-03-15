@@ -3,7 +3,9 @@
 
 package com.griddynamics.msd365fp.manualreview.queues.config;
 
+import com.azure.cosmos.CosmosAsyncClient;
 import com.azure.cosmos.CosmosClient;
+import com.azure.cosmos.CosmosClientBuilder;
 import com.azure.cosmos.CosmosDatabase;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.ExtendedCosmosContainer;
@@ -25,8 +27,13 @@ public class DatabaseConfig {
     private final ObjectMapper jsonMapper;
 
     @Bean
+    public CosmosClient cosmosClient(CosmosClientBuilder cosmosClientBuilder) {
+        return cosmosClientBuilder.buildClient();
+    }
+
+    @Bean
     public CosmosDatabase cosmosDatabase(CosmosClient cosmosClient,
-                                         @Value("${azure.cosmosdb.database}") String databaseId) {
+                                         @Value("${azure.cosmos.database}") String databaseId) {
         return cosmosClient.getDatabase(databaseId);
     }
 

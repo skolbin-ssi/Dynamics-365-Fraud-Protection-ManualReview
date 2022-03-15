@@ -74,7 +74,7 @@ public class ItemEnrichmentService {
     private Integer maxEnrichmentAttempts;
     @Setter(onMethod = @__({@Value("${mr.tasks.item-enrichment-task.history-depth}")}))
     private int historyDepth;
-    @Setter(onMethod = @__({@Value("${azure.cosmosdb.default-ttl}")}))
+    @Setter(onMethod = @__({@Value("${azure.cosmos.default-ttl}")}))
     private Duration defaultTtl;
 
     private final GeodeticCalculator geoCalc = new GeodeticCalculator();

@@ -52,7 +52,7 @@ public class PublicQueueService {
     private Duration defaultTimeToSLA;
     @Value("${mr.items.unlock-timeout}")
     private Duration unlockTimeout;
-    @Value("${azure.cosmosdb.default-ttl}")
+    @Value("${azure.cosmos.default-ttl}")
     private Duration defaultTtl;
 
     public QueueViewDTO getQueue(final String id) throws NotFoundException {

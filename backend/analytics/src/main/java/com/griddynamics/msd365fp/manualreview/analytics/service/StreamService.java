@@ -55,7 +55,7 @@ public class StreamService implements HealthCheckProcessor {
     @Setter(onMethod = @__({@Autowired}))
     private StreamService thisService;
 
-    @Value("${azure.cosmosdb.default-ttl}")
+    @Value("${azure.cosmos.default-ttl}")
     private Duration defaultTtl;
     @Value("${azure.event-hub.health-check-ttl}")
     private Duration healthCheckTtl;

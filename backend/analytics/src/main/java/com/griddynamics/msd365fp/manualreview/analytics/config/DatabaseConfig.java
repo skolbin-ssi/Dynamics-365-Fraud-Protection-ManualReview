@@ -28,7 +28,7 @@ public class DatabaseConfig {
 
     @Bean
     public CosmosDatabase cosmosDatabase(CosmosClient cosmosClient,
-                                         @Value("${azure.cosmosdb.database}") String databaseId) {
+                                         @Value("${azure.cosmos.database}") String databaseId) {
         return cosmosClient.getDatabase(databaseId);
     }
 

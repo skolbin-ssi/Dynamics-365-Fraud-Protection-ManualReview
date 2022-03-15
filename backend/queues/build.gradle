@@ -43,7 +43,6 @@ dependencies {
 //	  Common
     implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.4.0'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'com.nimbusds:nimbus-jose-jwt:7.9'
     implementation 'com.google.guava:guava:25.0-jre'
     implementation 'org.gavaghan:geodesy:1.1.3'
 

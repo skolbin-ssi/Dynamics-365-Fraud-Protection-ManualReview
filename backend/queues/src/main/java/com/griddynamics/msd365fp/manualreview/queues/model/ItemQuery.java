@@ -559,7 +559,11 @@ public class ItemQuery {
                     throw e;
                 }
                 Optional<Integer> optionalCount = res.getContent()
-                        .map(cip -> (int) cip.get("_aggregate").asInt())
+                        .map(cip -> {
+                            if(cip.get("_aggregate")!=null)
+                            return cip.get("_aggregate").asInt();
+                            else return 0;
+                        })
                         .findFirst();
                 return optionalCount.orElse(0);
             };

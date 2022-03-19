@@ -3,6 +3,7 @@
 
 package com.griddynamics.msd365fp.manualreview.analytics.controller;
 
+import com.azure.cosmos.CosmosAsyncClient;
 import com.azure.cosmos.CosmosClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.*;
@@ -55,7 +56,7 @@ public class TestingController {
     private final CollectedQueueInfoRepository queueInfoRepository;
     private final QueueSizeCalculationActivityRepository sizeCalculationActivitiesRepository;
     private final AnalystClient analystClient;
-    private final CosmosClient cosmosClient;
+    private final CosmosAsyncClient cosmosClient;
     private final TaskService taskService;
 
     @Qualifier("cosmosdbObjectMapper")

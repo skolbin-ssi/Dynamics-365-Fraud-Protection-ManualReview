@@ -3,10 +3,7 @@
 
 package com.griddynamics.msd365fp.manualreview.queues.config;
 
-import com.azure.cosmos.CosmosAsyncClient;
-import com.azure.cosmos.CosmosClient;
-import com.azure.cosmos.CosmosClientBuilder;
-import com.azure.cosmos.CosmosDatabase;
+import com.azure.cosmos.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.griddynamics.msd365fp.manualreview.cosmos.utilities.ExtendedCosmosContainer;
 import lombok.RequiredArgsConstructor;
@@ -27,28 +24,23 @@ public class DatabaseConfig {
     private final ObjectMapper jsonMapper;
 
     @Bean
-    public CosmosClient cosmosClient(CosmosClientBuilder cosmosClientBuilder) {
-        return cosmosClientBuilder.buildClient();
-    }
-
-    @Bean
-    public CosmosDatabase cosmosDatabase(CosmosClient cosmosClient,
-                                         @Value("${azure.cosmos.database}") String databaseId) {
+    public CosmosAsyncDatabase cosmosDatabase(CosmosAsyncClient cosmosClient,
+                                              @Value("${azure.cosmos.database}") String databaseId) {
         return cosmosClient.getDatabase(databaseId);
     }
 
     @Bean
-    public ExtendedCosmosContainer itemsContainer(CosmosDatabase cosmosDatabase) {
+    public ExtendedCosmosContainer itemsContainer(CosmosAsyncDatabase cosmosDatabase) {
         return new ExtendedCosmosContainer(cosmosDatabase.getContainer(ITEMS_CONTAINER_NAME), jsonMapper);
     }
 
     @Bean
-    public ExtendedCosmosContainer queuesContainer(CosmosDatabase cosmosDatabase) {
+    public ExtendedCosmosContainer queuesContainer(CosmosAsyncDatabase cosmosDatabase) {
         return new ExtendedCosmosContainer(cosmosDatabase.getContainer(QUEUES_CONTAINER_NAME), jsonMapper);
     }
 
     @Bean
-    public ExtendedCosmosContainer dictionariesContainer(CosmosDatabase cosmosDatabase) {
+    public ExtendedCosmosContainer dictionariesContainer(CosmosAsyncDatabase cosmosDatabase) {
         return new ExtendedCosmosContainer(cosmosDatabase.getContainer(DICTIONARIES_CONTAINER_NAME), jsonMapper);
     }
 }

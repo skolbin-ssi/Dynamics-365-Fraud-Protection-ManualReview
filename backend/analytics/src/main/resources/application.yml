@@ -45,7 +45,7 @@ mr:
     queue-capacity: 25
 
 azure:
-  cosmosdb:
+  cosmos:
     uri: ${COSMOSDB_ENDPOINT}
     key: ${azure-cosmosdb-key:${COSMOSDB_KEY}}
     database: AnalyticsDB

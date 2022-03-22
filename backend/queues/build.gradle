@@ -3,7 +3,7 @@
 
 plugins {
     id 'io.freefair.lombok' version '5.1.1'
-    id 'org.springframework.boot' version '2.3.5.RELEASE'
+    id 'org.springframework.boot' version '2.5.10'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
     id 'com.github.jk1.dependency-license-report' version '1.13'
@@ -29,16 +29,16 @@ repositories {
 }
 
 ext {
-    set('azureVersion', '3.2.0')
+    set('azureVersion', '3.14.0')
     set('appInsightsVersion', '2.6.1')
 }
 
 dependencies {
-    compile project(path: ':model', configuration: 'default')
-    compile project(path: ':cosmos-utilities', configuration: 'default')
-    compile project(path: ':azure-graph-client', configuration: 'default')
-    compile project(path: ':dfp-auth-starter', configuration: 'default')
-    compile project(path: ':durable-ehub-starter', configuration: 'default')
+    implementation project(path: ':model', configuration: 'default')
+    implementation project(path: ':cosmos-utilities', configuration: 'default')
+    implementation project(path: ':azure-graph-client', configuration: 'default')
+    implementation project(path: ':dfp-auth-starter', configuration: 'default')
+    implementation project(path: ':durable-ehub-starter', configuration: 'default')
 
 //	  Common
     implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.4.0'
@@ -52,9 +52,9 @@ dependencies {
     implementation 'org.springframework:spring-webflux'
 
 //    Azure
-    implementation 'com.azure.spring:azure-spring-boot-starter:3.2.0'
-    implementation 'com.azure.spring:azure-spring-boot-starter-cosmos:3.2.0'
-    implementation 'com.azure.spring:azure-spring-boot-starter-keyvault-secrets:3.2.0'
+    implementation 'com.azure.spring:azure-spring-boot-starter:3.14.0'
+    implementation 'com.azure.spring:azure-spring-boot-starter-cosmos:3.14.0'
+    implementation 'com.azure.spring:azure-spring-boot-starter-keyvault-secrets:3.14.0'
 
 
 //    OpenAPI

@@ -14,7 +14,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations.all {
-    resolutionStrategy.force 'com.nimbusds:nimbus-jose-jwt:7.9', 'com.google.guava:guava:25.0-jre'
+    resolutionStrategy.force 'com.google.guava:guava:25.0-jre'
 }
 
 configurations {
@@ -46,7 +46,7 @@ dependencies {
     implementation  project(path: ':dfp-auth-starter', configuration: 'default')
     implementation  project(path: ':durable-ehub-starter', configuration: 'default')
 
-    implementation 'com.nimbusds:nimbus-jose-jwt:7.9'
+    implementation 'com.nimbusds:nimbus-jose-jwt'
     implementation 'com.google.guava:guava:25.0-jre'
     implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.7.1'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'

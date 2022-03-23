@@ -3,8 +3,8 @@
 
 plugins {
     id 'io.freefair.lombok' version '5.1.1'
-    id 'org.springframework.boot' version '2.5.10'
-    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'com.github.jk1.dependency-license-report' version '1.13'
 }
@@ -31,6 +31,13 @@ ext {
     set('azureVersion', '3.14.0')
     set('appInsightsVersion', '2.6.1')
 }
+dependencyManagement {
+    imports
+            {
+                mavenBom "com.azure.spring:azure-spring-boot-bom:${azureVersion}"
+                mavenBom "com.azure.spring:azure-spring-cloud-dependencies:2.14.0"
+            }
+}
 
 dependencies {
     implementation  project(path: ':model', configuration: 'default')
@@ -41,7 +48,7 @@ dependencies {
 
     implementation 'com.nimbusds:nimbus-jose-jwt:7.9'
     implementation 'com.google.guava:guava:25.0-jre'
-    implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.4.0'
+    implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.7.1'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.modelmapper:modelmapper:2.4.3'
     implementation 'org.springframework:spring-webflux'
@@ -53,9 +60,9 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.3.9'
 
 //    Azure
-    implementation 'com.azure.spring:azure-spring-boot-starter:3.14.0'
-    implementation 'com.azure.spring:azure-spring-boot-starter-cosmos:3.14.0'
-    implementation 'com.azure.spring:azure-spring-boot-starter-keyvault-secrets:3.14.0'
+    implementation 'com.azure.spring:azure-spring-boot-starter'
+    implementation 'com.azure.spring:azure-spring-boot-starter-cosmos'
+    implementation 'com.azure.spring:azure-spring-boot-starter-keyvault-secrets'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'

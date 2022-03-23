@@ -3,8 +3,8 @@
 
 plugins {
     id 'io.freefair.lombok' version '5.1.1'
-    id 'org.springframework.boot' version '2.5.10'
-    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+    id 'org.springframework.boot' version '2.5.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'com.github.jk1.dependency-license-report' version '1.13'
 }
@@ -25,13 +25,15 @@ configurations {
 
 repositories {
     mavenCentral()
-    jcenter()
 }
 
 ext {
     set('azureVersion', '3.14.0')
     set('appInsightsVersion', '2.6.1')
 }
+
+dependencyManagement {imports {mavenBom "com.azure.spring:azure-spring-boot-bom:${azureVersion}"}}
+
 
 dependencies {
     implementation project(path: ':model', configuration: 'default')
@@ -41,7 +43,7 @@ dependencies {
     implementation project(path: ':durable-ehub-starter', configuration: 'default')
 
 //	  Common
-    implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.4.0'
+    implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.7.1'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'com.google.guava:guava:25.0-jre'
     implementation 'org.gavaghan:geodesy:1.1.3'
@@ -52,9 +54,9 @@ dependencies {
     implementation 'org.springframework:spring-webflux'
 
 //    Azure
-    implementation 'com.azure.spring:azure-spring-boot-starter:3.14.0'
-    implementation 'com.azure.spring:azure-spring-boot-starter-cosmos:3.14.0'
-    implementation 'com.azure.spring:azure-spring-boot-starter-keyvault-secrets:3.14.0'
+    implementation 'com.azure.spring:azure-spring-boot-starter'
+    implementation 'com.azure.spring:azure-spring-boot-starter-cosmos'
+    implementation 'com.azure.spring:azure-spring-boot-starter-keyvault-secrets'
 
 
 //    OpenAPI
@@ -85,7 +87,7 @@ test {
 
 bootRun {
     // Allows Intellij IDEA run configuration to pass system properties to the
-    // application using `./graldew bootRun` command.
+    // application using `./gradlew bootRun` command.
     systemProperties = System.properties
 }
 

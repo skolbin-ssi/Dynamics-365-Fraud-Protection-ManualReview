@@ -45,7 +45,7 @@ mr:
     queue-capacity: 25
 
 azure:
-  cosmosdb:
+  cosmos:
     uri: ${COSMOSDB_ENDPOINT}
     key: ${azure-cosmosdb-key:${COSMOSDB_KEY}}
     database: AnalyticsDB
@@ -161,4 +161,4 @@ resilience4j.retry:
       maxRetryAttempts: 3
       waitDuration: 0s
       retryExceptions:
-        - com.microsoft.azure.spring.data.cosmosdb.exception.CosmosDBAccessException
+        - com.azure.spring.data.cosmos.exception.CosmosAccessException

@@ -27,7 +27,7 @@ public class CollectedInfoService {
     private final ModelMapper modelMapper;
     private final AnalystClient analystClient;
 
-    @Value("${azure.cosmosdb.default-ttl}")
+    @Value("${azure.cosmos.default-ttl}")
     private Duration defaultTtl;
 
     public boolean collectAnalystInfo() {

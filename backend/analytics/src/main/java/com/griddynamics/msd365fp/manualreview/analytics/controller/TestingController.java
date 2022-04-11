@@ -3,7 +3,8 @@
 
 package com.griddynamics.msd365fp.manualreview.analytics.controller;
 
-import com.azure.data.cosmos.CosmosClient;
+import com.azure.cosmos.CosmosAsyncClient;
+import com.azure.cosmos.CosmosClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.griddynamics.msd365fp.manualreview.analytics.model.persistence.*;
 import com.griddynamics.msd365fp.manualreview.analytics.repository.*;
@@ -55,7 +56,7 @@ public class TestingController {
     private final CollectedQueueInfoRepository queueInfoRepository;
     private final QueueSizeCalculationActivityRepository sizeCalculationActivitiesRepository;
     private final AnalystClient analystClient;
-    private final CosmosClient cosmosClient;
+    private final CosmosAsyncClient cosmosClient;
     private final TaskService taskService;
 
     @Qualifier("cosmosdbObjectMapper")
@@ -85,7 +86,7 @@ public class TestingController {
                 "FROM c where " +
                 "c.active=true) " +
                 "AS root")
-                .map(cip -> queueCon.castCosmosObjectToClassInstance(cip.toJson(), Queue.class))
+                .map(cip -> queueCon.castCosmosObjectToClassInstance(cip, Queue.class))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -158,7 +159,7 @@ public class TestingController {
                 "FROM c where " +
                 "c.active=true) " +
                 "AS root")
-                .map(cip -> queueCon.castCosmosObjectToClassInstance(cip.toJson(), Queue.class))
+                .map(cip -> queueCon.castCosmosObjectToClassInstance(cip, Queue.class))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
@@ -196,7 +197,7 @@ public class TestingController {
                 "FROM c where " +
                 "c.active=true) " +
                 "AS root")
-                .map(cip -> queueCon.castCosmosObjectToClassInstance(cip.toJson(), Queue.class))
+                .map(cip -> queueCon.castCosmosObjectToClassInstance(cip, Queue.class))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());

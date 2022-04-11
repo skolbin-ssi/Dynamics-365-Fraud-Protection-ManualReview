@@ -102,7 +102,7 @@ logging:
               aad: ERROR
 
 azure:
-  cosmosdb:
+  cosmos:
     uri: ${COSMOSDB_ENDPOINT}
     key: ${azure-cosmosdb-key:${COSMOSDB_KEY}}
     database: QueuesDB
@@ -242,11 +242,9 @@ resilience4j.retry:
       maxRetryAttempts: 30
       waitDuration: 10ms
       retryExceptions:
-        - com.microsoft.azure.spring.data.cosmosdb.exception.CosmosDBAccessException
-        - com.azure.data.cosmos.CosmosClientException
+        - com.azure.spring.data.cosmos.exception.CosmosAccessException
     cosmosOptimisticUpdate:
       maxRetryAttempts: 3
       waitDuration: 100ms
       retryExceptions:
-        - com.microsoft.azure.spring.data.cosmosdb.exception.CosmosDBAccessException
-        - com.azure.data.cosmos.CosmosClientException
+        - com.azure.spring.data.cosmos.exception.CosmosAccessException

@@ -55,7 +55,7 @@ public class PublicItemService {
     private final ModelMapper modelMapper;
     private final DFPExplorerService dfpExplorerService;
 
-    @Setter(onMethod = @__({@Value("${azure.cosmosdb.default-ttl}")}))
+    @Setter(onMethod = @__({@Value("${azure.cosmos.default-ttl}")}))
     private Duration defaultTtl;
 
     public ItemDTO getItem(@NonNull final String itemId, @Nullable final String queueId) throws NotFoundException {

@@ -195,6 +195,20 @@ function GetTenantShortName {
     }
 }
 
+# Create an application key
+# See https://www.sabin.io/blog/adding-an-azure-active-directory-application-and-key-using-powershell/
+function CreateAppKey([DateTime] $fromDate, [double] $durationInYears, [string]$pw)
+{
+    $endDate = $fromDate.AddYears($durationInYears) 
+    $keyId = (New-Guid).ToString();
+    $key = New-Object Microsoft.Open.AzureAD.Model.PasswordCredential
+    $key.StartDate = $fromDate
+    $key.EndDate = $endDate
+    $key.Value = $pw
+    $key.KeyId = $keyId
+    return $key
+}
+
 function CreateMapApp {
     param (
         [string] $mapAppName,
@@ -203,17 +217,23 @@ function CreateMapApp {
 
     Write-Host "= Create application"
 
-	$mapAppName
-    if (!($mapApp = Get-AzADApplication -DisplayName $mapAppName)) {
+	if (!($mapApp = Get-AzADApplication -DisplayName $mapAppName)) {			
+		
         $mapApp = New-AzADApplication `
             -DisplayName $mapAppName `
-            -Password $mapAppSecurePassword `
-            -IdentifierUris "http://${mapAppName}"
+           
+        Write-Host "= Update application identifier uri and password"
+		
+		$startDate = Get-Date
+		
+		$key = CreateAppKey -fromDate $startDate -durationInYears 2 -pw $mapAppSecurePassword
 
-        Write-Host "= Update application identifier uri"
+		$passCredenials = New-AzADAppCredential -ObjectId $mapApp.AppId -PasswordCredentials $mapAppSecurePassword 	
+			
         Update-AzADApplication `
             -ApplicationId $mapApp.AppId `
-            -IdentifierUri "api://$($mapApp.AppId)"
+			-PasswordCredentials $passCredenials `
+            -IdentifierUri "api://$($mapApp.AppId)", "http://${mapAppName}"
     } else {
         Write-Host "Application is already exist"
     }
@@ -223,8 +243,7 @@ function CreateMapApp {
         $mapSp = New-AzADServicePrincipal `
             -DisplayName $mapAppName `
             -ApplicationId $mapApp.AppId `
-            -SkipAssignment
-    } else {
+     } else {
         Write-Host "Service principal is already exist"
     }
 
